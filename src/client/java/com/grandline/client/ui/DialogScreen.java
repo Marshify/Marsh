@@ -34,8 +34,8 @@ public class DialogScreen extends Screen {
 		int buttonWidth = Math.min(150, width / 3);
 		int buttonHeight = 20;
 		int x = width - buttonWidth - 12;
-		int bottomOfButtons = height - 70;
-		int y = bottomOfButtons - options.size() * (buttonHeight + 4);
+		int total = options.size() * (buttonHeight + 4);
+		int y = Math.max(8, Math.min(height - 80 - total, height / 2 - total / 2 - 10));
 		for (Option option : options) {
 			addRenderableWidget(new GoldButton(x, y, buttonWidth, buttonHeight, option.label(), b -> {
 				option.action().run();

@@ -42,6 +42,9 @@ public final class ProfileHud {
 		if (view == null || client.player == null || client.options.hideGui || client.options.renderDebug) {
 			return;
 		}
+		if (client.screen != null && client.screen.getClass().getName().startsWith("com.grandline.")) {
+			return; // our own screens have their own layout; avoid overlapping panels
+		}
 
 		// Draw in front of anything else on the GUI layer (items in particular render with depth).
 		graphics.pose().pushPose();
