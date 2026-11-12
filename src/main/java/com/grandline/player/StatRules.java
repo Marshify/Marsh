@@ -4,12 +4,31 @@ import com.grandline.config.GrandLineConfig;
 
 /**
  * Pure stat maths: allocation validation and derived bonuses. No Minecraft state, so it is unit tested directly.
+ *
+ * <p>Every bonus follows a {@link Curve}: the first {@code earlyPoints} points are worth {@code early} each, later
+ * points {@code late} each, and the total is capped. This makes the first points noticeable without making maxed
+ * players absurdly strong.
  */
-public record StatRules(int maxPointsPerStat, double defenseHealthPerPoint, double maxBonusHealth,
-		double meleeDamagePerPoint, double swordDamagePerPoint, double maxBonusDamage) {
+public record StatRules(int maxPointsPerStat, Curve health, Curve melee, Curve sword, Curve abilityPower) {
+	/** Diminishing-returns curve. */
+	public record Curve(int earlyPoints, double early, double late, double cap) {
+		public double value(int points) {
+			if (points <= 0) {
+				return 0.0;
+			}
+			int earlyCount = Math.min(points, earlyPoints);
+			int lateCount = points - earlyCount;
+			return Math.min(cap, earlyCount * early + lateCount * late);
+		}
+	}
+
 	public static StatRules fromConfig(GrandLineConfig config) {
-		return new StatRules(config.maxPointsPerStat, config.defenseHealthPerPoint, config.maxBonusHealth,
-				config.meleeDamagePerPoint, config.swordDamagePerPoint, config.maxBonusDamage);
+		int earlyPoints = config.statEarlyPoints;
+		return new StatRules(config.maxPointsPerStat,
+				new Curve(earlyPoints, config.defenseHealthPerPoint, config.defenseHealthPerLatePoint, config.maxBonusHealth),
+				new Curve(earlyPoints, config.meleeDamagePerPoint, config.meleeDamagePerLatePoint, config.maxBonusDamage),
+				new Curve(earlyPoints, config.swordDamagePerPoint, config.swordDamagePerLatePoint, config.maxBonusDamage),
+				new Curve(earlyPoints, config.abilityPowerPerPoint, config.abilityPowerPerLatePoint, config.maxAbilityPower));
 	}
 
 	public enum AllocationResult {
@@ -54,16 +73,21 @@ public record StatRules(int maxPointsPerStat, double defenseHealthPerPoint, doub
 
 	/** Bonus max health (in half-hearts) granted by Defense. */
 	public double bonusHealth(PlayerStats stats) {
-		return Math.min(maxBonusHealth, stats.get(StatType.DEFENSE) * defenseHealthPerPoint);
+		return health.value(stats.get(StatType.DEFENSE));
 	}
 
 	/** Bonus attack damage while the main hand is empty. */
 	public double bonusMeleeDamage(PlayerStats stats) {
-		return Math.min(maxBonusDamage, stats.get(StatType.MELEE) * meleeDamagePerPoint);
+		return melee.value(stats.get(StatType.MELEE));
 	}
 
 	/** Bonus attack damage while holding a sword. */
 	public double bonusSwordDamage(PlayerStats stats) {
-		return Math.min(maxBonusDamage, stats.get(StatType.SWORD) * swordDamagePerPoint);
+		return sword.value(stats.get(StatType.SWORD));
+	}
+
+	/** Damage multiplier for moves powered by {@code stat} (Melee for fighting styles, Fruit for fruits). */
+	public double abilityMultiplier(PlayerStats stats, StatType stat) {
+		return 1.0 + abilityPower.value(stats.get(stat));
 	}
 }

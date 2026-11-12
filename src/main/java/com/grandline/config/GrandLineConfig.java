@@ -2,6 +2,8 @@ package com.grandline.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonParseException;
 import com.grandline.GrandLineMod;
 
@@ -23,6 +25,14 @@ import java.nio.file.StandardCopyOption;
 public final class GrandLineConfig {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
+	/**
+	 * Config schema version. 1 = milestone 1/2 values; 2 = rebalanced stats with diminishing returns and ability
+	 * settings. Older files have balance keys reset to the new defaults once, other keys are kept.
+	 */
+	public static final int CURRENT_CONFIG_VERSION = 2;
+
+	public int configVersion = CURRENT_CONFIG_VERSION;
+
 	/** Highest level a player can reach. */
 	public int maxLevel = 2800;
 	/** Unallocated stat points granted per level gained. */
@@ -38,19 +48,35 @@ public final class GrandLineConfig {
 	/** Minimum number of server ticks between two accepted requests of the same type from one player. */
 	public int requestCooldownTicks = 4;
 
-	// --- Stats (milestone 2) ---
+	// --- Stats ---
+	// Every stat uses diminishing returns: the first statEarlyPoints points give the "PerPoint" value each, every
+	// point after that gives the "PerLatePoint" value, and the total is capped.
 	/** Maximum points that can be invested in a single stat. */
 	public int maxPointsPerStat = 2800;
-	/** Extra max health (half-hearts) per Defense point. */
-	public double defenseHealthPerPoint = 0.2;
-	/** Upper bound for the Defense health bonus. */
+	/** Number of points per stat that give the full (early) bonus. */
+	public int statEarlyPoints = 20;
+	/** Extra max health (half-hearts) per early Defense point. */
+	public double defenseHealthPerPoint = 1.0;
+	/** Extra max health (half-hearts) per Defense point after the early points. */
+	public double defenseHealthPerLatePoint = 0.05;
+	/** Upper bound for the Defense health bonus (half-hearts). */
 	public double maxBonusHealth = 200.0;
-	/** Extra attack damage per Melee point, applied while the main hand is empty. */
-	public double meleeDamagePerPoint = 0.05;
-	/** Extra attack damage per Sword point, applied while holding a sword. */
-	public double swordDamagePerPoint = 0.05;
+	/** Extra fist damage per early Melee point (empty main hand). */
+	public double meleeDamagePerPoint = 0.25;
+	/** Extra fist damage per Melee point after the early points. */
+	public double meleeDamagePerLatePoint = 0.02;
+	/** Extra damage per early Sword point (holding a sword). */
+	public double swordDamagePerPoint = 0.25;
+	/** Extra damage per Sword point after the early points. */
+	public double swordDamagePerLatePoint = 0.02;
 	/** Upper bound for the Melee and Sword damage bonuses. */
-	public double maxBonusDamage = 100.0;
+	public double maxBonusDamage = 60.0;
+	/** Ability power (fraction, 0.02 = +2%) per early Melee point (fighting style moves) or Fruit point (fruit moves). */
+	public double abilityPowerPerPoint = 0.02;
+	/** Ability power per point after the early points. */
+	public double abilityPowerPerLatePoint = 0.002;
+	/** Upper bound for ability power (3.0 = +300% damage). */
+	public double maxAbilityPower = 3.0;
 
 	// --- Mob kill rewards (milestone 2) ---
 	/** Experience granted per point of the killed hostile mob's max health. */
@@ -75,8 +101,12 @@ public final class GrandLineConfig {
 
 		if (Files.exists(path)) {
 			try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-				GrandLineConfig loaded = GSON.fromJson(reader, GrandLineConfig.class);
+				JsonElement json = JsonParser.parseReader(reader);
+				GrandLineConfig loaded = GSON.fromJson(json, GrandLineConfig.class);
 				if (loaded != null) {
+					int fileVersion = json.isJsonObject() && json.getAsJsonObject().has("configVersion")
+							? json.getAsJsonObject().get("configVersion").getAsInt() : 1;
+					loaded.migrateFrom(fileVersion);
 					config = loaded;
 				}
 			} catch (IOException | JsonParseException e) {
@@ -88,6 +118,20 @@ public final class GrandLineConfig {
 		config.validate();
 		save(path, config);
 		return config;
+	}
+
+	/** Upgrades values written by an older version of the mod. */
+	void migrateFrom(int fileVersion) {
+		if (fileVersion < 2) {
+			GrandLineConfig fresh = defaults();
+			defenseHealthPerPoint = fresh.defenseHealthPerPoint;
+			meleeDamagePerPoint = fresh.meleeDamagePerPoint;
+			swordDamagePerPoint = fresh.swordDamagePerPoint;
+			maxBonusDamage = fresh.maxBonusDamage;
+			GrandLineMod.LOGGER.info("Migrated config from version {} to {} (stat balance reset to new defaults)", fileVersion,
+					CURRENT_CONFIG_VERSION);
+		}
+		configVersion = CURRENT_CONFIG_VERSION;
 	}
 
 	/** Clamps every value into a safe range. */
@@ -105,6 +149,13 @@ public final class GrandLineConfig {
 		meleeDamagePerPoint = clamp(meleeDamagePerPoint, 0, 100);
 		swordDamagePerPoint = clamp(swordDamagePerPoint, 0, 100);
 		maxBonusDamage = clamp(maxBonusDamage, 0, 2000);
+		statEarlyPoints = clamp(statEarlyPoints, 0, 1_000_000);
+		defenseHealthPerLatePoint = clamp(defenseHealthPerLatePoint, 0, 100);
+		meleeDamagePerLatePoint = clamp(meleeDamagePerLatePoint, 0, 100);
+		swordDamagePerLatePoint = clamp(swordDamagePerLatePoint, 0, 100);
+		abilityPowerPerPoint = clamp(abilityPowerPerPoint, 0, 10);
+		abilityPowerPerLatePoint = clamp(abilityPowerPerLatePoint, 0, 10);
+		maxAbilityPower = clamp(maxAbilityPower, 0, 100);
 		experiencePerMobHealth = clamp(experiencePerMobHealth, 0, 1_000_000);
 		currencyPerMobHealth = clamp(currencyPerMobHealth, 0, 1_000_000);
 		maxKillExperiencePerMinute = clamp(maxKillExperiencePerMinute, 0, Long.MAX_VALUE / 2);
