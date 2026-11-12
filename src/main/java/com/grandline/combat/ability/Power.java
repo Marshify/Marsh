@@ -6,17 +6,19 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 
 /**
- * A fighting style or a fruit: an id, the stat that scales its damage, and exactly four moves (Z, X, C, V).
+ * A fighting style or a fruit: an id, the stat that scales its damage, and four moves (Z, X, C, V) plus an optional
+ * fifth utility move (R).
  *
  * @param rarity display rarity (fruits); fighting styles use {@code "style"}
  * @param color  HUD/UI accent colour (0xRRGGBB)
  */
 public record Power(ResourceLocation id, PowerSource source, StatType scalingStat, String rarity, int color, List<AbilityDef> abilities) {
-	public static final int SLOT_COUNT = 4;
+	public static final int SLOT_COUNT = 5;
+	public static final int MIN_ABILITIES = 4;
 
 	public Power {
-		if (abilities.size() != SLOT_COUNT) {
-			throw new IllegalArgumentException(id + " must have exactly " + SLOT_COUNT + " abilities");
+		if (abilities.size() < MIN_ABILITIES || abilities.size() > SLOT_COUNT) {
+			throw new IllegalArgumentException(id + " must have " + MIN_ABILITIES + "-" + SLOT_COUNT + " abilities");
 		}
 		abilities = List.copyOf(abilities);
 	}

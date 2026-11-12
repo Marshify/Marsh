@@ -6,6 +6,9 @@ import com.grandline.combat.style.FightingStyles;
 import com.grandline.command.GrandLineCommands;
 import com.grandline.config.GrandLineConfig;
 import com.grandline.data.ModAttachments;
+import com.grandline.fruit.FruitService;
+import com.grandline.fruit.Fruits;
+import com.grandline.fruit.LingeringAreas;
 import com.grandline.network.GrandLineNetworking;
 import com.grandline.player.PlayerProfileEvents;
 import com.grandline.player.reward.MobKillRewards;
@@ -38,11 +41,14 @@ public final class GrandLineMod implements ModInitializer {
 		ModCreativeTabs.register();
 		ModAttachments.register();
 		FightingStyles.register();
+		Fruits.register();
 		GrandLineNetworking.registerServerReceivers();
 		PlayerProfileEvents.register();
 		StatEffects.register();
 		EnergyService.register();
 		MobKillRewards.register();
+		LingeringAreas.register();
+		FruitService.register();
 		GrandLineCommands.register();
 
 		LOGGER.info("Grand Line {} initialized", modVersion());

@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PlayerProfileCodecTest {
 	private static final PlayerProfile SAMPLE = new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 42, 1234L, 987_654_321L, 17,
 			PlayerStats.EMPTY.with(StatType.MELEE, 30).with(StatType.DEFENSE, 12).with(StatType.FRUIT, 5),
-			new PowerState("grandline:brawler", "grandline:ember", java.util.Map.of("grandline:brawler", 120L, "grandline:ember", 7L)));
+			new PowerState("grandline:brawler", "grandline:ember", java.util.Map.of("grandline:brawler", 120L, "grandline:ember", 7L),
+					java.util.Map.of("grandline:gale", 2), 123_456L));
 
 	@Test
 	void nbtRoundTripPreservesEveryField() {

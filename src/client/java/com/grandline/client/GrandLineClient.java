@@ -15,5 +15,6 @@ public final class GrandLineClient implements ClientModInitializer {
 		GrandLineClientCommands.register();
 		GrandLineKeys.register();
 		ProfileHud.register();
+		com.grandline.client.screen.FruitDialogs.register();
 	}
 }

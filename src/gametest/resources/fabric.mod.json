@@ -10,7 +10,8 @@
 		"fabric-gametest": [
 			"com.grandline.test.GrandLineServerGameTests",
 			"com.grandline.test.GrandLineStatsGameTests",
-			"com.grandline.test.GrandLineAbilityGameTests"
+			"com.grandline.test.GrandLineAbilityGameTests",
+			"com.grandline.test.GrandLineFruitGameTests"
 		]
 	},
 	"depends": {

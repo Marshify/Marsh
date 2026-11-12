@@ -93,6 +93,24 @@ public final class GrandLineConfig {
 	/** Fraction of max energy regenerated per second. */
 	public double energyRegenPerSecond = 0.08;
 
+	// --- Fruits (milestone 4) ---
+	/** Shop price per rarity: common, uncommon, rare, legendary, mythical. */
+	public long[] fruitPrices = {2_500, 10_000, 40_000, 150_000, 500_000};
+	/** Currency cost of one gacha roll. */
+	public long gachaCost = 5_000;
+	/** Minutes a player must wait between gacha rolls. */
+	public int gachaCooldownMinutes = 30;
+	/** How many fruits the dealer offers at once. */
+	public int dealerStockSize = 3;
+	/** Minutes between dealer stock rotations. */
+	public int dealerRotationMinutes = 240;
+	/** Most fruits a player can keep in their stash. */
+	public int stashCapacity = 20;
+	/** Average minutes between natural fruit spawns near a random online player (0 disables). */
+	public int naturalFruitSpawnMinutes = 60;
+	/** Currency cost to refund (reset) all stat points. 0 = free. */
+	public long statRefundCost = 1_000;
+
 	// --- Mob kill rewards (milestone 2) ---
 	/** Experience granted per point of the killed hostile mob's max health. */
 	public double experiencePerMobHealth = 1.0;
@@ -177,6 +195,19 @@ public final class GrandLineConfig {
 		baseEnergy = clamp(baseEnergy, 1, 1_000_000);
 		energyPerLevel = clamp(energyPerLevel, 0, 10_000);
 		energyRegenPerSecond = clamp(energyRegenPerSecond, 0, 10);
+		if (fruitPrices == null || fruitPrices.length != 5) {
+			fruitPrices = defaults().fruitPrices;
+		}
+		for (int i = 0; i < fruitPrices.length; i++) {
+			fruitPrices[i] = clamp(fruitPrices[i], 0, maxCurrency);
+		}
+		gachaCost = clamp(gachaCost, 0, maxCurrency);
+		gachaCooldownMinutes = clamp(gachaCooldownMinutes, 0, 60 * 24 * 7);
+		dealerStockSize = clamp(dealerStockSize, 1, 6);
+		dealerRotationMinutes = clamp(dealerRotationMinutes, 1, 60 * 24 * 7);
+		stashCapacity = clamp(stashCapacity, 0, 1000);
+		naturalFruitSpawnMinutes = clamp(naturalFruitSpawnMinutes, 0, 60 * 24 * 7);
+		statRefundCost = clamp(statRefundCost, 0, maxCurrency);
 		experiencePerMobHealth = clamp(experiencePerMobHealth, 0, 1_000_000);
 		currencyPerMobHealth = clamp(currencyPerMobHealth, 0, 1_000_000);
 		maxKillExperiencePerMinute = clamp(maxKillExperiencePerMinute, 0, Long.MAX_VALUE / 2);

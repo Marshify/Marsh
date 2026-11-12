@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
  * cooldown → energy → execute → cooldown + mastery experience. Every check uses server data only.
  */
 public final class AbilityActivationHandler {
-	/** Number of move slots (Z, X, C, V). */
+	/** Number of move slots (Z, X, C, V, R). */
 	public static final int SLOT_COUNT = Power.SLOT_COUNT;
 
 	private AbilityActivationHandler() {
@@ -56,6 +56,10 @@ public final class AbilityActivationHandler {
 			return Outcome.NO_POWER;
 		}
 
+		if (request.slot() >= power.abilities().size()) {
+			ServerRequestGuard.reject(player, AbilityActivationRequestPayload.TYPE, ServerRequestGuard.Result.REJECTED_INVALID);
+			return Outcome.INVALID_SLOT;
+		}
 		AbilityDef ability = power.abilities().get(request.slot());
 		int mastery = masteryRules().level(profile.powers().masteryXp(power.id().toString()));
 		if (mastery < ability.requiredMastery()) {
