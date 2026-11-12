@@ -1,6 +1,8 @@
 package com.grandline;
 
+import com.grandline.combat.EnergyService;
 import com.grandline.combat.StatEffects;
+import com.grandline.combat.style.FightingStyles;
 import com.grandline.command.GrandLineCommands;
 import com.grandline.config.GrandLineConfig;
 import com.grandline.data.ModAttachments;
@@ -35,9 +37,11 @@ public final class GrandLineMod implements ModInitializer {
 		ModItems.register();
 		ModCreativeTabs.register();
 		ModAttachments.register();
+		FightingStyles.register();
 		GrandLineNetworking.registerServerReceivers();
 		PlayerProfileEvents.register();
 		StatEffects.register();
+		EnergyService.register();
 		MobKillRewards.register();
 		GrandLineCommands.register();
 

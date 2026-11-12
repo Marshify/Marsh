@@ -3,9 +3,11 @@ package com.grandline.client.network;
 import com.grandline.GrandLineMod;
 import com.grandline.client.ClientProfileCache;
 import com.grandline.combat.ability.AbilityActivationHandler;
+import com.grandline.combat.ability.PowerSource;
 import com.grandline.network.payload.AbilityActivationRequestPayload;
 import com.grandline.network.payload.AllocateStatPayload;
 import com.grandline.network.payload.CooldownSyncPayload;
+import com.grandline.network.payload.EnergySyncPayload;
 import com.grandline.network.payload.ProfileSyncPayload;
 import com.grandline.network.payload.RequestProfileSyncPayload;
 import com.grandline.player.StatType;
@@ -29,6 +31,9 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(CooldownSyncPayload.TYPE,
 				(packet, player, responseSender) -> ClientProfileCache.acceptCooldowns(packet.cooldowns()));
 
+		ClientPlayNetworking.registerGlobalReceiver(EnergySyncPayload.TYPE,
+				(packet, player, responseSender) -> ClientProfileCache.acceptEnergy(packet.current(), packet.max()));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientProfileCache.clear());
 	}
 
@@ -50,12 +55,12 @@ public final class ClientNetworking {
 		return true;
 	}
 
-	/** Sends an ability activation intent for a hotbar slot. The server decides what (if anything) happens. */
-	public static boolean requestAbilityActivation(int slot) {
+	/** Sends a move activation intent. The server decides what (if anything) happens. */
+	public static boolean requestAbilityActivation(PowerSource source, int slot) {
 		if (slot < 0 || slot >= AbilityActivationHandler.SLOT_COUNT || !ClientPlayNetworking.canSend(AbilityActivationRequestPayload.TYPE)) {
 			return false;
 		}
-		ClientPlayNetworking.send(new AbilityActivationRequestPayload(slot));
+		ClientPlayNetworking.send(new AbilityActivationRequestPayload(source.ordinal(), slot));
 		return true;
 	}
 }

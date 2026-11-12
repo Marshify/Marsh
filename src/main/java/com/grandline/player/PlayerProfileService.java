@@ -2,6 +2,10 @@ package com.grandline.player;
 
 import com.grandline.GrandLineMod;
 import com.grandline.combat.StatEffects;
+import com.grandline.combat.ability.AbilityActivationHandler;
+import com.grandline.combat.ability.AbilityDef;
+import com.grandline.combat.ability.MasteryRules;
+import com.grandline.combat.ability.Power;
 import com.grandline.data.ModAttachments;
 import com.grandline.network.payload.ProfileSyncPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -79,6 +83,34 @@ public final class PlayerProfileService {
 		return result[0];
 	}
 
+	/**
+	 * Adds mastery experience for {@code power} and announces newly unlocked moves.
+	 */
+	public static PlayerProfile addMastery(ServerPlayer player, Power power, long experience) {
+		String id = power.id().toString();
+		MasteryRules rules = AbilityActivationHandler.masteryRules();
+		int before = rules.level(get(player).powers().masteryXp(id));
+		PlayerProfile after = update(player, profile -> profile.withPowers(
+				profile.powers().withMasteryXp(id, profile.powers().masteryXp(id) + experience)));
+		int now = rules.level(after.powers().masteryXp(id));
+		if (now > before) {
+			for (AbilityDef ability : power.abilities()) {
+				if (ability.requiredMastery() > before && ability.requiredMastery() <= now) {
+					player.sendSystemMessage(Component.translatable("message.grandline.ability.unlocked",
+							Component.translatable(ability.translationKey()), Component.translatable(power.translationKey()))
+							.withStyle(ChatFormatting.LIGHT_PURPLE));
+				}
+			}
+		}
+		return after;
+	}
+
+	/** Sets mastery level directly (admin). */
+	public static PlayerProfile setMasteryLevel(ServerPlayer player, Power power, int level) {
+		long xp = (long) Math.max(0, level) * AbilityActivationHandler.masteryRules().experiencePerLevel();
+		return update(player, profile -> profile.withPowers(profile.powers().withMasteryXp(power.id().toString(), xp)));
+	}
+
 	public static PlayerProfile resetStats(ServerPlayer player) {
 		return update(player, profile -> statRules().resetStats(profile));
 	}
@@ -98,7 +130,7 @@ public final class PlayerProfileService {
 	/** Sends the authoritative profile to the owning client, if it has the mod installed. */
 	public static void sync(ServerPlayer player) {
 		if (ServerPlayNetworking.canSend(player, ProfileSyncPayload.TYPE)) {
-			ServerPlayNetworking.send(player, ProfileSyncPayload.of(get(player), rules(), statRules()));
+			ServerPlayNetworking.send(player, ProfileSyncPayload.of(get(player), rules(), statRules(), AbilityActivationHandler.masteryRules()));
 		}
 	}
 }

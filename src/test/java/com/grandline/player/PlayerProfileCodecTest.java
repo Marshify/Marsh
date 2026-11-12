@@ -13,7 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PlayerProfileCodecTest {
 	private static final PlayerProfile SAMPLE = new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 42, 1234L, 987_654_321L, 17,
-			PlayerStats.EMPTY.with(StatType.MELEE, 30).with(StatType.DEFENSE, 12).with(StatType.FRUIT, 5));
+			PlayerStats.EMPTY.with(StatType.MELEE, 30).with(StatType.DEFENSE, 12).with(StatType.FRUIT, 5),
+			new PowerState("grandline:brawler", "grandline:ember", java.util.Map.of("grandline:brawler", 120L, "grandline:ember", 7L)));
 
 	@Test
 	void nbtRoundTripPreservesEveryField() {
@@ -37,7 +38,7 @@ class PlayerProfileCodecTest {
 		json.addProperty("unallocated_stat_points", -8);
 
 		PlayerProfile decoded = PlayerProfile.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, message -> { });
-		assertEquals(new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 1, 0, 0, 0, PlayerStats.EMPTY), decoded);
+		assertEquals(new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 1, 0, 0, 0, PlayerStats.EMPTY, PowerState.DEFAULT), decoded);
 	}
 
 	/** A save written by milestone 1 (data version 1, no stats; data_version omitted because it was the default). */
@@ -50,7 +51,7 @@ class PlayerProfileCodecTest {
 		v1.putInt("unallocated_stat_points", 6);
 
 		PlayerProfile migrated = PlayerProfile.CODEC.parse(NbtOps.INSTANCE, v1).getOrThrow(false, message -> { });
-		assertEquals(new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 3, 10L, 777L, 6, PlayerStats.EMPTY), migrated);
+		assertEquals(new PlayerProfile(PlayerProfile.CURRENT_DATA_VERSION, 3, 10L, 777L, 6, PlayerStats.EMPTY, PowerState.DEFAULT), migrated);
 	}
 
 	@Test

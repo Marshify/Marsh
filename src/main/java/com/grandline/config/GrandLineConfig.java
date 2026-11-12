@@ -78,6 +78,21 @@ public final class GrandLineConfig {
 	/** Upper bound for ability power (3.0 = +300% damage). */
 	public double maxAbilityPower = 3.0;
 
+	// --- Abilities & mastery (milestone 3) ---
+	/** Mastery experience per mastery level. */
+	public long masteryExperiencePerLevel = 25;
+	/** Highest mastery level. */
+	public int maxMastery = 600;
+	/** Mastery experience per entity hit by a move. */
+	public long masteryExperiencePerHit = 5;
+
+	/** Max energy at level 1. */
+	public double baseEnergy = 100.0;
+	/** Extra max energy per level above 1. */
+	public double energyPerLevel = 2.0;
+	/** Fraction of max energy regenerated per second. */
+	public double energyRegenPerSecond = 0.08;
+
 	// --- Mob kill rewards (milestone 2) ---
 	/** Experience granted per point of the killed hostile mob's max health. */
 	public double experiencePerMobHealth = 1.0;
@@ -156,6 +171,12 @@ public final class GrandLineConfig {
 		abilityPowerPerPoint = clamp(abilityPowerPerPoint, 0, 10);
 		abilityPowerPerLatePoint = clamp(abilityPowerPerLatePoint, 0, 10);
 		maxAbilityPower = clamp(maxAbilityPower, 0, 100);
+		masteryExperiencePerLevel = clamp(masteryExperiencePerLevel, 1, 1_000_000);
+		maxMastery = clamp(maxMastery, 1, 100_000);
+		masteryExperiencePerHit = clamp(masteryExperiencePerHit, 0, 1_000_000);
+		baseEnergy = clamp(baseEnergy, 1, 1_000_000);
+		energyPerLevel = clamp(energyPerLevel, 0, 10_000);
+		energyRegenPerSecond = clamp(energyRegenPerSecond, 0, 10);
 		experiencePerMobHealth = clamp(experiencePerMobHealth, 0, 1_000_000);
 		currencyPerMobHealth = clamp(currencyPerMobHealth, 0, 1_000_000);
 		maxKillExperiencePerMinute = clamp(maxKillExperiencePerMinute, 0, Long.MAX_VALUE / 2);

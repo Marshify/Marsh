@@ -53,7 +53,7 @@ public record ProgressionRules(int maxLevel, int statPointsPerLevel, long baseEx
 		}
 
 		int points = saturatedAddInt(profile.unallocatedStatPoints(), saturatedMultiplyInt(levelsGained, statPointsPerLevel));
-		return new PlayerProfile(profile.dataVersion(), level, experience, profile.currency(), points, profile.stats());
+		return new PlayerProfile(profile.dataVersion(), level, experience, profile.currency(), points, profile.stats(), profile.powers());
 	}
 
 	/**
@@ -64,7 +64,7 @@ public record ProgressionRules(int maxLevel, int statPointsPerLevel, long baseEx
 		int clamped = Math.max(PlayerProfile.MIN_LEVEL, Math.min(maxLevel, newLevel));
 		int delta = clamped - profile.level();
 		int points = Math.max(0, saturatedAddInt(profile.unallocatedStatPoints(), saturatedMultiplyInt(delta, statPointsPerLevel)));
-		return new PlayerProfile(profile.dataVersion(), clamped, 0L, profile.currency(), points, profile.stats());
+		return new PlayerProfile(profile.dataVersion(), clamped, 0L, profile.currency(), points, profile.stats(), profile.powers());
 	}
 
 	/** Adds (or with a negative amount, removes) currency, clamped to {@code [0, maxCurrency]}. */

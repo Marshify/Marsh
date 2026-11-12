@@ -9,7 +9,8 @@
 	"entrypoints": {
 		"fabric-gametest": [
 			"com.grandline.test.GrandLineServerGameTests",
-			"com.grandline.test.GrandLineStatsGameTests"
+			"com.grandline.test.GrandLineStatsGameTests",
+			"com.grandline.test.GrandLineAbilityGameTests"
 		]
 	},
 	"depends": {

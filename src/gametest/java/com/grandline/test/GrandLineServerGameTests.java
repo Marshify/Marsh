@@ -79,11 +79,11 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 		PlayerProfile before = PlayerProfileService.get(player);
 		long rejectedBefore = ServerRequestGuard.rejectedCount();
 
-		assertEqual(helper, AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(-1)),
+		assertEqual(helper, AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(0, -1)),
 				AbilityActivationHandler.Outcome.INVALID_SLOT, "negative slot");
 
 		// Immediately repeated request (same tick) hits the rate limit when requestCooldownTicks > 0.
-		AbilityActivationHandler.Outcome spam = AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(0));
+		AbilityActivationHandler.Outcome spam = AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(0, 0));
 		if (GrandLineMod.config().requestCooldownTicks > 0) {
 			assertEqual(helper, spam, AbilityActivationHandler.Outcome.REJECTED_BY_GUARD, "spammed request");
 		}
@@ -92,8 +92,8 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 		assertEqual(helper, PlayerProfileService.get(player), before, "profile unchanged by client requests");
 
 		helper.runAfterDelay(GrandLineMod.config().requestCooldownTicks + 1, () -> {
-			assertEqual(helper, AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(0)),
-					AbilityActivationHandler.Outcome.NO_ABILITY_BOUND, "valid slot after rate-limit window");
+			assertEqual(helper, AbilityActivationHandler.handle(player, new AbilityActivationRequestPayload(0, 0)),
+					AbilityActivationHandler.Outcome.USED, "Brawler Z move used after the rate-limit window (no targets nearby)");
 			assertEqual(helper, PlayerProfileService.get(player), before, "profile still unchanged");
 			helper.succeed();
 		});

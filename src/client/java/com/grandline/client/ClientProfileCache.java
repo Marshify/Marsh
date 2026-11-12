@@ -17,6 +17,8 @@ public final class ClientProfileCache {
 	private static ProfileSyncPayload view;
 	private static List<CooldownSyncPayload.Entry> cooldowns = List.of();
 	private static long cooldownsReceivedAtMillis;
+	private static float energy;
+	private static float maxEnergy;
 
 	private ClientProfileCache() {
 	}
@@ -49,8 +51,34 @@ public final class ClientProfileCache {
 		cooldownsReceivedAtMillis = System.currentTimeMillis();
 	}
 
+	public static float energy() {
+		return energy;
+	}
+
+	public static float maxEnergy() {
+		return maxEnergy;
+	}
+
+	public static void acceptEnergy(float current, float max) {
+		energy = current;
+		maxEnergy = max;
+	}
+
+	/** Remaining cooldown in ticks for {@code abilityId}, estimated from the last sync and elapsed real time. */
+	public static int remainingCooldownTicks(net.minecraft.resources.ResourceLocation abilityId) {
+		long elapsedTicks = (System.currentTimeMillis() - cooldownsReceivedAtMillis) / 50L;
+		for (CooldownSyncPayload.Entry entry : cooldowns) {
+			if (entry.abilityId().equals(abilityId)) {
+				return (int) Math.max(0, entry.remainingTicks() - elapsedTicks);
+			}
+		}
+		return 0;
+	}
+
 	public static void clear() {
 		view = null;
 		cooldowns = List.of();
+		energy = 0;
+		maxEnergy = 0;
 	}
 }

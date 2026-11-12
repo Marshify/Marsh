@@ -25,6 +25,12 @@ public final class ModAttachments {
 			.initializer(AbilityCooldowns::new)
 			.buildAndRegister(GrandLineMod.id("ability_cooldowns"));
 
+	/** Server-only, non-persistent energy. */
+	public static final AttachmentType<com.grandline.combat.EnergyService.Energy> ENERGY =
+			AttachmentRegistry.<com.grandline.combat.EnergyService.Energy>builder()
+					.initializer(com.grandline.combat.EnergyService.Energy::new)
+					.buildAndRegister(GrandLineMod.id("energy"));
+
 	private ModAttachments() {
 	}
 

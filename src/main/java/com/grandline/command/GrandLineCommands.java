@@ -1,6 +1,8 @@
 package com.grandline.command;
 
 import com.grandline.GrandLineMod;
+import com.grandline.combat.ability.Power;
+import com.grandline.combat.ability.Powers;
 import com.grandline.player.PlayerProfile;
 import com.grandline.player.PlayerProfileService;
 import com.grandline.player.StatRules;
@@ -18,6 +20,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -41,6 +44,7 @@ import java.util.function.BiFunction;
  * /grandline admin setlevel &lt;players&gt; &lt;level&gt;        - gamemaster
  * /grandline admin reset &lt;players&gt;                  - gamemaster
  * /grandline admin resetstats &lt;players&gt;             - gamemaster (refunds all invested points)
+ * /grandline admin mastery &lt;players&gt; &lt;power&gt; &lt;lvl&gt; - gamemaster (e.g. grandline:brawler)
  * /grandline stats [player]                          - own stats (other players: gamemaster)
  * /grandline allocate &lt;stat&gt; &lt;amount&gt;               - any player: spend own points (server-validated)
  * </pre>
@@ -94,7 +98,14 @@ public final class GrandLineCommands {
 										.executes(context -> modify(context, "reset", (player, ctx) -> PlayerProfileService.reset(player)))))
 						.then(Commands.literal("resetstats")
 								.then(Commands.argument("players", EntityArgument.players())
-										.executes(context -> modify(context, "resetstats", (player, ctx) -> PlayerProfileService.resetStats(player)))))));
+										.executes(context -> modify(context, "resetstats", (player, ctx) -> PlayerProfileService.resetStats(player)))))
+						.then(Commands.literal("mastery")
+								.then(Commands.argument("players", EntityArgument.players())
+										.then(Commands.argument("power", ResourceLocationArgument.id())
+												.suggests((context, builder) -> SharedSuggestionProvider.suggestResource(
+														Powers.all().stream().map(Power::id), builder))
+												.then(Commands.argument("level", IntegerArgumentType.integer(0))
+														.executes(GrandLineCommands::setMastery)))))));
 	}
 
 	private static int runTest(CommandContext<CommandSourceStack> context) {
@@ -109,6 +120,17 @@ public final class GrandLineCommands {
 				Component.translatable(dedicated ? "commands.grandline.test.dedicated" : "commands.grandline.test.integrated")), false);
 		source.sendSuccess(() -> Component.translatable("commands.grandline.test.item", yesNo(crystalRegistered)), false);
 		return crystalRegistered ? 1 : 0;
+	}
+
+	private static int setMastery(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		Power power = Powers.get(ResourceLocationArgument.getId(context, "power"));
+		if (power == null) {
+			context.getSource().sendFailure(Component.translatable("commands.grandline.mastery.unknown_power",
+					ResourceLocationArgument.getId(context, "power").toString()));
+			return 0;
+		}
+		int level = IntegerArgumentType.getInteger(context, "level");
+		return modify(context, "mastery", (player, ctx) -> PlayerProfileService.setMasteryLevel(player, power, level));
 	}
 
 	private static int allocate(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
