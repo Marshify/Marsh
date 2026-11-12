@@ -132,8 +132,30 @@ public final class IslandFeature extends Feature<NoneFeatureConfiguration> {
 		}
 
 		plantTrees(context, level, random, centerX, centerZ, radius, waterTop, starter);
+		if (!starter && random.nextFloat() < TREASURE_CHANCE) {
+			buryTreasure(level, random, centerX, centerZ, radius);
+		}
 		registerIsland(level, chunk, centerX, centerZ, radius, starter);
 		return true;
+	}
+
+	/** Chance that a (non-starter) island hides a buried treasure chest. */
+	public static final float TREASURE_CHANCE = 0.4F;
+
+	/** Buries a vanilla buried-treasure chest (which always contains a Grand Line fruit) under the island's beach. */
+	private static void buryTreasure(WorldGenLevel level, Random random, int centerX, int centerZ, int radius) {
+		double angle = random.nextDouble() * Math.PI * 2;
+		double distance = radius * (0.55 + random.nextDouble() * 0.25);
+		int x = centerX + (int) Math.round(Math.cos(angle) * distance);
+		int z = centerZ + (int) Math.round(Math.sin(angle) * distance);
+		int top = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+		BlockPos chest = new BlockPos(x, top - 2, z);
+		if (!level.getBlockState(chest).isSolidRender(level, chest)) {
+			return;
+		}
+		level.setBlock(chest, Blocks.CHEST.defaultBlockState(), 2);
+		net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity.setLootTable(level, RandomSource.create(random.nextLong()),
+				chest, net.minecraft.world.level.storage.loot.BuiltInLootTables.BURIED_TREASURE);
 	}
 
 	private static void plantTrees(FeaturePlaceContext<NoneFeatureConfiguration> context, WorldGenLevel level, Random random,

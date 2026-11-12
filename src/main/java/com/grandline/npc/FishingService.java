@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
@@ -50,6 +51,13 @@ public final class FishingService {
 
 	public static void register() {
 		LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
+			if (source.isBuiltin() && BuiltInLootTables.BURIED_TREASURE.equals(id)) {
+				// Buried treasure always holds exactly one Grand Line fruit, weighted by rarity.
+				LootPool.Builder treasure = LootPool.lootPool().setRolls(ConstantValue.exactly(1));
+				Fruits.all().forEach(f -> treasure.add(LootItem.lootTableItem(f.item()).setWeight(f.rarity().gachaWeight())));
+				tableBuilder.withPool(treasure);
+				return;
+			}
 			if (!source.isBuiltin() || !FISHING.equals(id)) {
 				return;
 			}

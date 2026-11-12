@@ -29,7 +29,7 @@ public final class GrandLineConfig {
 	 * Config schema version. 1 = milestone 1/2 values; 2 = rebalanced stats with diminishing returns and ability
 	 * settings. Older files have balance keys reset to the new defaults once, other keys are kept.
 	 */
-	public static final int CURRENT_CONFIG_VERSION = 3;
+	public static final int CURRENT_CONFIG_VERSION = 4;
 
 	public int configVersion = CURRENT_CONFIG_VERSION;
 
@@ -110,8 +110,8 @@ public final class GrandLineConfig {
 	public int dealerRotationMinutes = 240;
 	/** Most fruits a player can keep in their stash. */
 	public int stashCapacity = 20;
-	/** Average minutes between natural fruit spawns near a random online player (0 disables). */
-	public int naturalFruitSpawnMinutes = 60;
+	/** Average minutes between natural fruit spawns near a random online player (0 = off; buried treasure replaces them). */
+	public int naturalFruitSpawnMinutes = 0;
 	/** Currency cost to refund (reset) all stat points. 0 = free. */
 	public long statRefundCost = 1_000;
 
@@ -170,6 +170,9 @@ public final class GrandLineConfig {
 		}
 		if (fileVersion < 3) {
 			gachaCost = defaults().gachaCost; // level-scaled gacha pricing replaced the flat 5,000 price
+		}
+		if (fileVersion < 4) {
+			naturalFruitSpawnMinutes = 0; // fruits now come from buried treasure instead
 		}
 		configVersion = CURRENT_CONFIG_VERSION;
 	}
