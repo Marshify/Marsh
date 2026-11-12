@@ -35,7 +35,7 @@ public class DialogScreen extends Screen {
 		int buttonHeight = 20;
 		int x = width - buttonWidth - 12;
 		int total = options.size() * (buttonHeight + 4);
-		int y = Math.max(8, Math.min(height - 80 - total, height / 2 - total / 2 - 10));
+		int y = Math.max(8, Math.min(height - 140 - total, height / 2 - total / 2 - 30));
 		for (Option option : options) {
 			addRenderableWidget(new GoldButton(x, y, buttonWidth, buttonHeight, option.label(), b -> {
 				option.action().run();
@@ -63,8 +63,9 @@ public class DialogScreen extends Screen {
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
 		// Bottom conversation band.
-		int bandTop = height - 62;
-		graphics.fillGradient(0, bandTop - 20, width, height, 0x00000000, 0xE0000000);
+		int bandTop = height - 118; // well above the hotbar so it's easy to notice
+		graphics.fillGradient(0, bandTop - 20, width, bandTop + 60, 0x00000000, 0xE0000000);
+		graphics.fillGradient(0, bandTop + 60, width, height, 0xE0000000, 0x00000000);
 		int plateWidth = Math.max(120, font.width(speaker) * 2 + 30);
 		int plateX = width / 2 - plateWidth / 2;
 		graphics.fill(plateX, bandTop, plateX + plateWidth, bandTop + 18, GrandLineUi.GOLD);

@@ -179,7 +179,7 @@ public final class ProfileHud {
 		Component where = Component.literal(arrow + " " + distance + "m");
 		int width = Math.max(font.width(title), font.width(progress) + font.width(where) + 12) + 12;
 		int x = graphics.guiWidth() / 2 - width / 2;
-		int y = 4;
+		int y = 52; // below the boss bar / Jade's block info at the top centre
 		graphics.fill(x - 1, y - 1, x + width + 1, y + 27, PANEL_BORDER);
 		graphics.fill(x, y, x + width, y + 26, NAVY);
 		graphics.fill(x, y, x + width, y + 2, GOLD);

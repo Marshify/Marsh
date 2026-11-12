@@ -467,5 +467,12 @@
   "npc.grandline.result.level_too_low": "You're not strong enough to sail there yet.",
   "npc.grandline.result.already_there": "You're already in that sea.",
   "screen.grandline.map.recommended": "Recommended",
-  "screen.grandline.map.sea_title": "Sea %s"
+  "screen.grandline.map.sea_title": "Sea %s",
+  "item.grandline.islander_spawn_egg": "Islander Spawn Egg",
+  "item.grandline.bandit_spawn_egg": "Bandit Spawn Egg",
+  "item.grandline.raider_spawn_egg": "Raider Spawn Egg",
+  "item.grandline.corsair_spawn_egg": "Corsair Spawn Egg",
+  "item.grandline.captain_spawn_egg": "Island Captain Spawn Egg",
+  "screen.grandline.shop.out_of_stock": "Out of stock",
+  "screen.grandline.shop.stock_info": "%s of %s fruits in stock. New stock in %sh %sm."
 }

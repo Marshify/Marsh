@@ -18,7 +18,15 @@ public final class ModCreativeTabs {
 			FabricItemGroup.builder()
 					.title(Component.translatable("itemGroup.grandline.main"))
 					.icon(() -> new ItemStack(ModItems.GRAND_LINE_CRYSTAL))
-					.displayItems((parameters, output) -> output.accept(ModItems.GRAND_LINE_CRYSTAL))
+					.displayItems((parameters, output) -> {
+						// Everything the mod adds: crystal, fruits by rarity, sea creatures, spawn eggs.
+						output.accept(ModItems.GRAND_LINE_CRYSTAL);
+						com.grandline.fruit.Fruits.all().stream()
+								.sorted(java.util.Comparator.comparingInt(f -> f.rarity().ordinal()))
+								.forEach(f -> output.accept(f.item()));
+						com.grandline.npc.FishingService.items().forEach(output::accept);
+						ModSpawnEggs.ALL.forEach(output::accept);
+					})
 					.build());
 
 	private ModCreativeTabs() {

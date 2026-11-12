@@ -35,18 +35,23 @@ public final class NpcService {
 		QuestState bossOffer = npc.role() == Islander.Role.QUEST_GIVER && level >= QuestService.BOSS_MIN_ISLAND_LEVEL
 				? QuestService.offer(island, npc, true) : null;
 
+		// The dealer lists every fruit; only the current stock can be bought.
 		List<String> stock = new ArrayList<>();
 		List<Long> prices = new ArrayList<>();
+		List<String> available = new ArrayList<>();
 		if (npc.role() == Islander.Role.FRUIT_DEALER) {
-			for (Fruits.FruitDef fruit : FruitService.dealerStock(player.server)) {
+			for (Fruits.FruitDef fruit : Fruits.all()) {
 				stock.add(fruit.id());
 				prices.add(FruitService.price(fruit));
+			}
+			for (Fruits.FruitDef fruit : FruitService.dealerStock(player.server)) {
+				available.add(fruit.id());
 			}
 		}
 
 		ServerPlayNetworking.send(player, new OpenNpcPayload(npc.getId(), npc.role().ordinal(), islandName, level,
 				java.util.Optional.ofNullable(offer), java.util.Optional.ofNullable(bossOffer),
-				java.util.Optional.ofNullable(QuestService.active(player)), stock, prices, FruitService.millisUntilRestock(),
+				java.util.Optional.ofNullable(QuestService.active(player)), stock, prices, available, FruitService.millisUntilRestock(),
 				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel));
 	}
 

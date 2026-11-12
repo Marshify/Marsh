@@ -16,7 +16,7 @@ import java.util.Optional;
  * choice goes back through a validated request.
  */
 public record OpenNpcPayload(int entityId, int role, String islandName, int islandLevel, Optional<QuestState> questOffer,
-		Optional<QuestState> bossOffer, Optional<QuestState> activeQuest, List<String> stock, List<Long> prices, long restockMillis, long gachaCost,
+		Optional<QuestState> bossOffer, Optional<QuestState> activeQuest, List<String> stock, List<Long> prices, List<String> available, long restockMillis, long gachaCost,
 		long gachaRemainingMillis, long fishValue, int gachaMinLevel) implements FabricPacket {
 	public static final PacketType<OpenNpcPayload> TYPE = PacketType.create(GrandLineMod.id("open_npc"), OpenNpcPayload::read);
 
@@ -38,7 +38,15 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 			stock.add(buf.readUtf(256));
 			prices.add(buf.readVarLong());
 		}
-		return new OpenNpcPayload(entityId, role, island, level, offer, boss, active, stock, prices, buf.readVarLong(), buf.readVarLong(),
+		int availableSize = buf.readVarInt();
+		if (availableSize < 0 || availableSize > 64) {
+			throw new IllegalArgumentException("Invalid stock size " + availableSize);
+		}
+		List<String> available = new ArrayList<>();
+		for (int i = 0; i < availableSize; i++) {
+			available.add(buf.readUtf(256));
+		}
+		return new OpenNpcPayload(entityId, role, island, level, offer, boss, active, stock, prices, available, buf.readVarLong(), buf.readVarLong(),
 				buf.readVarLong(), buf.readVarLong(), buf.readVarInt());
 	}
 
@@ -56,6 +64,8 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 			buf.writeUtf(stock.get(i), 256);
 			buf.writeVarLong(prices.get(i));
 		}
+		buf.writeVarInt(available.size());
+		available.forEach(id -> buf.writeUtf(id, 256));
 		buf.writeVarLong(restockMillis);
 		buf.writeVarLong(gachaCost);
 		buf.writeVarLong(gachaRemainingMillis);

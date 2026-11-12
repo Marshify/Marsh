@@ -323,7 +323,14 @@ public final class IslandBuilder {
 		int g = ground(tx, tz);
 		for (int y = 4; y < 24; y += 4) {
 			for (Direction side : Direction.Plane.HORIZONTAL) {
-				set(spec.x() + tx + side.getStepX() * 6, g + y, spec.z() + tz + side.getStepZ() * 6, Blocks.IRON_BARS.defaultBlockState());
+				// Bars must carry their connections: worldgen never recomputes block shapes.
+				boolean alongX = side.getAxis() == Direction.Axis.Z;
+				BlockState bars = Blocks.IRON_BARS.defaultBlockState()
+						.setValue(net.minecraft.world.level.block.IronBarsBlock.EAST, alongX)
+						.setValue(net.minecraft.world.level.block.IronBarsBlock.WEST, alongX)
+						.setValue(net.minecraft.world.level.block.IronBarsBlock.NORTH, !alongX)
+						.setValue(net.minecraft.world.level.block.IronBarsBlock.SOUTH, !alongX);
+				set(spec.x() + tx + side.getStepX() * 6, g + y, spec.z() + tz + side.getStepZ() * 6, bars);
 			}
 		}
 	}
@@ -482,7 +489,7 @@ public final class IslandBuilder {
 					if (edge) {
 						boolean door = dz == 0 && dx == width / 2 && dy < 2;
 						boolean window = dy == 2 && !door && (dx == 2 || dx == width - 3 || dz == 2 || dz == depth - 3);
-						state = door ? Blocks.AIR.defaultBlockState() : window ? Blocks.GLASS_PANE.defaultBlockState() : wall;
+						state = door ? Blocks.AIR.defaultBlockState() : window ? Blocks.GLASS.defaultBlockState() : wall;
 					}
 					set(spec.x() + lx + dx, y + dy, spec.z() + lz + dz, state);
 				}
