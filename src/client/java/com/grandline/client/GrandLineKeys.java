@@ -69,12 +69,23 @@ public final class GrandLineKeys {
 			}
 		}
 
+		// Move keys are read from the physical key state instead of consumeClick(): in 1.20.1 only one KeyMapping can own
+		// a key, and vanilla already binds X and C (toolbar save/load), so their clicks would never reach us. The bound
+		// key is still read from our mapping, so rebinding in Controls works.
+		long window = client.getWindow().getWindow();
 		for (int slot = 0; slot < MOVES.length; slot++) {
+			InputConstants.Key key = KeyBindingHelper.getBoundKeyOf(MOVES[slot]);
+			boolean down = key.getType() == InputConstants.Type.KEYSYM && key.getValue() != InputConstants.UNKNOWN.getValue()
+					&& InputConstants.isKeyDown(window, key.getValue());
 			while (MOVES[slot].consumeClick()) {
-				if (client.player != null && client.screen == null) {
-					ClientNetworking.requestAbilityActivation(activeSource(), slot);
-				}
+				down = true; // also honour clicks if we do own the key (e.g. after rebinding to a free key)
 			}
+			if (down && !moveKeyWasDown[slot] && client.player != null && client.screen == null) {
+				ClientNetworking.requestAbilityActivation(activeSource(), slot);
+			}
+			moveKeyWasDown[slot] = down;
 		}
 	}
+
+	private static final boolean[] moveKeyWasDown = new boolean[4];
 }

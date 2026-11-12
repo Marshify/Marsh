@@ -23,7 +23,7 @@ import java.util.Locale;
  * Nautical navy/gold styling. Hidden with F1 and while the F3 screen is open.
  */
 public final class ProfileHud {
-	private static final int NAVY = 0xC0101C2E;
+	private static final int NAVY = 0xE6101C2E;
 	private static final int NAVY_LIGHT = 0xE0233A57;
 	private static final int GOLD = 0xFFE8B84A;
 	private static final int PANEL_BORDER = 0xFF0A1220;
@@ -43,15 +43,19 @@ public final class ProfileHud {
 			return;
 		}
 
+		// Draw in front of anything else on the GUI layer (items in particular render with depth).
+		graphics.pose().pushPose();
+		graphics.pose().translate(0, 0, 400);
 		renderStatus(graphics, client, view);
 		renderPowerPanel(graphics, client, view);
+		graphics.pose().popPose();
 	}
 
 	/** Bottom-left status block. */
 	private static void renderStatus(GuiGraphics graphics, Minecraft client, ProfileSyncPayload view) {
 		Font font = client.font;
 		PlayerProfile profile = view.profile();
-		int width = 124;
+		int width = sideWidth(graphics, 124);
 		int x = 6;
 		int bottom = graphics.guiHeight() - 6;
 
@@ -97,7 +101,7 @@ public final class ProfileHud {
 			return;
 		}
 
-		int width = 128;
+		int width = sideWidth(graphics, 132);
 		int rowHeight = 17;
 		int x = graphics.guiWidth() - width - 6;
 		int movesHeight = rowHeight * power.abilities().size();
@@ -142,10 +146,16 @@ public final class ProfileHud {
 			String right = cooldown > 0 ? String.format(Locale.ROOT, "%.1fs", cooldown / 20.0) : key;
 			graphics.drawString(font, right, x + width - font.width(right) - 3, y + 4, cooldown > 0 ? 0xFF8A65 : GOLD);
 
-			Component mastery = Component.translatable("hud.grandline.move_mastery", ability.requiredMastery());
-			drawScaled(graphics, font, mastery, x + width - 3 - font.width(mastery) * 0.6f - font.width(right) - 4, y + 5, 0.6f,
-					unlocked ? 0xA9C4E0 : 0xD46A6A);
+			if (!unlocked) {
+				Component mastery = Component.translatable("hud.grandline.move_mastery", ability.requiredMastery());
+				drawScaled(graphics, font, mastery, x + width - 3 - font.width(mastery) * 0.6f - font.width(right) - 4, y + 5, 0.6f, 0xD46A6A);
+			}
 		}
+	}
+
+	/** Width that keeps a side panel clear of the centred vanilla hotbar (182 px wide). */
+	private static int sideWidth(GuiGraphics graphics, int preferred) {
+		return Math.max(80, Math.min(preferred, graphics.guiWidth() / 2 - 91 - 12));
 	}
 
 	private static void labelledBar(GuiGraphics graphics, Font font, int x, int y, int width, Component label, String value,
