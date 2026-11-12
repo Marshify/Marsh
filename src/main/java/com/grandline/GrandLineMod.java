@@ -1,10 +1,12 @@
 package com.grandline;
 
+import com.grandline.combat.StatEffects;
 import com.grandline.command.GrandLineCommands;
 import com.grandline.config.GrandLineConfig;
 import com.grandline.data.ModAttachments;
 import com.grandline.network.GrandLineNetworking;
 import com.grandline.player.PlayerProfileEvents;
+import com.grandline.player.reward.MobKillRewards;
 import com.grandline.registry.ModCreativeTabs;
 import com.grandline.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
@@ -35,6 +37,8 @@ public final class GrandLineMod implements ModInitializer {
 		ModAttachments.register();
 		GrandLineNetworking.registerServerReceivers();
 		PlayerProfileEvents.register();
+		StatEffects.register();
+		MobKillRewards.register();
 		GrandLineCommands.register();
 
 		LOGGER.info("Grand Line {} initialized", modVersion());

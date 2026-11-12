@@ -26,10 +26,10 @@
 |---|---|---|
 | *(root)* | `GrandLineMod` — common entrypoint; wires subsystems, owns `MOD_ID`, logger, `id()` | done |
 | `registry` | Registries: items, creative tabs (later blocks, entities, sounds) | `ModItems` (Grand Line Crystal), `ModCreativeTabs` |
-| `player` | Player profile model, progression rules, profile service, lifecycle events | `PlayerProfile`, `ProgressionRules`, `PlayerProfileService`, `PlayerProfileEvents` |
+| `player` | Player profile model, stats, progression/stat rules, profile service, lifecycle events, `reward` (mob kill rewards) | `PlayerProfile`, `ProgressionRules`, `PlayerProfileService`, `PlayerProfileEvents` |
 | `data` | Persistent data definitions (attachments; later world `SavedData`) | `ModAttachments` |
 | `network` | Packet registration, request validation | `GrandLineNetworking`, `ServerRequestGuard`, `payload/*` |
-| `combat` | Damage, abilities, weapons, fighting styles | `combat.ability`: cooldown state/service, activation validation pipeline (no abilities yet) |
+| `combat` | Damage, abilities, weapons, fighting styles; `StatEffects` (stats → attribute modifiers) | `combat.ability`: cooldown state/service, activation validation pipeline (no abilities yet) |
 | `command` | Brigadier command trees | `GrandLineCommands` — **added** (not in the original plan) so commands don't live in the entrypoint or in gameplay packages |
 | `config` | Mod configuration | `GrandLineConfig` (JSON, validated) |
 | `fruit` | Fruit definitions, rarity, consumption, mastery | reserved (`package-info` only) |
@@ -58,15 +58,32 @@ PlayerProfile (immutable record)
 `ProgressionRules` (pure maths): XP from level *L* to *L+1* = `base + growth × (L−1)`; each level grants
 `statPointsPerLevel`; level is capped at `maxLevel`; all arithmetic saturates instead of overflowing.
 
+## Stats, effects and rewards (milestone 2)
+
+- `StatType` (MELEE, DEFENSE, SWORD, GUN, FRUIT; serialized names are part of the save format) and immutable
+  `PlayerStats` live in the profile. Profile **data version 2**; version-1 saves load with empty stats.
+- `StatRules` (pure): allocation validation (amount > 0, enough points, per-stat cap) and bonus formulas.
+  Allocation enters through `AllocateStatPayload` → `GrandLineNetworking.handleAllocateStat` (guard, stat id,
+  per-request limit) → `PlayerProfileService.allocateStat`. A rejected request changes nothing and triggers a resync.
+- `StatEffects` maps stats to vanilla attribute modifiers with fixed UUIDs: Defense → `MAX_HEALTH` (saved with the
+  player so boosted health survives relogs), Melee/Sword → `ATTACK_DAMAGE` (transient; recomputed each tick from
+  the held item, only touched when the value changes). Re-applied on join, respawn and every profile change.
+- `reward.RewardRules` (pure) + `reward.MobKillRewards`: on `AFTER_DEATH`, if the entity is an `Enemy` and the
+  damage source's entity is a `ServerPlayer` (direct hit or their projectile), grant XP/currency scaled by the mob's
+  max health, limited by a per-player rolling one-minute budget. Level-ups announce themselves in chat with a sound.
+- Client: `ProfileHud` (top-left panel, hidden with F1/F3), `StatsScreen` opened with `GrandLineKeys.STATS` (K).
+  Both render only `ClientProfileCache` data; buttons send intents only.
+
 ## Networking
 
 All packets are `FabricPacket` records, each with a `PacketType` (`TYPE`) and explicit `write`/read logic.
 
 | Payload | Direction | Purpose |
 |---|---|---|
-| `ProfileSyncPayload` | S→C | Authoritative profile snapshot for the receiving player |
+| `ProfileSyncPayload` | S→C | Authoritative profile snapshot plus server-computed display values (XP to next level, level cap, stat cap, stat bonuses) |
 | `CooldownSyncPayload` | S→C | Active ability cooldowns (remaining/total ticks), capped at 256 entries |
 | `RequestProfileSyncPayload` | C→S | "Resend my profile & cooldowns" (no data) |
+| `AllocateStatPayload` | C→S | "Spend *n* points on stat *s*" (intent; stat id + amount ≤ 100, validated) |
 | `AbilityActivationRequestPayload` | C→S | "I pressed ability slot *n*" (intent only) |
 
 **Why a client cannot change authoritative data**
@@ -99,8 +116,8 @@ client's synced copy, to verify sync.
 
 | Layer | Tool | Covers |
 |---|---|---|
-| Unit | JUnit 5 + `fabric-loader-junit` (`./gradlew test`) | Progression maths, overflow, codec round-trip, corrupted-data sanitizing, network codec |
-| Server game tests | Fabric GameTest (`./gradlew runGameTest`) | Item registration, default profiles, profile save/load via vanilla player NBT, cooldowns not persisted, request validation/rate limiting cannot modify profile |
+| Unit | JUnit 5 + `fabric-loader-junit` (`./gradlew test`) | Progression maths, overflow, codec round-trip, corrupted-data sanitizing, network codec, v1→v2 migration, stat allocation & bonuses, rewards & anti-farm budget |
+| Server game tests | Fabric GameTest (`./gradlew runGameTest`) | Item registration, default profiles, profile save/load via vanilla player NBT, cooldowns not persisted, request validation/rate limiting cannot modify profile, allocation validation, Defense health incl. save/load, Melee/Sword bonus by held item, rewards for hostile kills only |
 | Client + dedicated server | Manual/scripted: `runServer` + `runClient --quickPlayMultiplayer`, commands over RCON | Real client joins, item renders, admin changes sync to client, profile on disk after shutdown, profile restored after full server restart. (The Fabric client gametest API does not exist for 1.20.1.) |
 
 ## Switching to Forge later

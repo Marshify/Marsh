@@ -3,9 +3,9 @@
 A multiplayer RPG mod for **Minecraft Java Edition 1.20.1** on **Fabric**, inspired by the progression,
 exploration, combat and fruit-ability loops of action RPGs like Blox Fruits. All content is original.
 
-> **Status: Milestone 1 (foundation).** The project builds, loads on client and dedicated server, registers a
-> test item, stores a persistent per-player profile, and has a validated networking layer. There is no fruit,
-> combat or world-generation gameplay yet — see [ROADMAP.md](ROADMAP.md).
+> **Status: Milestone 2 (stats, HUD & mob rewards) — version 0.2.0.** Players level up by killing hostile mobs,
+> spend stat points on Melee / Defense / Sword (Gun and Fruit are stored for later milestones), and see their
+> progress on a HUD and a stats screen (**K**). No fruits, abilities or world generation yet — see [ROADMAP.md](ROADMAP.md).
 
 | | |
 |---|---|
@@ -21,7 +21,9 @@ exploration, combat and fruit-ability loops of action RPGs like Blox Fruits. All
 
 Versions were checked against `meta.fabricmc.net` and `maven.fabricmc.net` on 2026-11-12.
 
-![Grand Line Crystal on a 1.20.1 client connected to a dedicated server](docs/images/grand-line-crystal-1.20.1.png)
+| HUD + kill reward | Stats screen (K) |
+|---|---|
+| ![HUD showing level, XP bar, currency and a kill reward](docs/images/m2-hud-kill-reward.png) | ![Stats screen with allocation buttons](docs/images/m2-stats-screen.png) |
 
 ## Requirements
 
@@ -45,8 +47,8 @@ export JAVA_HOME=/path/to/jdk-25
 The release jar is written to:
 
 ```
-build/libs/grandline-0.1.0.jar          # the mod — put this in a server's or client's mods/ folder
-build/libs/grandline-0.1.0-sources.jar  # sources
+build/libs/grandline-0.2.0.jar          # the mod — put this in a server's or client's mods/ folder
+build/libs/grandline-0.2.0-sources.jar  # sources
 ```
 
 Install it alongside **Fabric API 0.92.12+1.20.1** (or newer for 1.20.1) on Fabric Loader ≥ 0.20.1.
@@ -78,6 +80,10 @@ in `run-server/server.properties` for offline dev accounts).
 6. `/grandline admin addcurrency @s 500`, `/grandline admin setlevel @s 10`, `/grandline admin reset @s`.
 7. `/grandlineclient profile` — the **client-side** synced copy; it should match the server's values.
 8. Save & quit, re-open the world → profile is unchanged. Die and respawn → profile is unchanged.
+9. The HUD (top left) shows level, XP bar, currency and unspent stat points.
+10. Press **K** → Stats screen. Click **+5** on Defense → hearts increase (5 points = +1 half-heart by default).
+11. Kill a zombie (survival or creative) → action bar shows `+20 XP  +10 currency`; the HUD updates.
+12. Hold nothing and hit a mob with Melee points, or hold a sword with Sword points → more damage.
 
 ### Commands
 
@@ -90,6 +96,9 @@ in `run-server/server.properties` for offline dev accounts).
 | `/grandline admin addcurrency <players> <amount>` (negative removes) | op level 2 |
 | `/grandline admin setlevel <players> <level>` | op level 2 |
 | `/grandline admin reset <players>` | op level 2 |
+| `/grandline admin resetstats <players>` (refunds invested points) | op level 2 |
+| `/grandline stats` / `/grandline stats <player>` | everyone (own) / op level 2 |
+| `/grandline allocate <melee\|defense\|sword\|gun\|fruit> <amount>` | everyone (own points, server-validated) |
 | `/grandlineclient profile` (client-side command) | everyone |
 
 ## Configuration
@@ -106,6 +115,13 @@ a malformed file is renamed to `grandline.json.broken` and replaced with default
 | `startingCurrency` | 0 | Currency for new profiles |
 | `maxCurrency` | 1 000 000 000 000 | Currency cap |
 | `requestCooldownTicks` | 4 | Minimum ticks between accepted client requests of one type |
+| `maxPointsPerStat` | 2800 | Cap on points in one stat |
+| `defenseHealthPerPoint` / `maxBonusHealth` | 0.2 / 200 | Max health (half-hearts) per Defense point, and its cap |
+| `meleeDamagePerPoint` | 0.05 | Attack damage per Melee point (empty main hand) |
+| `swordDamagePerPoint` | 0.05 | Attack damage per Sword point (holding a sword) |
+| `maxBonusDamage` | 100 | Cap for the Melee and Sword bonuses |
+| `experiencePerMobHealth` / `currencyPerMobHealth` | 1.0 / 0.5 | Kill reward per point of the hostile mob's max health (zombie = 20 XP, 10 currency) |
+| `maxKillExperiencePerMinute` / `maxKillCurrencyPerMinute` | 5000 / 2500 | Anti-farm caps per player per minute (0 = no cap) |
 
 ## Documentation
 

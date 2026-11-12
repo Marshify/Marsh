@@ -3,23 +3,29 @@ package com.grandline.command;
 import com.grandline.GrandLineMod;
 import com.grandline.player.PlayerProfile;
 import com.grandline.player.PlayerProfileService;
+import com.grandline.player.StatRules;
+import com.grandline.player.StatType;
 import com.grandline.registry.ModItems;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.function.BiFunction;
 
 /**
@@ -34,6 +40,9 @@ import java.util.function.BiFunction;
  * /grandline admin addcurrency &lt;players&gt; &lt;amount&gt;    - gamemaster (negative removes)
  * /grandline admin setlevel &lt;players&gt; &lt;level&gt;        - gamemaster
  * /grandline admin reset &lt;players&gt;                  - gamemaster
+ * /grandline admin resetstats &lt;players&gt;             - gamemaster (refunds all invested points)
+ * /grandline stats [player]                          - own stats (other players: gamemaster)
+ * /grandline allocate &lt;stat&gt; &lt;amount&gt;               - any player: spend own points (server-validated)
  * </pre>
  */
 public final class GrandLineCommands {
@@ -52,6 +61,17 @@ public final class GrandLineCommands {
 						.then(Commands.argument("player", EntityArgument.player())
 								.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
 								.executes(context -> showProfile(context.getSource(), EntityArgument.getPlayer(context, "player")))))
+				.then(Commands.literal("stats")
+						.executes(context -> showStats(context.getSource(), context.getSource().getPlayerOrException()))
+						.then(Commands.argument("player", EntityArgument.player())
+								.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+								.executes(context -> showStats(context.getSource(), EntityArgument.getPlayer(context, "player")))))
+				.then(Commands.literal("allocate")
+						.then(Commands.argument("stat", StringArgumentType.word())
+								.suggests((context, builder) -> SharedSuggestionProvider.suggest(
+										Arrays.stream(StatType.values()).map(StatType::getSerializedName), builder))
+								.then(Commands.argument("amount", IntegerArgumentType.integer(1))
+										.executes(GrandLineCommands::allocate))))
 				.then(Commands.literal("admin")
 						.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						.then(Commands.literal("addxp")
@@ -71,7 +91,10 @@ public final class GrandLineCommands {
 														(player, ctx) -> PlayerProfileService.setLevel(player, IntegerArgumentType.getInteger(ctx, "level")))))))
 						.then(Commands.literal("reset")
 								.then(Commands.argument("players", EntityArgument.players())
-										.executes(context -> modify(context, "reset", (player, ctx) -> PlayerProfileService.reset(player)))))));
+										.executes(context -> modify(context, "reset", (player, ctx) -> PlayerProfileService.reset(player)))))
+						.then(Commands.literal("resetstats")
+								.then(Commands.argument("players", EntityArgument.players())
+										.executes(context -> modify(context, "resetstats", (player, ctx) -> PlayerProfileService.resetStats(player)))))));
 	}
 
 	private static int runTest(CommandContext<CommandSourceStack> context) {
@@ -86,6 +109,51 @@ public final class GrandLineCommands {
 				Component.translatable(dedicated ? "commands.grandline.test.dedicated" : "commands.grandline.test.integrated")), false);
 		source.sendSuccess(() -> Component.translatable("commands.grandline.test.item", yesNo(crystalRegistered)), false);
 		return crystalRegistered ? 1 : 0;
+	}
+
+	private static int allocate(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
+		String statName = StringArgumentType.getString(context, "stat");
+		StatType stat = StatType.CODEC.byName(statName);
+		if (stat == null) {
+			context.getSource().sendFailure(Component.translatable("commands.grandline.allocate.unknown_stat", statName));
+			return 0;
+		}
+
+		int amount = IntegerArgumentType.getInteger(context, "amount");
+		StatRules.AllocationResult result = PlayerProfileService.allocateStat(player, stat, amount);
+		if (result != StatRules.AllocationResult.SUCCESS) {
+			context.getSource().sendFailure(Component.translatable("commands.grandline.allocate." + result.name().toLowerCase(Locale.ROOT)));
+			return 0;
+		}
+
+		int newValue = PlayerProfileService.get(player).stats().get(stat);
+		context.getSource().sendSuccess(() -> Component.translatable("commands.grandline.allocate.success",
+				amount, Component.translatable(stat.translationKey()), newValue), false);
+		return newValue;
+	}
+
+	private static int showStats(CommandSourceStack source, ServerPlayer target) {
+		PlayerProfile profile = PlayerProfileService.get(target);
+		StatRules rules = PlayerProfileService.statRules();
+
+		source.sendSuccess(() -> Component.translatable("commands.grandline.stats.header", target.getDisplayName(),
+				profile.unallocatedStatPoints()).withStyle(ChatFormatting.GOLD), false);
+		for (StatType stat : StatType.values()) {
+			Component effect = switch (stat) {
+				case DEFENSE -> Component.translatable("stat.grandline.effect.health", format(rules.bonusHealth(profile.stats())));
+				case MELEE -> Component.translatable("stat.grandline.effect.melee", format(rules.bonusMeleeDamage(profile.stats())));
+				case SWORD -> Component.translatable("stat.grandline.effect.sword", format(rules.bonusSwordDamage(profile.stats())));
+				case GUN, FRUIT -> Component.translatable("stat.grandline.effect.none");
+			};
+			source.sendSuccess(() -> Component.translatable("commands.grandline.stats.line", Component.translatable(stat.translationKey()),
+					profile.stats().get(stat), rules.maxPointsPerStat(), effect), false);
+		}
+		return (int) profile.stats().total();
+	}
+
+	private static String format(double value) {
+		return String.format(Locale.ROOT, "%.2f", value);
 	}
 
 	private static int showProfile(CommandSourceStack source, ServerPlayer target) {

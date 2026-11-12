@@ -4,9 +4,11 @@ import com.grandline.GrandLineMod;
 import com.grandline.client.ClientProfileCache;
 import com.grandline.combat.ability.AbilityActivationHandler;
 import com.grandline.network.payload.AbilityActivationRequestPayload;
+import com.grandline.network.payload.AllocateStatPayload;
 import com.grandline.network.payload.CooldownSyncPayload;
 import com.grandline.network.payload.ProfileSyncPayload;
 import com.grandline.network.payload.RequestProfileSyncPayload;
+import com.grandline.player.StatType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
@@ -22,7 +24,7 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(ProfileSyncPayload.TYPE,
 				(packet, player, responseSender) -> {
 					GrandLineMod.LOGGER.debug("Received profile sync: {}", packet.profile());
-					ClientProfileCache.acceptProfile(packet.profile());
+					ClientProfileCache.acceptProfile(packet);
 				});
 		ClientPlayNetworking.registerGlobalReceiver(CooldownSyncPayload.TYPE,
 				(packet, player, responseSender) -> ClientProfileCache.acceptCooldowns(packet.cooldowns()));
@@ -36,6 +38,15 @@ public final class ClientNetworking {
 			return false;
 		}
 		ClientPlayNetworking.send(RequestProfileSyncPayload.INSTANCE);
+		return true;
+	}
+
+	/** Asks the server to spend {@code amount} unallocated points on {@code stat}. The server validates everything. */
+	public static boolean requestStatAllocation(StatType stat, int amount) {
+		if (amount <= 0 || amount > AllocateStatPayload.MAX_AMOUNT_PER_REQUEST || !ClientPlayNetworking.canSend(AllocateStatPayload.TYPE)) {
+			return false;
+		}
+		ClientPlayNetworking.send(new AllocateStatPayload(stat.ordinal(), amount));
 		return true;
 	}
 

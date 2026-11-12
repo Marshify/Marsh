@@ -13,7 +13,7 @@ Each milestone ends with a green `./gradlew build`, passing game tests, and an u
 - Config file with validation
 - Unit tests, server game tests, scripted real client + dedicated server verification
 
-## ▶ Milestone 2 — Stats, HUD & experience sources (recommended next)
+## ✅ Milestone 2 — Stats, HUD & experience sources (v0.2.0)
 - Stat model: e.g. Melee, Defense, Sword, Gun, Fruit — allocate unallocated points via a validated C2S request
   (server checks available points; client never sends resulting values)
 - Derived attributes from stats (max health, damage multipliers) applied server-side via attribute modifiers
@@ -21,8 +21,9 @@ Each milestone ends with a green `./gradlew build`, passing game tests, and an u
 - Stats screen with allocation buttons
 - XP/currency rewards from killing mobs (server-side, configurable table), with anti-farm limits
 - Persistence migration path exercised (`dataVersion` 1 → 2)
+- Done as listed; Gun and Fruit points are stored but have no effect until milestones 3–4
 
-## Milestone 3 — Ability framework & first fighting style
+## ▶ Milestone 3 — Ability framework & first fighting style (recommended next)
 - Ability registry (data-driven definitions), slot binding stored in profile
 - Keybinds → `AbilityActivationRequestPayload`; server resolves ability, checks cooldown/energy, executes
 - Energy/stamina resource with sync

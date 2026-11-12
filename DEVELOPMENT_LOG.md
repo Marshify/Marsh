@@ -1,5 +1,52 @@
 # Grand Line — Development Log
 
+## 2026-11-12 — Milestone 2: Stats, HUD & mob rewards (v0.2.0)
+
+Also recorded: the user's own test of v0.1.0 in CurseForge (1.20.1 Fabric profile) — mod listed, crystal in the
+creative tab, `/grandline test` and `/grandline profile` correct, `addxp 260` → level 3 / 10 XP / 6 points.
+
+### Completed
+- **Stats:** `StatType` (Melee, Defense, Sword, Gun, Fruit) and `PlayerStats` in the profile; data version 2 with
+  automatic migration of version-1 saves.
+- **Allocation:** `AllocateStatPayload` (C→S intent) validated server-side (rate limit, stat id, amount ≤ 100,
+  enough points, per-stat cap); `/grandline allocate`, `/grandline stats`, `/grandline admin resetstats`.
+- **Effects (server-side attribute modifiers):** Defense → max health; Melee → damage with an empty hand; Sword →
+  damage while holding a sword. Gun/Fruit points are stored and shown as "no effect yet".
+- **Mob rewards:** hostile (`Enemy`) mobs killed by a player give XP + currency scaled by max health; per-player
+  per-minute anti-farm caps; action-bar reward message; chat + sound on level-up.
+- **Client:** HUD panel (level, XP bar, XP, currency, unspent points with key hint) and Stats screen on **K**
+  (rebindable), both reading only server-synced data.
+- Config: 10 new validated keys (see README).
+
+### Verification performed
+| Check | Result |
+|---|---|
+| `./gradlew clean build` | ✅ no compiler warnings |
+| Unit tests | ✅ 21/21 (new: StatRulesTest 4, RewardRulesTest 4, migration + negative-stat codec tests) |
+| Server game tests | ✅ 11/11 (new: allocation validation, Defense health incl. save/load, Melee/Sword by held item, hostile kill reward, no reward for cows or kills without a player) |
+| Real v1 → v2 migration | ✅ the dev server's existing Milestone-1 player file (level 3, 777) loaded unchanged with empty stats |
+| Real client: HUD | ✅ screenshot `docs/images/m2-hud-kill-reward.png` |
+| Real client: Stats screen, click **Defense +5** | ✅ server shows Defense 5, 1 point left, max health 20 → 21 |
+| Real kill (zombie killed by the player via `/damage … by Tester`) | ✅ action bar `+20 XP +10 currency`, HUD updated live |
+| Full server restart | ✅ stats, max health 21 and current health 21 all restored (relog health fix works) |
+
+### Problems hit and fixed
+- A transient max-health modifier would lose boosted health on every relog (vanilla clamps saved health before mods
+  run) → the health modifier is saved with the player; still recomputed from stats on join.
+- End-portal respawn (`alive=true`) would have fully healed → only real deaths respawn at full health.
+- Stats screen text overlapped the buttons → columns moved; "1 stat points" → "Stat points: 1".
+- A game test used 50 as an "over the limit" amount while the limit is 100 → test fixed (server behaviour was correct).
+
+### Outstanding / unverified
+- Balance values are first guesses (e.g. 0.2 half-hearts per Defense point); tune in `config/grandline.json`.
+- Stat effects are flat bonuses; no scaling curve or respec cost yet. Melee applies only with an empty main hand.
+- The per-request stat limit plus the 4-tick rate limit means very fast repeated clicks can be dropped (the screen
+  resyncs, so it never shows a wrong value).
+- Not tested in your own game yet: v0.2.0 (download `dist/grandline-0.2.0.jar`).
+
+### Next milestone
+Milestone 3 — ability framework & first fighting style (see ROADMAP.md).
+
 ## 2026-11-12 — Retarget to Minecraft 1.20.1 (Fabric)
 
 Requested change: the mod must target **1.20.1** instead of 26.3, staying on Fabric (Forge may come later).

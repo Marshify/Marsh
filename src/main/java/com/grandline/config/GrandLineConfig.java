@@ -38,6 +38,30 @@ public final class GrandLineConfig {
 	/** Minimum number of server ticks between two accepted requests of the same type from one player. */
 	public int requestCooldownTicks = 4;
 
+	// --- Stats (milestone 2) ---
+	/** Maximum points that can be invested in a single stat. */
+	public int maxPointsPerStat = 2800;
+	/** Extra max health (half-hearts) per Defense point. */
+	public double defenseHealthPerPoint = 0.2;
+	/** Upper bound for the Defense health bonus. */
+	public double maxBonusHealth = 200.0;
+	/** Extra attack damage per Melee point, applied while the main hand is empty. */
+	public double meleeDamagePerPoint = 0.05;
+	/** Extra attack damage per Sword point, applied while holding a sword. */
+	public double swordDamagePerPoint = 0.05;
+	/** Upper bound for the Melee and Sword damage bonuses. */
+	public double maxBonusDamage = 100.0;
+
+	// --- Mob kill rewards (milestone 2) ---
+	/** Experience granted per point of the killed hostile mob's max health. */
+	public double experiencePerMobHealth = 1.0;
+	/** Currency granted per point of the killed hostile mob's max health. */
+	public double currencyPerMobHealth = 0.5;
+	/** Anti-farm cap: most experience a player can earn from mob kills per minute. 0 disables the cap. */
+	public long maxKillExperiencePerMinute = 5_000;
+	/** Anti-farm cap: most currency a player can earn from mob kills per minute. 0 disables the cap. */
+	public long maxKillCurrencyPerMinute = 2_500;
+
 	public static GrandLineConfig defaults() {
 		return new GrandLineConfig();
 	}
@@ -75,6 +99,16 @@ public final class GrandLineConfig {
 		maxCurrency = clamp(maxCurrency, 0, Long.MAX_VALUE / 2);
 		startingCurrency = clamp(startingCurrency, 0, maxCurrency);
 		requestCooldownTicks = clamp(requestCooldownTicks, 0, 20 * 60);
+		maxPointsPerStat = clamp(maxPointsPerStat, 0, 1_000_000);
+		defenseHealthPerPoint = clamp(defenseHealthPerPoint, 0, 100);
+		maxBonusHealth = clamp(maxBonusHealth, 0, 1000);
+		meleeDamagePerPoint = clamp(meleeDamagePerPoint, 0, 100);
+		swordDamagePerPoint = clamp(swordDamagePerPoint, 0, 100);
+		maxBonusDamage = clamp(maxBonusDamage, 0, 2000);
+		experiencePerMobHealth = clamp(experiencePerMobHealth, 0, 1_000_000);
+		currencyPerMobHealth = clamp(currencyPerMobHealth, 0, 1_000_000);
+		maxKillExperiencePerMinute = clamp(maxKillExperiencePerMinute, 0, Long.MAX_VALUE / 2);
+		maxKillCurrencyPerMinute = clamp(maxKillCurrencyPerMinute, 0, Long.MAX_VALUE / 2);
 	}
 
 	private static void save(Path path, GrandLineConfig config) {
@@ -100,6 +134,10 @@ public final class GrandLineConfig {
 
 	private static int clamp(int value, int min, int max) {
 		return Math.max(min, Math.min(max, value));
+	}
+
+	private static double clamp(double value, double min, double max) {
+		return Double.isNaN(value) ? min : Math.max(min, Math.min(max, value));
 	}
 
 	private static long clamp(long value, long min, long max) {

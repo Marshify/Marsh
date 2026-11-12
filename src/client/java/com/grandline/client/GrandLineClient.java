@@ -1,5 +1,6 @@
 package com.grandline.client;
 
+import com.grandline.client.hud.ProfileHud;
 import com.grandline.client.network.ClientNetworking;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -12,5 +13,7 @@ public final class GrandLineClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ClientNetworking.register();
 		GrandLineClientCommands.register();
+		GrandLineKeys.register();
+		ProfileHud.register();
 	}
 }
