@@ -113,7 +113,7 @@ public final class ProfileHud {
 		int masteryTop = titleTop - 20;
 
 		long masteryXp = profile.powers().masteryXp(power.id().toString());
-		int masteryLevel = view.masteryExperiencePerLevel() <= 0 ? 0 : (int) Math.min(view.maxMastery(), masteryXp / view.masteryExperiencePerLevel());
+		int masteryLevel = view.masteryExperiencePerLevel() <= 0 ? 1 : (int) Math.min(view.maxMastery(), 1 + masteryXp / view.masteryExperiencePerLevel());
 		double masteryProgress = masteryLevel >= view.maxMastery() ? 1.0
 				: (double) (masteryXp % view.masteryExperiencePerLevel()) / view.masteryExperiencePerLevel();
 

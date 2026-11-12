@@ -48,13 +48,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.SAND, 1.8, 5f),
 			"dune_shot", "dune_sandstorm", "dune_quicksand", "dune_collapse", "dune_dash");
 
-	public static final FruitDef EMBER = register("ember", FruitRarity.RARE, Element.FIRE, 0xFF7A33,
-			FruitMoves.bolt(Element.FIRE, 14, 1.3, 8f),
-			FruitMoves.burst(Element.FIRE, 5, 10f),
-			FruitMoves.bolt(Element.FIRE, 20, 1.8, 12f),
-			FruitMoves.eruption(Element.FIRE, 16, 4.5, 18f, 1.1),
-			FruitMoves.dash(Element.FIRE, 2.0, 6f),
-			"ember_bolt", "ember_burst", "ember_lance", "ember_pillar", "ember_dash");
+	/** Flame Fruit (id kept as "ember" for save compatibility): faithful base-form moveset, see FlameMoves. */
+	public static final FruitDef EMBER = register("ember", FruitRarity.RARE, 0xFF7A33, com.grandline.fruit.flame.FlameMoves.moves());
 
 	public static final FruitDef FROST = register("frost", FruitRarity.RARE, Element.ICE, 0x8FD0FF,
 			FruitMoves.bolt(Element.ICE, 14, 1.3, 8f),
@@ -259,7 +254,17 @@ public final class Fruits {
 				new AbilityDef(cKey, 25, 180, 0.2, c),
 				new AbilityDef(vKey, 50, 300, 0.3, v),
 				new AbilityDef(rKey, 15, 120, 0.1, r))));
+		return registerItem(name, rarity, power);
+	}
 
+	/** Registers a fruit with a hand-made moveset (Z, X, C, V, R order). */
+	private static FruitDef register(String name, FruitRarity rarity, int color, List<AbilityDef> moves) {
+		Power power = Powers.register(new Power(GrandLineMod.id(name), PowerSource.FRUIT, StatType.FRUIT,
+				rarity.name().toLowerCase(java.util.Locale.ROOT), color, moves));
+		return registerItem(name, rarity, power);
+	}
+
+	private static FruitDef registerItem(String name, FruitRarity rarity, Power power) {
 		Item.Properties properties = new Item.Properties().stacksTo(1).fireResistant().rarity(switch (rarity) {
 			case COMMON -> Rarity.COMMON;
 			case UNCOMMON -> Rarity.UNCOMMON;

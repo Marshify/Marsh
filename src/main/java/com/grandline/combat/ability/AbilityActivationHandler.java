@@ -61,6 +61,15 @@ public final class AbilityActivationHandler {
 			return Outcome.INVALID_SLOT;
 		}
 		AbilityDef ability = power.abilities().get(request.slot());
+
+		// A toggle that is already on is switched off without any further checks.
+		if (ability.activation() == AbilityDef.Activation.TOGGLE && FlightService.isFlying(player)) {
+			FlightService.stop(player, true);
+			return Outcome.USED;
+		}
+		if (ChargeService.isCharging(player)) {
+			return Outcome.NOT_ALLOWED; // already winding up another move
+		}
 		int mastery = masteryRules().level(profile.powers().masteryXp(power.id().toString()));
 		if (mastery < ability.requiredMastery()) {
 			tell(player, "message.grandline.ability.locked", ability.requiredMastery());
@@ -72,15 +81,54 @@ public final class AbilityActivationHandler {
 			return Outcome.ON_COOLDOWN;
 		}
 
+		double multiplier = PlayerProfileService.statRules().abilityMultiplier(profile.stats(), power.scalingStat());
+
+		if (ability.activation() == AbilityDef.Activation.CHARGED) {
+			// Energy is checked now and spent on release; the server times the charge itself.
+			if (EnergyService.current(player) + 1.0e-9 < EnergyService.max(player) * ability.energyCost()) {
+				tell(player, "message.grandline.ability.no_energy");
+				return Outcome.NO_ENERGY;
+			}
+			ChargeService.begin(player, power, ability, request.slot(), multiplier);
+			return Outcome.USED;
+		}
+
 		if (!EnergyService.trySpend(player, ability.energyCost())) {
 			tell(player, "message.grandline.ability.no_energy");
 			return Outcome.NO_ENERGY;
 		}
+		ability.action().execute(new AbilityContext(player, power, ability, multiplier));
+		if (ability.activation() == AbilityDef.Activation.INSTANT) {
+			AbilityCooldownService.start(player, abilityId, ability.cooldownTicks()); // toggles start theirs when switched off
+		}
 
-		double multiplier = PlayerProfileService.statRules().abilityMultiplier(profile.stats(), power.scalingStat());
-		int hits = ability.action().execute(new AbilityContext(player, power, ability, multiplier));
-		AbilityCooldownService.start(player, abilityId, ability.cooldownTicks());
+		return Outcome.USED;
+	}
 
+	/** Handles the release of a held key: fires the charged move with the server-measured charge. */
+	public static Outcome release(ServerPlayer player, com.grandline.network.payload.AbilityReleasePayload request) {
+		if (request.slot() < 0 || request.slot() >= SLOT_COUNT) {
+			return Outcome.INVALID_SLOT;
+		}
+		return releaseCharge(player, request.slot());
+	}
+
+	/** Fires the move the player is charging in {@code slot}. Also used for the automatic release at full charge. */
+	public static Outcome releaseCharge(ServerPlayer player, int slot) {
+		ChargeService.Charging charging = ChargeService.end(player, slot);
+		if (charging == null) {
+			return Outcome.NOT_ALLOWED;
+		}
+		if (!player.isAlive()) {
+			return Outcome.NOT_ALLOWED;
+		}
+		if (!EnergyService.trySpend(player, charging.ability().energyCost())) {
+			tell(player, "message.grandline.ability.no_energy");
+			return Outcome.NO_ENERGY;
+		}
+		double charge = charging.charge(player.server.getTickCount());
+		charging.ability().action().execute(new AbilityContext(player, charging.power(), charging.ability(), charging.multiplier(), charge));
+		AbilityCooldownService.start(player, charging.power().abilityId(charging.ability()), charging.ability().cooldownTicks());
 		return Outcome.USED;
 	}
 

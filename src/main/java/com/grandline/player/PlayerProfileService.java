@@ -107,7 +107,7 @@ public final class PlayerProfileService {
 
 	/** Sets mastery level directly (admin). */
 	public static PlayerProfile setMasteryLevel(ServerPlayer player, Power power, int level) {
-		long xp = (long) Math.max(0, level) * AbilityActivationHandler.masteryRules().experiencePerLevel();
+		long xp = (long) Math.max(0, level - 1) * AbilityActivationHandler.masteryRules().experiencePerLevel();
 		return update(player, profile -> profile.withPowers(profile.powers().withMasteryXp(power.id().toString(), xp)));
 	}
 

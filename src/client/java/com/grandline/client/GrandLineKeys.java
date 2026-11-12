@@ -99,10 +99,29 @@ public final class GrandLineKeys {
 			}
 			if (down && !moveKeyWasDown[slot] && client.player != null && client.screen == null) {
 				ClientNetworking.requestAbilityActivation(activeSource(), slot);
+				heldSource[slot] = activeSource();
+			}
+			// Letting go of a hold-to-charge move fires it (the server times the charge itself).
+			if (!down && moveKeyWasDown[slot] && heldSource[slot] != null && isCharged(heldSource[slot], slot)) {
+				ClientNetworking.requestAbilityRelease(heldSource[slot], slot);
+			}
+			if (!down) {
+				heldSource[slot] = null;
 			}
 			moveKeyWasDown[slot] = down;
 		}
 	}
 
 	private static final boolean[] moveKeyWasDown = new boolean[5];
+	private static final PowerSource[] heldSource = new PowerSource[5];
+
+	private static boolean isCharged(PowerSource source, int slot) {
+		var profile = ClientProfileCache.profile();
+		if (profile == null) {
+			return false;
+		}
+		var power = com.grandline.combat.ability.Powers.get(source == PowerSource.FRUIT ? profile.powers().fruit() : profile.powers().fightingStyle());
+		return power != null && slot < power.abilities().size()
+				&& power.abilities().get(slot).activation() == com.grandline.combat.ability.AbilityDef.Activation.CHARGED;
+	}
 }

@@ -6,9 +6,13 @@ import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Everything a move needs while executing on the server. {@link #damage} applies the stat multiplier and attributes
- * the damage to the player, so kills count for rewards and quests.
+ * the damage to the player, so kills count for rewards and quests. {@code charge} is 0..1 for charged moves (0 = tap).
  */
-public record AbilityContext(ServerPlayer player, Power power, AbilityDef ability, double multiplier) {
+public record AbilityContext(ServerPlayer player, Power power, AbilityDef ability, double multiplier, double charge) {
+	public AbilityContext(ServerPlayer player, Power power, AbilityDef ability, double multiplier) {
+		this(player, power, ability, multiplier, 0.0);
+	}
+
 	public ServerLevel level() {
 		return player.serverLevel();
 	}

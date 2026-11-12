@@ -67,6 +67,17 @@ public final class EnergyService {
 		return true;
 	}
 
+	/** Like {@link #trySpend} but without an immediate sync packet (for per-tick drains; the regular sync covers it). */
+	public static boolean trySpendQuiet(ServerPlayer player, double fraction) {
+		double cost = max(player) * Math.max(0, fraction);
+		double now = current(player);
+		if (now + 1.0e-9 < cost) {
+			return false;
+		}
+		state(player).current = now - cost;
+		return true;
+	}
+
 	public static void refill(ServerPlayer player) {
 		state(player).current = max(player);
 		sync(player, true);

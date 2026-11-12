@@ -28,7 +28,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		return GrandLineMod.config().requestCooldownTicks + 1;
 	}
 
-	@GameTest(template = EMPTY_STRUCTURE)
+	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_1")
 	public void slamDamagesNearbyMobsAndGrantsMastery(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		PlayerProfileService.setMasteryLevel(player, FightingStyles.BRAWLER, 25);
@@ -59,7 +59,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		});
 	}
 
-	@GameTest(template = EMPTY_STRUCTURE)
+	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_2")
 	public void lockedMovesAndMissingFruitAreRejected(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		eq(helper, use(player, PowerSource.STYLE, 3), Outcome.LOCKED, "Uppercut needs mastery 50");
@@ -73,7 +73,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		});
 	}
 
-	@GameTest(template = EMPTY_STRUCTURE)
+	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_3")
 	public void cooldownBlocksReuse(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		eq(helper, use(player, PowerSource.STYLE, 0), Outcome.USED, "first jab");
@@ -83,7 +83,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		});
 	}
 
-	@GameTest(template = EMPTY_STRUCTURE)
+	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_4")
 	public void movesNeedEnergy(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		helper.assertTrue(EnergyService.trySpend(player, 0.97), "drain energy");

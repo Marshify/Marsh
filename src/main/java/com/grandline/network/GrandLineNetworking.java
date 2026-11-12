@@ -44,6 +44,9 @@ public final class GrandLineNetworking {
 		ServerPlayNetworking.registerGlobalReceiver(AbilityActivationRequestPayload.TYPE,
 				(packet, player, responseSender) -> AbilityActivationHandler.handle(player, packet));
 
+		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.AbilityReleasePayload.TYPE,
+				(packet, player, responseSender) -> AbilityActivationHandler.release(player, packet));
+
 		ServerPlayNetworking.registerGlobalReceiver(AllocateStatPayload.TYPE,
 				(packet, player, responseSender) -> handleAllocateStat(player, packet));
 

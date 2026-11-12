@@ -68,6 +68,13 @@ public final class ClientNetworking {
 		return true;
 	}
 
+	/** Tells the server a held move key was released (fires charged moves). */
+	public static void requestAbilityRelease(PowerSource source, int slot) {
+		if (ClientPlayNetworking.canSend(com.grandline.network.payload.AbilityReleasePayload.TYPE)) {
+			ClientPlayNetworking.send(new com.grandline.network.payload.AbilityReleasePayload(source.ordinal(), slot));
+		}
+	}
+
 	/** Sends a move activation intent. The server decides what (if anything) happens. */
 	public static boolean requestAbilityActivation(PowerSource source, int slot) {
 		if (slot < 0 || slot >= AbilityActivationHandler.SLOT_COUNT || !ClientPlayNetworking.canSend(AbilityActivationRequestPayload.TYPE)) {
