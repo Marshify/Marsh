@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Dawnreach Harbor",
+    "theme": "town",
+    "x": 0,
+    "z": 0,
+    "level": 1,
+    "starter": true
+  },
+  {
+    "name": "Verdant Wilds",
+    "theme": "jungle",
+    "x": -60,
+    "z": -400,
+    "level": 15,
+    "starter": false
+  },
+  {
+    "name": "Millbrook Village",
+    "theme": "village",
+    "x": 630,
+    "z": 120,
+    "level": 30,
+    "starter": false
+  },
+  {
+    "name": "Redbrick Port",
+    "theme": "brick_town",
+    "x": -630,
+    "z": 120,
+    "level": 60,
+    "starter": false
+  },
+  {
+    "name": "Sunscorch Dunes",
+    "theme": "desert",
+    "x": 570,
+    "z": 540,
+    "level": 75,
+    "starter": false
+  },
+  {
+    "name": "Frostpeak Isle",
+    "theme": "snow",
+    "x": 630,
+    "z": -420,
+    "level": 90,
+    "starter": false
+  },
+  {
+    "name": "Ironhold Bastion",
+    "theme": "fortress",
+    "x": 1380,
+    "z": 0,
+    "level": 120,
+    "starter": false
+  },
+  {
+    "name": "Cloudtop Isles",
+    "theme": "sky",
+    "x": -1500,
+    "z": -540,
+    "level": 150,
+    "starter": false
+  },
+  {
+    "name": "Stonewall Prison",
+    "theme": "prison",
+    "x": -1170,
+    "z": 270,
+    "level": 190,
+    "starter": false
+  },
+  {
+    "name": "Gladiator's Ring",
+    "theme": "colosseum",
+    "x": -630,
+    "z": -540,
+    "level": 225,
+    "starter": false
+  },
+  {
+    "name": "Emberfall Isle",
+    "theme": "volcano",
+    "x": -1380,
+    "z": 660,
+    "level": 300,
+    "starter": false
+  },
+  {
+    "name": "Saltmarket Docks",
+    "theme": "harbor",
+    "x": -30,
+    "z": 540,
+    "level": 375,
+    "starter": false
+  },
+  {
+    "name": "Lotus Palace",
+    "theme": "palace",
+    "x": 1200,
+    "z": -630,
+    "level": 450,
+    "starter": false
+  },
+  {
+    "name": "Crystal Fountain",
+    "theme": "crystal",
+    "x": 1200,
+    "z": 660,
+    "level": 625,
+    "starter": false
+  }
+]

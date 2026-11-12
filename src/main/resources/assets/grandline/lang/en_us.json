@@ -474,5 +474,8 @@
   "ability.grandline.flame_blast": "Burning Blast",
   "ability.grandline.flame_column": "Fire Column",
   "ability.grandline.flame_destroyer": "Flame Destroyer",
-  "ability.grandline.flame_flight": "Fire Flight"
+  "ability.grandline.flame_flight": "Fire Flight",
+  "screen.grandline.map.sea_name.1": "First Sea",
+  "screen.grandline.map.sea_name.2": "Second Sea",
+  "screen.grandline.map.sea_name.3": "Third Sea"
 }
