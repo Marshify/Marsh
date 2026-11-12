@@ -57,7 +57,7 @@ The mod is required on **both** client and server (it adds an item and custom pa
 | `./gradlew runServer` | Launches a dedicated server with the mod (run dir: `run/`). Accept the EULA in `run/eula.txt` on first run. |
 | `./gradlew test` | JUnit unit tests (progression maths, codecs) |
 | `./gradlew runGameTest` | Headless server game tests; report at `build/reports/gametest/server-gametests.xml` |
-| `./gradlew runClientGameTest` | Boots a real client, creates a single-player world **and** a dedicated server, and runs the end-to-end suite. Needs a display — on a headless Linux box use `xvfb-run -a ./gradlew runClientGameTest`. Screenshots land in `build/run/clientGameTest/screenshots/`. |
+| `./gradlew runClientGameTest` | Boots a real client, creates a single-player world **and** a dedicated server, and runs the end-to-end suite. Needs a display — on a headless Linux box use `SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest` (EGL is needed because SDL's GLX path fails on Xvfb). Screenshots land in `build/run/clientGameTest/screenshots/`. |
 
 IDE: open the folder in IntelliJ IDEA 2025.3+ (required for mixins on 26.x) and set the Gradle JVM to JDK 25.
 

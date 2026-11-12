@@ -53,13 +53,21 @@ Notes from the official Fabric 26.1/26.3 posts that shaped the build:
 | Mod loads on a server | `./gradlew runGameTest` (headless server) | ✅ "Grand Line 0.1.0 initialized" |
 | Server game tests | `./gradlew runGameTest` | ✅ 5/5 Grand Line tests (+ vanilla `always_pass`) |
 | Release jar contents | inspected `build/libs/grandline-0.1.0.jar` | ✅ mod + client classes + assets; no test code |
-| Client end-to-end | `xvfb-run ./gradlew runClientGameTest` | CLIENT_RESULT |
+| Client end-to-end | `SDL_VIDEO_FORCE_EGL=1 ./gradlew runClientGameTest` on Xvfb + Mesa llvmpipe | ✅ all 16 checks (integrated + dedicated server) |
 
 Server game tests: item registered; new players get default profile; profile survives vanilla player
 save → load (and is present under `fabric:attachments` in player NBT); cooldowns are *not* persisted; invalid and
 spammed ability requests are rejected and never change the profile.
 
+Client end-to-end checks: client sees the item; `/grandline test` and `/grandline profile` run as a player;
+non-operators are denied admin commands; admin changes sync to the client cache; raw invalid ability packets
+from the client are rejected and do not change the profile; profile survives closing and reopening the
+single-player world (full integrated-server restart); on a **dedicated server**: profile changes sync, the raw
+player `.dat` file on disk contains the profile, and it reloads after disconnect/reconnect.
+
 ### Problems hit and fixed
+- Minecraft 26.3 creates its window through SDL3. On Xvfb, SDL's GLX visual matching fails ("Couldn't find
+  matching GLX visual") and the game blocks on an error dialog. Fix for headless runs: `SDL_VIDEO_FORCE_EGL=1`.
 - `AttachmentRegistry.builder()` is deprecated in this Fabric API → switched to `AttachmentRegistry.create(id, builder -> …)`.
 - A game test wrongly assumed mock players start without a profile; they go through the real join flow, which
   creates the default profile. Fixed the test, not the mod (the mod behavior is intended).
@@ -73,7 +81,8 @@ spammed ability requests are rejected and never change the profile.
 - Translation keys are used for command output; vanilla clients without the mod would see raw keys (the mod is
   required on clients anyway).
 - Offline sandbox: Mojang auth/services lookups fail in logs (`discovery.minecraftservices.com`); harmless.
-- Not tested: a real multi-player session with two separate human clients, and a production install via the
+- Not tested: a full dedicated-server *process restart* (covered instead by integrated-server restart + dedicated
+  logout/login + reading the on-disk file); a real multi-player session with two separate human clients, and a production install via the
   Fabric installer/launcher (the dev runtime was used).
 
 ### Next milestone
