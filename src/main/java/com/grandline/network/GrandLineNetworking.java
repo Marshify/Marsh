@@ -3,48 +3,33 @@ package com.grandline.network;
 import com.grandline.combat.ability.AbilityActivationHandler;
 import com.grandline.combat.ability.AbilityCooldownService;
 import com.grandline.network.payload.AbilityActivationRequestPayload;
-import com.grandline.network.payload.CooldownSyncPayload;
-import com.grandline.network.payload.ProfileSyncPayload;
 import com.grandline.network.payload.RequestProfileSyncPayload;
 import com.grandline.player.PlayerProfileService;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 /**
- * Central registration point for every Grand Line packet.
+ * Server-side registration point for every client → server packet.
  *
- * <p>Direction is enforced by registration: clientbound payloads are only registered with
- * {@link PayloadTypeRegistry#clientboundPlay()}, so the server has no decoder (and no handler) for them. A modified
- * client therefore cannot push profile or cooldown data to the server; it can only send the intent payloads
- * registered with {@link PayloadTypeRegistry#serverboundPlay()}, each of which is validated server-side.
+ * <p>Direction is enforced by registration: the server only registers receivers for the intent packets below.
+ * Clientbound packets ({@code ProfileSyncPayload}, {@code CooldownSyncPayload}) have no server receiver, so a
+ * modified client cannot push profile or cooldown data to the server. Every receiver validates its input, and
+ * {@code FabricPacket} handlers run on the server thread.
  */
 public final class GrandLineNetworking {
 	private GrandLineNetworking() {
 	}
 
-	/** Registers payload types. Runs on both physical sides. */
-	public static void registerCommon() {
-		// Server -> client
-		PayloadTypeRegistry.clientboundPlay().register(ProfileSyncPayload.TYPE, ProfileSyncPayload.CODEC);
-		PayloadTypeRegistry.clientboundPlay().register(CooldownSyncPayload.TYPE, CooldownSyncPayload.CODEC);
-
-		// Client -> server
-		PayloadTypeRegistry.serverboundPlay().register(RequestProfileSyncPayload.TYPE, RequestProfileSyncPayload.CODEC);
-		PayloadTypeRegistry.serverboundPlay().register(AbilityActivationRequestPayload.TYPE, AbilityActivationRequestPayload.CODEC);
-	}
-
-	/** Registers server-side handlers for client requests. Handlers run on the server thread. */
 	public static void registerServerReceivers() {
-		ServerPlayNetworking.registerGlobalReceiver(RequestProfileSyncPayload.TYPE, (payload, context) -> {
-			if (ServerRequestGuard.check(context.player(), RequestProfileSyncPayload.TYPE) != ServerRequestGuard.Result.ACCEPTED) {
+		ServerPlayNetworking.registerGlobalReceiver(RequestProfileSyncPayload.TYPE, (packet, player, responseSender) -> {
+			if (ServerRequestGuard.check(player, RequestProfileSyncPayload.TYPE) != ServerRequestGuard.Result.ACCEPTED) {
 				return;
 			}
 
-			PlayerProfileService.sync(context.player());
-			AbilityCooldownService.sync(context.player());
+			PlayerProfileService.sync(player);
+			AbilityCooldownService.sync(player);
 		});
 
 		ServerPlayNetworking.registerGlobalReceiver(AbilityActivationRequestPayload.TYPE,
-				(payload, context) -> AbilityActivationHandler.handle(context.player(), payload));
+				(packet, player, responseSender) -> AbilityActivationHandler.handle(player, packet));
 	}
 }

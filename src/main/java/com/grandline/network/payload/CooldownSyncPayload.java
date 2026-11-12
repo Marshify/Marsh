@@ -1,11 +1,10 @@
 package com.grandline.network.payload;
 
 import com.grandline.GrandLineMod;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,32 +13,47 @@ import java.util.List;
  * Server → client: the full set of active ability cooldowns for the receiving player, expressed as remaining ticks.
  * The server remains the only authority on whether an ability is ready; the client uses this purely for display.
  */
-public record CooldownSyncPayload(List<Entry> cooldowns) implements CustomPacketPayload {
+public record CooldownSyncPayload(List<Entry> cooldowns) implements FabricPacket {
 	/** Hard cap so a bug can never produce an oversized packet. */
 	public static final int MAX_ENTRIES = 256;
 
-	public static final Type<CooldownSyncPayload> TYPE = new Type<>(GrandLineMod.id("cooldown_sync"));
-
-	public static final StreamCodec<RegistryFriendlyByteBuf, CooldownSyncPayload> CODEC = StreamCodec.composite(
-			Entry.STREAM_CODEC.apply(ByteBufCodecs.collection(ArrayList::new, MAX_ENTRIES)), CooldownSyncPayload::cooldowns,
-			CooldownSyncPayload::new
-	);
+	public static final PacketType<CooldownSyncPayload> TYPE = PacketType.create(GrandLineMod.id("cooldown_sync"), CooldownSyncPayload::read);
 
 	public CooldownSyncPayload {
+		if (cooldowns.size() > MAX_ENTRIES) {
+			throw new IllegalArgumentException("Too many cooldown entries: " + cooldowns.size());
+		}
 		cooldowns = List.copyOf(cooldowns);
 	}
 
+	private static CooldownSyncPayload read(FriendlyByteBuf buf) {
+		int size = buf.readVarInt();
+		if (size < 0 || size > MAX_ENTRIES) {
+			throw new IllegalArgumentException("Invalid cooldown entry count: " + size);
+		}
+
+		List<Entry> entries = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			entries.add(new Entry(buf.readResourceLocation(), buf.readVarInt(), buf.readVarInt()));
+		}
+		return new CooldownSyncPayload(entries);
+	}
+
 	@Override
-	public Type<? extends CustomPacketPayload> type() {
+	public void write(FriendlyByteBuf buf) {
+		buf.writeVarInt(cooldowns.size());
+		for (Entry entry : cooldowns) {
+			buf.writeResourceLocation(entry.abilityId());
+			buf.writeVarInt(entry.remainingTicks());
+			buf.writeVarInt(entry.totalTicks());
+		}
+	}
+
+	@Override
+	public PacketType<?> getType() {
 		return TYPE;
 	}
 
-	public record Entry(Identifier abilityId, int remainingTicks, int totalTicks) {
-		public static final StreamCodec<RegistryFriendlyByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
-				Identifier.STREAM_CODEC, Entry::abilityId,
-				ByteBufCodecs.VAR_INT, Entry::remainingTicks,
-				ByteBufCodecs.VAR_INT, Entry::totalTicks,
-				Entry::new
-		);
+	public record Entry(ResourceLocation abilityId, int remainingTicks, int totalTicks) {
 	}
 }

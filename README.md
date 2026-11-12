@@ -1,6 +1,6 @@
 # Grand Line
 
-A multiplayer RPG mod for **Minecraft Java Edition 26.3** on **Fabric**, inspired by the progression,
+A multiplayer RPG mod for **Minecraft Java Edition 1.20.1** on **Fabric**, inspired by the progression,
 exploration, combat and fruit-ability loops of action RPGs like Blox Fruits. All content is original.
 
 > **Status: Milestone 1 (foundation).** The project builds, loads on client and dedicated server, registers a
@@ -11,20 +11,23 @@ exploration, combat and fruit-ability loops of action RPGs like Blox Fruits. All
 |---|---|
 | Mod ID | `grandline` |
 | Base package | `com.grandline` |
-| Minecraft | 26.3 |
+| Minecraft | 1.20.1 |
 | Fabric Loader | 0.20.1 |
-| Fabric API | 0.166.2+26.3 |
-| Fabric Loom | 1.19.4 (`net.fabricmc.fabric-loom`, non-remapping) |
+| Fabric API | 0.92.12+1.20.1 (latest for 1.20.1) |
+| Mappings | Mojang official (`loom.officialMojangMappings()`) |
+| Fabric Loom | 1.19.4 (`net.fabricmc.fabric-loom-remap`) |
 | Gradle | 9.9.1 (wrapper) |
-| Java | 25 (Temurin 25.0.5 used for development) |
+| Java | **17** bytecode for players; **JDK 25** needed to *build* (Loom 1.19 requires it) |
 
-Versions were checked against `meta.fabricmc.net`, `maven.fabricmc.net` and the official
-[Fabric for Minecraft 26.3](https://fabricmc.net/2026/09/15/263.html) post on 2026-11-12.
+Versions were checked against `meta.fabricmc.net` and `maven.fabricmc.net` on 2026-11-12.
+
+![Grand Line Crystal on a 1.20.1 client connected to a dedicated server](docs/images/grand-line-crystal-1.20.1.png)
 
 ## Requirements
 
-- **JDK 25** — Gradle itself must run on Java 25 for Minecraft 26.x. Set `JAVA_HOME` to a JDK 25 install.
-  Any distribution works (e.g. [Eclipse Temurin](https://adoptium.net/)).
+- **To build:** JDK 25 — Fabric Loom 1.19 refuses to run on older JVMs. Set `JAVA_HOME` to a JDK 25 install
+  (e.g. [Eclipse Temurin](https://adoptium.net/)). The compiled mod targets Java 17.
+- **To play:** Minecraft 1.20.1 with Fabric Loader ≥ 0.20.1, Fabric API for 1.20.1, Java 17 or newer.
 - Internet access to `maven.fabricmc.net`, `meta.fabricmc.net`, Mojang's
   `piston-meta`/`piston-data`/`libraries.minecraft.net`/`resources.download.minecraft.net`, Maven Central
   and `services.gradle.org` (first build only; everything is cached afterwards).
@@ -46,7 +49,7 @@ build/libs/grandline-0.1.0.jar          # the mod — put this in a server's or 
 build/libs/grandline-0.1.0-sources.jar  # sources
 ```
 
-Install it alongside **Fabric API 0.166.2+26.3** (or newer for 26.3) on Fabric Loader ≥ 0.20.1.
+Install it alongside **Fabric API 0.92.12+1.20.1** (or newer for 1.20.1) on Fabric Loader ≥ 0.20.1.
 The mod is required on **both** client and server (it adds an item and custom packets).
 
 ## Run in development
@@ -54,12 +57,15 @@ The mod is required on **both** client and server (it adds an item and custom pa
 | Command | What it does |
 |---|---|
 | `./gradlew runClient` | Launches the Minecraft client with the mod (run dir: `run/`) |
-| `./gradlew runServer` | Launches a dedicated server with the mod (run dir: `run/`). Accept the EULA in `run/eula.txt` on first run. |
+| `./gradlew runServer` | Launches a dedicated server with the mod (run dir: `run-server/`, so client and server can run together). Accept the EULA in `run-server/eula.txt` on first run. |
 | `./gradlew test` | JUnit unit tests (progression maths, codecs) |
 | `./gradlew runGameTest` | Headless server game tests; report at `build/reports/gametest/server-gametests.xml` |
-| `./gradlew runClientGameTest` | Boots a real client, creates a single-player world **and** a dedicated server, and runs the end-to-end suite. Needs a display — on a headless Linux box use `SDL_VIDEO_FORCE_EGL=1 xvfb-run -a ./gradlew runClientGameTest` (EGL is needed because SDL's GLX path fails on Xvfb). Screenshots land in `build/run/clientGameTest/screenshots/`. |
 
-IDE: open the folder in IntelliJ IDEA 2025.3+ (required for mixins on 26.x) and set the Gradle JVM to JDK 25.
+IDE: open the folder in IntelliJ IDEA and set the Gradle JVM to JDK 25.
+
+To test multiplayer locally: start `./gradlew runServer`, then
+`./gradlew runClient --args="--quickPlayMultiplayer localhost:25565 --username Tester"` (set `online-mode=false`
+in `run-server/server.properties` for offline dev accounts).
 
 ## Manual test checklist (in game)
 

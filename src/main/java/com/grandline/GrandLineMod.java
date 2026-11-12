@@ -9,7 +9,7 @@ import com.grandline.registry.ModCreativeTabs;
 import com.grandline.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,6 @@ public final class GrandLineMod implements ModInitializer {
 		ModItems.register();
 		ModCreativeTabs.register();
 		ModAttachments.register();
-		GrandLineNetworking.registerCommon();
 		GrandLineNetworking.registerServerReceivers();
 		PlayerProfileEvents.register();
 		GrandLineCommands.register();
@@ -42,8 +41,8 @@ public final class GrandLineMod implements ModInitializer {
 	}
 
 	/** Builds an identifier in the {@code grandline} namespace. */
-	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
+	public static ResourceLocation id(String path) {
+		return new ResourceLocation(MOD_ID, path);
 	}
 
 	/** The active, validated configuration. Never null. */

@@ -1,6 +1,6 @@
 package com.grandline.combat.ability;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,7 +11,7 @@ import java.util.Map;
  * Access it through {@link AbilityCooldownService}, which also handles synchronization.
  */
 public final class AbilityCooldowns {
-	private final Map<Identifier, Window> windows = new LinkedHashMap<>();
+	private final Map<ResourceLocation, Window> windows = new LinkedHashMap<>();
 
 	public record Window(int startTick, int endTick) {
 		public int total() {
@@ -19,7 +19,7 @@ public final class AbilityCooldowns {
 		}
 	}
 
-	public void start(Identifier abilityId, int nowTick, int durationTicks) {
+	public void start(ResourceLocation abilityId, int nowTick, int durationTicks) {
 		if (durationTicks <= 0) {
 			windows.remove(abilityId);
 			return;
@@ -28,17 +28,17 @@ public final class AbilityCooldowns {
 		windows.put(abilityId, new Window(nowTick, nowTick + durationTicks));
 	}
 
-	public int remaining(Identifier abilityId, int nowTick) {
+	public int remaining(ResourceLocation abilityId, int nowTick) {
 		Window window = windows.get(abilityId);
 		return window == null ? 0 : Math.max(0, window.endTick() - nowTick);
 	}
 
-	public boolean isOnCooldown(Identifier abilityId, int nowTick) {
+	public boolean isOnCooldown(ResourceLocation abilityId, int nowTick) {
 		return remaining(abilityId, nowTick) > 0;
 	}
 
 	/** Drops expired entries and returns the active ones. */
-	public Map<Identifier, Window> active(int nowTick) {
+	public Map<ResourceLocation, Window> active(int nowTick) {
 		windows.values().removeIf(window -> window.endTick() <= nowTick);
 		return Collections.unmodifiableMap(windows);
 	}

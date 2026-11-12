@@ -3,7 +3,7 @@ package com.grandline.combat.ability;
 import com.grandline.data.ModAttachments;
 import com.grandline.network.payload.CooldownSyncPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -23,19 +23,19 @@ public final class AbilityCooldownService {
 	}
 
 	private static int now(ServerPlayer player) {
-		return player.level().getServer().getTickCount();
+		return player.server.getTickCount();
 	}
 
-	public static void start(ServerPlayer player, Identifier abilityId, int durationTicks) {
+	public static void start(ServerPlayer player, ResourceLocation abilityId, int durationTicks) {
 		state(player).start(abilityId, now(player), durationTicks);
 		sync(player);
 	}
 
-	public static boolean isOnCooldown(ServerPlayer player, Identifier abilityId) {
+	public static boolean isOnCooldown(ServerPlayer player, ResourceLocation abilityId) {
 		return state(player).isOnCooldown(abilityId, now(player));
 	}
 
-	public static int remaining(ServerPlayer player, Identifier abilityId) {
+	public static int remaining(ServerPlayer player, ResourceLocation abilityId) {
 		return state(player).remaining(abilityId, now(player));
 	}
 
@@ -52,7 +52,7 @@ public final class AbilityCooldownService {
 
 		int now = now(player);
 		List<CooldownSyncPayload.Entry> entries = new ArrayList<>();
-		for (Map.Entry<Identifier, AbilityCooldowns.Window> entry : state(player).active(now).entrySet()) {
+		for (Map.Entry<ResourceLocation, AbilityCooldowns.Window> entry : state(player).active(now).entrySet()) {
 			if (entries.size() >= CooldownSyncPayload.MAX_ENTRIES) {
 				break;
 			}

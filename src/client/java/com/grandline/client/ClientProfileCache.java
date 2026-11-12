@@ -2,7 +2,7 @@ package com.grandline.client;
 
 import com.grandline.network.payload.CooldownSyncPayload;
 import com.grandline.player.PlayerProfile;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -12,14 +12,16 @@ import java.util.List;
  * Accessed only from the client thread.
  */
 public final class ClientProfileCache {
-	private static @Nullable PlayerProfile profile;
+	@Nullable
+	private static PlayerProfile profile;
 	private static List<CooldownSyncPayload.Entry> cooldowns = List.of();
 	private static long cooldownsReceivedAtMillis;
 
 	private ClientProfileCache() {
 	}
 
-	public static @Nullable PlayerProfile profile() {
+	@Nullable
+	public static PlayerProfile profile() {
 		return profile;
 	}
 

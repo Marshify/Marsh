@@ -1,6 +1,54 @@
 # Grand Line — Development Log
 
-## 2026-11-12 — Milestone 1: Foundation
+## 2026-11-12 — Retarget to Minecraft 1.20.1 (Fabric)
+
+Requested change: the mod must target **1.20.1** instead of 26.3, staying on Fabric (Forge may come later).
+The 26.3 version is preserved in git history (commit `0bf25b1`).
+
+### Versions (verified against meta.fabricmc.net / maven.fabricmc.net, 2026-11-12)
+| Component | Version |
+|---|---|
+| Minecraft | 1.20.1 |
+| Fabric Loader | 0.20.1 (latest stable; supports 1.20.1) |
+| Fabric API | 0.92.12+1.20.1 (latest for 1.20.1) |
+| Loom | 1.19.4, plugin `net.fabricmc.fabric-loom-remap` (1.20.1 is obfuscated → remapping required) |
+| Mappings | Mojang official |
+| Gradle | 9.9.1 |
+| Java | release 17 bytecode; JDK 25 required to run Gradle (Loom 1.19.4 rejects JDK 21) |
+
+### What changed
+- Build: remapping Loom plugin, `mappings loom.officialMojangMappings()`, `modImplementation`, Java 17 target,
+  `runServer` uses `run-server/` so a client and server can run together.
+- `Identifier` → `ResourceLocation`; no `Item.Properties.setId`; creative tab via `FabricItemGroup.builder()`;
+  no `items/` model definition (1.20.1 reads `models/item/` directly).
+- Networking rewritten on the 1.20.1 `FabricPacket`/`PacketType` API (explicit `write`/read, bounded list reads).
+  The direction guarantee now comes from the server registering receivers only for the intent packets.
+- Data attachments, the profile model, progression rules, config, request guard and commands were kept
+  (Fabric API 0.92.x has the attachment API). Permission checks use `source.hasPermission(2)`.
+- Tests: DFU `getOrThrow(false, ...)`; game tests use `@GameTest(template = EMPTY_STRUCTURE)`.
+  The automated client gametest was **removed** — `fabric-client-gametest-api-v1` does not exist for 1.20.1.
+
+### Verification performed (1.20.1)
+| Check | Result |
+|---|---|
+| `./gradlew clean build` | ✅ BUILD SUCCESSFUL, no compiler warnings |
+| Unit tests | ✅ 11/11 |
+| Server game tests (`runGameTest`) | ✅ 5/5 |
+| Release jar | ✅ Java 17 bytecode (class v61), remapped to intermediary names, `minecraft ~1.20.1`, no test code |
+| Dedicated server boot (`runServer`) | ✅ mod initializes; `/grandline test` via RCON → `dedicated`, crystal registered: yes |
+| Real client joins dedicated server (`runClient --quickPlayMultiplayer`, Xvfb) | ✅ joins; crystal renders in hand (screenshot in `docs/images/`) |
+| Server → client profile sync | ✅ client log shows each sync after RCON `addxp`/`addcurrency` |
+| Save on shutdown | ✅ decoded `world/playerdata/<uuid>.dat` contains `grandline:player_profile` with the right values |
+| Full dedicated-server restart | ✅ after restart + reconnect, server and client both show level 3 / 10 XP / 777 / 6 points |
+
+### Unverified on 1.20.1 (were verified on 26.3 by the removed client gametest)
+- Non-operator denial of `/grandline admin` when typed by a real player (logic is vanilla `requires(hasPermission(2))`).
+- Raw malicious packets sent from a real client (the server-side validation path is covered by game tests).
+- Death/respawn keeping the profile (`copyOnDeath`) in a live session.
+- Single-player save/reopen in a real client.
+- A production install through the Fabric installer/launcher.
+
+## 2026-11-12 — Milestone 1: Foundation (originally on 26.3)
 
 ### Environment findings
 - The container had only JDK 21 and Gradle 8.14; Minecraft 26.x requires Java 25 for the Gradle JVM.

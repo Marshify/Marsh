@@ -1,7 +1,7 @@
 package com.grandline.network;
 
 import com.grandline.GrandLineMod;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * interval to stop packet spam from flooding gameplay logic.
  */
 public final class ServerRequestGuard {
-	private static final Map<UUID, Map<CustomPacketPayload.Type<?>, Integer>> LAST_ACCEPTED_TICK = new HashMap<>();
+	private static final Map<UUID, Map<PacketType<?>, Integer>> LAST_ACCEPTED_TICK = new HashMap<>();
 	private static final AtomicLong REJECTED = new AtomicLong();
 
 	private ServerRequestGuard() {
@@ -34,14 +34,14 @@ public final class ServerRequestGuard {
 	 * Checks generic preconditions and rate limits for a request. Callers must still validate the request's own
 	 * contents and call {@link #reject} for any content they refuse.
 	 */
-	public static Result check(ServerPlayer player, CustomPacketPayload.Type<?> type) {
+	public static Result check(ServerPlayer player, PacketType<?> type) {
 		if (player.isRemoved() || player.hasDisconnected()) {
 			return reject(player, type, Result.REJECTED_PLAYER_STATE);
 		}
 
-		int now = player.level().getServer().getTickCount();
+		int now = player.server.getTickCount();
 		int interval = GrandLineMod.config().requestCooldownTicks;
-		Map<CustomPacketPayload.Type<?>, Integer> perType = LAST_ACCEPTED_TICK.computeIfAbsent(player.getUUID(), uuid -> new HashMap<>());
+		Map<PacketType<?>, Integer> perType = LAST_ACCEPTED_TICK.computeIfAbsent(player.getUUID(), uuid -> new HashMap<>());
 		Integer last = perType.get(type);
 
 		if (last != null && now - last < interval) {
@@ -52,9 +52,9 @@ public final class ServerRequestGuard {
 		return Result.ACCEPTED;
 	}
 
-	public static Result reject(ServerPlayer player, CustomPacketPayload.Type<?> type, Result reason) {
+	public static Result reject(ServerPlayer player, PacketType<?> type, Result reason) {
 		REJECTED.incrementAndGet();
-		GrandLineMod.LOGGER.debug("Rejected {} from {}: {}", type.id(), player.getName().getString(), reason);
+		GrandLineMod.LOGGER.debug("Rejected {} from {}: {}", type.getId(), player.getName().getString(), reason);
 		return reason;
 	}
 

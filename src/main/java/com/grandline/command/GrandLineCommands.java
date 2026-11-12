@@ -50,10 +50,10 @@ public final class GrandLineCommands {
 				.then(Commands.literal("profile")
 						.executes(context -> showProfile(context.getSource(), context.getSource().getPlayerOrException()))
 						.then(Commands.argument("player", EntityArgument.player())
-								.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+								.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
 								.executes(context -> showProfile(context.getSource(), EntityArgument.getPlayer(context, "player")))))
 				.then(Commands.literal("admin")
-						.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+						.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						.then(Commands.literal("addxp")
 								.then(Commands.argument("players", EntityArgument.players())
 										.then(Commands.argument("amount", LongArgumentType.longArg(0))
@@ -78,7 +78,7 @@ public final class GrandLineCommands {
 		CommandSourceStack source = context.getSource();
 		boolean dedicated = source.getServer().isDedicatedServer();
 		boolean crystalRegistered = BuiltInRegistries.ITEM.containsKey(GrandLineMod.id("grand_line_crystal"))
-				&& BuiltInRegistries.ITEM.getValue(GrandLineMod.id("grand_line_crystal")) == ModItems.GRAND_LINE_CRYSTAL;
+				&& BuiltInRegistries.ITEM.get(GrandLineMod.id("grand_line_crystal")) == ModItems.GRAND_LINE_CRYSTAL;
 
 		source.sendSuccess(() -> Component.translatable("commands.grandline.test.header", GrandLineMod.modVersion())
 				.withStyle(ChatFormatting.AQUA), false);

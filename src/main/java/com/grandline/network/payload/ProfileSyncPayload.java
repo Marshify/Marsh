@@ -2,21 +2,25 @@ package com.grandline.network.payload;
 
 import com.grandline.GrandLineMod;
 import com.grandline.player.PlayerProfile;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Server → client: the authoritative profile of the receiving player.
- * Clients only display this data; it is never sent back to the server.
+ * Clients only display this data; the server never registers a handler for it, so it cannot be sent back.
  */
-public record ProfileSyncPayload(PlayerProfile profile) implements CustomPacketPayload {
-	public static final Type<ProfileSyncPayload> TYPE = new Type<>(GrandLineMod.id("profile_sync"));
-	public static final StreamCodec<RegistryFriendlyByteBuf, ProfileSyncPayload> CODEC =
-			PlayerProfile.STREAM_CODEC.map(ProfileSyncPayload::new, ProfileSyncPayload::profile).cast();
+public record ProfileSyncPayload(PlayerProfile profile) implements FabricPacket {
+	public static final PacketType<ProfileSyncPayload> TYPE =
+			PacketType.create(GrandLineMod.id("profile_sync"), buf -> new ProfileSyncPayload(PlayerProfile.read(buf)));
 
 	@Override
-	public Type<? extends CustomPacketPayload> type() {
+	public void write(FriendlyByteBuf buf) {
+		profile.write(buf);
+	}
+
+	@Override
+	public PacketType<?> getType() {
 		return TYPE;
 	}
 }

@@ -2,7 +2,7 @@ package com.grandline.client;
 
 import com.grandline.player.PlayerProfile;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -15,7 +15,7 @@ final class GrandLineClientCommands {
 
 	static void register() {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, buildContext) -> dispatcher.register(
-				ClientCommands.literal("grandlineclient").then(ClientCommands.literal("profile").executes(context -> {
+				ClientCommandManager.literal("grandlineclient").then(ClientCommandManager.literal("profile").executes(context -> {
 					PlayerProfile profile = ClientProfileCache.profile();
 					if (profile == null) {
 						context.getSource().sendError(Component.translatable("commands.grandline_client.profile.none"));

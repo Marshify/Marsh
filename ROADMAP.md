@@ -3,14 +3,15 @@
 Each milestone ends with a green `./gradlew build`, passing game tests, and an updated DEVELOPMENT_LOG.md.
 
 ## ✅ Milestone 1 — Foundation
-- Fabric 26.3 project (Loom 1.19.4, Gradle 9.9.1, Java 25), split client/common source sets
+- Fabric 1.20.1 project (Loom 1.19.4 remap + Mojang mappings, Gradle 9.9.1, Java 17 target), split client/common source sets
+  (originally built for 26.3, retargeted to 1.20.1 on request)
 - Main initializer and modular package layout
 - Grand Line Crystal test item + creative tab
 - Persistent, server-authoritative player profile (level, experience, currency, unallocated stat points)
 - Networking foundation: profile sync, cooldown sync, validated + rate-limited client requests
 - `/grandline` test, profile and admin commands; `/grandlineclient profile`
 - Config file with validation
-- Unit tests, server game tests, client end-to-end game test (integrated + dedicated server)
+- Unit tests, server game tests, scripted real client + dedicated server verification
 
 ## ▶ Milestone 2 — Stats, HUD & experience sources (recommended next)
 - Stat model: e.g. Melee, Defense, Sword, Gun, Fruit — allocate unallocated points via a validated C2S request
@@ -44,6 +45,7 @@ Each milestone ends with a green `./gradlew build`, passing game tests, and an u
 - Level-tiered custom mobs and the first boss
 
 ## Later
+- Optional: Forge (or multi-loader) port — see ARCHITECTURE.md › Switching to Forge later
 - Weapons (swords, guns) with mastery
 - Shops/economy, trading between players
 - Raids, PvP rules/zones, party system

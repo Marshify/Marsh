@@ -3,8 +3,6 @@ package com.grandline.registry;
 import com.grandline.GrandLineMod;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 
@@ -20,9 +18,7 @@ public final class ModItems {
 	}
 
 	private static <T extends Item> T register(String name, Function<Item.Properties, T> factory, Item.Properties properties) {
-		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, GrandLineMod.id(name));
-		T item = factory.apply(properties.setId(key));
-		return Registry.register(BuiltInRegistries.ITEM, key, item);
+		return Registry.register(BuiltInRegistries.ITEM, GrandLineMod.id(name), factory.apply(properties));
 	}
 
 	/** Forces class loading so items are registered during mod initialization. */

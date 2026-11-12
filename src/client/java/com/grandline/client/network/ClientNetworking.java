@@ -1,5 +1,6 @@
 package com.grandline.client.network;
 
+import com.grandline.GrandLineMod;
 import com.grandline.client.ClientProfileCache;
 import com.grandline.combat.ability.AbilityActivationHandler;
 import com.grandline.network.payload.AbilityActivationRequestPayload;
@@ -19,9 +20,12 @@ public final class ClientNetworking {
 
 	public static void register() {
 		ClientPlayNetworking.registerGlobalReceiver(ProfileSyncPayload.TYPE,
-				(payload, context) -> ClientProfileCache.acceptProfile(payload.profile()));
+				(packet, player, responseSender) -> {
+					GrandLineMod.LOGGER.debug("Received profile sync: {}", packet.profile());
+					ClientProfileCache.acceptProfile(packet.profile());
+				});
 		ClientPlayNetworking.registerGlobalReceiver(CooldownSyncPayload.TYPE,
-				(payload, context) -> ClientProfileCache.acceptCooldowns(payload.cooldowns()));
+				(packet, player, responseSender) -> ClientProfileCache.acceptCooldowns(packet.cooldowns()));
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientProfileCache.clear());
 	}
