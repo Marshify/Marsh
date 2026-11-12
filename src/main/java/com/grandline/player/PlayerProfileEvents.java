@@ -21,6 +21,7 @@ public final class PlayerProfileEvents {
 			PlayerProfileService.sync(handler.getPlayer());
 			AbilityCooldownService.sync(handler.getPlayer());
 			EnergyService.sync(handler.getPlayer(), true);
+			com.grandline.npc.QuestService.sync(handler.getPlayer());
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> ServerRequestGuard.forget(handler.getPlayer().getUUID()));

@@ -43,6 +43,7 @@ public final class ModWorld {
 	}
 
 	public static void register() {
+		IslandRegistry.register();
 		BiomeModifications.addFeature(BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Decoration.RAW_GENERATION, ISLAND_PLACED);
 		ServerLifecycleEvents.SERVER_STARTED.register(ModWorld::placeSpawnOnStarterIsland);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

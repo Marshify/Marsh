@@ -51,47 +51,46 @@ public final class ProfileHud {
 		graphics.pose().translate(0, 0, 400);
 		renderStatus(graphics, client, view);
 		renderPowerPanel(graphics, client, view);
+		renderQuest(graphics, client);
 		graphics.pose().popPose();
 	}
 
-	/** Bottom-left status block. */
+	/** Top-left status block (kept out of the bottom-left, where vanilla chat lives). */
 	private static void renderStatus(GuiGraphics graphics, Minecraft client, ProfileSyncPayload view) {
 		Font font = client.font;
 		PlayerProfile profile = view.profile();
-		int width = sideWidth(graphics, 124);
+		int width = 124;
 		int x = 6;
-		int bottom = graphics.guiHeight() - 6;
+		int y = 6;
 
-		int energyY = bottom - 12;
-		int healthY = energyY - 14;
-		int xpY = healthY - 8;
-		int levelY = xpY - 19;
-		int currencyY = levelY - 13;
+		graphics.drawString(font, "$ " + NUMBERS.format(profile.currency()), x, y, 0x6BE36B);
+		y += 11;
+		drawScaled(graphics, font, Component.translatable("hud.grandline.level_big", profile.level()), x, y, 2.0f, 0xFFFFFF);
+		y += 19;
 
-		if (profile.unallocatedStatPoints() > 0) {
-			graphics.drawString(font, Component.translatable("hud.grandline.points_hint", profile.unallocatedStatPoints(),
-					GrandLineKeys.STATS.getTranslatedKeyMessage()), x, currencyY - 11, 0x7CFC7C);
-		}
-
-		graphics.drawString(font, "$ " + NUMBERS.format(profile.currency()), x, currencyY, 0x6BE36B);
-		drawScaled(graphics, font, Component.translatable("hud.grandline.level_big", profile.level()), x, levelY, 2.0f, 0xFFFFFF);
-
-		// XP bar with text.
 		double xpProgress = view.experienceToNextLevel() <= 0 ? 1.0 : Math.min(1.0, (double) profile.experience() / view.experienceToNextLevel());
-		bar(graphics, x, xpY, width, 6, xpProgress, 0xFF9B59D6, 0xFF2A1A3A);
+		bar(graphics, x, y, width, 6, xpProgress, 0xFF9B59D6, 0xFF2A1A3A);
 		Component xpText = view.experienceToNextLevel() <= 0 ? Component.translatable("hud.grandline.max_level")
 				: Component.literal(NUMBERS.format(profile.experience()) + " / " + NUMBERS.format(view.experienceToNextLevel()));
-		drawScaled(graphics, font, xpText, x + width / 2f - font.width(xpText) * 0.35f, xpY, 0.7f, 0xFFFFFF);
+		drawScaled(graphics, font, xpText, x + width / 2f - font.width(xpText) * 0.35f, y, 0.7f, 0xFFFFFF);
+		y += 9;
 
 		float health = client.player.getHealth();
 		float maxHealth = client.player.getMaxHealth();
-		labelledBar(graphics, font, x, healthY, width, Component.translatable("hud.grandline.health"),
+		labelledBar(graphics, font, x, y, width, Component.translatable("hud.grandline.health"),
 				Math.round(health) + "/" + Math.round(maxHealth), maxHealth <= 0 ? 0 : health / maxHealth, 0xFF3FBF4F, 0xFF1D3B22);
+		y += 14;
 
 		float energy = ClientProfileCache.energy();
 		float maxEnergy = ClientProfileCache.maxEnergy();
-		labelledBar(graphics, font, x, energyY, width, Component.translatable("hud.grandline.energy"),
+		labelledBar(graphics, font, x, y, width, Component.translatable("hud.grandline.energy"),
 				Math.round(energy) + "/" + Math.round(maxEnergy), maxEnergy <= 0 ? 0 : energy / maxEnergy, 0xFF3FA9E8, 0xFF16304A);
+		y += 15;
+
+		if (profile.unallocatedStatPoints() > 0) {
+			graphics.drawString(font, Component.translatable("hud.grandline.points_hint", NUMBERS.format(profile.unallocatedStatPoints()),
+					GrandLineKeys.STATS.getTranslatedKeyMessage()), x, y, 0x7CFC7C);
+		}
 	}
 
 	/** Bottom-right power panel. */
@@ -159,6 +158,34 @@ public final class ProfileHud {
 	/** Width that keeps a side panel clear of the centred vanilla hotbar (182 px wide). */
 	private static int sideWidth(GuiGraphics graphics, int preferred) {
 		return Math.max(80, Math.min(preferred, graphics.guiWidth() / 2 - 91 - 12));
+	}
+
+	/** Top-centre quest tracker with distance and direction to the quest island. */
+	private static void renderQuest(GuiGraphics graphics, Minecraft client) {
+		com.grandline.npc.QuestState quest = ClientProfileCache.quest();
+		if (quest == null) {
+			return;
+		}
+		Font font = client.font;
+		Component title = com.grandline.client.screen.NpcScreensAccess.describe(quest);
+		Component progress = Component.translatable("hud.grandline.quest.progress", quest.progress(), quest.required());
+		double dx = quest.x() - client.player.getX();
+		double dz = quest.z() - client.player.getZ();
+		int distance = (int) Math.sqrt(dx * dx + dz * dz);
+		double bearing = Math.toDegrees(Math.atan2(-dx, dz)) - client.player.getYRot();
+		bearing = ((bearing % 360) + 540) % 360 - 180;
+		String arrow = Math.abs(bearing) < 22.5 ? "↑" : Math.abs(bearing) > 157.5 ? "↓" : bearing > 0 ? (bearing < 67.5 ? "↗" : bearing < 112.5 ? "→" : "↘")
+				: (bearing > -67.5 ? "↖" : bearing > -112.5 ? "←" : "↙");
+		Component where = Component.literal(arrow + " " + distance + "m");
+		int width = Math.max(font.width(title), font.width(progress) + font.width(where) + 12) + 12;
+		int x = graphics.guiWidth() / 2 - width / 2;
+		int y = 4;
+		graphics.fill(x - 1, y - 1, x + width + 1, y + 27, PANEL_BORDER);
+		graphics.fill(x, y, x + width, y + 26, NAVY);
+		graphics.fill(x, y, x + width, y + 2, GOLD);
+		graphics.drawString(font, title, x + 6, y + 5, 0xFFFFFF);
+		graphics.drawString(font, progress, x + 6, y + 16, 0x9CFF9C);
+		graphics.drawString(font, where, x + width - 6 - font.width(where), y + 16, GOLD);
 	}
 
 	private static void labelledBar(GuiGraphics graphics, Font font, int x, int y, int width, Component label, String value,

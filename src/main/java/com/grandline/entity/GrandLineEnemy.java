@@ -1,0 +1,106 @@
+package com.grandline.entity;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.util.RandomSource;
+
+/**
+ * A level-scaled hostile islander. Health and damage grow with its level, so kill rewards (which scale with max health)
+ * grow too. Shows its name and level above its head.
+ */
+public class GrandLineEnemy extends Monster {
+	private static final String LEVEL_KEY = "GrandLineLevel";
+	private int grandLineLevel = 1;
+
+	public GrandLineEnemy(EntityType<? extends GrandLineEnemy> type, Level level) {
+		super(type, level);
+		setPersistenceRequired();
+	}
+
+	public static AttributeSupplier.Builder createAttributes() {
+		return Monster.createMonsterAttributes()
+				.add(Attributes.MAX_HEALTH, 20.0)
+				.add(Attributes.ATTACK_DAMAGE, 3.0)
+				.add(Attributes.MOVEMENT_SPEED, 0.28)
+				.add(Attributes.FOLLOW_RANGE, 24.0);
+	}
+
+	public EnemyKind kind() {
+		return GrandLineEntities.kindOf(getType());
+	}
+
+	public int grandLineLevel() {
+		return grandLineLevel;
+	}
+
+	/** Sets the level, scales attributes and heals to full. */
+	public void setGrandLineLevel(int level) {
+		grandLineLevel = Math.max(1, level);
+		EnemyKind kind = kind();
+		double health = 20.0 * kind.healthScale() * (1.0 + grandLineLevel * 0.06);
+		double damage = (3.0 + grandLineLevel * 0.08) * kind.damageScale();
+		getAttribute(Attributes.MAX_HEALTH).setBaseValue(Math.min(health, 1_000_000));
+		getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(Math.min(damage, 2048));
+		setHealth(getMaxHealth());
+		updateName();
+	}
+
+	protected void updateName() {
+		setCustomName(Component.translatable("entity.grandline." + kind().id()).append(" [Lv. " + grandLineLevel + "]"));
+		setCustomNameVisible(true);
+	}
+
+	@Override
+	protected void registerGoals() {
+		goalSelector.addGoal(0, new FloatGoal(this));
+		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.1, false));
+		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
+		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
+		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+		targetSelector.addGoal(1, new HurtByTargetGoal(this));
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+	}
+
+	@Override
+	protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
+		setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(kind().weapon()));
+		setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+	}
+
+	public void equip() {
+		populateDefaultEquipmentSlots(getRandom(), level().getCurrentDifficultyAt(blockPosition()));
+	}
+
+	@Override
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+		tag.putInt(LEVEL_KEY, grandLineLevel);
+	}
+
+	@Override
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+		grandLineLevel = Math.max(1, tag.getInt(LEVEL_KEY));
+	}
+
+	@Override
+	public boolean removeWhenFarAway(double distance) {
+		return false;
+	}
+}

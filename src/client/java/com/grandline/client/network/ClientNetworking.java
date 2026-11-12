@@ -37,6 +37,16 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.IslandListPayload.TYPE,
 				(packet, player, responseSender) -> ClientProfileCache.acceptIslands(packet.islands()));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.OpenNpcPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.screen.NpcScreens.open(packet));
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.GachaResultPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.screen.GachaScreen.onResult(packet.fruitId()));
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.QuestSyncPayload.TYPE,
+				(packet, player, responseSender) -> ClientProfileCache.acceptQuest(packet.quest().orElse(null)));
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.ActionResultPayload.TYPE,
+				(packet, player, responseSender) -> player.displayClientMessage(net.minecraft.network.chat.Component.translatable(packet.key())
+						.withStyle(packet.success() ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED), true));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientProfileCache.clear());
 	}
 

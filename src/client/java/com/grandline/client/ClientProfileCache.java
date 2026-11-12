@@ -18,6 +18,8 @@ public final class ClientProfileCache {
 	private static List<CooldownSyncPayload.Entry> cooldowns = List.of();
 	private static long cooldownsReceivedAtMillis;
 	private static List<com.grandline.world.Island> islands = List.of();
+	@Nullable
+	private static com.grandline.npc.QuestState quest;
 	private static float energy;
 	private static float maxEnergy;
 
@@ -60,6 +62,15 @@ public final class ClientProfileCache {
 		islands = List.copyOf(list);
 	}
 
+	@Nullable
+	public static com.grandline.npc.QuestState quest() {
+		return quest;
+	}
+
+	public static void acceptQuest(@Nullable com.grandline.npc.QuestState newQuest) {
+		quest = newQuest;
+	}
+
 	public static float energy() {
 		return energy;
 	}
@@ -90,5 +101,6 @@ public final class ClientProfileCache {
 		energy = 0;
 		maxEnergy = 0;
 		islands = List.of();
+		quest = null;
 	}
 }

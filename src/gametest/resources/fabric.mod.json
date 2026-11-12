@@ -11,7 +11,8 @@
 			"com.grandline.test.GrandLineServerGameTests",
 			"com.grandline.test.GrandLineStatsGameTests",
 			"com.grandline.test.GrandLineAbilityGameTests",
-			"com.grandline.test.GrandLineFruitGameTests"
+			"com.grandline.test.GrandLineFruitGameTests",
+			"com.grandline.test.GrandLineNpcGameTests"
 		]
 	},
 	"depends": {

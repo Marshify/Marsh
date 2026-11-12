@@ -47,6 +47,9 @@ public final class GrandLineNetworking {
 		ServerPlayNetworking.registerGlobalReceiver(AllocateStatPayload.TYPE,
 				(packet, player, responseSender) -> handleAllocateStat(player, packet));
 
+		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.NpcActionPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.npc.NpcService.handle(player, packet));
+
 		ServerPlayNetworking.registerGlobalReceiver(FruitActionPayload.TYPE,
 				(packet, player, responseSender) -> handleFruitAction(player, packet));
 	}

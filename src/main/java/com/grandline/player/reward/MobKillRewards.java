@@ -40,11 +40,16 @@ public final class MobKillRewards {
 			return;
 		}
 		grant(player, entity.getMaxHealth());
+		com.grandline.npc.QuestService.onKill(player, entity);
 	}
 
 	/** Grants the (budget-limited) reward for killing a mob with {@code mobMaxHealth}. Returns what was granted. */
 	public static RewardRules.Reward grant(ServerPlayer player, float mobMaxHealth) {
-		RewardRules rules = RewardRules.fromConfig(GrandLineMod.config());
+		RewardRules base0 = RewardRules.fromConfig(GrandLineMod.config());
+		// Anti-farm caps grow with the player's level so high-level enemies stay worth fighting.
+		double capScale = 1.0 + PlayerProfileService.get(player).level() / 25.0;
+		RewardRules rules = new RewardRules(base0.experiencePerMobHealth(), base0.currencyPerMobHealth(),
+				(long) (base0.maxExperiencePerMinute() * capScale), (long) (base0.maxCurrencyPerMinute() * capScale));
 		RewardRules.Reward base = rules.rewardFor(mobMaxHealth);
 		if (base.isEmpty()) {
 			return RewardRules.Reward.NONE;

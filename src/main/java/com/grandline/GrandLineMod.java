@@ -50,6 +50,9 @@ public final class GrandLineMod implements ModInitializer {
 		LingeringAreas.register();
 		FruitService.register();
 		com.grandline.world.ModWorld.register();
+		com.grandline.entity.GrandLineEntities.register();
+		com.grandline.npc.FishingService.register();
+		com.grandline.npc.IslandPopulation.register();
 		GrandLineCommands.register();
 
 		LOGGER.info("Grand Line {} initialized", modVersion());

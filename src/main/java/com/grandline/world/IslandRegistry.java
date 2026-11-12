@@ -25,10 +25,33 @@ public final class IslandRegistry extends SavedData {
 	private final Map<Long, Island> islands = new LinkedHashMap<>();
 	private boolean spawnPlaced;
 
+	/**
+	 * Loaded once on the main thread when the overworld loads. World-generation threads must only use this instance:
+	 * vanilla's data storage is not thread-safe, and touching it from worker threads can hang the server.
+	 */
+	private static volatile IslandRegistry instance;
+
+	public static void register() {
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, level) -> {
+			if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+				instance = level.getDataStorage().computeIfAbsent(IslandRegistry::load, IslandRegistry::new, NAME);
+			}
+		});
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> instance = null);
+	}
+
+	/** The registry for the running server, or null before the overworld has loaded. Safe from any thread. */
+	public static IslandRegistry current() {
+		return instance;
+	}
+
 	public static IslandRegistry get(ServerLevel overworld) {
-		synchronized (IslandRegistry.class) {
-			return overworld.getDataStorage().computeIfAbsent(IslandRegistry::load, IslandRegistry::new, NAME);
+		IslandRegistry registry = instance;
+		if (registry == null) {
+			registry = overworld.getDataStorage().computeIfAbsent(IslandRegistry::load, IslandRegistry::new, NAME);
+			instance = registry;
 		}
+		return registry;
 	}
 
 	public static IslandRegistry get(MinecraftServer server) {

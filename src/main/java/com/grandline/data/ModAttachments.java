@@ -39,6 +39,13 @@ public final class ModAttachments {
 					.initializer(java.util.List::of)
 					.buildAndRegister(GrandLineMod.id("discovered_islands"));
 
+	/** The player's active quest, if any (persistent, survives death). */
+	public static final AttachmentType<com.grandline.npc.QuestState> ACTIVE_QUEST =
+			AttachmentRegistry.<com.grandline.npc.QuestState>builder()
+					.persistent(com.grandline.npc.QuestState.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("active_quest"));
+
 	private ModAttachments() {
 	}
 

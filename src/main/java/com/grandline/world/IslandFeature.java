@@ -168,6 +168,11 @@ public final class IslandFeature extends Feature<NoneFeatureConfiguration> {
 		double distance = Math.sqrt((double) x * x + (double) z * z);
 		int recommended = starter ? 1 : (int) Math.max(1, Math.min(GrandLineMod.config().maxLevel, 1 + distance * 0.5));
 		String name = starter ? "Dawnreach Isle" : IslandNames.generate(level.getSeed() ^ chunk.toLong());
-		IslandRegistry.get(serverLevel).add(new Island(chunk.toLong(), x, z, radius, recommended, name, starter, false));
+		IslandRegistry registry = IslandRegistry.current(); // never touch vanilla data storage from a worldgen thread
+		if (registry != null) {
+			registry.add(new Island(chunk.toLong(), x, z, radius, recommended, name, starter, false));
+		} else {
+			GrandLineMod.LOGGER.warn("Island {} generated before the island registry was loaded", name);
+		}
 	}
 }
