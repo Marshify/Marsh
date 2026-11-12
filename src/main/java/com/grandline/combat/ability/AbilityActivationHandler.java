@@ -81,10 +81,6 @@ public final class AbilityActivationHandler {
 		int hits = ability.action().execute(new AbilityContext(player, power, ability, multiplier));
 		AbilityCooldownService.start(player, abilityId, ability.cooldownTicks());
 
-		long masteryGain = masteryRules().experienceFor(hits);
-		if (masteryGain > 0) {
-			PlayerProfileService.addMastery(player, power, masteryGain);
-		}
 		return Outcome.USED;
 	}
 

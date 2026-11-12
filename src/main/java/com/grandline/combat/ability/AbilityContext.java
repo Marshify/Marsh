@@ -18,6 +18,8 @@ public record AbilityContext(ServerPlayer player, Power power, AbilityDef abilit
 		if (target == player || !target.isAlive()) {
 			return false;
 		}
+		// Remember which power struck last, so a kill credits mastery to the right power.
+		KillCredit.record(target, player, power);
 		return target.hurt(level().damageSources().playerAttack(player), (float) (baseDamage * multiplier));
 	}
 }

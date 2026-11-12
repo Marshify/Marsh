@@ -40,6 +40,7 @@ public final class MobKillRewards {
 			return;
 		}
 		grant(player, entity.getMaxHealth());
+		com.grandline.combat.ability.KillCredit.onKill(player, entity);
 		com.grandline.npc.QuestService.onKill(player, entity);
 	}
 

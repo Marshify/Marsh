@@ -83,8 +83,8 @@ public final class GrandLineConfig {
 	public long masteryExperiencePerLevel = 25;
 	/** Highest mastery level. */
 	public int maxMastery = 600;
-	/** Mastery experience per entity hit by a move. */
-	public long masteryExperiencePerHit = 5;
+	/** Mastery experience per point of a killed enemy's max health, given to the power that landed the killing blow. */
+	public double masteryPerKilledHealth = 1.0;
 
 	/** Max energy at level 1. */
 	public double baseEnergy = 100.0;
@@ -201,7 +201,7 @@ public final class GrandLineConfig {
 		maxAbilityPower = clamp(maxAbilityPower, 0, 100);
 		masteryExperiencePerLevel = clamp(masteryExperiencePerLevel, 1, 1_000_000);
 		maxMastery = clamp(maxMastery, 1, 100_000);
-		masteryExperiencePerHit = clamp(masteryExperiencePerHit, 0, 1_000_000);
+		masteryPerKilledHealth = clamp(masteryPerKilledHealth, 0, 1_000_000);
 		baseEnergy = clamp(baseEnergy, 1, 1_000_000);
 		energyPerLevel = clamp(energyPerLevel, 0, 10_000);
 		energyRegenPerSecond = clamp(energyRegenPerSecond, 0, 10);

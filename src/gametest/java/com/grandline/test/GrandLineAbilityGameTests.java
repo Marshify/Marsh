@@ -39,10 +39,24 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		long masteryBefore = PlayerProfileService.get(player).powers().masteryXp(FightingStyles.BRAWLER.id().toString());
 
 		eq(helper, use(player, PowerSource.STYLE, 2), Outcome.USED, "Ground Slam");
-		helper.assertTrue(zombie.getHealth() < healthBefore || zombie.isDeadOrDying(), "zombie took damage");
-		long masteryAfter = PlayerProfileService.get(player).powers().masteryXp(FightingStyles.BRAWLER.id().toString());
-		helper.assertTrue(masteryAfter > masteryBefore, "mastery gained from the hit");
-		helper.succeed();
+		helper.assertTrue(zombie.getHealth() < healthBefore, "zombie took damage");
+		long afterHit = PlayerProfileService.get(player).powers().masteryXp(FightingStyles.BRAWLER.id().toString());
+		eq(helper, afterHit, masteryBefore, "hitting alone gives no mastery");
+
+		// Finish it with another move: the kill credits the Brawler style.
+		helper.runAfterDelay(Math.max(gap(), 12), () -> { // past the zombie's post-hit invulnerability
+			zombie.setHealth(1f);
+			zombie.setDeltaMovement(0, 0, 0);
+			zombie.moveTo(player.getX() + 1.5, player.getY(), player.getZ());
+			player.setYRot(-90);
+			player.setXRot(0);
+			eq(helper, use(player, PowerSource.STYLE, 0), Outcome.USED, "finishing jab");
+			helper.assertTrue(zombie.isDeadOrDying(), "zombie killed");
+			long afterKill = PlayerProfileService.get(player).powers().masteryXp(FightingStyles.BRAWLER.id().toString());
+			eq(helper, afterKill - masteryBefore, (long) Math.round(zombie.getMaxHealth() * GrandLineMod.config().masteryPerKilledHealth),
+					"kill mastery scales with the zombie's max health");
+			helper.succeed();
+		});
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE)
