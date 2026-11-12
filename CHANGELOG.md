@@ -1,5 +1,14 @@
 # Grand Line patch notes
 
+## v0.7.2 — New Fruit Art (Part 1)
+**New**
+- 15 fruits have brand-new 32×32 pixel art: Flame, Frost, Dune, Lava, Volt, Blast, Umbra, Orbit, Echo, Quartz, Tremor, Toxin, Feather, Nova and Bounce.
+- The new art shows everywhere the fruit appears: inventory, the fruit dealer, the gacha, your stash and the eat/store dialog.
+
+**Notes**
+- Item IDs are unchanged, so fruits you're holding, eaten fruits and mastery all carry over.
+- The other 27 fruits keep their old icons until they're matched with their new art.
+
 ## v0.7.1 — The New Sea Chart
 **New**
 - The sea chart (M) has new art: an illustrated ocean, a hand-drawn picture for every First Sea island and drifting clouds along the edges.
