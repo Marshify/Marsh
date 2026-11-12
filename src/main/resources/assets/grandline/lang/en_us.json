@@ -395,5 +395,6 @@
   "ability.grandline.seraph_grace": "Seraph Grace",
   "ability.grandline.seraph_halo": "Seraph Halo",
   "ability.grandline.seraph_heavenfall": "Seraph Heavenfall",
-  "ability.grandline.seraph_wings": "Seraph Wings"
+  "ability.grandline.seraph_wings": "Seraph Wings",
+  "generator.grandline.grand_line": "Grand Line (ocean & islands)"
 }
