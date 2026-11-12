@@ -72,6 +72,9 @@ public final class IslandPopulation {
 		if (island.starter() || Math.floorMod(island.id(), 3) == 0) {
 			spawnNpc(level, island, Islander.Role.FISHERMAN, -3, -1);
 		}
+		if (island.starter() && island.designed()) {
+			spawnNpc(level, island, Islander.Role.NAVIGATOR, 1, -4);
+		}
 		IslandRegistry.get(level.getServer()).update(current.withNpcsSpawned());
 	}
 

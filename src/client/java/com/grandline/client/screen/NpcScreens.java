@@ -26,6 +26,7 @@ public final class NpcScreens {
 			case QUEST_GIVER -> questGiver(data);
 			case FRUIT_DEALER -> fruitDealer(data);
 			case FISHERMAN -> fisherman(data);
+			case NAVIGATOR -> navigator(data);
 		});
 	}
 
@@ -79,6 +80,21 @@ public final class NpcScreens {
 				DialogScreen.Option.of(Component.translatable("npc.grandline.fisher.sell", data.fishValue()),
 						() -> send(data, NpcActionPayload.SELL_FISH)),
 				DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
+	}
+
+	private static DialogScreen navigator(OpenNpcPayload data) {
+		int level = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
+		List<DialogScreen.Option> options = new ArrayList<>();
+		for (int sea = 1; sea <= com.grandline.world.SeaLayout.SEA_CENTER_X.length; sea++) {
+			int required = com.grandline.world.SeaLayout.SEA_MIN_LEVEL[sea - 1];
+			int target = sea;
+			Component label = level >= required ? Component.translatable("npc.grandline.navigator.sail", sea)
+					: Component.translatable("npc.grandline.navigator.locked", sea, required).withStyle(ChatFormatting.GRAY);
+			options.add(DialogScreen.Option.of(label, () -> send(data, NpcActionPayload.SAIL_TO_SEA + target - 1)));
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		return new DialogScreen(Component.translatable("entity.grandline.islander.navigator"),
+				List.of(Component.translatable("npc.grandline.navigator.greeting")), options);
 	}
 
 	static void send(OpenNpcPayload data, int action) {

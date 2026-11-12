@@ -5,7 +5,7 @@
       "generator": {
         "type": "minecraft:flat",
         "settings": {
-          "biome": "minecraft:warm_ocean",
+          "biome": "grandline:grand_line_sea",
           "features": true,
           "lakes": false,
           "layers": [

@@ -192,7 +192,7 @@ public final class IslandFeature extends Feature<NoneFeatureConfiguration> {
 		String name = starter ? "Dawnreach Isle" : IslandNames.generate(level.getSeed() ^ chunk.toLong());
 		IslandRegistry registry = IslandRegistry.current(); // never touch vanilla data storage from a worldgen thread
 		if (registry != null) {
-			registry.add(new Island(chunk.toLong(), x, z, radius, recommended, name, starter, false));
+			registry.add(new Island(chunk.toLong(), x, z, radius, recommended, name, starter, false, "plain"));
 		} else {
 			GrandLineMod.LOGGER.warn("Island {} generated before the island registry was loaded", name);
 		}

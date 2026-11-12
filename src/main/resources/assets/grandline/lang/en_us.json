@@ -457,5 +457,15 @@
   "screen.grandline.gacha.hint": "Press Spin to roll a random fruit!",
   "screen.grandline.gacha.won": "%s Fruit (%s)!",
   "npc.grandline.dealer.gacha_level": "Gacha unlocks at level %s",
-  "result.grandline.level_too_low": "You need a higher level for that."
+  "result.grandline.level_too_low": "You need a higher level for that.",
+  "entity.grandline.islander.navigator": "Navigator",
+  "npc.grandline.navigator.greeting": "Where to, captain? The seas beyond are not for the weak.",
+  "npc.grandline.navigator.sail": "Set sail for Sea %s",
+  "npc.grandline.navigator.locked": "Sea %s (requires Lv. %s)",
+  "message.grandline.sailed": "You sailed to Sea %s and arrived at %s.",
+  "npc.grandline.result.sailed": "Bon voyage!",
+  "npc.grandline.result.level_too_low": "You're not strong enough to sail there yet.",
+  "npc.grandline.result.already_there": "You're already in that sea.",
+  "screen.grandline.map.recommended": "Recommended",
+  "screen.grandline.map.sea_title": "Sea %s"
 }

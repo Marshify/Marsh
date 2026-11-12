@@ -11,6 +11,8 @@ public record NpcActionPayload(int entityId, int action) implements FabricPacket
 	public static final int ACCEPT_BOSS = 1;
 	public static final int ABANDON_QUEST = 2;
 	public static final int SELL_FISH = 3;
+	/** Sail to sea {@code SAIL_TO_SEA + n - 1} (n = 1..3). */
+	public static final int SAIL_TO_SEA = 10;
 
 	public static final PacketType<NpcActionPayload> TYPE = PacketType.create(GrandLineMod.id("npc_action"),
 			buf -> new NpcActionPayload(buf.readVarInt(), buf.readVarInt()));

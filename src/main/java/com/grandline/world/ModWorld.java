@@ -34,6 +34,8 @@ import java.util.Set;
 public final class ModWorld {
 	public static final IslandFeature ISLAND = Registry.register(BuiltInRegistries.FEATURE, GrandLineMod.id("island"),
 			new IslandFeature(NoneFeatureConfiguration.CODEC));
+	public static final SeaIslandsFeature SEA_ISLANDS = Registry.register(BuiltInRegistries.FEATURE, GrandLineMod.id("sea_islands"),
+			new SeaIslandsFeature(NoneFeatureConfiguration.CODEC));
 	public static final ResourceKey<PlacedFeature> ISLAND_PLACED = ResourceKey.create(Registries.PLACED_FEATURE, GrandLineMod.id("island"));
 
 	/** Islands within this many blocks of a player get discovered. */
@@ -45,6 +47,11 @@ public final class ModWorld {
 	public static void register() {
 		IslandRegistry.register();
 		BiomeModifications.addFeature(BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Decoration.RAW_GENERATION, ISLAND_PLACED);
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, level) -> {
+			if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && isGrandLineWorld(level)) {
+				registerDesignedIslands(IslandRegistry.get(level));
+			}
+		});
 		ServerLifecycleEvents.SERVER_STARTED.register(ModWorld::placeSpawnOnStarterIsland);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			discoverStarter(handler.getPlayer());
@@ -59,6 +66,20 @@ public final class ModWorld {
 		});
 	}
 
+	/** True for worlds created with the Grand Line world type (their ocean is the Grand Line Sea biome). */
+	public static boolean isGrandLineWorld(ServerLevel overworld) {
+		return overworld.getBiome(new BlockPos(0, 62, 0)).unwrapKey()
+				.map(key -> key.location().equals(GrandLineMod.id("grand_line_sea"))).orElse(false);
+	}
+
+	/** Adds every designed island of all seas to the registry (they exist from the start, like a real map). */
+	private static void registerDesignedIslands(IslandRegistry registry) {
+		for (SeaLayout.Spec spec : SeaLayout.all()) {
+			registry.add(new Island(SeaLayout.idOf(spec), spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), spec.starter(),
+					false, spec.theme().name().toLowerCase(java.util.Locale.ROOT)));
+		}
+	}
+
 	/** First start of a world with a starter island: move the world spawn onto it. */
 	private static void placeSpawnOnStarterIsland(MinecraftServer server) {
 		ServerLevel overworld = server.overworld();
@@ -68,7 +89,7 @@ public final class ModWorld {
 		}
 		overworld.getChunk(0, 0); // make sure the starter chunk is generated
 		for (Island island : registry.all()) {
-			if (island.starter()) {
+			if (island.starter() && (!island.designed() || island.sea() == 1)) {
 				int y = overworld.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, island.x(), island.z());
 				overworld.setDefaultSpawnPos(new BlockPos(island.x(), y, island.z()), 0);
 				GrandLineMod.LOGGER.info("World spawn moved onto {} at {}, {}, {}", island.name(), island.x(), y, island.z());
@@ -122,7 +143,8 @@ public final class ModWorld {
 		Set<Long> known = discovered(player);
 		List<Island> visible = new ArrayList<>();
 		for (Island island : IslandRegistry.get(player.server).all()) {
-			if (known.contains(island.id())) {
+			// Designed islands are always on the chart (like a real sea map); random islands appear once discovered.
+			if (island.designed() || known.contains(island.id())) {
 				visible.add(island);
 			}
 		}

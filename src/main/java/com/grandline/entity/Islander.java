@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
  */
 public class Islander extends PathfinderMob implements FruitDealer {
 	public enum Role {
-		QUEST_GIVER, FRUIT_DEALER, FISHERMAN;
+		QUEST_GIVER, FRUIT_DEALER, FISHERMAN, NAVIGATOR;
 
 		public static Role byId(int id) {
 			Role[] values = values();

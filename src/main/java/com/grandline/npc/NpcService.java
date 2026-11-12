@@ -67,9 +67,11 @@ public final class NpcService {
 			case NpcActionPayload.ABANDON_QUEST -> QuestService.abandon(player).name().toLowerCase(java.util.Locale.ROOT);
 			case NpcActionPayload.SELL_FISH -> npc.role() == Islander.Role.FISHERMAN
 					? (FishingService.sellAll(player) > 0 ? "sold" : "nothing_to_sell") : "too_far";
+			case NpcActionPayload.SAIL_TO_SEA, NpcActionPayload.SAIL_TO_SEA + 1, NpcActionPayload.SAIL_TO_SEA + 2 ->
+					npc.role() == Islander.Role.NAVIGATOR ? SeaTravel.sail(player, packet.action() - NpcActionPayload.SAIL_TO_SEA + 1) : "too_far";
 			default -> "too_far";
 		};
-		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold");
+		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed");
 		return reply(player, success, result);
 	}
 
