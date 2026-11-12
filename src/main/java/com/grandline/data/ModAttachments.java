@@ -31,6 +31,14 @@ public final class ModAttachments {
 					.initializer(com.grandline.combat.EnergyService.Energy::new)
 					.buildAndRegister(GrandLineMod.id("energy"));
 
+	/** Ids of islands this player has discovered (persistent). */
+	public static final AttachmentType<java.util.List<Long>> DISCOVERED_ISLANDS =
+			AttachmentRegistry.<java.util.List<Long>>builder()
+					.persistent(com.mojang.serialization.Codec.LONG.listOf())
+					.copyOnDeath()
+					.initializer(java.util.List::of)
+					.buildAndRegister(GrandLineMod.id("discovered_islands"));
+
 	private ModAttachments() {
 	}
 

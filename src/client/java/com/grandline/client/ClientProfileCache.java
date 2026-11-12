@@ -17,6 +17,7 @@ public final class ClientProfileCache {
 	private static ProfileSyncPayload view;
 	private static List<CooldownSyncPayload.Entry> cooldowns = List.of();
 	private static long cooldownsReceivedAtMillis;
+	private static List<com.grandline.world.Island> islands = List.of();
 	private static float energy;
 	private static float maxEnergy;
 
@@ -51,6 +52,14 @@ public final class ClientProfileCache {
 		cooldownsReceivedAtMillis = System.currentTimeMillis();
 	}
 
+	public static List<com.grandline.world.Island> islands() {
+		return islands;
+	}
+
+	public static void acceptIslands(List<com.grandline.world.Island> list) {
+		islands = List.copyOf(list);
+	}
+
 	public static float energy() {
 		return energy;
 	}
@@ -80,5 +89,6 @@ public final class ClientProfileCache {
 		cooldowns = List.of();
 		energy = 0;
 		maxEnergy = 0;
+		islands = List.of();
 	}
 }

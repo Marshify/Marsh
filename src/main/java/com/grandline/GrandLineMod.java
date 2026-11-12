@@ -49,6 +49,7 @@ public final class GrandLineMod implements ModInitializer {
 		MobKillRewards.register();
 		LingeringAreas.register();
 		FruitService.register();
+		com.grandline.world.ModWorld.register();
 		GrandLineCommands.register();
 
 		LOGGER.info("Grand Line {} initialized", modVersion());

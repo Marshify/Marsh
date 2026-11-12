@@ -396,5 +396,12 @@
   "ability.grandline.seraph_halo": "Seraph Halo",
   "ability.grandline.seraph_heavenfall": "Seraph Heavenfall",
   "ability.grandline.seraph_wings": "Seraph Wings",
-  "generator.grandline.grand_line": "Grand Line (ocean & islands)"
+  "generator.grandline.grand_line": "Grand Line (ocean & islands)",
+  "message.grandline.island.discovered": "Discovered %s (recommended Lv. %s, Sea %s)",
+  "key.grandline.map": "World Map",
+  "screen.grandline.map.title": "Grand Line Sea Chart",
+  "screen.grandline.map.sea": "Sea %s",
+  "screen.grandline.map.level": "Lv. %s",
+  "screen.grandline.map.help": "Scroll to zoom, drag to move",
+  "screen.grandline.map.empty": "No islands discovered yet. Sail out to find some!"
 }

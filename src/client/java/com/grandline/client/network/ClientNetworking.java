@@ -34,6 +34,9 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(EnergySyncPayload.TYPE,
 				(packet, player, responseSender) -> ClientProfileCache.acceptEnergy(packet.current(), packet.max()));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.IslandListPayload.TYPE,
+				(packet, player, responseSender) -> ClientProfileCache.acceptIslands(packet.islands()));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientProfileCache.clear());
 	}
 
