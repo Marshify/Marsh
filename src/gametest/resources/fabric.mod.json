@@ -1,0 +1,21 @@
+{
+	"schemaVersion": 1,
+	"id": "grandline-test",
+	"version": "0.1.0",
+	"name": "Grand Line Test Suite",
+	"description": "Server and client game tests for Grand Line. Not shipped in the release jar.",
+	"license": "All-Rights-Reserved",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-gametest": [
+			"com.grandline.test.GrandLineServerGameTests"
+		],
+		"fabric-client-gametest": [
+			"com.grandline.test.GrandLineClientGameTest"
+		]
+	},
+	"depends": {
+		"grandline": "*",
+		"fabric-api": "*"
+	}
+}

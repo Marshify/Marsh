@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "grandline",
+	"version": "${version}",
+	"name": "Grand Line",
+	"description": "A multiplayer RPG mod built around ocean exploration, progression, combat and fruit abilities.",
+	"authors": [
+		"Grand Line Team"
+	],
+	"contact": {},
+	"license": "All-Rights-Reserved",
+	"icon": "assets/grandline/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.grandline.GrandLineMod"
+		],
+		"client": [
+			"com.grandline.client.GrandLineClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

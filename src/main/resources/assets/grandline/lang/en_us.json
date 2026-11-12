@@ -1,0 +1,24 @@
+{
+  "item.grandline.grand_line_crystal": "Grand Line Crystal",
+  "itemGroup.grandline.main": "Grand Line",
+
+  "commands.grandline.yes": "yes",
+  "commands.grandline.no": "no",
+  "commands.grandline.test.header": "Grand Line %s is running",
+  "commands.grandline.test.server": "Server type: %s",
+  "commands.grandline.test.dedicated": "dedicated",
+  "commands.grandline.test.integrated": "integrated (single-player / LAN)",
+  "commands.grandline.test.item": "Grand Line Crystal registered: %s",
+
+  "commands.grandline.profile.header": "Profile of %s",
+  "commands.grandline.profile.level": "Level: %s / %s",
+  "commands.grandline.profile.experience": "Experience: %s / %s",
+  "commands.grandline.profile.currency": "Currency: %s",
+  "commands.grandline.profile.stat_points": "Unallocated stat points: %s",
+  "commands.grandline.admin.success": "Applied '%s' to %s player(s)",
+
+  "commands.grandline_client.profile.none": "No profile received from the server yet.",
+  "commands.grandline_client.profile.header": "Client-side synced profile (read-only copy)",
+  "commands.grandline_client.profile.values": "Level %s, XP %s, currency %s, stat points %s",
+  "commands.grandline_client.cooldowns": "Synced cooldowns: %s"
+}
