@@ -70,14 +70,17 @@ public final class GachaScreen extends Screen {
 	protected void init() {
 		current = this;
 		boolean onCooldown = data.gachaRemainingMillis() > 0;
+		int level = com.grandline.client.ClientProfileCache.profile() == null ? 1 : com.grandline.client.ClientProfileCache.profile().level();
+		boolean tooLow = level < data.gachaMinLevel();
 		spin = addRenderableWidget(new GoldButton(width / 2 - 60, height / 2 + 50, 120, 20,
-				onCooldown ? Component.translatable("npc.grandline.dealer.gacha_wait", data.gachaRemainingMillis() / 60_000 + 1)
-						: Component.translatable("screen.grandline.gacha.spin", data.gachaCost()),
+				tooLow ? Component.translatable("npc.grandline.dealer.gacha_level", data.gachaMinLevel())
+						: onCooldown ? Component.translatable("npc.grandline.dealer.gacha_wait", data.gachaRemainingMillis() / 60_000 + 1)
+						: Component.translatable("screen.grandline.gacha.spin", java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(data.gachaCost())),
 				b -> {
 					FruitDialogs.send(FruitActionPayload.GACHA_ROLL, "", data.entityId());
 					b.active = false;
 				}));
-		spin.active = !onCooldown && result == null;
+		spin.active = !onCooldown && !tooLow && result == null;
 		addRenderableWidget(new GoldButton(width / 2 + 120, height / 2 - 78, 50, 16, Component.translatable("screen.grandline.back"),
 				b -> NpcScreens.open(data)));
 	}

@@ -1,5 +1,7 @@
 package com.grandline.client.screen;
 
+import com.grandline.client.ClientProfileCache;
+
 import com.grandline.client.ui.DialogScreen;
 import com.grandline.entity.EnemyKind;
 import com.grandline.entity.Islander;
@@ -58,9 +60,11 @@ public final class NpcScreens {
 		long minutes = data.restockMillis() / 60_000;
 		List<Component> lines = List.of(Component.translatable("npc.grandline.dealer.greeting"),
 				Component.translatable("npc.grandline.dealer.restock", minutes / 60, minutes % 60).withStyle(ChatFormatting.GRAY));
-		Component gacha = data.gachaRemainingMillis() > 0
+		boolean tooLow = (ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level()) < data.gachaMinLevel();
+		Component gacha = tooLow ? Component.translatable("npc.grandline.dealer.gacha_level", data.gachaMinLevel())
+				: data.gachaRemainingMillis() > 0
 				? Component.translatable("npc.grandline.dealer.gacha_wait", data.gachaRemainingMillis() / 60_000 + 1)
-				: Component.translatable("npc.grandline.dealer.gacha", data.gachaCost());
+				: Component.translatable("npc.grandline.dealer.gacha", java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(data.gachaCost()));
 		return new DialogScreen(Component.translatable("entity.grandline.islander.fruit_dealer"), lines, List.of(
 				new DialogScreen.Option(Component.translatable("npc.grandline.dealer.browse"),
 						() -> Minecraft.getInstance().setScreen(new FruitShopScreen(data)), true),

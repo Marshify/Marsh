@@ -29,7 +29,7 @@ public final class GrandLineConfig {
 	 * Config schema version. 1 = milestone 1/2 values; 2 = rebalanced stats with diminishing returns and ability
 	 * settings. Older files have balance keys reset to the new defaults once, other keys are kept.
 	 */
-	public static final int CURRENT_CONFIG_VERSION = 2;
+	public static final int CURRENT_CONFIG_VERSION = 3;
 
 	public int configVersion = CURRENT_CONFIG_VERSION;
 
@@ -96,8 +96,12 @@ public final class GrandLineConfig {
 	// --- Fruits (milestone 4) ---
 	/** Shop price per rarity: common, uncommon, rare, legendary, mythical. */
 	public long[] fruitPrices = {2_500, 10_000, 40_000, 150_000, 500_000};
-	/** Currency cost of one gacha roll. */
-	public long gachaCost = 5_000;
+	/** Gacha price at level 1. Price per spin = gachaCost + gachaCostPerLevel × (level − 1). */
+	public long gachaCost = 25_000;
+	/** Extra gacha price per player level above 1. */
+	public long gachaCostPerLevel = 150;
+	/** Minimum player level to use the gacha. */
+	public int gachaMinLevel = 50;
 	/** Minutes a player must wait between gacha rolls. */
 	public int gachaCooldownMinutes = 30;
 	/** How many fruits the dealer offers at once. */
@@ -164,6 +168,9 @@ public final class GrandLineConfig {
 			GrandLineMod.LOGGER.info("Migrated config from version {} to {} (stat balance reset to new defaults)", fileVersion,
 					CURRENT_CONFIG_VERSION);
 		}
+		if (fileVersion < 3) {
+			gachaCost = defaults().gachaCost; // level-scaled gacha pricing replaced the flat 5,000 price
+		}
 		configVersion = CURRENT_CONFIG_VERSION;
 	}
 
@@ -202,6 +209,8 @@ public final class GrandLineConfig {
 			fruitPrices[i] = clamp(fruitPrices[i], 0, maxCurrency);
 		}
 		gachaCost = clamp(gachaCost, 0, maxCurrency);
+		gachaCostPerLevel = clamp(gachaCostPerLevel, 0, maxCurrency);
+		gachaMinLevel = clamp(gachaMinLevel, 1, 100_000);
 		gachaCooldownMinutes = clamp(gachaCooldownMinutes, 0, 60 * 24 * 7);
 		dealerStockSize = clamp(dealerStockSize, 1, 6);
 		dealerRotationMinutes = clamp(dealerRotationMinutes, 1, 60 * 24 * 7);

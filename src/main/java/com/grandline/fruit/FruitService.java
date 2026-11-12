@@ -31,6 +31,7 @@ public final class FruitService {
 	public enum Result {
 		SUCCESS,
 		NOT_ENOUGH_CURRENCY,
+		LEVEL_TOO_LOW,
 		ON_COOLDOWN,
 		NOT_IN_STOCK,
 		UNKNOWN_FRUIT,
@@ -183,12 +184,25 @@ public final class FruitService {
 		return Math.max(0L, PlayerProfileService.get(player).powers().gachaReadyAtMillis() - System.currentTimeMillis());
 	}
 
+	/** Gacha price for a player of {@code level}: base + perLevel × (level − 1). */
+	public static long gachaCost(int level) {
+		long cost = GrandLineMod.config().gachaCost + GrandLineMod.config().gachaCostPerLevel * Math.max(0, level - 1L);
+		return Math.min(cost, GrandLineMod.config().maxCurrency);
+	}
+
+	public static long gachaCost(ServerPlayer player) {
+		return gachaCost(PlayerProfileService.get(player).level());
+	}
+
 	/** Pays for and performs a gacha roll. The fruit is given immediately; the client only animates the reveal. */
 	public static GachaRoll rollGacha(ServerPlayer player) {
+		if (PlayerProfileService.get(player).level() < GrandLineMod.config().gachaMinLevel) {
+			return new GachaRoll(Result.LEVEL_TOO_LOW, null);
+		}
 		if (gachaMillisRemaining(player) > 0) {
 			return new GachaRoll(Result.ON_COOLDOWN, null);
 		}
-		long cost = GrandLineMod.config().gachaCost;
+		long cost = gachaCost(player);
 		if (PlayerProfileService.get(player).currency() < cost) {
 			return new GachaRoll(Result.NOT_ENOUGH_CURRENCY, null);
 		}

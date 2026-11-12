@@ -47,7 +47,7 @@ public final class NpcService {
 		ServerPlayNetworking.send(player, new OpenNpcPayload(npc.getId(), npc.role().ordinal(), islandName, level,
 				java.util.Optional.ofNullable(offer), java.util.Optional.ofNullable(bossOffer),
 				java.util.Optional.ofNullable(QuestService.active(player)), stock, prices, FruitService.millisUntilRestock(),
-				GrandLineMod.config().gachaCost, FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player)));
+				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel));
 	}
 
 	/** Validates and runs an NPC choice. Returns the result key (exposed for tests). */

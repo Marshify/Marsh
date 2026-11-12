@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public record OpenNpcPayload(int entityId, int role, String islandName, int islandLevel, Optional<QuestState> questOffer,
 		Optional<QuestState> bossOffer, Optional<QuestState> activeQuest, List<String> stock, List<Long> prices, long restockMillis, long gachaCost,
-		long gachaRemainingMillis, long fishValue) implements FabricPacket {
+		long gachaRemainingMillis, long fishValue, int gachaMinLevel) implements FabricPacket {
 	public static final PacketType<OpenNpcPayload> TYPE = PacketType.create(GrandLineMod.id("open_npc"), OpenNpcPayload::read);
 
 	private static OpenNpcPayload read(FriendlyByteBuf buf) {
@@ -39,7 +39,7 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 			prices.add(buf.readVarLong());
 		}
 		return new OpenNpcPayload(entityId, role, island, level, offer, boss, active, stock, prices, buf.readVarLong(), buf.readVarLong(),
-				buf.readVarLong(), buf.readVarLong());
+				buf.readVarLong(), buf.readVarLong(), buf.readVarInt());
 	}
 
 	@Override
@@ -60,6 +60,7 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 		buf.writeVarLong(gachaCost);
 		buf.writeVarLong(gachaRemainingMillis);
 		buf.writeVarLong(fishValue);
+		buf.writeVarInt(gachaMinLevel);
 	}
 
 	@Override

@@ -455,5 +455,7 @@
   "screen.grandline.gacha.title": "Fruit Gacha",
   "screen.grandline.gacha.spin": "Spin ($%s)",
   "screen.grandline.gacha.hint": "Press Spin to roll a random fruit!",
-  "screen.grandline.gacha.won": "%s Fruit (%s)!"
+  "screen.grandline.gacha.won": "%s Fruit (%s)!",
+  "npc.grandline.dealer.gacha_level": "Gacha unlocks at level %s",
+  "result.grandline.level_too_low": "You need a higher level for that."
 }

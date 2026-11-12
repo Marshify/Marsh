@@ -112,9 +112,12 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void gachaChargesCurrencyAndHasCooldown(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		eq(helper, FruitService.rollGacha(player).result(), FruitService.Result.LEVEL_TOO_LOW, "level 1 cannot spin");
+		PlayerProfileService.setLevel(player, 100);
 		eq(helper, FruitService.rollGacha(player).result(), FruitService.Result.NOT_ENOUGH_CURRENCY, "broke");
 
-		long cost = GrandLineMod.config().gachaCost;
+		long cost = FruitService.gachaCost(player);
+		eq(helper, cost, 39_850L, "price at level 100 = 25,000 + 150 x 99");
 		PlayerProfileService.addCurrency(player, cost * 2);
 		FruitService.GachaRoll roll = FruitService.rollGacha(player);
 		eq(helper, roll.result(), FruitService.Result.SUCCESS, "first roll");

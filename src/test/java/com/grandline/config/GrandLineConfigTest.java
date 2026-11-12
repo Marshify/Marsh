@@ -25,10 +25,10 @@ class GrandLineConfigTest {
 		assertEquals(0.25, config.meleeDamagePerPoint, 1e-9);
 		assertEquals(60.0, config.maxBonusDamage, 1e-9);
 		assertEquals(500, config.maxLevel, "unrelated settings are kept");
-		assertTrue(Files.readString(file).contains("\"configVersion\": 2"), "file rewritten with the new version");
+		assertTrue(Files.readString(file).contains("\"configVersion\": 3"), "file rewritten with the new version");
 
 		// A current-version file is not touched by migration.
-		Files.writeString(file, "{ \"configVersion\": 2, \"defenseHealthPerPoint\": 3.5 }");
+		Files.writeString(file, "{ \"configVersion\": 3, \"defenseHealthPerPoint\": 3.5 }");
 		assertEquals(3.5, GrandLineConfig.loadOrCreate(file).defenseHealthPerPoint, 1e-9);
 	}
 
