@@ -1,5 +1,16 @@
 # Grand Line patch notes
 
+## v0.22.0 — Flame Reforged
+**Flame Fruit overhaul.** Every move is now a full sequence: windup, release, travel, impact, recovery. Each uses new custom visuals made from Grand Line's own textures, with glowing cores, flame shells, trails and rings instead of vanilla particles. Hits land exactly where and when you see them.
+- **Z Cinder Shots:** fire coils round your hand, then three quick fireballs, one per punch. Each has a white-hot core, flickering shell and ember trail, with a flash and burst on contact. A miss flies until it hits the ground or burns out.
+- **X Blaze Wave** (was Blaze Burst): an arm sweep sends a broad, curved wall of flame rolling forward over the ground, with a white-hot leading edge. It pushes enemies along.
+- **C Pyre Ring** (was Pyre Pillar): plant your feet, draw the flames in, then a low ring of fire races outward. Enemies are hit the moment the ring reaches them.
+- **V Inferno Nova:** hold to grow a churning mass of fire over your raised hands, then hurl it. Its blast area glows on the ground while it flies, then it explodes in a flash and a fast ring of fire, leaving embers and smoke.
+- **F Ember Wings:** ignition ring and lift-off, then two flame streamers that follow every turn and fade when you land.
+- Players now pose through each cast (punches, sweeps, planted stance, overhead throw, flight). Everyone nearby sees the same timing.
+- **Settings → Effect detail (Low / Med / High):** controls the extra sparks and embers; attack shapes always show. Camera shake can still be turned off.
+- Effects clean themselves up on death, logout or dimension change.
+
 ## v0.21.0 — Uncharted Waters
 **New**
 - **Fog of war on the M chart.** Every island starts gray. It switches to full colour on *your* chart once you set foot on it, the same moment the "Discovered" message appears.
