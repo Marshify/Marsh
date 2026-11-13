@@ -1,5 +1,9 @@
 # Grand Line patch notes
 
+## v0.19.1 — Dawnreach Chart Art
+**Changes**
+- Dawnreach Harbor's picture on the M chart is now your hand-drawn pixel art, with a blue surf ripple along its shore.
+
 ## v0.19.0 — Dawnreach Harbor Rebuilt
 **Island update: Dawnreach Harbor (starter island)**
 - A low, paved harbour town on a long platform with chamfered corners, pale quay walls and a rocky base.
