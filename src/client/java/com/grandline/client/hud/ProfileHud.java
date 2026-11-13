@@ -69,6 +69,7 @@ public final class ProfileHud {
 			element(graphics, "quest", () -> renderQuest(graphics, client));
 		}
 		renderCombatTag(graphics, client);
+		renderShipHull(graphics, client);
 		graphics.pose().popPose();
 	}
 
@@ -222,6 +223,21 @@ public final class ProfileHud {
 				drawScaled(graphics, font, mastery, x + width - 3 - font.width(mastery) * 0.6f - font.width(right) - 4, y + 5, 0.6f, 0xD46A6A);
 			}
 		}
+	}
+
+	/** Hull bar above the hotbar while riding a ship. */
+	private static void renderShipHull(GuiGraphics graphics, Minecraft client) {
+		if (!(client.player.getVehicle() instanceof com.grandline.ship.PirateShip ship)) {
+			return;
+		}
+		int w = 182;
+		int x = graphics.guiWidth() / 2 - w / 2;
+		int y = graphics.guiHeight() - 62;
+		Component label = Component.translatable("hud.grandline.ship.hull");
+		String value = Math.round(ship.hull()) + "/" + Math.round(ship.maxHull());
+		com.grandline.client.ui.MarshUi.bar(graphics, x, y, w, 10, ship.hull() / ship.maxHull(), 0);
+		drawScaled(graphics, client.font, ship.shipClass().displayName().copy().append(" · ").append(label), x + 3, y + 2, 0.75F, 0xFFFFFF);
+		drawScaled(graphics, client.font, Component.literal(value), x + w - 3 - client.font.width(value) * 0.75F, y + 2, 0.75F, 0xFFFFFF);
 	}
 
 	/** "In Combat" banner (top centre) while combat-tagged, with "Bounty/Honor at Risk" from 2.5M. */

@@ -31,7 +31,12 @@ public class DialogScreen extends Screen {
 
 	@Override
 	protected void init() {
-		int buttonWidth = Math.min(150, width / 3);
+		// Wide enough for the longest choice (up to half the screen), never narrower than before.
+		int longest = 0;
+		for (Option option : options) {
+			longest = Math.max(longest, font.width(option.label()));
+		}
+		int buttonWidth = Math.max(Math.min(150, width / 3), Math.min(longest + 28, width / 2 - 12));
 		int buttonHeight = 20;
 		int x = width - buttonWidth - 12;
 		int total = options.size() * (buttonHeight + 4);

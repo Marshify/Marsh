@@ -1,5 +1,22 @@
 # Grand Line patch notes
 
+## v0.17.0 — Set Sail
+**New: Ships**
+- Three ships to sail the seas, all original designs:
+  - **Driftwood Sloop** — $5,000, Lv. 1, 2 seats, 300 hull.
+  - **Corsair Brig** — $60,000, Lv. 60, 4 seats, 700 hull.
+  - **Stormbreaker Galleon** — $300,000, Lv. 200, 6 seats, 1,500 hull.
+- Buy them from a **Navigator**. Your new ship launches at the island's dock with you at the helm.
+- Press **J (Call Ship)** next to open water to launch your ship from anywhere (30 s cooldown).
+- Sails show your side: black with a skull and cutlasses for Pirates, white with a blue anchor for Marines.
+- Steer like a boat: forward to sail, A/D to turn, sneak to leave the helm. Only the owner steers; crew can ride along.
+- Ships have **hull points** shown above your hotbar. Enemies and explosions wear them down, and the hull slowly repairs out of combat. At zero the ship sinks and can't launch again for 60 seconds.
+- One ship per player: launching or calling another replaces the old one.
+
+**Changes**
+- NPC dialog choices widen to fit long options.
+- **Island importer guide** rewritten to match the code, with a working example pack (see docs/STRUCTURES.md).
+
 ## v0.16.0 — Loadout Editor
 **New**
 - Press **Tab** to rearrange your loadout: drag a slot onto another to swap them, **Reset Order** puts it back to Style, Fruit, Sword, Gun. Tab or Esc closes it.

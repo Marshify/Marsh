@@ -122,6 +122,20 @@ public final class GrandLineConfig {
 	/** PvP damage reduction factor per tier (grows faster than damage). */
 	public double pvpDefensePerTier = 0.006;
 
+	// ---- Ships ----
+	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
+	public long[] shipPrices = {5_000, 60_000, 300_000};
+	/** Level needed to buy each ship. */
+	public int[] shipMinLevels = {1, 60, 200};
+	/** Hull points of each ship. */
+	public double[] shipHull = {300, 700, 1500};
+	/** Seconds between Call Ship uses. */
+	public int shipCallCooldownSeconds = 30;
+	/** Seconds before a sunk ship can be launched again. */
+	public int shipSinkCooldownSeconds = 60;
+	/** Hull regained per second (fraction of max) after 15 seconds without damage. */
+	public double shipRepairPerSecond = 0.01;
+
 	public double baseEnergy = 100.0;
 	/** Extra max energy per level above 1. */
 	public double energyPerLevel = 2.0;
@@ -251,6 +265,23 @@ public final class GrandLineConfig {
 		masteryExperiencePerLevel = clamp(masteryExperiencePerLevel, 1, 1_000_000);
 		maxMastery = clamp(maxMastery, 1, 100_000);
 		masteryPerKilledHealth = clamp(masteryPerKilledHealth, 0, 1_000_000);
+		if (shipPrices == null || shipPrices.length != 3) {
+			shipPrices = defaults().shipPrices;
+		}
+		if (shipMinLevels == null || shipMinLevels.length != 3) {
+			shipMinLevels = defaults().shipMinLevels;
+		}
+		if (shipHull == null || shipHull.length != 3) {
+			shipHull = defaults().shipHull;
+		}
+		for (int i = 0; i < 3; i++) {
+			shipPrices[i] = clamp(shipPrices[i], 0, maxCurrency);
+			shipMinLevels[i] = clamp(shipMinLevels[i], 1, 100_000);
+			shipHull[i] = clamp(shipHull[i], 1, 1_000_000);
+		}
+		shipCallCooldownSeconds = clamp(shipCallCooldownSeconds, 0, 3600);
+		shipSinkCooldownSeconds = clamp(shipSinkCooldownSeconds, 0, 3600);
+		shipRepairPerSecond = clamp(shipRepairPerSecond, 0, 1);
 		baseEnergy = clamp(baseEnergy, 1, 1_000_000);
 		energyPerLevel = clamp(energyPerLevel, 0, 10_000);
 		energyRegenPerSecond = clamp(energyRegenPerSecond, 0, 10);

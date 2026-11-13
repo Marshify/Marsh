@@ -73,6 +73,13 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("loadout_order"));
 
+	/** Ships the player owns and the one Call Ship launches (persistent, survives death). */
+	public static final AttachmentType<com.grandline.ship.ShipOwnership> SHIPS =
+			AttachmentRegistry.<com.grandline.ship.ShipOwnership>builder()
+					.persistent(com.grandline.ship.ShipOwnership.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("ships"));
+
 	private ModAttachments() {
 	}
 

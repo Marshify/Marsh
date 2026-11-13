@@ -62,7 +62,11 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.LoadoutOrderPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.client.hud.LoadoutHotbar.setOrder(packet.order()));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.ShipSyncPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.ClientShips.accept(packet));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			com.grandline.client.ClientShips.clear();
 			com.grandline.client.hud.LoadoutHotbar.setOrder(com.grandline.player.loadout.LoadoutOrder.DEFAULT);
 			com.grandline.client.ClientReputation.clear();
 			ClientProfileCache.clear();

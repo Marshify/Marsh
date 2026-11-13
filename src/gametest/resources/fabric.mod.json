@@ -10,6 +10,7 @@
     "fabric-gametest": [
       "com.grandline.test.GrandLineServerGameTests",
       "com.grandline.test.GrandLineLoadoutGameTests",
+      "com.grandline.test.GrandLineShipGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

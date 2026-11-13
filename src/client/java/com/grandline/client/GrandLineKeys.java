@@ -23,6 +23,7 @@ public final class GrandLineKeys {
 	public static final KeyMapping EDIT_LOADOUT = new KeyMapping("key.grandline.edit_loadout", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
 	/** Where the player list goes when it would share Tab with the loadout editor. */
 	public static final int PLAYER_LIST_KEY = GLFW.GLFW_KEY_GRAVE_ACCENT;
+	public static final KeyMapping CALL_SHIP = new KeyMapping("key.grandline.call_ship", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
 	public static final KeyMapping MENU = new KeyMapping("key.grandline.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 	public static final KeyMapping ITEMS = new KeyMapping("key.grandline.items", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, CATEGORY);
 	public static final KeyMapping SWITCH_POWER = new KeyMapping("key.grandline.switch_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY);
@@ -89,6 +90,7 @@ public final class GrandLineKeys {
 		KeyBindingHelper.registerKeyBinding(MENU);
 		KeyBindingHelper.registerKeyBinding(EDIT_LOADOUT);
 		KeyBindingHelper.registerKeyBinding(ITEMS);
+		KeyBindingHelper.registerKeyBinding(CALL_SHIP);
 		for (KeyMapping move : MOVES) {
 			KeyBindingHelper.registerKeyBinding(move);
 		}
@@ -134,6 +136,13 @@ public final class GrandLineKeys {
 		while (EDIT_LOADOUT.consumeClick()) {
 			if (client.screen == null && client.player != null) {
 				client.setScreen(new com.grandline.client.screen.LoadoutEditScreen());
+			}
+		}
+
+		while (CALL_SHIP.consumeClick()) {
+			if (client.screen == null && client.player != null
+					&& net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(com.grandline.network.payload.CallShipPayload.TYPE)) {
+				net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.grandline.network.payload.CallShipPayload());
 			}
 		}
 

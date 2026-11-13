@@ -74,10 +74,26 @@ public final class NpcService {
 					? (FishingService.sellAll(player) > 0 ? "sold" : "nothing_to_sell") : "too_far";
 			case NpcActionPayload.SAIL_TO_SEA, NpcActionPayload.SAIL_TO_SEA + 1, NpcActionPayload.SAIL_TO_SEA + 2 ->
 					npc.role() == Islander.Role.NAVIGATOR ? SeaTravel.sail(player, packet.action() - NpcActionPayload.SAIL_TO_SEA + 1) : "too_far";
+			case NpcActionPayload.BUY_SHIP, NpcActionPayload.BUY_SHIP + 1, NpcActionPayload.BUY_SHIP + 2 -> npc.role() == Islander.Role.NAVIGATOR
+					? buyShip(player, npc, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.BUY_SHIP]) : "too_far";
+			case NpcActionPayload.LAUNCH_SHIP, NpcActionPayload.LAUNCH_SHIP + 1, NpcActionPayload.LAUNCH_SHIP + 2 -> npc.role() == Islander.Role.NAVIGATOR
+					? com.grandline.ship.ShipService.launchFromNavigator(player, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP], npc)
+					: "too_far";
 			default -> "too_far";
 		};
-		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed");
+		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
+				|| result.equals("ship_launched") || result.equals("ship_bought");
 		return reply(player, success, result);
+	}
+
+	/** Buys a ship and launches it beside the Navigator (if that fails, the ship is still bought). */
+	private static String buyShip(ServerPlayer player, Islander npc, com.grandline.ship.ShipClass ship) {
+		String bought = com.grandline.ship.ShipService.buy(player, ship);
+		if (!bought.equals("ship_bought")) {
+			return bought;
+		}
+		String launched = com.grandline.ship.ShipService.launchFromNavigator(player, ship, npc);
+		return launched.equals("ship_launched") ? "ship_launched" : bought;
 	}
 
 	private static String reply(ServerPlayer player, boolean success, String result) {

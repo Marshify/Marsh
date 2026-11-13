@@ -92,6 +92,23 @@ public final class NpcScreens {
 					: Component.translatable("npc.grandline.navigator.locked", sea, required).withStyle(ChatFormatting.GRAY);
 			options.add(DialogScreen.Option.of(label, () -> send(data, NpcActionPayload.SAIL_TO_SEA + target - 1)));
 		}
+		// Ships: launch the ones you own, buy the others (buying launches it here).
+		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
+		for (com.grandline.ship.ShipClass ship : com.grandline.ship.ShipClass.values()) {
+			Component label;
+			int action;
+			if (com.grandline.client.ClientShips.owns(ship)) {
+				label = Component.translatable("npc.grandline.navigator.launch_ship", ship.displayName());
+				action = NpcActionPayload.LAUNCH_SHIP + ship.ordinal();
+			} else if (level < ship.minLevel()) {
+				label = Component.translatable("npc.grandline.navigator.ship_locked", ship.displayName(), ship.minLevel()).withStyle(ChatFormatting.GRAY);
+				action = NpcActionPayload.BUY_SHIP + ship.ordinal();
+			} else {
+				label = Component.translatable("npc.grandline.navigator.buy_ship", ship.displayName(), numbers.format(ship.price()));
+				action = NpcActionPayload.BUY_SHIP + ship.ordinal();
+			}
+			options.add(DialogScreen.Option.of(label, () -> send(data, action)));
+		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
 		return new DialogScreen(Component.translatable("entity.grandline.islander.navigator"),
 				List.of(Component.translatable("npc.grandline.navigator.greeting")), options);

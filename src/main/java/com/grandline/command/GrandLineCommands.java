@@ -85,6 +85,31 @@ public final class GrandLineCommands {
 																			+ com.grandline.reputation.ReputationService.get(p).get(kind.equalsIgnoreCase("bounty"))), true);
 															return 1;
 														}))))))
+				// Ships admin: give a ship class for free, or launch a player's ship beside them.
+				.then(Commands.literal("ship").requires(source -> source.hasPermission(2))
+						.then(Commands.literal("give")
+								.then(Commands.argument("player", EntityArgument.player())
+										.then(Commands.argument("class", StringArgumentType.word())
+												.suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(com.grandline.ship.ShipClass.values()).map(s -> s.id), b))
+												.executes(context -> {
+													var p = EntityArgument.getPlayer(context, "player");
+													var ship = com.grandline.ship.ShipClass.byId(StringArgumentType.getString(context, "class"));
+													if (ship == null) {
+														context.getSource().sendFailure(Component.literal("Unknown ship class"));
+														return 0;
+													}
+													com.grandline.ship.ShipService.grant(p, ship);
+													context.getSource().sendSuccess(() -> Component.literal("Gave " + ship.id + " to " + p.getGameProfile().getName()), true);
+													return 1;
+												}))))
+						.then(Commands.literal("call")
+								.then(Commands.argument("player", EntityArgument.player())
+										.executes(context -> {
+											var p = EntityArgument.getPlayer(context, "player");
+											String result = com.grandline.ship.ShipService.call(p);
+											context.getSource().sendSuccess(() -> Component.literal("Call ship for " + p.getGameProfile().getName() + ": " + result), false);
+											return result.equals("ship_launched") ? 1 : 0;
+										}))))
 				// Plate travel between structures (run by command blocks; operators only).
 				.then(Commands.literal("travel").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("players", EntityArgument.players())
