@@ -28,7 +28,8 @@ public final class MenuScreen extends Screen {
 		add(x + w + 4, y, w, h, "screen.grandline.menu.items", () -> minecraft.setScreen(new ItemsScreen(ItemsScreen.Tab.BUILD)));
 		add(x, y + h + 4, w, h, "screen.grandline.menu.settings", () -> minecraft.setScreen(new SettingsScreen(this)));
 		add(x + w + 4, y + h + 4, w, h, "screen.grandline.menu.map", () -> minecraft.setScreen(new WorldMapScreen()));
-		add(x, y + 2 * (h + 4), w * 2 + 4, h, "screen.grandline.menu.close", this::onClose);
+		add(x, y + 2 * (h + 4), w, h, "screen.grandline.menu.ranks", () -> minecraft.setScreen(new LeaderboardScreen()));
+		add(x + w + 4, y + 2 * (h + 4), w, h, "screen.grandline.menu.close", this::onClose);
 	}
 
 	private void add(int x, int y, int w, int h, String key, Runnable action) {

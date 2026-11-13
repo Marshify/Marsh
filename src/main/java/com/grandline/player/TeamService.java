@@ -80,8 +80,13 @@ public final class TeamService {
 
 	public static void choose(ServerPlayer player, Side side) {
 		Side before = get(player);
+		if (before != side && com.grandline.reputation.ReputationService.isTagged(player)) {
+			player.displayClientMessage(Component.translatable("message.grandline.team.tagged").withStyle(ChatFormatting.RED), true);
+			return;
+		}
 		player.setAttached(ModAttachments.TEAM, side.key());
 		applyScoreboard(player, side);
+		com.grandline.reputation.ReputationService.sync(player); // the displayed/earned total follows the side
 		if (before != side) {
 			player.server.getPlayerList().broadcastSystemMessage(Component.translatable("message.grandline.team.joined",
 					player.getDisplayName(), Component.translatable("team.grandline." + side.key()).withStyle(side.color)), false);

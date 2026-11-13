@@ -20,6 +20,7 @@
 		]
 	},
 	"mixins": [
+		"grandline.mixins.json",
 		{
 			"config": "grandline.client.mixins.json",
 			"environment": "client"

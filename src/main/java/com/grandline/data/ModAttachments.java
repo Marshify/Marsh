@@ -59,6 +59,13 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("team"));
 
+	/** Bounty and Honor (persistent, survives death). Existing saves start at zero. */
+	public static final AttachmentType<com.grandline.reputation.Reputation> REPUTATION =
+			AttachmentRegistry.<com.grandline.reputation.Reputation>builder()
+					.persistent(com.grandline.reputation.Reputation.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("reputation"));
+
 	private ModAttachments() {
 	}
 

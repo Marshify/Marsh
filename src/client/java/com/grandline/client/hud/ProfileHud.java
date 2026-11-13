@@ -68,6 +68,7 @@ public final class ProfileHud {
 		if (settings.showQuestTracker) {
 			element(graphics, "quest", () -> renderQuest(graphics, client));
 		}
+		renderCombatTag(graphics, client);
 		graphics.pose().popPose();
 	}
 
@@ -104,6 +105,14 @@ public final class ProfileHud {
 		int y = 6;
 
 		graphics.drawString(font, "$ " + NUMBERS.format(profile.currency()), x, y, 0x6BE36B);
+		var rep = com.grandline.client.ClientReputation.state();
+		if (rep.side() >= 0) {
+			boolean pirate = rep.side() == 0;
+			long total = pirate ? rep.bounty() : rep.honor();
+			Component label = Component.translatable(pirate ? "hud.grandline.bounty" : "hud.grandline.honor", NUMBERS.format(total));
+			int lx = x + font.width("$ " + NUMBERS.format(profile.currency())) + 8;
+			graphics.drawString(font, label, lx, y, pirate ? 0xFF7070 : 0x7FB0FF);
+		}
 		y += 11;
 		drawScaled(graphics, font, Component.translatable("hud.grandline.level_big", profile.level()), x, y, 2.0f, 0xFFFFFF);
 		y += 19;
@@ -213,6 +222,24 @@ public final class ProfileHud {
 				drawScaled(graphics, font, mastery, x + width - 3 - font.width(mastery) * 0.6f - font.width(right) - 4, y + 5, 0.6f, 0xD46A6A);
 			}
 		}
+	}
+
+	/** "In Combat" banner (top centre) while combat-tagged, with "Bounty/Honor at Risk" from 2.5M. */
+	private static void renderCombatTag(GuiGraphics graphics, Minecraft client) {
+		int seconds = com.grandline.client.ClientReputation.tagSeconds();
+		if (seconds <= 0) {
+			return;
+		}
+		var rep = com.grandline.client.ClientReputation.state();
+		Component text = Component.translatable("hud.grandline.in_combat", seconds);
+		if (rep.atRisk()) {
+			text = text.copy().append("  ").append(Component.translatable(rep.side() == 0 ? "hud.grandline.bounty_risk" : "hud.grandline.honor_risk"));
+		}
+		int w = client.font.width(text) + 16;
+		int x = graphics.guiWidth() / 2 - w / 2;
+		int y = 34;
+		com.grandline.client.ui.MarshUi.button(graphics, x, y, w, 16, com.grandline.client.ui.MarshUi.Color.RED, com.grandline.client.ui.MarshUi.State.NORMAL);
+		com.grandline.client.ui.MarshUi.outlined(graphics, client.font, text, x + 8, y + 4, 0xFFFFFF);
 	}
 
 	/** Width that keeps a side panel clear of the centred vanilla hotbar (182 px wide). */

@@ -94,6 +94,34 @@ public final class GrandLineConfig {
 	/** Gear: Pink Coat max health bonus (half-hearts). */
 	public double pinkCoatHealth = 8.0;
 
+	// ---- Bounty (Pirates) and Honor (Marines) ----
+	/** Highest Bounty or Honor a player can hold. */
+	public long reputationMax = 30_000_000L;
+	/** Reputation per enemy level for ordinary Grand Line enemies (default: the enemy's level). */
+	public double reputationPerEnemyLevel = 1.0;
+	/** Enemies stop giving reputation once the active total reaches this. */
+	public long reputationEnemyCap = 250_000L;
+	/** Reputation per boss level for bosses. */
+	public double reputationPerBossLevel = 25.0;
+	/** Bosses stop giving reputation once the active total reaches this; after it, only PvP raises it. */
+	public long reputationBossCap = 2_500_000L;
+	/** PvP: the lower-level player must be at least this fraction of the higher player's level. */
+	public double pvpLevelRatio = 0.75;
+	/** PvP: at most this many reputation results per pair of players... */
+	public int pvpPairLimit = 3;
+	/** ...within this many hours (rolling, shared both ways). */
+	public int pvpPairWindowHours = 72;
+	/** Combat tag length after valid PvP damage. */
+	public int combatTagSeconds = 30;
+	/** Reputation at or above this is at risk (PvP losses, "at Risk" warning, disconnect penalty). */
+	public long reputationRiskThreshold = 2_500_000L;
+	/** PvP-only damage/defense bonuses from reputation tiers. Off until balance is tested. */
+	public boolean reputationCombatBonuses = false;
+	/** PvP damage bonus per tier (0.004 = +0.4%). Tiers: every 500K up to 5M, then every 1M up to 20M (25 tiers). */
+	public double pvpDamagePerTier = 0.004;
+	/** PvP damage reduction factor per tier (grows faster than damage). */
+	public double pvpDefensePerTier = 0.006;
+
 	public double baseEnergy = 100.0;
 	/** Extra max energy per level above 1. */
 	public double energyPerLevel = 2.0;
@@ -186,6 +214,17 @@ public final class GrandLineConfig {
 
 	/** Clamps every value into a safe range. */
 	public void validate() {
+		reputationMax = Math.max(0, reputationMax);
+		reputationEnemyCap = Math.max(0, Math.min(reputationEnemyCap, reputationMax));
+		reputationBossCap = Math.max(0, Math.min(reputationBossCap, reputationMax));
+		reputationPerEnemyLevel = Math.max(0, reputationPerEnemyLevel);
+		reputationPerBossLevel = Math.max(0, reputationPerBossLevel);
+		pvpLevelRatio = Math.max(0, Math.min(1, pvpLevelRatio));
+		pvpPairLimit = Math.max(0, pvpPairLimit);
+		pvpPairWindowHours = Math.max(0, pvpPairWindowHours);
+		combatTagSeconds = Math.max(0, combatTagSeconds);
+		pvpDamagePerTier = Math.max(0, pvpDamagePerTier);
+		pvpDefensePerTier = Math.max(0, pvpDefensePerTier);
 		blackCapeHealth = Math.max(0, Math.min(blackCapeHealth, 200));
 		blackCapeEnergy = Math.max(0, Math.min(blackCapeEnergy, 1000));
 		pinkCoatHealth = Math.max(0, Math.min(pinkCoatHealth, 200));

@@ -60,6 +60,31 @@ public final class GrandLineCommands {
 	private static void registerTree(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("grandline")
 				.then(Commands.literal("test").executes(GrandLineCommands::runTest))
+				// Bounty/Honor admin: show or set a player's totals.
+				.then(Commands.literal("reputation").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("player", EntityArgument.player())
+								.executes(context -> {
+									var p = EntityArgument.getPlayer(context, "player");
+									var r = com.grandline.reputation.ReputationService.get(p);
+									context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(
+											p.getGameProfile().getName() + ": Bounty " + r.bounty() + ", Honor " + r.honor()
+													+ (com.grandline.reputation.ReputationService.isTagged(p) ? " (in combat)" : "")), false);
+									return (int) Math.min(Integer.MAX_VALUE, com.grandline.reputation.ReputationService.active(p));
+								})
+								.then(Commands.literal("set")
+										.then(Commands.argument("kind", com.mojang.brigadier.arguments.StringArgumentType.word())
+												.suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(java.util.List.of("bounty", "honor"), b))
+												.then(Commands.argument("amount", LongArgumentType.longArg(0))
+														.executes(context -> {
+															var p = EntityArgument.getPlayer(context, "player");
+															String kind = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "kind");
+															long amount = LongArgumentType.getLong(context, "amount");
+															com.grandline.reputation.ReputationService.setTotal(p, kind.equalsIgnoreCase("bounty"), amount);
+															context.getSource().sendSuccess(() -> net.minecraft.network.chat.Component.literal(
+																	"Set " + kind + " of " + p.getGameProfile().getName() + " to "
+																			+ com.grandline.reputation.ReputationService.get(p).get(kind.equalsIgnoreCase("bounty"))), true);
+															return 1;
+														}))))))
 				// Plate travel between structures (run by command blocks; operators only).
 				.then(Commands.literal("travel").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("players", EntityArgument.players())

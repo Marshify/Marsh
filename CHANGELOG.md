@@ -1,5 +1,17 @@
 # Grand Line patch notes
 
+## v0.15.0 — Bounty & Honor
+**New**
+- Pirates earn **Bounty**, Marines earn **Honor**. Each side keeps its own total (start 0, max 30M); switching sides swaps which one you see and earn, and switching back restores it.
+- Enemies pay their level in Bounty/Honor (up to 250K); bosses pay 25 × their level (up to 2.5M).
+- PvP: beat a player within 75% of your level for 3.5× their level (rising to 7× for 10M+ targets). From 2.5M you can lose some on defeat.
+- The same two players can only score off each other 3 times per 72 hours.
+- Getting killed by a Grand Line enemy costs that enemy's level.
+- **Combat tag:** 30 seconds after a PvP hit — shows "In Combat", and "Bounty/Honor at Risk" from 2.5M. You can't switch sides while tagged, and logging out while at risk counts as a loss.
+- Your Bounty/Honor shows at the top of the HUD, with +/- popups.
+- **Ranks** in the Menu: separate Bounty and Honor leaderboards.
+- Optional PvP tier bonuses for servers (off by default).
+
 ## v0.14.1 — Hotfix
 **Fixes**
 - Fixed a crash when entering a world with no sword or gun in your hotbar (the new loadout panel).

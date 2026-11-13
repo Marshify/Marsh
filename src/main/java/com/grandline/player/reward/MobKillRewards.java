@@ -42,6 +42,7 @@ public final class MobKillRewards {
 		grant(player, entity.getMaxHealth());
 		com.grandline.combat.ability.KillCredit.onKill(player, entity);
 		com.grandline.npc.QuestService.onKill(player, entity);
+		com.grandline.reputation.ReputationService.onMobKilled(player, entity);
 	}
 
 	/** Grants the (budget-limited) reward for killing a mob with {@code mobMaxHealth}. Returns what was granted. */

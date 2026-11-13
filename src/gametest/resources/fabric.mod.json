@@ -18,7 +18,8 @@
       "com.grandline.test.GrandLineIslandGameTests",
       "com.grandline.test.GrandLinePlanGameTests",
       "com.grandline.test.GrandLineGearGameTests",
-      "com.grandline.test.GrandLineTravelGameTests"
+      "com.grandline.test.GrandLineTravelGameTests",
+      "com.grandline.test.GrandLineReputationGameTests"
     ]
   },
   "depends": {

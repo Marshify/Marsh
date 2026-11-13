@@ -54,7 +54,13 @@ public final class ClientNetworking {
 				(packet, player, responseSender) -> net.minecraft.client.Minecraft.getInstance().setScreen(
 						new com.grandline.client.screen.PickSideScreen(packet.team(), packet.team() < 0)));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.ReputationSyncPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.ClientReputation.accept(packet));
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.LeaderboardPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.ClientReputation.acceptBoard(packet));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			com.grandline.client.ClientReputation.clear();
 			ClientProfileCache.clear();
 			com.grandline.client.ClientGear.clear();
 		});
