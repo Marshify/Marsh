@@ -1,0 +1,338 @@
+[
+  {
+    "icon": "rocket_fruit.png",
+    "id": "grandline:rocket",
+    "item": "grandline:rocket_fruit",
+    "name": "Rocket Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "spin_fruit.png",
+    "id": "grandline:gale",
+    "item": "grandline:gale_fruit",
+    "name": "Spin Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "blade_fruit.png",
+    "id": "grandline:blade",
+    "item": "grandline:blade_fruit",
+    "name": "Blade Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "spring_fruit.png",
+    "id": "grandline:spring",
+    "item": "grandline:spring_fruit",
+    "name": "Spring Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "bomb_fruit.png",
+    "id": "grandline:blast",
+    "item": "grandline:blast_fruit",
+    "name": "Bomb Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "smoke_fruit.png",
+    "id": "grandline:mist",
+    "item": "grandline:mist_fruit",
+    "name": "Smoke Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "spike_fruit.png",
+    "id": "grandline:spike",
+    "item": "grandline:spike_fruit",
+    "name": "Spike Fruit",
+    "rarity": "COMMON",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "flame_fruit.png",
+    "id": "grandline:ember",
+    "item": "grandline:ember_fruit",
+    "name": "Flame Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "ice_fruit.png",
+    "id": "grandline:frost",
+    "item": "grandline:frost_fruit",
+    "name": "Ice Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "sand_fruit.png",
+    "id": "grandline:dune",
+    "item": "grandline:dune_fruit",
+    "name": "Sand Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "dark_fruit.png",
+    "id": "grandline:umbra",
+    "item": "grandline:umbra_fruit",
+    "name": "Dark Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "diamond_fruit.png",
+    "id": "grandline:quartz",
+    "item": "grandline:quartz_fruit",
+    "name": "Diamond Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "eagle_fruit.png",
+    "id": "grandline:feather",
+    "item": "grandline:feather_fruit",
+    "name": "Eagle Fruit",
+    "rarity": "UNCOMMON",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "light_fruit.png",
+    "id": "grandline:nova",
+    "item": "grandline:nova_fruit",
+    "name": "Light Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "rubber_fruit.png",
+    "id": "grandline:bounce",
+    "item": "grandline:bounce_fruit",
+    "name": "Rubber Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "ghost_fruit.png",
+    "id": "grandline:ghost",
+    "item": "grandline:ghost_fruit",
+    "name": "Ghost Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "magma_fruit.png",
+    "id": "grandline:lava",
+    "item": "grandline:lava_fruit",
+    "name": "Magma Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "quake_fruit.png",
+    "id": "grandline:tremor",
+    "item": "grandline:tremor_fruit",
+    "name": "Quake Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "spider_fruit.png",
+    "id": "grandline:spider",
+    "item": "grandline:spider_fruit",
+    "name": "Spider Fruit",
+    "rarity": "RARE",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "buddha_fruit.png",
+    "id": "grandline:buddha",
+    "item": "grandline:buddha_fruit",
+    "name": "Buddha Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "love_fruit.png",
+    "id": "grandline:love",
+    "item": "grandline:love_fruit",
+    "name": "Love Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "creation_fruit.png",
+    "id": "grandline:creation",
+    "item": "grandline:creation_fruit",
+    "name": "Creation Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "sound_fruit.png",
+    "id": "grandline:echo",
+    "item": "grandline:echo_fruit",
+    "name": "Sound Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "phoenix_fruit.png",
+    "id": "grandline:phoenix",
+    "item": "grandline:phoenix_fruit",
+    "name": "Phoenix Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "portal_fruit.png",
+    "id": "grandline:portal",
+    "item": "grandline:portal_fruit",
+    "name": "Portal Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "lightning_fruit.png",
+    "id": "grandline:volt",
+    "item": "grandline:volt_fruit",
+    "name": "Lightning Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "pain_fruit.png",
+    "id": "grandline:pain",
+    "item": "grandline:pain_fruit",
+    "name": "Pain Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "blizzard_fruit.png",
+    "id": "grandline:blizzard",
+    "item": "grandline:blizzard_fruit",
+    "name": "Blizzard Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "magnet_fruit.png",
+    "id": "grandline:magnet",
+    "item": "grandline:magnet_fruit",
+    "name": "Magnet Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "gas_fruit.png",
+    "id": "grandline:gas",
+    "item": "grandline:gas_fruit",
+    "name": "Gas Fruit",
+    "rarity": "LEGENDARY",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "gravity_fruit.png",
+    "id": "grandline:orbit",
+    "item": "grandline:orbit_fruit",
+    "name": "Gravity Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "mammoth_fruit.png",
+    "id": "grandline:mammoth",
+    "item": "grandline:mammoth_fruit",
+    "name": "Mammoth Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "t_rex_fruit.png",
+    "id": "grandline:t_rex",
+    "item": "grandline:t_rex_fruit",
+    "name": "T-Rex Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "dough_fruit.png",
+    "id": "grandline:dough",
+    "item": "grandline:dough_fruit",
+    "name": "Dough Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "shadow_fruit.png",
+    "id": "grandline:ink",
+    "item": "grandline:ink_fruit",
+    "name": "Shadow Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "venom_fruit.png",
+    "id": "grandline:toxin",
+    "item": "grandline:toxin_fruit",
+    "name": "Venom Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": true
+  },
+  {
+    "icon": "spirit_fruit.png",
+    "id": "grandline:spirit",
+    "item": "grandline:spirit_fruit",
+    "name": "Spirit Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "tiger_fruit.png",
+    "id": "grandline:tiger",
+    "item": "grandline:tiger_fruit",
+    "name": "Tiger Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "yeti_fruit.png",
+    "id": "grandline:yeti",
+    "item": "grandline:yeti_fruit",
+    "name": "Yeti Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "kitsune_fruit.png",
+    "id": "grandline:kitsune",
+    "item": "grandline:kitsune_fruit",
+    "name": "Kitsune Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "control_fruit.png",
+    "id": "grandline:control",
+    "item": "grandline:control_fruit",
+    "name": "Control Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  },
+  {
+    "icon": "dragon_fruit.png",
+    "id": "grandline:dragon",
+    "item": "grandline:dragon_fruit",
+    "name": "Dragon Fruit",
+    "rarity": "MYTHICAL",
+    "carried_over_from_old_id": false
+  }
+]

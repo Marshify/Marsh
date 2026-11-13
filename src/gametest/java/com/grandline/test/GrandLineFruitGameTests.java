@@ -42,9 +42,10 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	}
 
 	/** Runs every move of every fruit next to a zombie: none may throw, and damaging moves must be able to hit. */
-	@GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 400)
+	@GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 400, batch = "fruit_moves")
 	public void everyFruitMoveExecutes(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		player.moveTo(helper.absolutePos(new BlockPos(1, 2, 1)).getCenter()); // own test area, away from world spawn
 		int totalHits = 0;
 		for (Fruits.FruitDef fruit : Fruits.all()) {
 			for (AbilityDef ability : fruit.power().abilities()) {
@@ -60,6 +61,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 					return;
 				}
 				zombie.discard();
+				com.grandline.combat.ability.FlightService.stop(player, false); // flight moves are toggles
 				player.moveTo(helper.absolutePos(new BlockPos(1, 2, 1)).getCenter()); // undo dashes/blinks
 				player.setDeltaMovement(0, 0, 0);
 			}
@@ -72,18 +74,18 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	public void eatingReplacesFruitAndConsumesItem(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		player.setGameMode(GameType.SURVIVAL); // creative players keep items by design
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.EMBER.item(), 1));
+		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.FLAME.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.EAT), FruitService.Result.SUCCESS, "eat ember");
-		eq(helper, PlayerProfileService.get(player).powers().fruit(), Fruits.EMBER.id(), "fruit set");
+		eq(helper, PlayerProfileService.get(player).powers().fruit(), Fruits.FLAME.id(), "fruit set");
 		helper.assertTrue(player.getMainHandItem().isEmpty(), "fruit consumed");
 
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.EMBER.item(), 1));
+		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.FLAME.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.EAT), FruitService.Result.ALREADY_HAVE_FRUIT, "same fruit");
 		helper.assertFalse(player.getMainHandItem().isEmpty(), "not consumed when refused");
 
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.FROST.item(), 1));
+		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.ICE.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.EAT), FruitService.Result.SUCCESS, "replace with frost");
-		eq(helper, PlayerProfileService.get(player).powers().fruit(), Fruits.FROST.id(), "fruit replaced");
+		eq(helper, PlayerProfileService.get(player).powers().fruit(), Fruits.ICE.id(), "fruit replaced");
 
 		player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.EAT), FruitService.Result.NOT_HOLDING_FRUIT, "empty hand");
@@ -93,19 +95,19 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void stashStoresWithdrawsAndRespectsCapacity(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.GALE.item(), 1));
+		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.SPIN.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.STORE), FruitService.Result.SUCCESS, "store");
-		eq(helper, PlayerProfileService.get(player).powers().stashCount(Fruits.GALE.id()), 1, "in stash");
+		eq(helper, PlayerProfileService.get(player).powers().stashCount(Fruits.SPIN.id()), 1, "in stash");
 		helper.assertTrue(player.getMainHandItem().isEmpty(), "item moved into stash");
 
-		eq(helper, FruitService.withdrawFromStash(player, Fruits.GALE.id()), FruitService.Result.SUCCESS, "withdraw");
-		eq(helper, FruitService.withdrawFromStash(player, Fruits.GALE.id()), FruitService.Result.NOT_IN_STASH, "nothing left");
-		helper.assertTrue(player.getInventory().countItem(Fruits.GALE.item()) == 1, "withdrawn fruit in inventory");
+		eq(helper, FruitService.withdrawFromStash(player, Fruits.SPIN.id()), FruitService.Result.SUCCESS, "withdraw");
+		eq(helper, FruitService.withdrawFromStash(player, Fruits.SPIN.id()), FruitService.Result.NOT_IN_STASH, "nothing left");
+		helper.assertTrue(player.getInventory().countItem(Fruits.SPIN.item()) == 1, "withdrawn fruit in inventory");
 
 		for (int i = 0; i < GrandLineMod.config().stashCapacity; i++) {
-			FruitService.storeInStash(player, Fruits.DUNE.id());
+			FruitService.storeInStash(player, Fruits.SAND.id());
 		}
-		eq(helper, FruitService.storeInStash(player, Fruits.DUNE.id()), FruitService.Result.STASH_FULL, "capacity enforced");
+		eq(helper, FruitService.storeInStash(player, Fruits.SAND.id()), FruitService.Result.STASH_FULL, "capacity enforced");
 		helper.succeed();
 	}
 

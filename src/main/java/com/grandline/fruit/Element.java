@@ -34,7 +34,17 @@ public enum Element {
 	MIST(ParticleTypes.POOF, SoundEvents.FIRE_EXTINGUISH),
 	BOUNCE(ParticleTypes.ITEM_SLIME, SoundEvents.SLIME_JUMP),
 	BARRIER(ParticleTypes.TOTEM_OF_UNDYING, SoundEvents.BEACON_POWER_SELECT),
-	EARTH(new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.DIRT.defaultBlockState()), SoundEvents.GRAVEL_BREAK);
+	EARTH(new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.DIRT.defaultBlockState()), SoundEvents.GRAVEL_BREAK),
+	WEB(ParticleTypes.WHITE_ASH, SoundEvents.SPIDER_AMBIENT),
+	HEART(ParticleTypes.HEART, SoundEvents.AMETHYST_BLOCK_RESONATE),
+	SOUL(ParticleTypes.SOUL, SoundEvents.SOUL_ESCAPE),
+	FOXFIRE(ParticleTypes.SOUL_FIRE_FLAME, SoundEvents.FIRECHARGE_USE),
+	SPIRIT(ParticleTypes.FLAME, SoundEvents.SOUL_ESCAPE),
+	PAIN(ParticleTypes.DAMAGE_INDICATOR, SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH),
+	MAGNET(ParticleTypes.CRIT, SoundEvents.IRON_GOLEM_REPAIR),
+	PORTAL(ParticleTypes.REVERSE_PORTAL, SoundEvents.ENDERMAN_TELEPORT),
+	CONTROL(ParticleTypes.ENCHANT, SoundEvents.ILLUSIONER_CAST_SPELL),
+	DRAGON(ParticleTypes.DRAGON_BREATH, SoundEvents.ENDER_DRAGON_GROWL);
 
 	private final ParticleOptions particle;
 	private final SoundEvent sound;
@@ -101,6 +111,38 @@ public enum Element {
 				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), ctx.player());
 				target.setDeltaMovement(target.getDeltaMovement().add(0, 0.35, 0));
 				target.hurtMarked = true;
+			}
+			case WEB -> target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 3), ctx.player());
+			case HEART -> {
+				// Lovestruck: the target is weakened and slowed.
+				target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 1), ctx.player());
+				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), ctx.player());
+			}
+			case SOUL -> {
+				target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 15, 0), ctx.player());
+				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), ctx.player());
+			}
+			case FOXFIRE -> target.setSecondsOnFire(5);
+			case SPIRIT -> {
+				// Half flame, half frost.
+				target.setSecondsOnFire(3);
+				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1), ctx.player());
+			}
+			case PAIN -> AbilityHelpers.knockAway(target, ctx.player().position(), 1.5, 0.3);
+			case MAGNET -> {
+				// Pulled toward the caster.
+				net.minecraft.world.phys.Vec3 pull = ctx.player().position().subtract(target.position()).normalize().scale(0.9);
+				target.setDeltaMovement(pull.x, 0.2, pull.z);
+				target.hurtMarked = true;
+			}
+			case PORTAL -> {
+				target.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 60, 0), ctx.player());
+				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 2), ctx.player());
+			}
+			case CONTROL -> target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, 25, 1), ctx.player());
+			case DRAGON -> {
+				target.setSecondsOnFire(4);
+				AbilityHelpers.knockAway(target, ctx.player().position(), 0.9, 0.3);
 			}
 			case LIGHTNING -> {
 				// Chain to up to two nearby enemies for half damage.

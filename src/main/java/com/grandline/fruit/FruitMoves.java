@@ -195,6 +195,17 @@ public final class FruitMoves {
 		};
 	}
 
+	/** Toggled, steerable flight with an element trail. Movement only; energy drains while airborne. */
+	public static AbilityAction flight(Element element, int maxTicks, float speed) {
+		return ctx -> {
+			AbilityHelpers.sound(ctx.player(), element.sound(), 1.3F);
+			com.grandline.combat.ability.FlightService.start(ctx.player(), ctx.power(), ctx.ability(), maxTicks, 0.012, speed,
+					(flier, ticks) -> com.grandline.combat.ability.Projectiles.particles(flier.serverLevel(), element.particle(),
+							flier.position(), 3, 0.2, 0.02));
+			return 0;
+		};
+	}
+
 	private static int hitAll(AbilityContext ctx, Element element, List<LivingEntity> targets, float damage) {
 		int hits = 0;
 		for (LivingEntity target : targets) {

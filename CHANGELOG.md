@@ -1,5 +1,20 @@
 # Grand Line patch notes
 
+## v0.8.0 — The New Fruit Roster
+**New**
+- A brand-new lineup of **42 fruits**, each with its own pixel-art icon and five original moves.
+- 24 fruits are brand new: Rocket, Blade, Spring, Spike, Ghost, Buddha, Love, Creation, Spider, Phoenix, Portal, Pain, Blizzard, Magnet, Gas, Mammoth, T-Rex, Dough, Spirit, Tiger, Yeti, Kitsune, Control and Dragon.
+- **Flight fruits:** Eagle, Light, Phoenix, Blizzard, Spirit and Dragon can fly with R. Press R again to land.
+- New elemental effects: webs slow, hearts weaken, souls lift, foxfire burns, magnets pull, control lifts and dragons scorch.
+
+**Changes**
+- 18 old fruits became new ones, and you keep them and their mastery: Ember → Flame, Frost → Ice, Dune → Sand, Lava → Magma, Volt → Lightning, Blast → Bomb, Umbra → Dark, Orbit → Gravity, Echo → Sound, Quartz → Diamond, Tremor → Quake, Toxin → Venom, Feather → Eagle, Nova → Light, Bounce → Rubber, Gale → Spin, Mist → Smoke, Ink → Shadow.
+- Flame's moves have new names: Cinder Shots, Blaze Burst, Pyre Pillar, Inferno Nova and Ember Wings.
+- Fruit rarities have been rebalanced for the new lineup.
+
+**Notes**
+- The other 24 old fruits are now retired. If you own one or have eaten one, it still works and keeps its mastery, but it no longer drops or sells.
+
 ## v0.7.2 — New Fruit Art (Part 1)
 **New**
 - 15 fruits have brand-new 32×32 pixel art: Flame, Frost, Dune, Lava, Volt, Blast, Umbra, Orbit, Echo, Quartz, Tremor, Toxin, Feather, Nova and Bounce.

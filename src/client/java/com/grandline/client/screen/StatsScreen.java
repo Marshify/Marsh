@@ -55,7 +55,7 @@ public final class StatsScreen extends Screen {
 			case DEFENSE -> new ItemStack(Items.SHIELD);
 			case SWORD -> new ItemStack(Items.IRON_SWORD);
 			case GUN -> new ItemStack(Items.CROSSBOW);
-			case FRUIT -> new ItemStack(Fruits.EMBER.item());
+			case FRUIT -> new ItemStack(Fruits.FLAME.item());
 		};
 	}
 

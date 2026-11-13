@@ -1,23 +1,24 @@
 {
-	"schemaVersion": 1,
-	"id": "grandline-test",
-	"version": "0.2.0",
-	"name": "Grand Line Test Suite",
-	"description": "Server game tests for Grand Line. Not shipped in the release jar.",
-	"license": "All-Rights-Reserved",
-	"environment": "*",
-	"entrypoints": {
-		"fabric-gametest": [
-			"com.grandline.test.GrandLineServerGameTests",
-			"com.grandline.test.GrandLineStatsGameTests",
-			"com.grandline.test.GrandLineAbilityGameTests",
-			"com.grandline.test.GrandLineFruitGameTests",
-			"com.grandline.test.GrandLineNpcGameTests",
-			"com.grandline.test.GrandLineFlameGameTests"
-		]
-	},
-	"depends": {
-		"grandline": "*",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "grandline-test",
+  "version": "0.2.0",
+  "name": "Grand Line Test Suite",
+  "description": "Server game tests for Grand Line. Not shipped in the release jar.",
+  "license": "All-Rights-Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.grandline.test.GrandLineServerGameTests",
+      "com.grandline.test.GrandLineStatsGameTests",
+      "com.grandline.test.GrandLineAbilityGameTests",
+      "com.grandline.test.GrandLineFruitGameTests",
+      "com.grandline.test.GrandLineNpcGameTests",
+      "com.grandline.test.GrandLineFlameGameTests",
+      "com.grandline.test.GrandLineRosterGameTests"
+    ]
+  },
+  "depends": {
+    "grandline": "*",
+    "fabric-api": "*"
+  }
 }

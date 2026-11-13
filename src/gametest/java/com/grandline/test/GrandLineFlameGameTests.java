@@ -41,9 +41,9 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
 		player.moveTo(helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5, 3, 1.5)));
 		player.setGameMode(GameType.SURVIVAL);
-		PlayerProfileService.update(player, p -> p.withPowers(p.powers().withFruit(Fruits.EMBER.id())));
+		PlayerProfileService.update(player, p -> p.withPowers(p.powers().withFruit(Fruits.FLAME.id())));
 		if (mastery > 1) {
-			PlayerProfileService.setMasteryLevel(player, Fruits.EMBER.power(), mastery);
+			PlayerProfileService.setMasteryLevel(player, Fruits.FLAME.power(), mastery);
 		}
 		player.setYRot(-90); // look along +X
 		player.setXRot(0);
@@ -65,9 +65,9 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 
 	@GameTest(template = EMPTY_STRUCTURE, batch = "flame_1")
 	public void flameKeepsIdsAndUsesBloxMasteryLevels(GameTestHelper helper) {
-		eq(helper, Fruits.EMBER.id(), "grandline:ember", "power id kept for saves");
-		eq(helper, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(Fruits.EMBER.item()).toString(), "grandline:ember_fruit", "item id kept");
-		List<AbilityDef> moves = Fruits.EMBER.power().abilities();
+		eq(helper, Fruits.FLAME.id(), "grandline:ember", "power id kept for saves");
+		eq(helper, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(Fruits.FLAME.item()).toString(), "grandline:ember_fruit", "item id kept");
+		List<AbilityDef> moves = Fruits.FLAME.power().abilities();
 		eq(helper, moves.stream().map(AbilityDef::requiredMastery).toList(), List.of(1, 25, 50, 100, 10), "mastery Z X C V R");
 		eq(helper, moves.get(3).activation(), AbilityDef.Activation.CHARGED, "Flame Destroyer charges");
 		eq(helper, moves.get(4).activation(), AbilityDef.Activation.TOGGLE, "Fire Flight toggles");
@@ -132,7 +132,7 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 		helper.runAfterDelay(25, () -> {
 			helper.assertTrue(target.getHealth() < target.getMaxHealth(), "quick fireball hits");
 			eq(helper, side.getHealth(), side.getMaxHealth(), "tap explosion stays small");
-			helper.assertTrue(AbilityCooldownService.isOnCooldown(player, Fruits.EMBER.power().abilityId(Fruits.EMBER.power().abilities().get(3))),
+			helper.assertTrue(AbilityCooldownService.isOnCooldown(player, Fruits.FLAME.power().abilityId(Fruits.FLAME.power().abilities().get(3))),
 					"cooldown starts on release");
 			helper.succeed();
 		});
@@ -170,7 +170,7 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 			helper.assertFalse(FlightService.isFlying(player), "flight ended");
 			// Mock test players always report creative mode, where flight is (correctly) left alone, so the survival
 			// revoke path is covered by the real-client checklist instead.
-			helper.assertTrue(AbilityCooldownService.isOnCooldown(player, Fruits.EMBER.power().abilityId(Fruits.EMBER.power().abilities().get(4))),
+			helper.assertTrue(AbilityCooldownService.isOnCooldown(player, Fruits.FLAME.power().abilityId(Fruits.FLAME.power().abilities().get(4))),
 					"cooldown starts on landing");
 			helper.succeed();
 		});

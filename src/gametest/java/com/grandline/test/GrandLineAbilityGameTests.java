@@ -31,6 +31,9 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_1")
 	public void slamDamagesNearbyMobsAndGrantsMastery(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		// Mock players spawn at world spawn, where other tests leave mobs; run this one inside its own test area.
+		net.minecraft.world.phys.Vec3 home = helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5, 2, 1.5));
+		player.moveTo(home.x, home.y, home.z, -90, 0);
 		PlayerProfileService.setMasteryLevel(player, FightingStyles.BRAWLER, 25);
 		Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 1));
 		zombie.setNoAi(true);
