@@ -66,6 +66,13 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("reputation"));
 
+	/** Loadout hotbar order (persistent, survives death). Missing or invalid data loads as the default order. */
+	public static final AttachmentType<java.util.List<Integer>> LOADOUT_ORDER =
+			AttachmentRegistry.<java.util.List<Integer>>builder()
+					.persistent(com.grandline.player.loadout.LoadoutOrder.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("loadout_order"));
+
 	private ModAttachments() {
 	}
 

@@ -1,5 +1,16 @@
 # Grand Line patch notes
 
+## v0.16.0 — Loadout Editor
+**New**
+- Press **Tab** to rearrange your loadout: drag a slot onto another to swap them, **Reset Order** puts it back to Style, Fruit, Sword, Gun. Tab or Esc closes it.
+- Number keys **1–4** now pick whatever is in that loadout slot (5–9 and scrolling work as before).
+- Your order is saved to your character: it stays through death, relogging and server restarts.
+- New swords and fruits slot straight into wherever you placed their category.
+
+**Changes**
+- The R "cycle loadout" key is gone — use 1–4 instead.
+- **Player list moved to the ` key** (it used to be Tab). Both keys can be changed in Controls → Key Binds.
+
 ## v0.15.0 — Bounty & Honor
 **New**
 - Pirates earn **Bounty**, Marines earn **Honor**. Each side keeps its own total (start 0, max 30M); switching sides swaps which one you see and earn, and switching back restores it.

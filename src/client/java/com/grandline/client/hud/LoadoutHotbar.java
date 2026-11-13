@@ -8,6 +8,11 @@ import com.grandline.combat.ability.PowerSource;
 import com.grandline.fruit.Fruits;
 import com.grandline.gear.GearSwordItem;
 import com.grandline.gear.GunItem;
+import com.grandline.network.payload.LoadoutOrderPayload;
+import com.grandline.player.loadout.LoadoutOrder;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -18,14 +23,31 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import java.util.List;
+
 /**
- * The Grand Line hotbar: the vanilla 9 slots (same keys, scrolling and item behaviour) drawn with the Marsh UI slot
- * sprites, plus a loadout panel (Style, Fruit, Sword, Gun) showing which one powers the move keys. The loadout key
- * cycles through it: Style/Fruit switch the move keys and select a hand without a weapon; Sword/Gun select that
- * weapon's hotbar slot.
+ * The Grand Line hotbar: the vanilla 9 slots drawn with the Marsh UI slot sprites, plus a four-slot loadout panel
+ * (Fighting Style, Fruit, Sword, Gun) in the player's saved order. Number keys 1-4 select the loadout entry in that
+ * position: Style/Fruit switch the move keys and select a hand without a weapon; Sword/Gun select that weapon's
+ * hotbar slot. Keys 5-9 and scrolling keep their vanilla behaviour. The order is edited in {@code LoadoutEditScreen}.
  */
 public final class LoadoutHotbar {
-	public enum Loadout { STYLE, FRUIT, SWORD, GUN }
+	public enum Loadout {
+		STYLE("style"), FRUIT("fruit"), SWORD("sword"), GUN("gun");
+
+		public final String label;
+
+		Loadout(String label) {
+			this.label = label;
+		}
+
+		public Component displayName() {
+			return Component.translatable("screen.grandline.items.loadout." + label);
+		}
+	}
+
+	/** Entry ids by position (see {@link LoadoutOrder}); the server sends the saved order on join. */
+	private static List<Integer> order = LoadoutOrder.DEFAULT;
 
 	private static final int SLOT = 20;
 	private static final int GAP = 1;
@@ -92,20 +114,59 @@ public final class LoadoutHotbar {
 		return -1;
 	}
 
-	/** Loadout key: move to the next available entry. */
-	public static void cycle() {
-		Minecraft mc = Minecraft.getInstance();
-		Player player = mc.player;
-		if (player == null) {
-			return;
+	public static List<Integer> order() {
+		return order;
+	}
+
+	/** Changes the order on this client only (the editor saves it to the server when it closes). */
+	public static void setOrder(List<Integer> newOrder) {
+		order = LoadoutOrder.sanitize(newOrder);
+	}
+
+	/** Sends the current order to the server to be saved. */
+	public static void saveOrder() {
+		if (ClientPlayNetworking.canSend(LoadoutOrderPayload.TYPE)) {
+			ClientPlayNetworking.send(new LoadoutOrderPayload(order));
 		}
-		Loadout current = active();
-		for (int step = 1; step <= 4; step++) {
-			Loadout next = Loadout.values()[(current.ordinal() + step) % 4];
-			if (select(next)) {
+	}
+
+	/** The loadout entry in {@code position} (0-3). */
+	public static Loadout at(int position) {
+		return Loadout.values()[order.get(position)];
+	}
+
+	/** Number key {@code position + 1}: selects the entry in that position, or says why it can't. */
+	public static void selectPosition(int position) {
+		Minecraft mc = Minecraft.getInstance();
+		Loadout loadout = at(position);
+		if (mc.player != null && !select(loadout)) {
+			mc.player.displayClientMessage(Component.translatable("message.grandline.loadout.empty." + loadout.label).withStyle(ChatFormatting.RED), true);
+		}
+	}
+
+	/**
+	 * While the Grand Line hotbar is shown, number keys 1-4 select loadout positions instead of hotbar slots 1-4.
+	 * Runs before vanilla reads the hotbar keys each tick, so the clicks never reach the vanilla hotbar.
+	 */
+	public static void register() {
+		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+			if (client.player == null || client.screen != null || !replacesVanilla()) {
 				return;
 			}
-		}
+			// Creative "save/load toolbar" (activator + number) keeps working.
+			if (client.player.isCreative() && (client.options.keySaveHotbarActivator.isDown() || client.options.keyLoadHotbarActivator.isDown())) {
+				return;
+			}
+			for (int i = 0; i < LoadoutOrder.SIZE; i++) {
+				boolean pressed = false;
+				while (client.options.keyHotbarSlots[i].consumeClick()) {
+					pressed = true;
+				}
+				if (pressed) {
+					selectPosition(i);
+				}
+			}
+		});
 	}
 
 	/** Selects a loadout entry. Returns false if the player does not have it. */
@@ -169,7 +230,9 @@ public final class LoadoutHotbar {
 				g.renderItem(player, stack, x + 2, y + 2, i + 1);
 				g.renderItemDecorations(font, stack, x + 2, y + 2);
 			}
-			keyNumber(g, font, String.valueOf(i + 1), x + 1, y - 3);
+			if (i >= LoadoutOrder.SIZE) { // 1-4 belong to the loadout panel
+				keyNumber(g, font, String.valueOf(i + 1), x + 1, y - 3);
+			}
 		}
 		// Offhand slot, on the side vanilla uses.
 		ItemStack offhand = player.getOffhandItem();
@@ -181,31 +244,30 @@ public final class LoadoutHotbar {
 			g.renderItemDecorations(font, offhand, left + 2, y + 2);
 			left -= 4;
 		}
-		// Loadout panel: Style, Fruit, Sword, Gun.
+		// Loadout panel in the saved order; number keys 1-4.
 		Loadout active = active();
 		int lx = left - 4 * (SLOT + GAP) - 2;
-		String[] labels = {"style", "fruit", "sword", "gun"};
-		for (Loadout l : Loadout.values()) {
-			int x = lx + l.ordinal() * (SLOT + GAP);
+		for (int pos = 0; pos < LoadoutOrder.SIZE; pos++) {
+			Loadout l = at(pos);
+			int x = lx + pos * (SLOT + GAP);
 			ItemStack icon = icon(l);
 			MarshUi.abilitySlot(g, x, y, SLOT, l == active ? 1 : icon.isEmpty() ? 2 : 0);
 			if (!icon.isEmpty()) {
 				g.renderFakeItem(icon, x + 2, y + 2);
 			}
+			keyNumber(g, font, String.valueOf(pos + 1), x + 1, y - 3);
 			if (l == active) {
-				Component label = Component.translatable("screen.grandline.items.loadout." + labels[l.ordinal()]);
+				Component label = l.displayName();
 				g.pose().pushPose();
-				g.pose().translate(x + SLOT / 2f - font.width(label) * 0.35f, y - 7, 0);
+				g.pose().translate(x + SLOT / 2f - font.width(label) * 0.35f, y - 10, 0);
 				g.pose().scale(0.7f, 0.7f, 1);
 				g.drawString(font, label, 0, 0, 0xFFD25A, true);
 				g.pose().popPose();
 			}
 		}
-		Component key = Component.literal(GrandLineKeys.LOADOUT.getTranslatedKeyMessage().getString());
-		keyNumber(g, font, key.getString(), lx - font.width(key) - 6, y + 6);
 	}
 
-	private static void keyNumber(GuiGraphics g, Font font, String text, int x, int y) {
+	public static void keyNumber(GuiGraphics g, Font font, String text, int x, int y) {
 		int w = Math.max(9, font.width(text) + 3);
 		MarshUi.keyCap(g, x, y, w, 9);
 		g.pose().pushPose();

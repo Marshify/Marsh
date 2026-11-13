@@ -19,7 +19,10 @@ public final class GrandLineKeys {
 	public static final KeyMapping STATS = new KeyMapping("key.grandline.stats", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
 	public static final KeyMapping STASH = new KeyMapping("key.grandline.stash", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, CATEGORY);
 	public static final KeyMapping MAP = new KeyMapping("key.grandline.map", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, CATEGORY);
-	public static final KeyMapping LOADOUT = new KeyMapping("key.grandline.loadout", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY);
+	/** Opens the loadout editor. Tab by default; the vanilla player list moves to its own key once (see below). */
+	public static final KeyMapping EDIT_LOADOUT = new KeyMapping("key.grandline.edit_loadout", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
+	/** Where the player list goes when it would share Tab with the loadout editor. */
+	public static final int PLAYER_LIST_KEY = GLFW.GLFW_KEY_GRAVE_ACCENT;
 	public static final KeyMapping MENU = new KeyMapping("key.grandline.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 	public static final KeyMapping ITEMS = new KeyMapping("key.grandline.items", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, CATEGORY);
 	public static final KeyMapping SWITCH_POWER = new KeyMapping("key.grandline.switch_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY);
@@ -84,13 +87,35 @@ public final class GrandLineKeys {
 		KeyBindingHelper.registerKeyBinding(STASH);
 		KeyBindingHelper.registerKeyBinding(MAP);
 		KeyBindingHelper.registerKeyBinding(MENU);
-		KeyBindingHelper.registerKeyBinding(LOADOUT);
+		KeyBindingHelper.registerKeyBinding(EDIT_LOADOUT);
 		KeyBindingHelper.registerKeyBinding(ITEMS);
 		for (KeyMapping move : MOVES) {
 			KeyBindingHelper.registerKeyBinding(move);
 		}
 
 		ClientTickEvents.END_CLIENT_TICK.register(GrandLineKeys::tick);
+		com.grandline.client.hud.LoadoutHotbar.register();
+		net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register(GrandLineKeys::movePlayerList);
+	}
+
+	/**
+	 * One key can only drive one action in 1.20.1, so the first time the mod runs with the loadout editor on Tab, the
+	 * vanilla "List Players" binding moves from Tab to ` (grave accent). Done once: rebinding either key afterwards in
+	 * Controls is respected.
+	 */
+	private static void movePlayerList(Minecraft client) {
+		var settings = com.grandline.client.settings.ClientSettings.get();
+		if (settings.playerListKeyMoved) {
+			return;
+		}
+		KeyMapping list = client.options.keyPlayerList;
+		if (list.same(EDIT_LOADOUT)) {
+			list.setKey(InputConstants.Type.KEYSYM.getOrCreate(PLAYER_LIST_KEY));
+			KeyMapping.resetMapping();
+			client.options.save();
+		}
+		settings.playerListKeyMoved = true;
+		settings.save();
 	}
 
 	private static void tick(Minecraft client) {
@@ -106,9 +131,9 @@ public final class GrandLineKeys {
 			}
 		}
 
-		while (LOADOUT.consumeClick()) {
+		while (EDIT_LOADOUT.consumeClick()) {
 			if (client.screen == null && client.player != null) {
-				com.grandline.client.hud.LoadoutHotbar.cycle();
+				client.setScreen(new com.grandline.client.screen.LoadoutEditScreen());
 			}
 		}
 

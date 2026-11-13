@@ -42,6 +42,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.gear.GearService.register();
 		com.grandline.player.TeamService.register();
 		com.grandline.reputation.ReputationService.register();
+		com.grandline.player.loadout.LoadoutOrderService.register();
 		com.grandline.reputation.Leaderboards.register();
 		com.grandline.world.structure.MarkerProcessor.register();
 		com.grandline.world.structure.StructurePlacements.register();
