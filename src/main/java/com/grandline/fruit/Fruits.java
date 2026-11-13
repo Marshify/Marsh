@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * The fruit roster. Every fruit is a {@link Power} (5 moves, scaled by the Fruit stat) plus an edible {@link FruitItem}.
  * Moves unlock at mastery 0 (Z), 10 (X), 15 (R), 25 (C) and 50 (V), except Flame (see FlameMoves).
- * The active roster has one fruit per approved icon; old fruits stay registered as legacy so saves keep working.
+ * The roster has one fruit per approved icon. Saves that still name a removed fruit are cleaned up on join.
  */
 public final class Fruits {
 	public record FruitDef(Power power, FruitRarity rarity, FruitItem item) {
@@ -32,10 +32,7 @@ public final class Fruits {
 	}
 
 	private static final Map<ResourceLocation, FruitDef> FRUITS = new LinkedHashMap<>();
-	/** Old fruits kept so existing saves stay valid; hidden from every drop and shop pool (see {@link #all()}). */
-	private static final java.util.Set<ResourceLocation> LEGACY = new java.util.HashSet<>();
-
-	// ===== Active roster: one fruit per approved icon. Ids of carried-over fruits are kept for saves. =====
+	// ===== Roster: one fruit per approved icon. Ids of carried-over fruits are kept for saves. =====
 
 	public static final FruitDef ROCKET = register("rocket", FruitRarity.COMMON, Element.EXPLOSION, 0xD94A3A,
 			FruitMoves.bolt(Element.EXPLOSION, 16, 1.2, 6f),
@@ -385,108 +382,6 @@ public final class Fruits {
 			FruitMoves.flight(Element.DRAGON, 240, 0.08f),
 			"dragon_breath", "dragon_scales", "dragon_talon", "dragon_inferno", "dragon_flight", true);
 
-	// ===== Legacy fruits (pre-0.8 roster). Owners keep them and their mastery until they are migrated. =====
-
-	public static final FruitDef LEGACY_THORN = legacy("thorn", FruitRarity.COMMON, Element.PLANT, 0x5FA84A,
-			FruitMoves.bolt(Element.PLANT, 12, 1.3, 6f), FruitMoves.burst(Element.PLANT, 5, 7f),
-			FruitMoves.lingering(Element.PLANT, 14, 3.5, 5f, 3f, 5), FruitMoves.eruption(Element.PLANT, 15, 5, 13f, 0.7),
-			FruitMoves.dash(Element.PLANT, 1.6, 4f),
-			"thorn_shot", "thorn_ring", "thorn_patch", "thorn_eruption", "thorn_swing");
-	public static final FruitDef LEGACY_TIDE = legacy("tide", FruitRarity.UNCOMMON, Element.WATER, 0x3F8FE0,
-			FruitMoves.bolt(Element.WATER, 14, 1.4, 7f), FruitMoves.burst(Element.WATER, 5, 8f), FruitMoves.bolt(Element.WATER, 20, 2.2, 10f),
-			FruitMoves.eruption(Element.WATER, 18, 6, 15f, 0.9), FruitMoves.dash(Element.WATER, 2.0, 4f),
-			"tide_jet", "tide_ring", "tide_lance", "tide_crash", "tide_surf");
-	public static final FruitDef LEGACY_CORAL = legacy("coral", FruitRarity.UNCOMMON, Element.CRYSTAL, 0xFF7F6B,
-			FruitMoves.bolt(Element.CRYSTAL, 12, 1.2, 7f), FruitMoves.burst(Element.CRYSTAL, 5, 8f),
-			FruitMoves.lingering(Element.CRYSTAL, 14, 3.5, 6f, 3f, 5), FruitMoves.eruption(Element.CRYSTAL, 16, 5, 15f, 0.8),
-			FruitMoves.barrier(Element.CRYSTAL, 5, 1),
-			"coral_shard", "coral_spikes", "coral_garden", "coral_eruption", "coral_armor");
-	public static final FruitDef LEGACY_IRON = legacy("iron", FruitRarity.UNCOMMON, Element.METAL, 0x9AA3AE,
-			FruitMoves.strike(Element.METAL, 5, 9f), FruitMoves.burst(Element.METAL, 4, 9f), FruitMoves.strike(Element.METAL, 7, 13f),
-			FruitMoves.eruption(Element.METAL, 12, 4.5, 16f, 0.8), FruitMoves.barrier(Element.METAL, 6, 2),
-			"iron_fist", "iron_shockwave", "iron_hammer", "iron_fall", "iron_skin");
-	public static final FruitDef LEGACY_BLOOM = legacy("bloom", FruitRarity.RARE, Element.PLANT, 0xF29BC4,
-			FruitMoves.bolt(Element.PLANT, 14, 1.3, 7f), FruitMoves.heal(Element.PLANT, 8f, 6),
-			FruitMoves.lingering(Element.PLANT, 16, 4, 8f, 4f, 6), FruitMoves.eruption(Element.PLANT, 18, 5.5, 16f, 0.9),
-			FruitMoves.barrier(Element.PLANT, 6, 1),
-			"bloom_petal", "bloom_heal", "bloom_garden", "bloom_root", "bloom_bark");
-	public static final FruitDef LEGACY_PRISM = legacy("prism", FruitRarity.RARE, Element.LIGHT, 0xFFF3A0,
-			FruitMoves.bolt(Element.LIGHT, 20, 1.1, 8f), FruitMoves.burst(Element.LIGHT, 5, 10f), FruitMoves.bolt(Element.LIGHT, 26, 1.6, 13f),
-			FruitMoves.eruption(Element.LIGHT, 22, 5, 18f, 0.6), FruitMoves.blink(Element.LIGHT, 14),
-			"prism_ray", "prism_flash", "prism_beam", "prism_sunfall", "prism_speed");
-	public static final FruitDef LEGACY_WOLF = legacy("wolf", FruitRarity.LEGENDARY, Element.BEAST, 0x8C8C9A,
-			FruitMoves.strike(Element.BEAST, 5, 10f), FruitMoves.dash(Element.BEAST, 2.2, 10f), FruitMoves.burst(Element.BEAST, 5, 12f),
-			FruitMoves.leap(Element.BEAST, 5, 18f), FruitMoves.dash(Element.BEAST, 2.4, 0f),
-			"wolf_fang", "wolf_pounce", "wolf_howl", "wolf_rampage", "wolf_sprint");
-	public static final FruitDef LEGACY_LEVIATHAN = legacy("leviathan", FruitRarity.MYTHICAL, Element.WATER, 0x1F5FA8,
-			FruitMoves.strike(Element.WATER, 10, 11f), FruitMoves.bolt(Element.WATER, 22, 2.2, 13f), FruitMoves.vortex(Element.WATER, 18, 6, 16f),
-			FruitMoves.eruption(Element.WATER, 26, 8, 26f, 1.1), FruitMoves.dash(Element.WATER, 2.6, 6f),
-			"leviathan_bite", "leviathan_torrent", "leviathan_whirlpool", "leviathan_wrath", "leviathan_dive");
-	public static final FruitDef LEGACY_AEGIS = legacy("aegis", FruitRarity.MYTHICAL, Element.BARRIER, 0xF5E08A,
-			FruitMoves.strike(Element.BARRIER, 8, 10f), FruitMoves.heal(Element.BARRIER, 12f, 7), FruitMoves.burst(Element.BARRIER, 6, 14f),
-			FruitMoves.eruption(Element.BARRIER, 22, 7, 22f, 0.9), FruitMoves.barrier(Element.BARRIER, 8, 3),
-			"aegis_bash", "aegis_sanctuary", "aegis_repulse", "aegis_judgment", "aegis_wall");
-	public static final FruitDef LEGACY_PEBBLE = legacy("pebble", FruitRarity.COMMON, Element.EARTH, 0x8A8178,
-			FruitMoves.bolt(Element.EARTH, 12, 1.3, 6f), FruitMoves.burst(Element.EARTH, 4.5, 7f), FruitMoves.eruption(Element.EARTH, 14, 4, 10f, 0.7),
-			FruitMoves.eruption(Element.EARTH, 16, 5.5, 12f, 0.9), FruitMoves.leap(Element.EARTH, 3, 4f),
-			"pebble_toss", "pebble_scatter", "pebble_spire", "pebble_landslide", "pebble_hop");
-	public static final FruitDef LEGACY_ASH = legacy("ash", FruitRarity.COMMON, Element.MIST, 0x5E5A57,
-			FruitMoves.bolt(Element.FIRE, 12, 1.3, 6f), FruitMoves.burst(Element.MIST, 5, 6f), FruitMoves.lingering(Element.FIRE, 14, 3.5, 5f, 3f, 5),
-			FruitMoves.eruption(Element.FIRE, 15, 5, 12f, 0.8), FruitMoves.blink(Element.MIST, 8),
-			"ash_cinder", "ash_cloud", "ash_embers", "ash_plume", "ash_drift");
-	public static final FruitDef LEGACY_SLUDGE = legacy("sludge", FruitRarity.UNCOMMON, Element.EARTH, 0x6B5A3A,
-			FruitMoves.bolt(Element.POISON, 12, 1.5, 7f), FruitMoves.lingering(Element.EARTH, 14, 4, 6f, 3f, 6), FruitMoves.burst(Element.EARTH, 5, 9f),
-			FruitMoves.vortex(Element.EARTH, 16, 5, 14f), FruitMoves.dash(Element.EARTH, 1.8, 4f),
-			"sludge_glob", "sludge_bog", "sludge_splash", "sludge_swamp", "sludge_slide");
-	public static final FruitDef LEGACY_GLASS = legacy("glass", FruitRarity.UNCOMMON, Element.CRYSTAL, 0xBFE8F2,
-			FruitMoves.bolt(Element.CRYSTAL, 14, 1.1, 8f), FruitMoves.burst(Element.CRYSTAL, 5, 8f), FruitMoves.bolt(Element.CRYSTAL, 20, 1.8, 11f),
-			FruitMoves.eruption(Element.CRYSTAL, 16, 5, 15f, 0.6), FruitMoves.barrier(Element.CRYSTAL, 5, 1),
-			"glass_shard", "glass_shatter", "glass_lance", "glass_storm", "glass_pane");
-	public static final FruitDef LEGACY_RUST = legacy("rust", FruitRarity.UNCOMMON, Element.METAL, 0xA8582E,
-			FruitMoves.strike(Element.METAL, 6, 9f), FruitMoves.lingering(Element.POISON, 12, 3.5, 6f, 3f, 5), FruitMoves.burst(Element.METAL, 5, 10f),
-			FruitMoves.eruption(Element.METAL, 14, 5, 15f, 0.7), FruitMoves.barrier(Element.METAL, 5, 1),
-			"rust_claw", "rust_corrode", "rust_burst", "rust_collapse", "rust_plating");
-	public static final FruitDef LEGACY_POLLEN = legacy("pollen", FruitRarity.UNCOMMON, Element.PLANT, 0xF2D64B,
-			FruitMoves.bolt(Element.SOUND, 12, 1.6, 6f), FruitMoves.burst(Element.PLANT, 5.5, 8f), FruitMoves.heal(Element.PLANT, 6f, 5),
-			FruitMoves.lingering(Element.PLANT, 16, 5, 10f, 4f, 6), FruitMoves.dash(Element.PLANT, 1.8, 3f),
-			"pollen_puff", "pollen_burst", "pollen_nectar", "pollen_meadow", "pollen_breeze");
-	public static final FruitDef LEGACY_MONSOON = legacy("monsoon", FruitRarity.RARE, Element.WATER, 0x4A6FA0,
-			FruitMoves.bolt(Element.WATER, 16, 1.5, 8f), FruitMoves.burst(Element.LIGHTNING, 5.5, 10f), FruitMoves.lingering(Element.WATER, 16, 5, 9f, 4f, 6),
-			FruitMoves.eruption(Element.LIGHTNING, 20, 6, 17f, 0.6), FruitMoves.dash(Element.WATER, 2.2, 5f),
-			"monsoon_rain", "monsoon_thunder", "monsoon_flood", "monsoon_tempest", "monsoon_current");
-	public static final FruitDef LEGACY_MIRAGE = legacy("mirage", FruitRarity.RARE, Element.LIGHT, 0xF5C27A,
-			FruitMoves.bolt(Element.LIGHT, 18, 1.2, 8f), FruitMoves.burst(Element.SOUND, 5.5, 9f), FruitMoves.lingering(Element.MIST, 16, 5, 9f, 4f, 6),
-			FruitMoves.eruption(Element.LIGHT, 20, 5, 16f, 0.6), FruitMoves.blink(Element.LIGHT, 12),
-			"mirage_glint", "mirage_dazzle", "mirage_haze", "mirage_oasis", "mirage_shift");
-	public static final FruitDef LEGACY_HORNET = legacy("hornet", FruitRarity.RARE, Element.POISON, 0xE0B020,
-			FruitMoves.strike(Element.POISON, 8, 9f), FruitMoves.dash(Element.POISON, 2.2, 9f), FruitMoves.burst(Element.POISON, 5, 11f),
-			FruitMoves.vortex(Element.POISON, 18, 5.5, 15f), FruitMoves.updraft(Element.BEAST),
-			"hornet_sting", "hornet_dive", "hornet_swarm", "hornet_hive", "hornet_flight");
-	public static final FruitDef LEGACY_GRIZZLY = legacy("grizzly", FruitRarity.LEGENDARY, Element.BEAST, 0x6E4A2E,
-			FruitMoves.strike(Element.BEAST, 5, 11f), FruitMoves.burst(Element.EARTH, 5, 12f), FruitMoves.dash(Element.BEAST, 2.0, 13f),
-			FruitMoves.leap(Element.BEAST, 6, 19f), FruitMoves.barrier(Element.BEAST, 6, 2),
-			"grizzly_maul", "grizzly_roar", "grizzly_charge", "grizzly_frenzy", "grizzly_hide");
-	public static final FruitDef LEGACY_TEMPEST = legacy("tempest", FruitRarity.LEGENDARY, Element.LIGHTNING, 0x5AA0D6,
-			FruitMoves.bolt(Element.WIND, 18, 1.6, 10f), FruitMoves.burst(Element.LIGHTNING, 6, 12f), FruitMoves.vortex(Element.WIND, 20, 6, 15f),
-			FruitMoves.lingering(Element.LIGHTNING, 22, 6.5, 18f, 6f, 6), FruitMoves.updraft(Element.WIND),
-			"tempest_squall", "tempest_crack", "tempest_cyclone", "tempest_superstorm", "tempest_skyride");
-	public static final FruitDef LEGACY_SOLAR = legacy("solar", FruitRarity.LEGENDARY, Element.FIRE, 0xFFB52E,
-			FruitMoves.bolt(Element.LIGHT, 20, 1.3, 10f), FruitMoves.burst(Element.FIRE, 6, 13f), FruitMoves.eruption(Element.FIRE, 20, 5, 17f, 1.0),
-			FruitMoves.eruption(Element.LIGHT, 26, 7.5, 24f, 0.7), FruitMoves.dash(Element.FIRE, 2.4, 6f),
-			"solar_ray", "solar_flare", "solar_corona", "solar_sunburst", "solar_streak");
-	public static final FruitDef LEGACY_HYDRA = legacy("hydra", FruitRarity.MYTHICAL, Element.POISON, 0x2E8A6A,
-			FruitMoves.strike(Element.POISON, 10, 12f), FruitMoves.bolt(Element.WATER, 22, 2.0, 13f), FruitMoves.lingering(Element.POISON, 18, 6, 14f, 6f, 7),
-			FruitMoves.vortex(Element.WATER, 24, 7.5, 25f), FruitMoves.dash(Element.WATER, 2.6, 7f),
-			"hydra_bite", "hydra_spray", "hydra_mire", "hydra_maelstrom", "hydra_lunge");
-	public static final FruitDef LEGACY_TITAN = legacy("titan", FruitRarity.MYTHICAL, Element.EARTH, 0x8F7F6A,
-			FruitMoves.strike(Element.EARTH, 7, 14f), FruitMoves.burst(Element.EARTH, 6.5, 15f), FruitMoves.eruption(Element.EARTH, 20, 6, 20f, 1.2),
-			FruitMoves.eruption(Element.EARTH, 26, 9, 28f, 1.0), FruitMoves.barrier(Element.EARTH, 8, 3),
-			"titan_fist", "titan_stomp", "titan_pillar", "titan_cataclysm", "titan_bulwark");
-	public static final FruitDef LEGACY_SERAPH = legacy("seraph", FruitRarity.MYTHICAL, Element.LIGHT, 0xFFF5D6,
-			FruitMoves.bolt(Element.LIGHT, 22, 1.4, 12f), FruitMoves.heal(Element.BARRIER, 14f, 8), FruitMoves.burst(Element.LIGHT, 6.5, 15f),
-			FruitMoves.eruption(Element.LIGHT, 26, 8, 26f, 0.8), FruitMoves.updraft(Element.LIGHT),
-			"seraph_lance", "seraph_grace", "seraph_halo", "seraph_heavenfall", "seraph_wings");
-
 	private Fruits() {
 	}
 
@@ -506,14 +401,6 @@ public final class Fruits {
 				new AbilityDef(vKey, 50, 300, 0.3, v),
 				flightR ? new AbilityDef(rKey, 15, 120, 0.05, AbilityDef.Activation.TOGGLE, r) : new AbilityDef(rKey, 15, 120, 0.1, r))));
 		return registerItem(name, rarity, power);
-	}
-
-	/** A fruit from the old roster: still loads, works and keeps its mastery, but never drops or sells. */
-	private static FruitDef legacy(String name, FruitRarity rarity, Element element, int color, AbilityAction z, AbilityAction x,
-			AbilityAction c, AbilityAction v, AbilityAction r, String zKey, String xKey, String cKey, String vKey, String rKey) {
-		FruitDef def = register(name, rarity, element, color, z, x, c, v, r, zKey, xKey, cKey, vKey, rKey, false);
-		LEGACY.add(def.power().id());
-		return def;
 	}
 
 	/** Registers a fruit with a hand-made moveset (Z, X, C, V, F order). */
@@ -541,18 +428,9 @@ public final class Fruits {
 		return location == null ? null : FRUITS.get(location);
 	}
 
-	/** The active roster (42 fruits): what the dealer, gacha, treasure, fishing and bosses use. */
+	/** The 42-fruit roster: what the dealer, gacha, treasure, fishing and bosses use. */
 	public static List<FruitDef> all() {
-		return FRUITS.values().stream().filter(f -> !LEGACY.contains(f.power().id())).toList();
-	}
-
-	/** Every registered fruit, including legacy ones that only exist so old saves keep working. */
-	public static List<FruitDef> allIncludingLegacy() {
 		return Collections.unmodifiableList(new ArrayList<>(FRUITS.values()));
-	}
-
-	public static boolean isLegacy(FruitDef fruit) {
-		return LEGACY.contains(fruit.power().id());
 	}
 
 	public static void register() {

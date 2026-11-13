@@ -16,6 +16,8 @@ public final class PlayerProfileEvents {
 	public static void register() {
 		// Fires once the client is ready to receive play packets.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			// Profiles that still name a fruit removed from the roster are cleaned before anything reads them.
+			com.grandline.fruit.FruitService.cleanUpRemovedFruits(handler.getPlayer());
 			// Creates the default profile for new players; stat modifiers are transient, so re-apply them on every join.
 			StatEffects.apply(handler.getPlayer(), PlayerProfileService.get(handler.getPlayer()));
 			PlayerProfileService.sync(handler.getPlayer());

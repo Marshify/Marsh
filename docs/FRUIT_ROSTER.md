@@ -1,4 +1,4 @@
-# Fruit roster and save migration (v0.8.0)
+# Fruit roster and save migration
 
 The active roster has one fruit per approved icon in `art/fruit_icons/`. A fruit keeps its old registry id when it clearly replaces an old fruit, so inventories, eaten fruits, stash entries and mastery carry over unchanged.
 
@@ -49,8 +49,10 @@ The active roster has one fruit per approved icon in `art/fruit_icons/`. A fruit
 | Control Fruit | Mythical | `grandline:control` | `grandline:control_fruit` | `control_fruit.png` | new fruit |
 | Dragon Fruit | Mythical | `grandline:dragon` | `grandline:dragon_fruit` | `dragon_fruit.png` | new fruit |
 
-## Legacy fruits awaiting a decision (24)
+## Removed fruits (v0.8.3)
 
-These old fruits are still registered, so anyone who holds, stores or has eaten one keeps it, its moves and its mastery. They no longer appear in the dealer, gacha, treasure, fishing or boss drops. Each needs a target fruit (or removal) before it can be migrated.
+The 24 retired fruits from the pre-0.8 roster were removed: `thorn`, `pebble`, `ash`, `tide`, `coral`, `iron`, `sludge`, `glass`, `rust`, `pollen`, `bloom`, `prism`, `monsoon`, `mirage`, `hornet`, `wolf`, `grizzly`, `tempest`, `solar`, `leviathan`, `aegis`, `hydra`, `titan`, `seraph`.
 
-`thorn`, `pebble`, `ash`, `tide`, `coral`, `iron`, `sludge`, `glass`, `rust`, `pollen`, `bloom`, `prism`, `monsoon`, `mirage`, `hornet`, `wolf`, `grizzly`, `tempest`, `solar`, `leviathan`, `aegis`, `hydra`, `titan`, `seraph`
+- Held or chested items of these fruits disappear when the world loads (Minecraft drops unknown items).
+- On join, an eaten removed fruit is cleared (the player has no fruit) and removed fruits are dropped from the stash (`FruitService.cleanUpRemovedFruits`).
+- Mastery XP stored under their ids is left in the profile but is never shown or used.

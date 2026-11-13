@@ -1,5 +1,14 @@
 # Grand Line patch notes
 
+## v0.8.3 — Retired Fruits Removed
+**Changes**
+- The 24 retired fruits from the old lineup are gone for good: Thorn, Pebble, Ash, Tide, Coral, Iron, Sludge, Glass, Rust, Pollen, Bloom, Prism, Monsoon, Mirage, Hornet, Wolf, Grizzly, Tempest, Solar, Leviathan, Aegis, Hydra, Titan and Seraph.
+- The fruit lineup is now exactly the 42 fruits with the new art.
+
+**Notes**
+- If you had eaten a retired fruit, you'll have no fruit when you next join. Eat a new one!
+- Retired fruits are removed from your stash. Any copies in your inventory or chests disappear.
+
 ## v0.8.2 — Classic Sea Chart
 **Changes**
 - The sea chart (M) has a brand-new look: every First Sea island is drawn as a little block-built island, with a sharper ocean background and blocky clouds.

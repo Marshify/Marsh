@@ -46,7 +46,7 @@ public final class StashScreen extends Screen {
 		List<Fruits.FruitDef> list = new ArrayList<>();
 		ProfileSyncPayload view = ClientProfileCache.view();
 		if (view != null) {
-			for (Fruits.FruitDef fruit : Fruits.allIncludingLegacy()) {
+			for (Fruits.FruitDef fruit : Fruits.all()) {
 				if (view.profile().powers().stashCount(fruit.id()) > 0) {
 					list.add(fruit);
 				}

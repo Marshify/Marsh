@@ -134,6 +134,20 @@ public final class FruitService {
 
 	// ------------------------------------------------------------------------------------------------ shop
 
+	/**
+	 * Clears fruits that were removed from the roster out of a player's profile (eaten fruit and stash). Returns true if
+	 * anything changed. Held items of removed fruits need no handling: the game drops unknown items when it loads them.
+	 */
+	public static boolean cleanUpRemovedFruits(ServerPlayer player) {
+		var before = PlayerProfileService.get(player).powers();
+		var after = before.withoutUnknownFruits(id -> Fruits.get(id) != null);
+		if (after.equals(before)) {
+			return false;
+		}
+		PlayerProfileService.update(player, p -> p.withPowers(after));
+		return true;
+	}
+
 	public static long price(Fruits.FruitDef fruit) {
 		return GrandLineMod.config().fruitPrices[fruit.rarity().ordinal()];
 	}

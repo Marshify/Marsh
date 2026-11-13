@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Checks the 42-fruit roster against {@code fruit_roster.json}: every fruit is registered under the expected id,
  * shows the expected name, its item model points at its texture, and that texture is byte-for-byte the approved
- * icon from {@code art/fruit_icons}. Legacy fruits must stay registered but out of every pool.
+ * icon from {@code art/fruit_icons}. Saves naming removed fruits are cleaned on join.
  */
 public final class GrandLineRosterGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "roster")
@@ -34,7 +34,7 @@ public final class GrandLineRosterGameTests implements FabricGameTest {
 		JsonObject lang = json("/assets/grandline/lang/en_us.json").getAsJsonObject();
 		Path icons = projectRoot().resolve("art/fruit_icons");
 		helper.assertTrue(roster.size() == 42, "roster file has " + roster.size() + " entries");
-		helper.assertTrue(Fruits.all().size() == 42, "active fruits: " + Fruits.all().size());
+		helper.assertTrue(Fruits.all().size() == 42, "fruits: " + Fruits.all().size());
 		Set<String> active = new HashSet<>();
 		Fruits.all().forEach(f -> active.add(f.id()));
 		for (JsonElement element : roster) {
@@ -58,17 +58,18 @@ public final class GrandLineRosterGameTests implements FabricGameTest {
 		helper.succeed();
 	}
 
-	@GameTest(template = EMPTY_STRUCTURE, batch = "roster_legacy")
-	public void legacyFruitsStayLoadableButNeverDrop(GameTestHelper helper) {
-		long legacy = Fruits.allIncludingLegacy().stream().filter(Fruits::isLegacy).count();
-		helper.assertTrue(legacy == 24, "legacy fruits: " + legacy);
-		for (Fruits.FruitDef fruit : Fruits.allIncludingLegacy()) {
-			if (Fruits.isLegacy(fruit)) {
-				helper.assertTrue(Fruits.get(fruit.id()) == fruit, fruit.id() + " still resolves for old saves");
-				helper.assertTrue(!Fruits.all().contains(fruit), fruit.id() + " is out of the active pools");
-				helper.assertTrue(!FruitService.dealerStock(helper.getLevel().getServer()).contains(fruit), fruit.id() + " not sold");
-			}
-		}
+	@GameTest(template = EMPTY_STRUCTURE, batch = "roster_removed")
+	public void savesNamingRemovedFruitsAreCleanedUp(GameTestHelper helper) {
+		helper.assertTrue(Fruits.get("grandline:thorn") == null, "retired fruits are gone");
+		net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		com.grandline.player.PlayerProfileService.update(player, p -> p.withPowers(p.powers().withFruit("grandline:solar")
+				.withStashCount("grandline:thorn", 2).withStashCount(Fruits.ICE.id(), 1).withMasteryXp("grandline:solar", 900)));
+		helper.assertTrue(FruitService.cleanUpRemovedFruits(player), "something was cleaned");
+		var powers = com.grandline.player.PlayerProfileService.get(player).powers();
+		helper.assertTrue(!powers.hasFruit(), "removed eaten fruit cleared");
+		helper.assertTrue(powers.stashCount("grandline:thorn") == 0, "removed fruit dropped from the stash");
+		helper.assertTrue(powers.stashCount(Fruits.ICE.id()) == 1, "real fruits stay in the stash");
+		helper.assertTrue(!FruitService.cleanUpRemovedFruits(player), "second run changes nothing");
 		helper.succeed();
 	}
 

@@ -61,6 +61,18 @@ public record PowerState(String fightingStyle, String fruit, Map<String, Long> m
 		return total;
 	}
 
+	/** Drops the eaten fruit and stash entries whose fruit no longer exists (removed from the roster). Mastery is kept. */
+	public PowerState withoutUnknownFruits(java.util.function.Predicate<String> exists) {
+		String keptFruit = fruit.isEmpty() || exists.test(fruit) ? fruit : "";
+		Map<String, Integer> keptStash = new HashMap<>();
+		stash.forEach((id, count) -> {
+			if (exists.test(id)) {
+				keptStash.put(id, count);
+			}
+		});
+		return new PowerState(fightingStyle, keptFruit, mastery, keptStash, gachaReadyAtMillis);
+	}
+
 	public PowerState withStashCount(String fruitId, int count) {
 		Map<String, Integer> copy = new HashMap<>(stash);
 		if (count <= 0) {
