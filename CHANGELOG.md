@@ -1,5 +1,13 @@
 # Grand Line patch notes
 
+## v0.20.1 — Smoke & Curbs
+**Fixes**
+- Emberfall's smoke on the map no longer shows a dark outline around its edges.
+- The walls beside Dawnreach's pier stairs are capped with smooth stone slabs again, matching the quay curb.
+
+**Changes**
+- Emberfall's smoke is now a real rising plume: puffs leave the crater one after another, swell, drift west with the wind and fade.
+
 ## v0.20.0 — Dawnreach Upgrades
 **New**
 - **Gunsmith** on Dawnreach's plaza sells the Slingshot ($1,500) and the Musket ($12,000). He replaces the quest giver, since Dawnreach is a safe zone with no enemies. Any leftover Dawnreach quest is cleared automatically when you join.

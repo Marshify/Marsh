@@ -447,7 +447,7 @@ public final class DawnreachHarbor extends BasePlan {
 				}
 			}
 			// Stairway cut straight into the quay: 3 wide, one stone-brick step per block from the deck up to the street,
-			// between pale quartz cheek walls capped with stone-brick slabs.
+			// between pale quartz cheek walls capped with the quay's smooth stone curb.
 			Direction up = west ? Direction.EAST : Direction.WEST;
 			int step = west ? 1 : -1;
 			int wall = west ? PX1 : PX2;
@@ -462,7 +462,7 @@ public final class DawnreachHarbor extends BasePlan {
 				}
 				for (int z : new int[]{c - 2, c + 2}) {
 					p.fill(x, DECK, z, x, STREET, z, s(Blocks.SMOOTH_QUARTZ));
-					p.set(x, WALK, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+					p.set(x, WALK, z, Kit.slab(Blocks.SMOOTH_STONE_SLAB, false)); // same curb as the rest of the quay
 				}
 			}
 		}

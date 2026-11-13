@@ -271,11 +271,24 @@ public final class WorldMapScreen extends Screen {
 
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
 		if (firstSeaArt) {
-			// Volcanic smoke above Emberfall: rises and fades in a slow loop.
-			double phase = (time * 0.35) % 1.0;
-			double smokeScale = Math.min(91.0 / 98, 45.0 / 58) * (0.95 + 0.1 * phase);
-			graphics.setColor(1, 1, 1, (float) (1.0 - 0.35 * phase));
-			blitChart(graphics, SMOKE, 156 - 98 * smokeScale / 2, 542 - 58 * smokeScale / 2 - phase * 6, smokeScale, 98, 58);
+			// Volcanic smoke above Emberfall: a continuous plume. Puffs leave the crater one after another, rise and drift
+			// downwind, swell and thin out, and fade; their staggered lifetimes overlap so the column never empties.
+			double baseScale = Math.min(91.0 / 98, 45.0 / 58);
+			double craterX = 156 + 98 * baseScale / 2 - 4;   // the plume's root (texture bottom-right) sits on the crater
+			double craterY = 542 + 58 * baseScale / 2 - 2;
+			int puffs = 4;
+			double period = 7.0;                               // seconds for one puff to rise and vanish
+			for (int i = puffs - 1; i >= 0; i--) {             // oldest (highest, faintest) first, newest on top
+				double life = ((time / period) + i / (double) puffs) % 1.0;
+				double ease = 1 - (1 - life) * (1 - life);
+				double scale = baseScale * (0.32 + 0.78 * ease);
+				double sway = Math.sin(time * 0.9 + i * 1.7) * 2.5 * life;
+				double x = craterX - 26 * ease + sway;         // the wind carries it west
+				double y = craterY - 30 * ease;
+				float alpha = (float) (Math.min(1.0, life / 0.12) * Math.pow(1 - life, 1.3) * 0.95);
+				graphics.setColor(1, 1, 1, alpha);
+				blitChart(graphics, SMOKE, x - 98 * scale, y - 58 * scale, scale, 98, 58);
+			}
 			graphics.setColor(1, 1, 1, 1);
 		}
 
