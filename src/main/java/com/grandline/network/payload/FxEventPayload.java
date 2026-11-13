@@ -16,11 +16,12 @@ import net.minecraft.world.phys.Vec3;
  * @param dir    travel direction for launches (zero otherwise)
  * @param speed  blocks per tick for launches
  * @param range  maximum travel distance for launches
+ * @param size   move-specific size (fireball size, wave width, blast radius, charge...)
  */
-public record FxEventPayload(String effect, int caster, Vec3 pos, Vec3 dir, float speed, float range) implements FabricPacket {
+public record FxEventPayload(String effect, int caster, Vec3 pos, Vec3 dir, float speed, float range, float size) implements FabricPacket {
 	public static final PacketType<FxEventPayload> TYPE = PacketType.create(GrandLineMod.id("fx_event"), buf -> new FxEventPayload(
 			buf.readUtf(64), buf.readVarInt(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-			new Vec3(buf.readFloat(), buf.readFloat(), buf.readFloat()), buf.readFloat(), buf.readFloat()));
+			new Vec3(buf.readFloat(), buf.readFloat(), buf.readFloat()), buf.readFloat(), buf.readFloat(), buf.readFloat()));
 
 	@Override
 	public void write(FriendlyByteBuf buf) {
@@ -34,6 +35,7 @@ public record FxEventPayload(String effect, int caster, Vec3 pos, Vec3 dir, floa
 		buf.writeFloat((float) dir.z);
 		buf.writeFloat(speed);
 		buf.writeFloat(range);
+		buf.writeFloat(size);
 	}
 
 	@Override

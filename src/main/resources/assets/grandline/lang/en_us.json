@@ -301,8 +301,8 @@
   "screen.grandline.shop.out_of_stock": "Out of stock",
   "screen.grandline.shop.stock_info": "%s of %s fruits in stock. New stock in %sh %sm.",
   "ability.grandline.flame_bullets": "Cinder Shots",
-  "ability.grandline.flame_blast": "Blaze Burst",
-  "ability.grandline.flame_column": "Pyre Pillar",
+  "ability.grandline.flame_blast": "Blaze Wave",
+  "ability.grandline.flame_column": "Pyre Ring",
   "ability.grandline.flame_destroyer": "Inferno Nova",
   "ability.grandline.flame_flight": "Ember Wings",
   "screen.grandline.map.sea_name.1": "First Sea",
@@ -735,5 +735,10 @@
   "message.grandline.quest.safe_zone": "Your quest on %s was cleared: it's a safe zone with no enemies to fight.",
   "item.grandline.flame_fruit": "Flame Fruit",
   "power.grandline.flame": "Flame",
-  "screen.grandline.map.undiscovered": "Undiscovered"
+  "screen.grandline.map.undiscovered": "Undiscovered",
+  "setting.grandline.fx_density": "Effect detail",
+  "setting.grandline.fx_density.desc": "Sparks, embers and smoke around moves. Attack shapes always show.",
+  "screen.grandline.settings.low": "Low",
+  "screen.grandline.settings.medium": "Med",
+  "screen.grandline.settings.high": "High"
 }

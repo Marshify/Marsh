@@ -19,6 +19,8 @@ public final class ClientSettings {
 
 	/** Show move effects cast by other players. */
 	public boolean allyVfx = true;
+	/** Move-effect density: 0 low, 1 medium, 2 high. Secondary sparks, embers and smoke scale; core shapes always show. */
+	public int fxDensity = 2;
 	/** Shake the camera on nearby move impacts. */
 	public boolean cameraShake = true;
 	/** Show the move list (bottom right). */

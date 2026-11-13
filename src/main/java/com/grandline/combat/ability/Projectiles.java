@@ -42,6 +42,21 @@ public final class Projectiles {
 	}
 
 	/**
+	 * What the crosshair points at: the body centre of the first living entity on the look ray within {@code range},
+	 * else the block point. Use this when a projectile starts away from the eye (e.g. above the head), so it flies to
+	 * the enemy the player is aiming at instead of the ground behind them.
+	 */
+	public static Vec3 crosshairAim(ServerPlayer player, double range) {
+		Vec3 eye = player.getEyePosition();
+		Vec3 blockPoint = crosshairTarget(player, range);
+		Vec3 look = player.getLookAngle();
+		AABB box = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0);
+		net.minecraft.world.phys.EntityHitResult hit = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(
+				player.serverLevel(), player, eye, blockPoint, box, e -> e instanceof LivingEntity && e.isAlive() && !e.isSpectator());
+		return hit == null ? blockPoint : hit.getEntity().getBoundingBox().getCenter();
+	}
+
+	/**
 	 * Fires a projectile.
 	 *
 	 * @param start     launch point

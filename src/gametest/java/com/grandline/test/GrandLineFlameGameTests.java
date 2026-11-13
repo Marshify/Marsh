@@ -21,6 +21,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.GameType;
 
+import com.grandline.fruit.flame.FlameMoves;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -95,18 +97,22 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 	}
 
 	@GameTest(template = EMPTY_STRUCTURE, batch = "flame_3")
-	public void burningBlastExplodesAndKnocksBack(GameTestHelper helper) {
+	public void blazeWaveSweepsItsWidthAndPushesForward(GameTestHelper helper) {
 		ServerPlayer player = flameUser(helper, 25);
 		Zombie front = dummy(helper, player, 9, 0);
-		Zombie beside = dummy(helper, player, 10, 2.5);
-		Zombie far = dummy(helper, player, 9, 9);
+		Zombie beside = dummy(helper, player, 10, 2.5);  // inside the 7-wide wave
+		Zombie far = dummy(helper, player, 9, 9);        // well outside it
+		Zombie early = dummy(helper, player, 12, 0);
 		float frontBefore = front.getHealth();
-		eq(helper, use(player, 1), Outcome.USED, "Burning Blast at mastery 25");
-		helper.runAfterDelay(15, () -> {
-			helper.assertTrue(front.getHealth() < frontBefore, "direct target damaged");
-			helper.assertTrue(beside.getHealth() < beside.getMaxHealth(), "explosion splashes nearby enemies");
-			eq(helper, far.getHealth(), far.getMaxHealth(), "enemies outside the blast are untouched");
-			helper.assertTrue(beside.getZ() > player.getZ() + 2.5 + 0.1 || beside.getDeltaMovement().z > 0, "splash target knocked away");
+		eq(helper, use(player, 1), Outcome.USED, "Blaze Wave at mastery 25");
+		// Windup 7 ticks, then the front moves 0.9 blocks a tick: it reaches 9 blocks around tick 16, 12 blocks around tick 19.
+		helper.runAfterDelay(FlameMoves.WAVE_WINDUP_TICKS + 6, () -> eq(helper, early.getHealth(), early.getMaxHealth(),
+				"the wave only hits where its front has reached"));
+		helper.runAfterDelay(30, () -> {
+			helper.assertTrue(front.getHealth() < frontBefore, "the wave hits along its path");
+			helper.assertTrue(beside.getHealth() < beside.getMaxHealth(), "the wave hits across its width");
+			eq(helper, far.getHealth(), far.getMaxHealth(), "enemies beside the wave are untouched");
+			helper.assertTrue(beside.getX() > player.getX() + 10.05 || beside.getDeltaMovement().x > 0, "hit enemies are pushed forward");
 			helper.succeed();
 		});
 	}
@@ -118,8 +124,8 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 		Zombie far = dummy(helper, player, 9, 0);
 		double startY = close.getY();
 		eq(helper, use(player, 2), Outcome.USED, "Fire Column at mastery 50");
-		helper.runAfterDelay(8, () -> {
-			helper.assertTrue(close.getHealth() < close.getMaxHealth(), "column damages enemies around the caster");
+		helper.runAfterDelay(FlameMoves.RING_GATHER_TICKS + 6, () -> {
+			helper.assertTrue(close.getHealth() < close.getMaxHealth(), "the ring damages enemies around the caster");
 			helper.assertTrue(close.getDeltaMovement().y > 0.2 || close.getY() > startY + 0.5, "column lifts them");
 			eq(helper, far.getHealth(), far.getMaxHealth(), "column is centred on the caster");
 			helper.succeed();

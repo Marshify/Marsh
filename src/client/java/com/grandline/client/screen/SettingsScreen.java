@@ -20,6 +20,13 @@ public final class SettingsScreen extends Screen {
 	private record Toggle(String key, Supplier<Boolean> get, Consumer<Boolean> set) {
 	}
 
+	/** A setting with three levels (Low / Medium / High). */
+	private record Choice(String key, Supplier<Integer> get, Consumer<Integer> set) {
+	}
+
+	private final List<MarshButton[]> choiceButtons = new ArrayList<>();
+	private final List<Choice> choiceOf = new ArrayList<>();
+
 	private final Screen parent;
 	private final List<Object> rows = new ArrayList<>(); // section title (String) or Toggle
 	private int left;
@@ -33,6 +40,7 @@ public final class SettingsScreen extends Screen {
 		rows.add("screen.grandline.settings.section.visuals");
 		rows.add(new Toggle("ally_vfx", () -> s.allyVfx, v -> s.allyVfx = v));
 		rows.add(new Toggle("camera_shake", () -> s.cameraShake, v -> s.cameraShake = v));
+		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v));
 		rows.add("screen.grandline.settings.section.hud");
 		rows.add(new Toggle("move_list", () -> s.showMoveList, v -> s.showMoveList = v));
 		rows.add(new Toggle("quest_tracker", () -> s.showQuestTracker, v -> s.showQuestTracker = v));
@@ -58,6 +66,21 @@ public final class SettingsScreen extends Screen {
 						MarshUi.Color.GRAY, () -> set(toggle, false)));
 				toggleButtons.add(new MarshButton[]{on, off});
 				toggleOf.add(toggle);
+				y += ROW;
+			} else if (row instanceof Choice choice) {
+				MarshButton[] buttons = new MarshButton[3];
+				String[] labels = {"low", "medium", "high"};
+				for (int i = 0; i < 3; i++) {
+					int level = i;
+					buttons[i] = addRenderableWidget(new MarshButton(left + WIDTH - 118 + i * 37, y + 7, 35, 20,
+							Component.translatable("screen.grandline.settings." + labels[i]), MarshUi.Color.GRAY, () -> {
+								choice.set().accept(level);
+								ClientSettings.get().save();
+								refresh();
+							}));
+				}
+				choiceButtons.add(buttons);
+				choiceOf.add(choice);
 				y += ROW;
 			} else {
 				y += 14;
@@ -88,6 +111,12 @@ public final class SettingsScreen extends Screen {
 			toggleButtons.get(i)[0].setColor(v ? MarshUi.Color.GREEN : MarshUi.Color.GRAY);
 			toggleButtons.get(i)[1].setColor(v ? MarshUi.Color.GRAY : MarshUi.Color.RED);
 		}
+		for (int i = 0; i < choiceOf.size(); i++) {
+			int v = choiceOf.get(i).get().get();
+			for (int b = 0; b < 3; b++) {
+				choiceButtons.get(i)[b].setColor(b == v ? MarshUi.Color.GREEN : MarshUi.Color.GRAY);
+			}
+		}
 	}
 
 	@Override
@@ -101,13 +130,14 @@ public final class SettingsScreen extends Screen {
 			if (row instanceof String section) {
 				g.drawString(font, Component.translatable(section), left + 10, y + 3, 0xA9B2C0);
 				y += 14;
-			} else if (row instanceof Toggle toggle) {
+			} else if (row instanceof Toggle || row instanceof Choice) {
+				String key = row instanceof Toggle toggle ? toggle.key() : ((Choice) row).key();
 				MarshUi.row(g, left + 6, y, WIDTH - 12, ROW - 2, MarshUi.Row.DARK);
-				MarshUi.outlined(g, font, Component.translatable("setting.grandline." + toggle.key()), left + 14, y + 6, 0xFFFFFF);
+				MarshUi.outlined(g, font, Component.translatable("setting.grandline." + key), left + 14, y + 6, 0xFFFFFF);
 				// Description at 75% size, wrapped to stay clear of the On/Off buttons.
 				int descWidth = (int) ((WIDTH - 14 - 124) / 0.75f);
 				int dy = 0;
-				for (var part : font.split(Component.translatable("setting.grandline." + toggle.key() + ".desc"), descWidth)) {
+				for (var part : font.split(Component.translatable("setting.grandline." + key + ".desc"), descWidth)) {
 					g.pose().pushPose();
 					g.pose().translate(left + 14, y + 17 + dy, 0);
 					g.pose().scale(0.75f, 0.75f, 1);

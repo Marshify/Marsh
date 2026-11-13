@@ -16,7 +16,11 @@ public final class FxEvents {
 	}
 
 	public static void send(ServerPlayer caster, String effect, Vec3 pos, Vec3 dir, double speed, double range) {
-		FxEventPayload payload = new FxEventPayload(effect, caster.getId(), pos, dir, (float) speed, (float) range);
+		send(caster, effect, pos, dir, speed, range, 0);
+	}
+
+	public static void send(ServerPlayer caster, String effect, Vec3 pos, Vec3 dir, double speed, double range, double size) {
+		FxEventPayload payload = new FxEventPayload(effect, caster.getId(), pos, dir, (float) speed, (float) range, (float) size);
 		ServerLevel level = caster.serverLevel();
 		for (ServerPlayer viewer : PlayerLookup.around(level, pos, VIEW_DISTANCE)) {
 			if (ServerPlayNetworking.canSend(viewer, FxEventPayload.TYPE)) {
@@ -26,6 +30,10 @@ public final class FxEvents {
 	}
 
 	public static void send(ServerPlayer caster, String effect, Vec3 pos) {
-		send(caster, effect, pos, Vec3.ZERO, 0, 0);
+		send(caster, effect, pos, Vec3.ZERO, 0, 0, 0);
+	}
+
+	public static void send(ServerPlayer caster, String effect, Vec3 pos, double size) {
+		send(caster, effect, pos, Vec3.ZERO, 0, 0, size);
 	}
 }

@@ -70,6 +70,7 @@ public final class FlightService {
 			return;
 		}
 		revoke(player);
+		com.grandline.combat.fx.FxEvents.send(player, "flight_end", player.position()); // trails fade on every client
 		player.fallDistance = 0;
 		player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false));
 		if (cooldown) {
