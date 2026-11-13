@@ -55,6 +55,12 @@ public final class Canvas {
 		return wx + r >= minX && wx - r < minX + 16 && wz + r >= minZ && wz - r < minZ + 16;
 	}
 
+	/** The chunk being generated, full height. */
+	public net.minecraft.world.level.levelgen.structure.BoundingBox chunkBox() {
+		return new net.minecraft.world.level.levelgen.structure.BoundingBox(minX, level.getMinBuildHeight(), minZ, minX + 15,
+				level.getMaxBuildHeight() - 1, minZ + 15);
+	}
+
 	public BlockPos world(int x, int y, int z) {
 		return new BlockPos(originX + x, y, originZ + z);
 	}

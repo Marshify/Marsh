@@ -36,6 +36,9 @@ public final class ModWorld {
 			new IslandFeature(NoneFeatureConfiguration.CODEC));
 	public static final SeaIslandsFeature SEA_ISLANDS = Registry.register(BuiltInRegistries.FEATURE, GrandLineMod.id("sea_islands"),
 			new SeaIslandsFeature(NoneFeatureConfiguration.CODEC));
+	public static final FountainFeature FOUNTAIN = Registry.register(BuiltInRegistries.FEATURE, GrandLineMod.id("fountain"),
+			new FountainFeature(NoneFeatureConfiguration.CODEC));
+	public static final ResourceKey<PlacedFeature> FOUNTAIN_PLACED = ResourceKey.create(Registries.PLACED_FEATURE, GrandLineMod.id("fountain"));
 	public static final ResourceKey<PlacedFeature> ISLAND_PLACED = ResourceKey.create(Registries.PLACED_FEATURE, GrandLineMod.id("island"));
 
 	/** Islands within this many blocks of a player get discovered. */
@@ -47,6 +50,8 @@ public final class ModWorld {
 	public static void register() {
 		IslandRegistry.register();
 		BiomeModifications.addFeature(BiomeSelectors.tag(BiomeTags.IS_OCEAN), GenerationStep.Decoration.RAW_GENERATION, ISLAND_PLACED);
+		BiomeModifications.addFeature(BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, GrandLineMod.id("grand_line_sea"))),
+				GenerationStep.Decoration.TOP_LAYER_MODIFICATION, FOUNTAIN_PLACED);
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, level) -> {
 			if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && isGrandLineWorld(level)) {
 				registerDesignedIslands(IslandRegistry.get(level));

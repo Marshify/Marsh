@@ -247,8 +247,10 @@ public final class DawnreachHarbor extends BasePlan {
 		P p = new P(canvas);
 		ground(p);
 		piers(p);
-		if (p.near(0, 0, 8)) {
-			fountain(p);
+		if (p.near(0, 0, 16)) {
+			if (!placeFountainTemplate(canvas)) {
+				fountain(p);
+			}
 		}
 		for (Building b : BUILDINGS) {
 			if (p.near(b.outline(), 6)) {
@@ -448,6 +450,47 @@ public final class DawnreachHarbor extends BasePlan {
 	}
 
 	// ---------------------------------------------------------------------------------------------------- fountain
+
+	/** A hand-built fountain saved with a Structure Block; when the mod ships it, it replaces the generated fountain. */
+	public static final net.minecraft.resources.ResourceLocation FOUNTAIN_TEMPLATE =
+			new net.minecraft.resources.ResourceLocation("grandline", "dawnreach/fountain");
+
+	/**
+	 * Places the saved fountain exactly as built: every block state, flowing water levels included, is copied from the
+	 * file. Its footprint is centred on the fountain point (0, 0) and its bottom layer goes at the plaza paving level
+	 * (STREET). Returns false when there is no such file (the generated fountain is used instead).
+	 */
+	/** Final-step pass (see FountainFeature): places the saved fountain's part in this chunk, if Dawnreach uses it. */
+	public static boolean placeFountainInChunk(net.minecraft.world.level.WorldGenLevel level, int chunkMinX, int chunkMinZ) {
+		com.grandline.world.SeaLayout.Spec spec = com.grandline.world.SeaLayout.starter(1);
+		if (!(com.grandline.world.plan.IslandPlans.get(spec.name()) instanceof DawnreachHarbor plan)) {
+			return false; // older worlds keep their old Dawnreach
+		}
+		int fx = spec.x() + OX, fz = spec.z();
+		if (chunkMinX > fx + 16 || chunkMinX + 15 < fx - 16 || chunkMinZ > fz + 16 || chunkMinZ + 15 < fz - 16) {
+			return false;
+		}
+		return placeFountainTemplate(new Canvas(level, plan.terrain(), spec.x(), spec.z(), chunkMinX, chunkMinZ));
+	}
+
+	private static boolean placeFountainTemplate(Canvas canvas) {
+		var server = canvas.level().getServer();
+		if (server == null) {
+			return false;
+		}
+		var template = server.getStructureManager().get(FOUNTAIN_TEMPLATE).orElse(null);
+		if (template == null) {
+			return false;
+		}
+		var size = template.getSize();
+		net.minecraft.core.BlockPos corner = canvas.world(-(size.getX() - 1) / 2 + OX, STREET, -(size.getZ() - 1) / 2);
+		var settings = new net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings()
+				.setBoundingBox(canvas.chunkBox())
+				.setKeepLiquids(false)
+				.addProcessor(com.grandline.world.structure.MarkerProcessor.INSTANCE);
+		template.placeInWorld(canvas.level(), corner, corner, settings, net.minecraft.util.RandomSource.create(42), 2);
+		return true;
+	}
 
 	/** The basin: an 11 x 11 cross (arms 5 wide) with 3 x 3 notches at the corners. */
 	static boolean basinCell(int x, int z) {
