@@ -47,6 +47,14 @@ public final class GearService {
 			}
 			unequip(player, packet.slot());
 		});
+		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.EquipFromSlotPayload.TYPE, (packet, player, sender) -> {
+			if (ServerRequestGuard.check(player, com.grandline.network.payload.EquipFromSlotPayload.TYPE) != ServerRequestGuard.Result.ACCEPTED) {
+				return;
+			}
+			if (equipFromInventory(player, packet.slot()) < 0) {
+				ServerRequestGuard.reject(player, com.grandline.network.payload.EquipFromSlotPayload.TYPE, ServerRequestGuard.Result.REJECTED_INVALID);
+			}
+		});
 	}
 
 	public static EquippedGear get(ServerPlayer player) {
@@ -55,7 +63,18 @@ public final class GearService {
 
 	/** Equips the accessory in {@code hand}. Returns the slot used, or -1 if the item is not an accessory. */
 	public static int equip(ServerPlayer player, InteractionHand hand) {
-		ItemStack stack = player.getItemInHand(hand);
+		return equipStack(player, player.getItemInHand(hand));
+	}
+
+	/** Equips the accessory in inventory slot {@code index} (Items screen). Returns the gear slot used, or -1. */
+	public static int equipFromInventory(ServerPlayer player, int index) {
+		if (index < 0 || index >= player.getInventory().items.size()) {
+			return -1;
+		}
+		return equipStack(player, player.getInventory().items.get(index));
+	}
+
+	private static int equipStack(ServerPlayer player, ItemStack stack) {
 		if (!(stack.getItem() instanceof AccessoryItem accessory)) {
 			return -1;
 		}

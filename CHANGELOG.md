@@ -1,5 +1,26 @@
 # Grand Line patch notes
 
+## v0.12.0 — New UI
+**New**
+- The whole interface uses the Marsh UI look: yellow-titled windows, chunky buttons, coloured stat rows and new health, energy and XP bars.
+- **Menu (H):** opens big buttons right under your bars: Stats, Items, Settings, Map, Side and Close.
+- **Items (I):**
+  - **Backpack:** every Grand Line item you carry. Click an accessory or ring to equip it.
+  - **Build:** your fighting style, gun, fruit and sword, plus your accessory and ring slots and your Build Stats.
+  - **Stash:** your stored fruits.
+- **Settings:**
+  - Turn other players' move effects on or off.
+  - Camera shake on nearby impacts.
+  - Show or hide the move list, the quest tracker and the Menu button.
+  - **Move HUD:** drag your HUD panels anywhere. **Reset HUD** puts them back.
+- **Pick a Side!** Choose Pirates or Marines every time you join (or from the Menu):
+  - **Pirates** have red names and can fight anyone, even other pirates.
+  - **Marines** have blue names and can't hurt each other.
+
+**Changes**
+- The Stats screen has the new look, and the Gun stat now correctly shows that it boosts gun moves.
+- Accessory and ring slots moved from the Stats screen to Items → Build.
+
 ## v0.11.0 — Flame X Polish
 **New**
 - **Blaze Burst (Flame X)** now plays out in three beats:

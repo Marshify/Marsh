@@ -36,23 +36,63 @@ public final class ProfileHud {
 		HudRenderCallback.EVENT.register((graphics, tickDelta) -> render(graphics));
 	}
 
+	/** Movable HUD elements, in Settings order. */
+	public static final String[] ELEMENTS = {"status", "moves", "quest"};
+	/** Last drawn box of each element (x, y, w, h, before its offset), for the HUD editor. */
+	private static final java.util.Map<String, int[]> BOUNDS = new java.util.HashMap<>();
+
 	private static void render(GuiGraphics graphics) {
+		Minecraft client = Minecraft.getInstance();
+		if (client.screen != null && client.screen.getClass().getName().startsWith("com.grandline.")
+				&& !(client.screen instanceof com.grandline.client.screen.MenuScreen)) {
+			return; // our own screens have their own layout; avoid overlapping panels
+		}
+		renderAll(graphics);
+	}
+
+	/** Draws every enabled HUD element at its configured position. Also used by the HUD editor. */
+	public static void renderAll(GuiGraphics graphics) {
 		Minecraft client = Minecraft.getInstance();
 		ProfileSyncPayload view = ClientProfileCache.view();
 		if (view == null || client.player == null || client.options.hideGui || client.options.renderDebug) {
 			return;
 		}
-		if (client.screen != null && client.screen.getClass().getName().startsWith("com.grandline.")) {
-			return; // our own screens have their own layout; avoid overlapping panels
-		}
-
+		var settings = com.grandline.client.settings.ClientSettings.get();
 		// Draw in front of anything else on the GUI layer (items in particular render with depth).
 		graphics.pose().pushPose();
 		graphics.pose().translate(0, 0, 400);
-		renderStatus(graphics, client, view);
-		renderPowerPanel(graphics, client, view);
-		renderQuest(graphics, client);
+		element(graphics, "status", () -> renderStatus(graphics, client, view));
+		if (settings.showMoveList) {
+			element(graphics, "moves", () -> renderPowerPanel(graphics, client, view));
+		}
+		if (settings.showQuestTracker) {
+			element(graphics, "quest", () -> renderQuest(graphics, client));
+		}
 		graphics.pose().popPose();
+	}
+
+	private static void element(GuiGraphics graphics, String id, Runnable draw) {
+		int[] offset = com.grandline.client.settings.ClientSettings.get().offset(id);
+		graphics.pose().pushPose();
+		graphics.pose().translate(offset[0], offset[1], 0);
+		draw.run();
+		graphics.pose().popPose();
+	}
+
+	/** The element's box on screen with its offset applied, or null if it was not drawn. */
+	public static int[] bounds(String id) {
+		int[] b = BOUNDS.get(id);
+		if (b == null) {
+			return null;
+		}
+		int[] offset = com.grandline.client.settings.ClientSettings.get().offset(id);
+		return new int[]{b[0] + offset[0], b[1] + offset[1], b[2], b[3]};
+	}
+
+	/** Where the Menu button is drawn (screen coordinates, offset applied), so the Menu screen can line up with it. */
+	public static int[] menuButtonBox() {
+		int[] status = bounds("status");
+		return status == null ? new int[]{6, 110, 124, 20} : new int[]{status[0], status[1] + status[3] + 2, 124, 20};
 	}
 
 	/** Top-left status block (kept out of the bottom-left, where vanilla chat lives). */
@@ -69,28 +109,46 @@ public final class ProfileHud {
 		y += 19;
 
 		double xpProgress = view.experienceToNextLevel() <= 0 ? 1.0 : Math.min(1.0, (double) profile.experience() / view.experienceToNextLevel());
-		bar(graphics, x, y, width, 6, xpProgress, 0xFF9B59D6, 0xFF2A1A3A);
+		com.grandline.client.ui.MarshUi.xpBar(graphics, x, y, width, 8, xpProgress);
 		Component xpText = view.experienceToNextLevel() <= 0 ? Component.translatable("hud.grandline.max_level")
 				: Component.literal(NUMBERS.format(profile.experience()) + " / " + NUMBERS.format(view.experienceToNextLevel()));
-		drawScaled(graphics, font, xpText, x + width / 2f - font.width(xpText) * 0.35f, y, 0.7f, 0xFFFFFF);
-		y += 9;
+		drawScaled(graphics, font, xpText, x + width / 2f - font.width(xpText) * 0.35f, y + 1, 0.7f, 0xFFFFFF);
+		y += 10;
 
 		float health = client.player.getHealth();
 		float maxHealth = client.player.getMaxHealth();
-		labelledBar(graphics, font, x, y, width, Component.translatable("hud.grandline.health"),
-				Math.round(health) + "/" + Math.round(maxHealth), maxHealth <= 0 ? 0 : health / maxHealth, 0xFF3FBF4F, 0xFF1D3B22);
-		y += 14;
+		spriteBar(graphics, font, x, y, width, Component.translatable("hud.grandline.health"),
+				Math.round(health) + "/" + Math.round(maxHealth), maxHealth <= 0 ? 0 : health / maxHealth, 0);
+		y += 16;
 
 		float energy = ClientProfileCache.energy();
 		float maxEnergy = ClientProfileCache.maxEnergy();
-		labelledBar(graphics, font, x, y, width, Component.translatable("hud.grandline.energy"),
-				Math.round(energy) + "/" + Math.round(maxEnergy), maxEnergy <= 0 ? 0 : energy / maxEnergy, 0xFF3FA9E8, 0xFF16304A);
-		y += 15;
+		spriteBar(graphics, font, x, y, width, Component.translatable("hud.grandline.energy"),
+				Math.round(energy) + "/" + Math.round(maxEnergy), maxEnergy <= 0 ? 0 : energy / maxEnergy, 1);
+		y += 17;
 
 		if (profile.unallocatedStatPoints() > 0) {
 			graphics.drawString(font, Component.translatable("hud.grandline.points_hint", NUMBERS.format(profile.unallocatedStatPoints()),
 					GrandLineKeys.STATS.getTranslatedKeyMessage()), x, y, 0x7CFC7C);
+			y += 10;
 		}
+		BOUNDS.put("status", new int[]{x, 6, width, y - 6});
+		if (com.grandline.client.settings.ClientSettings.get().showMenuButton && !(client.screen instanceof com.grandline.client.screen.MenuScreen)) {
+			// The Menu button (opened with its key; the Menu screen puts the clickable buttons right here).
+			com.grandline.client.ui.MarshUi.menuButton(graphics, x, y + 2, width, 20, com.grandline.client.ui.MarshUi.State.NORMAL);
+			Component menu = Component.translatable("hud.grandline.menu", GrandLineKeys.MENU.getTranslatedKeyMessage());
+			com.grandline.client.ui.MarshUi.outlined(graphics, font, menu, x + width / 2 - font.width(menu) / 2, y + 8, 0xFFFFFF);
+			if (profile.unallocatedStatPoints() > 0) {
+				com.grandline.client.ui.MarshUi.badge(graphics, x + width - 10, y - 2, 12);
+			}
+		}
+	}
+
+	private static void spriteBar(GuiGraphics graphics, Font font, int x, int y, int width, Component label, String value,
+			double progress, int kind) {
+		com.grandline.client.ui.MarshUi.bar(graphics, x, y, width, 14, progress, kind);
+		com.grandline.client.ui.MarshUi.outlined(graphics, font, label, x + 4, y + 3, 0xFFFFFF);
+		com.grandline.client.ui.MarshUi.outlined(graphics, font, Component.literal(value), x + width - font.width(value) - 4, y + 3, 0xFFFFFF);
 	}
 
 	/** Bottom-right power panel. */
@@ -112,6 +170,7 @@ public final class ProfileHud {
 		int movesTop = bottom - movesHeight;
 		int titleTop = movesTop - 16;
 		int masteryTop = titleTop - 20;
+		BOUNDS.put("moves", new int[]{x, masteryTop, width, bottom - masteryTop});
 
 		long masteryXp = profile.powers().masteryXp(power.id().toString());
 		int masteryLevel = view.masteryExperiencePerLevel() <= 0 ? 1 : (int) Math.min(view.maxMastery(), 1 + masteryXp / view.masteryExperiencePerLevel());
@@ -181,6 +240,7 @@ public final class ProfileHud {
 		int width = Math.max(font.width(title), font.width(progress) + font.width(where) + 12) + 12;
 		int x = graphics.guiWidth() / 2 - width / 2;
 		int y = 52; // below the boss bar / Jade's block info at the top centre
+		BOUNDS.put("quest", new int[]{x - 1, y - 1, width + 2, 29});
 		graphics.fill(x - 1, y - 1, x + width + 1, y + 27, PANEL_BORDER);
 		graphics.fill(x, y, x + width, y + 26, NAVY);
 		graphics.fill(x, y, x + width, y + 2, GOLD);

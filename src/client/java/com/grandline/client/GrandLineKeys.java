@@ -19,6 +19,8 @@ public final class GrandLineKeys {
 	public static final KeyMapping STATS = new KeyMapping("key.grandline.stats", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
 	public static final KeyMapping STASH = new KeyMapping("key.grandline.stash", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, CATEGORY);
 	public static final KeyMapping MAP = new KeyMapping("key.grandline.map", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, CATEGORY);
+	public static final KeyMapping MENU = new KeyMapping("key.grandline.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
+	public static final KeyMapping ITEMS = new KeyMapping("key.grandline.items", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, CATEGORY);
 	public static final KeyMapping SWITCH_POWER = new KeyMapping("key.grandline.switch_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY);
 	public static final KeyMapping[] MOVES = {
 			new KeyMapping("key.grandline.move_1", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, CATEGORY),
@@ -73,6 +75,8 @@ public final class GrandLineKeys {
 		KeyBindingHelper.registerKeyBinding(SWITCH_POWER);
 		KeyBindingHelper.registerKeyBinding(STASH);
 		KeyBindingHelper.registerKeyBinding(MAP);
+		KeyBindingHelper.registerKeyBinding(MENU);
+		KeyBindingHelper.registerKeyBinding(ITEMS);
 		for (KeyMapping move : MOVES) {
 			KeyBindingHelper.registerKeyBinding(move);
 		}
@@ -90,6 +94,18 @@ public final class GrandLineKeys {
 		while (MAP.consumeClick()) {
 			if (client.screen == null && client.player != null) {
 				client.setScreen(new com.grandline.client.screen.WorldMapScreen());
+			}
+		}
+
+		while (MENU.consumeClick()) {
+			if (client.screen == null && client.player != null) {
+				client.setScreen(new com.grandline.client.screen.MenuScreen());
+			}
+		}
+
+		while (ITEMS.consumeClick()) {
+			if (client.screen == null && client.player != null) {
+				client.setScreen(new com.grandline.client.screen.ItemsScreen(com.grandline.client.screen.ItemsScreen.Tab.BACKPACK));
 			}
 		}
 

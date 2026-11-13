@@ -14,10 +14,10 @@ public enum StatType implements StringRepresentable {
 	DEFENSE("defense", true),
 	/** Bonus damage while holding a sword. */
 	SWORD("sword", true),
-	/** Reserved for the weapons milestone: points can be stored but have no effect yet. */
-	GUN("gun", false),
-	/** Reserved for the fruit milestone: points can be stored but have no effect yet. */
-	FRUIT("fruit", false);
+	/** Bonus damage for gun moves. */
+	GUN("gun", true),
+	/** Bonus damage for fruit moves. */
+	FRUIT("fruit", true);
 
 	public static final StringRepresentable.EnumCodec<StatType> CODEC = StringRepresentable.fromEnum(StatType::values);
 

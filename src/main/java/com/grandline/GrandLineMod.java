@@ -40,6 +40,7 @@ public final class GrandLineMod implements ModInitializer {
 		ModItems.register();
 		com.grandline.gear.Gear.register();
 		com.grandline.gear.GearService.register();
+		com.grandline.player.TeamService.register();
 		ModCreativeTabs.register();
 		ModAttachments.register();
 		FightingStyles.register();

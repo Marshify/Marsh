@@ -98,6 +98,11 @@ public final class GrandLineFx {
 			return;
 		}
 		Entity caster = level.getEntity(packet.caster());
+		// Settings: other players' move effects can be hidden (their arm animation and damage still happen).
+		boolean own = mc.player != null && packet.caster() == mc.player.getId();
+		if (!own && !com.grandline.client.settings.ClientSettings.get().allyVfx) {
+			return;
+		}
 		switch (packet.effect()) {
 			case "flame_blast_windup" -> {
 				if (caster != null) {
@@ -143,6 +148,9 @@ public final class GrandLineFx {
 				}
 				if (!(photonLoaded() && PhotonBridge.atPoint(packet.effect(), level, packet.pos()))) {
 					impactBurst(level, packet.pos());
+				}
+				if (mc.player != null) {
+					com.grandline.client.settings.CameraShake.impact(mc.player.position().distanceTo(packet.pos()), own ? 1.6f : 1.0f);
 				}
 			}
 			default -> {

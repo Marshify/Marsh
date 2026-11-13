@@ -53,6 +53,12 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("equipped_gear"));
 
+	/** Chosen side: "pirates", "marines" or "" (persistent, survives death). */
+	public static final AttachmentType<String> TEAM = AttachmentRegistry.<String>builder()
+			.persistent(com.mojang.serialization.Codec.STRING)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("team"));
+
 	private ModAttachments() {
 	}
 

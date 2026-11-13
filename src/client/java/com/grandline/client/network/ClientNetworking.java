@@ -50,6 +50,10 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.GearSyncPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.client.ClientGear.accept(packet.gear(), packet.bonuses()));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.TeamPromptPayload.TYPE,
+				(packet, player, responseSender) -> net.minecraft.client.Minecraft.getInstance().setScreen(
+						new com.grandline.client.screen.PickSideScreen(packet.team(), packet.team() < 0)));
+
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			ClientProfileCache.clear();
 			com.grandline.client.ClientGear.clear();
@@ -72,6 +76,20 @@ public final class ClientNetworking {
 		}
 		ClientPlayNetworking.send(new AllocateStatPayload(stat.ordinal(), amount));
 		return true;
+	}
+
+	/** Asks the server to equip the accessory in an inventory slot. */
+	public static void requestEquipFromSlot(int slot) {
+		if (ClientPlayNetworking.canSend(com.grandline.network.payload.EquipFromSlotPayload.TYPE)) {
+			ClientPlayNetworking.send(new com.grandline.network.payload.EquipFromSlotPayload(slot));
+		}
+	}
+
+	/** Asks the server to put the player on a side (0 pirates, 1 marines). */
+	public static void requestChooseTeam(int side) {
+		if (ClientPlayNetworking.canSend(com.grandline.network.payload.ChooseTeamPayload.TYPE)) {
+			ClientPlayNetworking.send(new com.grandline.network.payload.ChooseTeamPayload(side));
+		}
 	}
 
 	/** Asks the server to move an equipped accessory or ring back into the inventory. */
