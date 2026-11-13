@@ -37,6 +37,7 @@ public final class SettingsScreen extends Screen {
 		rows.add(new Toggle("move_list", () -> s.showMoveList, v -> s.showMoveList = v));
 		rows.add(new Toggle("quest_tracker", () -> s.showQuestTracker, v -> s.showQuestTracker = v));
 		rows.add(new Toggle("menu_button", () -> s.showMenuButton, v -> s.showMenuButton = v));
+		rows.add(new Toggle("custom_hotbar", () -> s.customHotbar, v -> s.customHotbar = v));
 	}
 
 	@Override

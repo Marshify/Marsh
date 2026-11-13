@@ -25,6 +25,8 @@ public final class ClientSettings {
 	public boolean showMoveList = true;
 	/** Show the active quest tracker. */
 	public boolean showQuestTracker = true;
+	/** Draw the Grand Line loadout hotbar instead of the vanilla hotbar. */
+	public boolean customHotbar = true;
 	/** Show the Menu button under the status bars. */
 	public boolean showMenuButton = true;
 	/** HUD element offsets from their default positions, by element id ("status", "moves", "quest"). */

@@ -672,5 +672,8 @@
   "team.grandline.marines": "Marines",
   "message.grandline.team.joined": "%s joined the %s!",
   "stat.grandline.effect.gun": "boosts gun move damage",
-  "screen.grandline.map.teleport": "Click to teleport (creative)"
+  "screen.grandline.map.teleport": "Click to teleport (creative)",
+  "key.grandline.loadout": "Cycle Loadout (Style / Fruit / Sword / Gun)",
+  "setting.grandline.custom_hotbar": "Loadout Hotbar",
+  "setting.grandline.custom_hotbar.desc": "Grand Line hotbar with Style, Fruit, Sword and Gun slots"
 }

@@ -19,6 +19,7 @@ public final class GrandLineKeys {
 	public static final KeyMapping STATS = new KeyMapping("key.grandline.stats", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
 	public static final KeyMapping STASH = new KeyMapping("key.grandline.stash", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, CATEGORY);
 	public static final KeyMapping MAP = new KeyMapping("key.grandline.map", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, CATEGORY);
+	public static final KeyMapping LOADOUT = new KeyMapping("key.grandline.loadout", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY);
 	public static final KeyMapping MENU = new KeyMapping("key.grandline.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 	public static final KeyMapping ITEMS = new KeyMapping("key.grandline.items", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, CATEGORY);
 	public static final KeyMapping SWITCH_POWER = new KeyMapping("key.grandline.switch_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY);
@@ -61,6 +62,13 @@ public final class GrandLineKeys {
 		return chosenSource();
 	}
 
+	/** Sets the style/fruit choice (loadout hotbar). */
+	public static void choose(PowerSource source) {
+		if (source == PowerSource.STYLE || source == PowerSource.FRUIT) {
+			activeSource = source;
+		}
+	}
+
 	/** The style/fruit choice made with the switch key, ignoring any held weapon. */
 	private static PowerSource chosenSource() {
 		// Fall back to the style if the fruit was lost (e.g. replaced or removed).
@@ -76,6 +84,7 @@ public final class GrandLineKeys {
 		KeyBindingHelper.registerKeyBinding(STASH);
 		KeyBindingHelper.registerKeyBinding(MAP);
 		KeyBindingHelper.registerKeyBinding(MENU);
+		KeyBindingHelper.registerKeyBinding(LOADOUT);
 		KeyBindingHelper.registerKeyBinding(ITEMS);
 		for (KeyMapping move : MOVES) {
 			KeyBindingHelper.registerKeyBinding(move);
@@ -94,6 +103,12 @@ public final class GrandLineKeys {
 		while (MAP.consumeClick()) {
 			if (client.screen == null && client.player != null) {
 				client.setScreen(new com.grandline.client.screen.WorldMapScreen());
+			}
+		}
+
+		while (LOADOUT.consumeClick()) {
+			if (client.screen == null && client.player != null) {
+				com.grandline.client.hud.LoadoutHotbar.cycle();
 			}
 		}
 

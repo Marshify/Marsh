@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 
 /**
  * The Menu: opens right where the HUD's Menu button sits (the HUD stays visible behind it) and turns it into a grid of
- * big buttons: Stats, Items, Settings, Map, Side and Close. The mouse is free while it is open.
+ * big buttons: Stats, Items, Settings, Map and Close. The mouse is free while it is open.
  */
 public final class MenuScreen extends Screen {
 	public MenuScreen() {
@@ -28,8 +28,7 @@ public final class MenuScreen extends Screen {
 		add(x + w + 4, y, w, h, "screen.grandline.menu.items", () -> minecraft.setScreen(new ItemsScreen(ItemsScreen.Tab.BUILD)));
 		add(x, y + h + 4, w, h, "screen.grandline.menu.settings", () -> minecraft.setScreen(new SettingsScreen(this)));
 		add(x + w + 4, y + h + 4, w, h, "screen.grandline.menu.map", () -> minecraft.setScreen(new WorldMapScreen()));
-		add(x, y + 2 * (h + 4), w, h, "screen.grandline.menu.side", () -> minecraft.setScreen(new PickSideScreen(-1, false)));
-		add(x + w + 4, y + 2 * (h + 4), w, h, "screen.grandline.menu.close", this::onClose);
+		add(x, y + 2 * (h + 4), w * 2 + 4, h, "screen.grandline.menu.close", this::onClose);
 	}
 
 	private void add(int x, int y, int w, int h, String key, Runnable action) {

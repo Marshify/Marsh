@@ -1,5 +1,17 @@
 # Grand Line patch notes
 
+## v0.14.0 — Loadout Hotbar
+**New**
+- **Loadout hotbar:** a new hotbar in the Grand Line style, with numbered slots and a highlighted selection. Same keys, scrolling and items as before.
+- **Loadout panel:** Style, Fruit, Sword and Gun slots beside the hotbar, showing which one powers your moves.
+- **Press R to cycle your loadout:**
+  - **Style / Fruit** switch your move keys.
+  - **Sword / Gun** jump straight to that weapon in your hotbar.
+- You can switch back to the vanilla hotbar in Settings → Loadout Hotbar.
+
+**Changes**
+- The Side button has been removed from the Menu. Pick a Side still opens when you join.
+
 ## v0.13.0 — Build Tools & Creative Map Teleport
 **New**
 - **Creative map teleport:** in creative mode, click an island on the sea chart to teleport there.
