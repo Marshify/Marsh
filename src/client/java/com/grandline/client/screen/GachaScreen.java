@@ -82,7 +82,14 @@ public final class GachaScreen extends Screen {
 				}));
 		spin.active = !onCooldown && !tooLow && result == null;
 		addRenderableWidget(new GoldButton(width / 2 + 120, height / 2 - 78, 50, 16, Component.translatable("screen.grandline.back"),
-				b -> NpcScreens.open(data)));
+				b -> {
+					// The Fruit Dealer's Back returns to its conversation; the gacha cart keeper has no other menu, so close.
+					if (com.grandline.entity.Islander.Role.byId(data.role()) == com.grandline.entity.Islander.Role.GACHA) {
+						onClose();
+					} else {
+						NpcScreens.open(data);
+					}
+				}));
 	}
 
 	@Override

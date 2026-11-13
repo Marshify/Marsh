@@ -448,6 +448,16 @@ public final class WorldMapScreen extends Screen {
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
+	/** The map key (M by default) closes the map the same way it opens it. */
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (com.grandline.client.GrandLineKeys.MAP.matches(keyCode, scanCode)) {
+			onClose();
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+
 	@Override
 	public boolean isPauseScreen() {
 		return false;

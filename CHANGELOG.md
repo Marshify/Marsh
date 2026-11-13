@@ -1,5 +1,13 @@
 # Grand Line patch notes
 
+## v0.19.3 — Small Fixes
+**Fixes**
+- The **Back** button on the Fruit Gacha cart's menu now closes it. It used to reopen the same menu. At the Fruit Dealer, Back still returns to the conversation.
+
+**Changes**
+- Press **M** again while the map is open to close it, the same key that opens it.
+- Dawnreach is ready for a hand-built fountain file: once one ships with the mod, it's placed exactly as built, flowing water included.
+
 ## v0.19.2 — Fountain & No Vanilla Mobs
 **Changes**
 - Dawnreach's fountain is rebuilt:
