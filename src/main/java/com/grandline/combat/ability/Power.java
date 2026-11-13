@@ -14,7 +14,8 @@ import java.util.List;
  */
 public record Power(ResourceLocation id, PowerSource source, StatType scalingStat, String rarity, int color, List<AbilityDef> abilities) {
 	public static final int SLOT_COUNT = 5;
-	public static final int MIN_ABILITIES = 4;
+	/** Weapons have one to three moves; styles and fruits have four or five. */
+	public static final int MIN_ABILITIES = 1;
 
 	public Power {
 		if (abilities.size() < MIN_ABILITIES || abilities.size() > SLOT_COUNT) {

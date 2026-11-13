@@ -50,7 +50,7 @@ public final class AbilityActivationHandler {
 		}
 
 		PlayerProfile profile = PlayerProfileService.get(player);
-		Power power = resolve(profile, source);
+		Power power = resolve(player, profile, source);
 		if (power == null) {
 			tell(player, "message.grandline.ability.no_fruit");
 			return Outcome.NO_POWER;
@@ -133,10 +133,11 @@ public final class AbilityActivationHandler {
 	}
 
 	/** The power the player owns for {@code source}, or null if they have none (or it no longer exists). */
-	public static Power resolve(PlayerProfile profile, PowerSource source) {
+	public static Power resolve(ServerPlayer player, PlayerProfile profile, PowerSource source) {
 		return switch (source) {
 			case STYLE -> Powers.get(profile.powers().fightingStyle());
 			case FRUIT -> profile.powers().hasFruit() ? Powers.get(profile.powers().fruit()) : null;
+			case WEAPON -> com.grandline.gear.Gear.powerFor(player.getMainHandItem().getItem());
 		};
 	}
 

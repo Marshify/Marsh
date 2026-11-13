@@ -38,6 +38,8 @@ public final class GrandLineMod implements ModInitializer {
 
 		// Order matters only in that everything must be registered before registries freeze.
 		ModItems.register();
+		com.grandline.gear.Gear.register();
+		com.grandline.gear.GearService.register();
 		ModCreativeTabs.register();
 		ModAttachments.register();
 		FightingStyles.register();

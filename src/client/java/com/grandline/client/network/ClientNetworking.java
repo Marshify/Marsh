@@ -47,7 +47,13 @@ public final class ClientNetworking {
 				(packet, player, responseSender) -> player.displayClientMessage(net.minecraft.network.chat.Component.translatable(packet.key())
 						.withStyle(packet.success() ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED), true));
 
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ClientProfileCache.clear());
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.GearSyncPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.ClientGear.accept(packet.gear(), packet.bonuses()));
+
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			ClientProfileCache.clear();
+			com.grandline.client.ClientGear.clear();
+		});
 	}
 
 	/** Asks the server to resend profile and cooldowns. Returns false if the server does not have the mod. */
@@ -66,6 +72,13 @@ public final class ClientNetworking {
 		}
 		ClientPlayNetworking.send(new AllocateStatPayload(stat.ordinal(), amount));
 		return true;
+	}
+
+	/** Asks the server to move an equipped accessory or ring back into the inventory. */
+	public static void requestUnequip(int slot) {
+		if (ClientPlayNetworking.canSend(com.grandline.network.payload.UnequipGearPayload.TYPE)) {
+			ClientPlayNetworking.send(new com.grandline.network.payload.UnequipGearPayload(slot));
+		}
 	}
 
 	/** Tells the server a held move key was released (fires charged moves). */

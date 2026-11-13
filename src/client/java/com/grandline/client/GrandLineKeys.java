@@ -34,7 +34,33 @@ public final class GrandLineKeys {
 	private GrandLineKeys() {
 	}
 
+	/** The power the move keys use right now on this client (display only; the server re-checks everything). */
+	public static com.grandline.combat.ability.Power activePower() {
+		var profile = ClientProfileCache.profile();
+		if (profile == null) {
+			return null;
+		}
+		return switch (activeSource()) {
+			case STYLE -> com.grandline.combat.ability.Powers.get(profile.powers().fightingStyle());
+			case FRUIT -> com.grandline.combat.ability.Powers.get(profile.powers().fruit());
+			case WEAPON -> {
+				var player = net.minecraft.client.Minecraft.getInstance().player;
+				yield player == null ? null : com.grandline.gear.Gear.powerFor(player.getMainHandItem().getItem());
+			}
+		};
+	}
+
 	public static PowerSource activeSource() {
+		// Holding a sword or gun puts its moves on the keys; switching back to empty hands restores the choice.
+		var player = net.minecraft.client.Minecraft.getInstance().player;
+		if (player != null && com.grandline.gear.Gear.powerFor(player.getMainHandItem().getItem()) != null) {
+			return PowerSource.WEAPON;
+		}
+		return chosenSource();
+	}
+
+	/** The style/fruit choice made with the switch key, ignoring any held weapon. */
+	private static PowerSource chosenSource() {
 		// Fall back to the style if the fruit was lost (e.g. replaced or removed).
 		if (activeSource == PowerSource.FRUIT && (ClientProfileCache.profile() == null || !ClientProfileCache.profile().powers().hasFruit())) {
 			activeSource = PowerSource.STYLE;
@@ -77,9 +103,9 @@ public final class GrandLineKeys {
 			if (client.player == null) {
 				continue;
 			}
-			if (activeSource() == PowerSource.STYLE && ClientProfileCache.profile() != null && ClientProfileCache.profile().powers().hasFruit()) {
+			if (chosenSource() == PowerSource.STYLE && ClientProfileCache.profile() != null && ClientProfileCache.profile().powers().hasFruit()) {
 				activeSource = PowerSource.FRUIT;
-			} else if (activeSource() == PowerSource.FRUIT) {
+			} else if (chosenSource() == PowerSource.FRUIT) {
 				activeSource = PowerSource.STYLE;
 			} else {
 				client.player.displayClientMessage(Component.translatable("message.grandline.ability.no_fruit").withStyle(ChatFormatting.RED), true);
@@ -120,7 +146,8 @@ public final class GrandLineKeys {
 		if (profile == null) {
 			return false;
 		}
-		var power = com.grandline.combat.ability.Powers.get(source == PowerSource.FRUIT ? profile.powers().fruit() : profile.powers().fightingStyle());
+		var power = source == PowerSource.WEAPON ? activePower()
+				: com.grandline.combat.ability.Powers.get(source == PowerSource.FRUIT ? profile.powers().fruit() : profile.powers().fightingStyle());
 		return power != null && slot < power.abilities().size()
 				&& power.abilities().get(slot).activation() == com.grandline.combat.ability.AbilityDef.Activation.CHARGED;
 	}

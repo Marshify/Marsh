@@ -24,6 +24,8 @@ public record AbilityContext(ServerPlayer player, Power power, AbilityDef abilit
 		}
 		// Remember which power struck last, so a kill credits mastery to the right power.
 		KillCredit.record(target, player, power);
-		return target.hurt(level().damageSources().playerAttack(player), (float) (baseDamage * multiplier));
+		// Gear bonus by the move's own category (a fruit move gets the Fruit bonus even while holding a sword).
+		double gear = com.grandline.gear.GearService.damageMultiplier(player, power.scalingStat());
+		return target.hurt(level().damageSources().playerAttack(player), (float) (baseDamage * multiplier * gear));
 	}
 }

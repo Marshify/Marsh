@@ -87,6 +87,13 @@ public final class GrandLineConfig {
 	public double masteryPerKilledHealth = 1.0;
 
 	/** Max energy at level 1. */
+	/** Gear: Black Cape max health bonus (half-hearts). */
+	public double blackCapeHealth = 4.0;
+	/** Gear: Black Cape max energy bonus. */
+	public double blackCapeEnergy = 10.0;
+	/** Gear: Pink Coat max health bonus (half-hearts). */
+	public double pinkCoatHealth = 8.0;
+
 	public double baseEnergy = 100.0;
 	/** Extra max energy per level above 1. */
 	public double energyPerLevel = 2.0;
@@ -179,6 +186,9 @@ public final class GrandLineConfig {
 
 	/** Clamps every value into a safe range. */
 	public void validate() {
+		blackCapeHealth = Math.max(0, Math.min(blackCapeHealth, 200));
+		blackCapeEnergy = Math.max(0, Math.min(blackCapeEnergy, 1000));
+		pinkCoatHealth = Math.max(0, Math.min(pinkCoatHealth, 200));
 		maxLevel = clamp(maxLevel, 1, 100_000);
 		statPointsPerLevel = clamp(statPointsPerLevel, 0, 1_000);
 		baseExperiencePerLevel = clamp(baseExperiencePerLevel, 1, 1_000_000_000L);

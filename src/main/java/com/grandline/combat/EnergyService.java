@@ -44,7 +44,16 @@ public final class EnergyService {
 
 	public static double max(ServerPlayer player) {
 		int level = PlayerProfileService.get(player).level();
-		return GrandLineMod.config().baseEnergy + GrandLineMod.config().energyPerLevel * Math.max(0, level - 1);
+		return GrandLineMod.config().baseEnergy + GrandLineMod.config().energyPerLevel * Math.max(0, level - 1)
+				+ com.grandline.gear.GearService.bonusEnergy(player);
+	}
+
+	/** Lowers stored energy to the current cap (after gear is removed). Never raises it. */
+	public static void clampToMax(ServerPlayer player) {
+		Energy energy = state(player);
+		if (energy.current > max(player)) {
+			energy.current = max(player);
+		}
 	}
 
 	public static double current(ServerPlayer player) {

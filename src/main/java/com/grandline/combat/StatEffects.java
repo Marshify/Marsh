@@ -32,6 +32,8 @@ import java.util.UUID;
 public final class StatEffects {
 	private static final UUID HEALTH_MODIFIER = UUID.fromString("6f1d2c4e-0b5a-4f3e-9c1a-8a7e5d2b1c01");
 	private static final UUID DAMAGE_MODIFIER = UUID.fromString("6f1d2c4e-0b5a-4f3e-9c1a-8a7e5d2b1c02");
+	/** Gear damage bonus for normal hits (Melee with an empty hand, Sword with a sword), as a total multiplier. */
+	private static final UUID GEAR_DAMAGE_MODIFIER = UUID.fromString("6f1d2c4e-0b5a-4f3e-9c1a-8a7e5d2b1c03");
 
 	private StatEffects() {
 	}
@@ -72,9 +74,20 @@ public final class StatEffects {
 
 	private static void refreshDamage(ServerPlayer player, PlayerProfile profile) {
 		setModifier(player, Attributes.ATTACK_DAMAGE, DAMAGE_MODIFIER, "Grand Line melee/sword", currentDamageBonus(player, profile), false);
+		ItemStack held = player.getMainHandItem();
+		com.grandline.player.StatType category = held.isEmpty() ? com.grandline.player.StatType.MELEE
+				: held.getItem() instanceof SwordItem ? com.grandline.player.StatType.SWORD : null;
+		double gear = category == null ? 0 : com.grandline.gear.GearService.damageMultiplier(player, category) - 1.0;
+		setModifier(player, Attributes.ATTACK_DAMAGE, GEAR_DAMAGE_MODIFIER, "Grand Line gear", gear, false,
+				AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 
 	private static void setModifier(ServerPlayer player, Attribute attribute, UUID id, String name, double amount, boolean saved) {
+		setModifier(player, attribute, id, name, amount, saved, AttributeModifier.Operation.ADDITION);
+	}
+
+	private static void setModifier(ServerPlayer player, Attribute attribute, UUID id, String name, double amount, boolean saved,
+			AttributeModifier.Operation operation) {
 		AttributeInstance instance = player.getAttribute(attribute);
 		if (instance == null) {
 			return;
@@ -87,7 +100,7 @@ public final class StatEffects {
 
 		instance.removeModifier(id);
 		if (amount != 0.0) {
-			AttributeModifier modifier = new AttributeModifier(id, name, amount, AttributeModifier.Operation.ADDITION);
+			AttributeModifier modifier = new AttributeModifier(id, name, amount, operation);
 			if (saved) {
 				instance.addPermanentModifier(modifier);
 			} else {

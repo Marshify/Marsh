@@ -29,11 +29,15 @@ public final class KillCredit {
 		LAST_HIT.put(target, new Hit(player.getUUID(), power, player.server.getTickCount()));
 	}
 
-	/** The power to credit for {@code killer} killing {@code target}, or null if none (e.g. a sword kill). */
+	/** The power to credit for {@code killer} killing {@code target}, or null if none (e.g. a kill with a vanilla tool). */
 	public static Power creditedPower(ServerPlayer killer, LivingEntity target) {
 		Hit hit = LAST_HIT.remove(target);
 		if (hit != null && hit.player().equals(killer.getUUID()) && killer.server.getTickCount() - hit.tick() <= WINDOW_TICKS) {
 			return hit.power();
+		}
+		Power weapon = com.grandline.gear.Gear.powerFor(killer.getMainHandItem().getItem());
+		if (weapon != null) {
+			return weapon; // melee or shot kills with a sword or gun train that weapon's mastery
 		}
 		if (killer.getMainHandItem().isEmpty()) {
 			return Powers.get(PlayerProfileService.get(killer).powers().fightingStyle());

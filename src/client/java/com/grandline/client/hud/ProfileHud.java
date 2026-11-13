@@ -98,7 +98,8 @@ public final class ProfileHud {
 		Font font = client.font;
 		PlayerProfile profile = view.profile();
 		PowerSource source = GrandLineKeys.activeSource();
-		Power power = source == PowerSource.FRUIT ? Powers.get(profile.powers().fruit()) : Powers.get(profile.powers().fightingStyle());
+		Power power = source == PowerSource.WEAPON ? GrandLineKeys.activePower()
+				: source == PowerSource.FRUIT ? Powers.get(profile.powers().fruit()) : Powers.get(profile.powers().fightingStyle());
 		if (power == null) {
 			return;
 		}

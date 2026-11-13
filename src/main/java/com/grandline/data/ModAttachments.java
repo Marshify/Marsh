@@ -46,6 +46,13 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("active_quest"));
 
+	/** Equipped accessory and rings (persistent, survives death). */
+	public static final AttachmentType<com.grandline.gear.EquippedGear> EQUIPPED_GEAR =
+			AttachmentRegistry.<com.grandline.gear.EquippedGear>builder()
+					.persistent(com.grandline.gear.EquippedGear.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("equipped_gear"));
+
 	private ModAttachments() {
 	}
 

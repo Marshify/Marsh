@@ -1,5 +1,22 @@
 # Grand Line patch notes
 
+## v0.10.0 — Swords, Guns & Accessories
+**New**
+- **4 swords:** Katana, Cutlass, Saber and Trident. Hold one and Z / X / C use its moves (Rising Draw, Crescent Arc, Hundred Cuts, and more).
+- **4 guns:** Slingshot, Flintlock, Musket and Cannon. Right-click to fire (no ammo, each has its own reload), and Z / X / C for gun moves like Long Shot and Broadside Barrage.
+- Swords and guns level up their own mastery with kills, which unlocks more moves.
+- **4 accessories.** Right-click to equip:
+  - **Black Cape:** +5% damage (Melee, Sword, Gun, Fruit), +2 hearts, +10 max energy.
+  - **Pink Coat:** +10% Gun damage, +4 hearts.
+  - **Swordsman Hat:** +10% Sword damage (normal hits and sword moves).
+  - **Tomoe Ring:** +10% Fruit damage (goes in a ring slot).
+- **Build screen (K):** a new Gear panel shows your accessory and two ring slots, plus your total bonuses. Click a slot to take the item off.
+
+**Notes**
+- Fruit moves always get Fruit bonuses, even while you're holding a sword or gun.
+- Swapping gear never refills your health or energy.
+- Accessories don't show on your character yet. That needs worn models.
+
 ## v0.9.1 — Refined Sea Chart
 **New**
 - The sea chart (M) has a brand-new pirate look: a torn parchment frame, gold doubloons in the corners, surf around every island and smoke rising from Emberfall's volcano.

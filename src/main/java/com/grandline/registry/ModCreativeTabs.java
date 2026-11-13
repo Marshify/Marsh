@@ -24,6 +24,7 @@ public final class ModCreativeTabs {
 						com.grandline.fruit.Fruits.all().stream()
 								.sorted(java.util.Comparator.comparingInt(f -> f.rarity().ordinal()))
 								.forEach(f -> output.accept(f.item()));
+						com.grandline.gear.Gear.all().forEach(output::accept);
 						com.grandline.npc.FishingService.items().forEach(output::accept);
 						ModSpawnEggs.ALL.forEach(output::accept);
 					})

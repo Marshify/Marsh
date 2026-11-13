@@ -1,0 +1,62 @@
+[
+  {
+    "blox_fruits_reference": "Katana",
+    "category": "swords",
+    "file": "textures/swords/katana.png"
+  },
+  {
+    "blox_fruits_reference": "Cutlass",
+    "category": "swords",
+    "file": "textures/swords/cutlass.png"
+  },
+  {
+    "blox_fruits_reference": "Saber",
+    "category": "swords",
+    "file": "textures/swords/saber.png"
+  },
+  {
+    "blox_fruits_reference": "Trident",
+    "category": "swords",
+    "file": "textures/swords/trident.png"
+  },
+  {
+    "blox_fruits_reference": "Slingshot",
+    "category": "guns",
+    "file": "textures/guns/slingshot.png"
+  },
+  {
+    "blox_fruits_reference": "Flintlock",
+    "category": "guns",
+    "file": "textures/guns/flintlock.png"
+  },
+  {
+    "blox_fruits_reference": "Musket",
+    "category": "guns",
+    "file": "textures/guns/musket.png"
+  },
+  {
+    "blox_fruits_reference": "Cannon",
+    "category": "guns",
+    "file": "textures/guns/cannon.png"
+  },
+  {
+    "blox_fruits_reference": "Black Cape",
+    "category": "accessories",
+    "file": "textures/accessories/black_cape.png"
+  },
+  {
+    "blox_fruits_reference": "Pink Coat",
+    "category": "accessories",
+    "file": "textures/accessories/pink_coat.png"
+  },
+  {
+    "blox_fruits_reference": "Swordsman Hat",
+    "category": "accessories",
+    "file": "textures/accessories/swordsman_hat.png"
+  },
+  {
+    "blox_fruits_reference": "Tomoe Ring",
+    "category": "accessories",
+    "file": "textures/accessories/tomoe_ring.png"
+  }
+]
