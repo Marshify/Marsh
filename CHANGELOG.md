@@ -1,5 +1,17 @@
 # Grand Line patch notes
 
+## v0.11.0 — Flame X Polish
+**New**
+- **Blaze Burst (Flame X)** now plays out in three beats:
+  - **Windup:** embers gather around your hand as you pull your shoulder back.
+  - **Release:** a blocky flaming fist with a tapering flame trail snaps forward.
+  - **Impact:** a bright spark pop, expanding fire rings and a burst of embers. The target stays visible.
+- A punch animation with windup, snap and follow-through, seen by you in third person and by other players. In first person your hand punches on release.
+- Optional support for the **Photon** effects mod (Fabric 1.20.1, version 1.1.17). With Photon installed, custom effects can replace the built-in ones.
+
+**Changes**
+- Blaze Burst now has a short 0.3 second windup before the fist launches. Damage, range, cooldown and mastery are unchanged.
+
 ## v0.10.1 — Chart Hover Fix
 **Fixes**
 - The surf around each island on the sea chart now rises and grows with the island when you hover over it, instead of staying behind.

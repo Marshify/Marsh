@@ -13,6 +13,18 @@ base {
 
 repositories {
 	// Loom adds the Fabric, Mojang and Maven Central repositories automatically.
+	// Photon (VFX) is published on Modrinth's Maven; only use that repository for Modrinth artifacts.
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 loom {
@@ -50,6 +62,13 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// Photon VFX (optional at runtime): compile against it, run it in the dev client, never bundle it.
+	// Grand Line only touches Photon classes when the mod is installed; otherwise its own particle effects play.
+	modCompileOnly "maven.modrinth:photon-editor:${project.photon_version}"
+	modLocalRuntime "maven.modrinth:photon-editor:${project.photon_version}"
+	// Photon nests LDLib in its released jar; the dev environment needs the same LDLib build on its own.
+	modLocalRuntime "maven.modrinth:ldlib:${project.ldlib_version}"
 
 	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }

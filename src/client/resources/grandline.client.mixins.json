@@ -3,7 +3,8 @@
 	"package": "com.grandline.client.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"WorldCreationUiStateMixin"
+		"WorldCreationUiStateMixin",
+		"HumanoidModelPunchMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

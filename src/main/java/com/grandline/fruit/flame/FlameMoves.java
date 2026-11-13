@@ -41,6 +41,11 @@ public final class FlameMoves {
 	static final double BLAST_RADIUS = 4.0;
 	static final double BLAST_SPEED = 1.5;
 	static final double BLAST_RANGE = 32;
+	/** Windup before the fist leaves the hand (the arm animation releases on the launch event). */
+	static final int BLAST_WINDUP_TICKS = 6;
+	public static final String FX_BLAST_WINDUP = "flame_blast_windup";
+	public static final String FX_BLAST_LAUNCH = "flame_blast_launch";
+	public static final String FX_BLAST_IMPACT = "flame_blast_impact";
 
 	static final float COLUMN_DAMAGE = 13.0f;
 	static final double COLUMN_RADIUS = 4.5;
@@ -114,16 +119,28 @@ public final class FlameMoves {
 
 	static int burningBlast(AbilityContext ctx) {
 		ServerPlayer player = ctx.player();
-		Vec3 start = player.getEyePosition().subtract(0, 0.3, 0).add(player.getLookAngle().scale(0.8));
-		Vec3 target = Projectiles.crosshairTarget(player, BLAST_RANGE);
-		sound(player, SoundEvents.BLAZE_SHOOT, 0.7F);
-		Projectiles.fire(player, start, target.subtract(start), BLAST_SPEED, BLAST_RANGE, 0.9,
-				(level, pos, age) -> {
-					// A big fist-sized fireball with a smoky tail.
-					Projectiles.particles(level, ParticleTypes.FLAME, pos, 6, 0.35, 0.01);
-					Projectiles.particles(level, ParticleTypes.LARGE_SMOKE, pos, 1, 0.2, 0.0);
-				},
-				impact -> explode(ctx, impact.position(), BLAST_RADIUS, BLAST_DAMAGE, 1.3, 0.45, 4));
+		// Beat 1, windup: embers gather at the casting hand while the shoulder pulls back.
+		com.grandline.combat.fx.FxEvents.send(player, FX_BLAST_WINDUP, player.position());
+		sound(player, SoundEvents.FIRECHARGE_USE, 1.6F);
+		TimedEffects.later(BLAST_WINDUP_TICKS, () -> {
+			if (!player.isAlive() || player.isRemoved()) {
+				return;
+			}
+			// Beat 2, release: aim is read now, at the moment the fist actually leaves the hand.
+			Vec3 start = player.getEyePosition().subtract(0, 0.3, 0).add(player.getLookAngle().scale(0.8));
+			Vec3 target = Projectiles.crosshairTarget(player, BLAST_RANGE);
+			Vec3 dir = target.subtract(start).normalize();
+			com.grandline.combat.fx.FxEvents.send(player, FX_BLAST_LAUNCH, start, dir, BLAST_SPEED, BLAST_RANGE);
+			sound(player, SoundEvents.BLAZE_SHOOT, 0.7F);
+			// The fist and its trail are drawn by each client from the launch event; the server only simulates the hit.
+			Projectiles.fire(player, start, dir, BLAST_SPEED, BLAST_RANGE, 0.9, (level, pos, age) -> {
+					},
+					impact -> {
+						// Beat 3, impact at the real collision point.
+						com.grandline.combat.fx.FxEvents.send(player, FX_BLAST_IMPACT, impact.position());
+						explode(ctx, impact.position(), BLAST_RADIUS, BLAST_DAMAGE, 1.3, 0.45, 4);
+					});
+		});
 		return 0;
 	}
 

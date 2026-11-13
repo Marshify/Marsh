@@ -11,6 +11,7 @@ import net.fabricmc.api.ClientModInitializer;
 public final class GrandLineClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		com.grandline.client.fx.GrandLineFx.register();
 		ClientNetworking.register();
 		GrandLineClientCommands.register();
 		GrandLineKeys.register();
