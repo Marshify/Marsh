@@ -1,5 +1,14 @@
 # Grand Line patch notes
 
+## v0.8.1 — Movement on F
+**Changes**
+- The fifth move (flight, dashes, blinks and jumps) now uses **F** instead of R.
+- Existing players are switched to F automatically. You can still rebind it in Controls, under Grand Line → Move 5 (movement).
+- Fruit tooltips and the fruit dealer now show F for the movement move.
+
+**Notes**
+- F is also vanilla's "swap item with offhand" key, so pressing F does both. To avoid that, rebind either one in Controls.
+
 ## v0.8.0 — The New Fruit Roster
 **New**
 - A brand-new lineup of **42 fruits**, each with its own pixel-art icon and five original moves.

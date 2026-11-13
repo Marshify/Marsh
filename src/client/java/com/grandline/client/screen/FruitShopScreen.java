@@ -25,7 +25,7 @@ import java.util.Locale;
  * wheel. Buying sends a request; the server checks stock, distance and money.
  */
 public final class FruitShopScreen extends Screen {
-	private static final String[] KEYS = {"Z", "X", "C", "V", "R"};
+	private static final String[] KEYS = {"Z", "X", "C", "V", "F"};
 	private static final int ROW = 52;
 	private static final NumberFormat NUMBERS = NumberFormat.getIntegerInstance(Locale.US);
 

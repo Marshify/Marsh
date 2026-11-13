@@ -25,7 +25,7 @@ import java.util.List;
  *     <li>X Burning Blast: a big flaming fist that explodes where it lands, knocking enemies back.</li>
  *     <li>C Fire Column: a pillar of fire erupts around the caster, launching nearby enemies upward.</li>
  *     <li>V Flame Destroyer: tap for a quick fireball, hold to charge a giant one with a wider explosion.</li>
- *     <li>R Fire Flight: steerable flight with a flame trail; movement only, no damage.</li>
+ *     <li>F Ember Wings: steerable flight with a flame trail; movement only, no damage.</li>
  * </ul>
  * All aiming uses the server's view of the player's look direction (the crosshair); all hits are computed here.
  */

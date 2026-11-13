@@ -495,7 +495,7 @@ public final class Fruits {
 		return register(name, rarity, element, color, z, x, c, v, r, zKey, xKey, cKey, vKey, rKey, false);
 	}
 
-	/** Standard fruit. With {@code flightR} the R move is a toggled flight (press again to land). */
+	/** Standard fruit. With {@code flightR} the movement move (F) is a toggled flight (press again to land). */
 	private static FruitDef register(String name, FruitRarity rarity, Element element, int color, AbilityAction z, AbilityAction x,
 			AbilityAction c, AbilityAction v, AbilityAction r, String zKey, String xKey, String cKey, String vKey, String rKey, boolean flightR) {
 		Power power = Powers.register(new Power(GrandLineMod.id(name), PowerSource.FRUIT, StatType.FRUIT,
@@ -516,7 +516,7 @@ public final class Fruits {
 		return def;
 	}
 
-	/** Registers a fruit with a hand-made moveset (Z, X, C, V, R order). */
+	/** Registers a fruit with a hand-made moveset (Z, X, C, V, F order). */
 	private static FruitDef register(String name, FruitRarity rarity, int color, List<AbilityDef> moves) {
 		Power power = Powers.register(new Power(GrandLineMod.id(name), PowerSource.FRUIT, StatType.FRUIT,
 				rarity.name().toLowerCase(java.util.Locale.ROOT), color, moves));

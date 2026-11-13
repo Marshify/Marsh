@@ -110,7 +110,7 @@
   "ability.grandline.volt_strike": "Lightning Strike",
   "ability.grandline.volt_storm": "Storm Field",
   "ability.grandline.volt_step": "Volt Step",
-  "key.grandline.move_5": "Move 5 (utility)",
+  "key.grandline.move_movement": "Move 5 (movement)",
   "key.grandline.stash": "Open Fruit Stash",
   "message.grandline.fruit.already": "You already have this fruit's power.",
   "message.grandline.fruit.eaten": "You ate the %s fruit! Its power is yours. Press G to switch to it.",

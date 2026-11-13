@@ -25,7 +25,7 @@ public final class GrandLineKeys {
 			new KeyMapping("key.grandline.move_2", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, CATEGORY),
 			new KeyMapping("key.grandline.move_3", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, CATEGORY),
 			new KeyMapping("key.grandline.move_4", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, CATEGORY),
-			new KeyMapping("key.grandline.move_5", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, CATEGORY)
+			new KeyMapping("key.grandline.move_movement", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F, CATEGORY) // renamed from move_5 so saved R bindings switch to F
 	};
 
 	/** Which power the move keys currently use. Purely a client display/selection choice; the server checks ownership. */

@@ -57,7 +57,7 @@ public final class FruitItem extends Item {
 		}
 		Power power = Powers.get(powerId);
 		if (power != null) {
-			String[] keys = {"Z", "X", "C", "V", "R"};
+			String[] keys = {"Z", "X", "C", "V", "F"};
 			for (int i = 0; i < power.abilities().size(); i++) {
 				AbilityDef ability = power.abilities().get(i);
 				tooltip.add(Component.literal("[" + keys[i] + "] ").withStyle(ChatFormatting.GOLD)
