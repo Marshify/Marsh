@@ -29,7 +29,7 @@ public class GrandLineEnemy extends Monster {
 	private int grandLineLevel = 1;
 	/** Where the island's spawner placed this enemy (its respawn point), and its island; null / -1 if unknown. */
 	private net.minecraft.core.BlockPos origin;
-	private long islandId = -1;
+	private long islandId = Long.MIN_VALUE; // none (island ids can be negative)
 
 	public GrandLineEnemy(EntityType<? extends GrandLineEnemy> type, Level level) {
 		super(type, level);

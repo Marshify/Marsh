@@ -125,7 +125,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		helper.assertTrue(NpcService.setHome(p, innA).equals("home_set"), "home set");
 		helper.assertTrue(p.getAttached(ModAttachments.HOME_ISLAND) == a.id(), "home stored");
 		helper.assertTrue(q.getAttached(ModAttachments.HOME_ISLAND) == null, "each player's home is their own");
-		helper.assertTrue(IslandSpawns.respawnIsland(p, -1).id() == a.id(), "dying at sea: respawn at home");
+		helper.assertTrue(IslandSpawns.respawnIsland(p, IslandSpawns.NO_ISLAND).id() == a.id(), "dying at sea: respawn at home");
 		helper.assertTrue(IslandSpawns.respawnIsland(p, b.id()).id() == b.id(), "dying on an island still respawns there");
 		NpcService.setHome(p, innB);
 		helper.assertTrue(p.getAttached(ModAttachments.HOME_ISLAND) == b.id(), "home can be changed");
@@ -256,6 +256,25 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 			p.teleportTo(away.x, away.y, away.z);
 			q.teleportTo(away.x, away.y, away.z);
 		});
+		// A third boss: the top fighter has fallen, so the next living fighter gets the Saber.
+		SaberBoss third = GrandLineEntities.SABER_BOSS.create(level);
+		ServerPlayer r = survivor(helper);
+		ServerPlayer s = survivor(helper);
+		helper.runAfterDelay(6, () -> {
+			third.moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, 0, 0);
+			third.setup(home, 0, 990018, 20);
+			level.addFreshEntity(third);
+			third.hurt(level.damageSources().playerAttack(r), 60);
+			third.invulnerableTime = 0;
+			third.hurt(level.damageSources().playerAttack(s), 20);
+			r.kill();
+			third.invulnerableTime = 0;
+			third.hurt(level.damageSources().playerAttack(s), 100_000);
+		});
+		helper.runAfterDelay(8, () -> {
+			helper.assertTrue(s.getInventory().countItem(Gear.SABER) == 1, "the fallen top fighter's Saber goes to the next living fighter");
+			remove(helper, r, s);
+		});
 		helper.runAfterDelay(4 + 130, () -> {
 			helper.assertTrue(other.getHealth() == other.getMaxHealth(), "reset to full with nobody in the arena: " + other.getHealth());
 			helper.assertTrue(other.damageBy().isEmpty(), "fight forgotten");
@@ -276,6 +295,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 				com.grandline.world.plan.Anchor.Type.TEMPLE_BOSS).get(0);
 		Island verdant = new Island(990017, anchorHome.getX() - spot.x(), anchorHome.getZ() - spot.z(), 40, 15, "Verdant Wilds", false, true, "jungle");
 		registry.add(verdant);
+		TempleBosses.forget(level, verdant.id()); // the test world keeps saved data between runs
 		BlockPos home = TempleBosses.home(verdant);
 		for (BlockPos p : BlockPos.betweenClosed(home.offset(-2, -1, -2), home.offset(2, -1, 2))) {
 			level.setBlockAndUpdate(p, Blocks.STONE.defaultBlockState());

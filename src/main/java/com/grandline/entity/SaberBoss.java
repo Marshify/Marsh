@@ -484,29 +484,37 @@ public class SaberBoss extends GrandLineEnemy {
 		}
 	}
 
-	/** Exactly one Saber per defeat, to the player who dealt the most damage (if they are still around). */
+	/**
+	 * Exactly one Saber per defeat. It goes to the player who dealt the most damage; if they have fallen (or left), to
+	 * the next living fighter; if no fighter is alive, it is left at the boss's spot for the top fighter alone to pick
+	 * up, and it never despawns.
+	 */
 	private void dropSaber() {
-		ServerPlayer best = null;
-		float most = 0;
-		for (Map.Entry<UUID, Float> e : damageBy.entrySet()) {
-			ServerPlayer p = level().getServer().getPlayerList().getPlayer(e.getKey());
-			if (p != null && p.isAlive() && p.level() == level() && p.distanceTo(this) < 64 && e.getValue() > most) {
-				most = e.getValue();
-				best = p;
-			}
-		}
-		if (best == null) {
+		List<Map.Entry<UUID, Float>> ranked = new java.util.ArrayList<>(damageBy.entrySet());
+		ranked.removeIf(e -> e.getValue() <= 0);
+		if (ranked.isEmpty()) {
 			return; // not a fight (removed by a command, killed by the world): no reward
 		}
+		ranked.sort(Map.Entry.<UUID, Float>comparingByValue().reversed());
 		ItemStack saber = new ItemStack(Gear.SABER);
-		if (!best.getInventory().add(saber)) {
-			ItemEntity item = new ItemEntity(level(), best.getX(), best.getY() + 0.5, best.getZ(), saber);
-			item.setTarget(best.getUUID());
-			item.setNoPickUpDelay();
-			level().addFreshEntity(item);
+		for (Map.Entry<UUID, Float> e : ranked) {
+			ServerPlayer p = level().getServer().getPlayerList().getPlayer(e.getKey());
+			if (p != null && p.isAlive() && p.level() == level() && p.distanceTo(this) < 64) {
+				if (!p.getInventory().add(saber)) {
+					ItemEntity item = new ItemEntity(level(), p.getX(), p.getY() + 0.5, p.getZ(), saber);
+					item.setTarget(p.getUUID());
+					item.setNoPickUpDelay();
+					level().addFreshEntity(item);
+				}
+				p.sendSystemMessage(Component.translatable("message.grandline.saber_boss.reward").withStyle(net.minecraft.ChatFormatting.GOLD));
+				level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.9F, 1.0F);
+				return;
+			}
 		}
-		best.sendSystemMessage(Component.translatable("message.grandline.saber_boss.reward").withStyle(net.minecraft.ChatFormatting.GOLD));
-		level().playSound(null, best.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.9F, 1.0F);
+		ItemEntity item = new ItemEntity(level(), getX(), getY() + 0.5, getZ(), saber);
+		item.setTarget(ranked.get(0).getKey());
+		item.setUnlimitedLifetime();
+		level().addFreshEntity(item);
 	}
 
 	/** Players who fought it (for tests). */

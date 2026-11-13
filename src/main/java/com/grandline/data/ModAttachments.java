@@ -101,6 +101,12 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("first_spawn_done"));
 
+	/** The island the player last died on (-1: at sea), kept until they respawn, through restarts. */
+	public static final AttachmentType<Long> DEATH_ISLAND = AttachmentRegistry.<Long>builder()
+			.persistent(com.mojang.serialization.Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("death_island"));
+
 	private ModAttachments() {
 	}
 

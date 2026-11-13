@@ -160,9 +160,12 @@ public final class GrandLineCoreRulesGameTests implements FabricGameTest {
 		}
 		ServerPlayer p = survivor(helper);
 		helper.assertTrue(IslandSpawns.respawnIsland(p, died.id()).id() == died.id(), "died on an island: back on that island");
-		helper.assertTrue(IslandSpawns.respawnIsland(p, -1).name().equals(GrandLineMod.config().spawnIsland), "no home: spawn island");
+		Island negative = new Island(-103079215108L - 7, 53_000, 50_000, 20, 15, "Test Negative Isle", false, true, "jungle");
+		registry.add(negative);
+		helper.assertTrue(IslandSpawns.respawnIsland(p, negative.id()).id() == negative.id(), "islands with negative ids count too");
+		helper.assertTrue(IslandSpawns.respawnIsland(p, IslandSpawns.NO_ISLAND).name().equals(GrandLineMod.config().spawnIsland), "no home: spawn island");
 		p.setAttached(ModAttachments.HOME_ISLAND, home.id());
-		helper.assertTrue(IslandSpawns.respawnIsland(p, -1).id() == home.id(), "died at sea: home island");
+		helper.assertTrue(IslandSpawns.respawnIsland(p, IslandSpawns.NO_ISLAND).id() == home.id(), "died at sea: home island");
 		helper.assertTrue(IslandSpawns.islandAt(helper.getLevel(), died.x() + 5, died.z()) != null, "on land: the island is found");
 		helper.assertTrue(IslandSpawns.islandAt(helper.getLevel(), died.x() + 60, died.z()) == null, "out at sea: no island");
 		remove(helper, p);

@@ -16,10 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Where players appear: new players start on the spawn island (Millbrook Village by default); after death a player
@@ -28,7 +25,9 @@ import java.util.UUID;
  * blocks before use; chunks are generated first. Only active in worlds whose registry has the spawn island.
  */
 public final class IslandSpawns {
-	private static final Map<UUID, Long> DEATH_ISLAND = new HashMap<>();
+	/** "Not on any island" (died at sea). Island ids are chunk positions and can be negative, so -1 is not safe. */
+	public static final long NO_ISLAND = Long.MIN_VALUE;
+
 
 	private IslandSpawns() {
 	}
@@ -38,13 +37,13 @@ public final class IslandSpawns {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (entity instanceof ServerPlayer player) {
 				Island island = player.level().dimension() == Level.OVERWORLD ? islandAt(player.serverLevel(), player.getBlockX(), player.getBlockZ()) : null;
-				DEATH_ISLAND.put(player.getUUID(), island == null ? -1L : island.id());
+				player.setAttached(ModAttachments.DEATH_ISLAND, island == null ? NO_ISLAND : island.id());
 			}
 		});
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-			Long died = DEATH_ISLAND.remove(newPlayer.getUUID());
+			Long died = newPlayer.removeAttached(ModAttachments.DEATH_ISLAND);
 			if (!alive && GrandLineMod.config().islandRespawn) {
-				respawn(newPlayer, died == null ? -1L : died);
+				respawn(newPlayer, died == null ? NO_ISLAND : died);
 			}
 		});
 	}
@@ -72,7 +71,7 @@ public final class IslandSpawns {
 	/** The island this respawn should use: where they died, else home, else the spawn island (may be null). */
 	public static Island respawnIsland(ServerPlayer player, long diedOn) {
 		IslandRegistry registry = IslandRegistry.get(player.server);
-		Island island = diedOn >= 0 ? registry.get(diedOn) : null;
+		Island island = diedOn != NO_ISLAND ? registry.get(diedOn) : null;
 		if (island == null) {
 			Long home = player.getAttached(ModAttachments.HOME_ISLAND);
 			island = home == null ? null : registry.get(home);

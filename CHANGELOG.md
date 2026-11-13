@@ -1,5 +1,31 @@
 # Grand Line patch notes
 
+## v0.24.0 — Homes, Blades & the Saber Warden (Update Part 2)
+**New**
+- **Innkeepers on every island.** Talk to one and choose **Set Home** to make that island your home. Your home is kept through death, logout and restarts, and you can change it whenever you like.
+- **Respawning:** you come back on the island where you died. If you died at sea, you come back at your home, or at Millbrook if you have none.
+- **Swordsmith in Millbrook Village** sells the **Katana ($8,000)** and the **Cutlass ($2,500)**.
+- **The Saber Warden** guards the Verdant Wilds temple, in front of the altar. It has 400 HP (more for groups) and wields the Saber, with three attacks you can read and dodge:
+  - **Saber Slash:** a wide cut in front, warned by a red arc on the ground.
+  - **Flying Saber Slash:** a crescent of sword energy. Its aim locks just before release, so sidestep it.
+  - **Heavy Combo:** three lunging cuts, then a winded pause where you can strike back.
+
+  No single hit takes more than 35% of your health. Defeating it gives **one Saber** to the player who dealt the most damage. It returns 10 minutes later.
+- **Enemies come back 10 seconds after they die**, at the spot where they first appeared.
+
+**Changes**
+- **The Saber is stronger:** 9 damage per hit (was 7) at 2.0 swings per second (was 1.7), and its moves hit 30% harder. Hits now flash with a bright slash arc and sparks.
+
+**Fixes**
+- Dying on islands like Verdant Wilds now brings you back on that island. Before, it sent you home.
+- The island you died on is remembered even if the server restarts before you respawn.
+
+**Settings**
+- Every value is in `config/grandline.json` (see `docs/PART2_NPCS_WEAPONS_BOSS.md`).
+
+**Existing worlds**
+- Innkeepers and the Swordsmith appear the first time you visit an island. Nothing else changes.
+
 ## v0.23.0 — Core Rules (Update Part 1)
 **New rules**
 - **No vanilla XP.** The green bar and level number are gone. No orbs drop and nothing gives vanilla XP; old XP is cleared when you join. Grand Line levels work as before.

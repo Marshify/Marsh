@@ -221,13 +221,23 @@ public final class KeeperNpcs {
 					}
 					level.getChunk(x >> 4, z >> 4);
 					BlockPos p = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
-					if (IslandSpawns.isSafe(level, p)) {
+					if (IslandSpawns.isSafe(level, p) && onGround(island, p)) {
 						return p;
 					}
 				}
 			}
 		}
 		return null;
+	}
+
+	/** On the island's ground (or a step above it), not on a roof, a wall or a canopy. */
+	private static boolean onGround(Island island, BlockPos feet) {
+		IslandPlan plan = IslandPlans.get(island);
+		if (plan == null) {
+			return true;
+		}
+		int ground = plan.terrain().ground(feet.getX() - island.x(), feet.getZ() - island.z());
+		return feet.getY() <= ground + 2;
 	}
 
 	/** Where a keeper stands (null until chosen). Exposed for tests. */

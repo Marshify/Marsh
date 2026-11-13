@@ -110,6 +110,9 @@ public final class EnemyRespawns {
 		long now = level.getGameTime();
 		for (Iterator<Pending> it = data.pending.iterator(); it.hasNext(); ) {
 			Pending p = it.next();
+			if (p.due() > now + Math.round(GrandLineMod.config().enemyRespawnSeconds * 20)) {
+				p = new Pending(p.kind(), p.level(), p.pos(), p.islandId(), now); // the world clock went back
+			}
 			if (p.due() > now || !level.isPositionEntityTicking(p.pos())) {
 				continue;
 			}

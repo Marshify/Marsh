@@ -126,6 +126,11 @@ public final class TempleBosses {
 			state.boss = null; // gone without a defeat (chunk data lost, removed by a command): replace it
 			data.setDirty();
 		}
+		long cooldown = Math.round(GrandLineMod.config().saberBossRespawnSeconds * 20);
+		if (state.nextSpawn > level.getGameTime() + cooldown) {
+			state.nextSpawn = level.getGameTime() + cooldown; // the world clock went back (or the cooldown was shortened)
+			data.setDirty();
+		}
 		if (level.getGameTime() < state.nextSpawn) {
 			return null;
 		}
@@ -172,6 +177,13 @@ public final class TempleBosses {
 	public static long nextSpawn(ServerLevel level, long islandId) {
 		State s = Data.get(level).states.get(islandId);
 		return s == null ? 0 : s.nextSpawn;
+	}
+
+	/** Forgets an island's boss state (tests). */
+	public static void forget(ServerLevel level, long islandId) {
+		Data data = Data.get(level);
+		data.states.remove(islandId);
+		data.setDirty();
 	}
 
 	static final class State {
