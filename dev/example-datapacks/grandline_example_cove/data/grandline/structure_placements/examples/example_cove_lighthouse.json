@@ -1,0 +1,10 @@
+{
+  "template": "grandline:examples/example_cove_lighthouse",
+  "position": [
+    224,
+    56,
+    -899
+  ],
+  "rotation": "none",
+  "mirror": "none"
+}

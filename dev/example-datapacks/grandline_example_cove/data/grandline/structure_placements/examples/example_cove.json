@@ -1,0 +1,10 @@
+{
+  "template": "grandline:examples/example_cove",
+  "position": [
+    240,
+    64,
+    -880
+  ],
+  "rotation": "none",
+  "mirror": "none"
+}
