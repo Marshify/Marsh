@@ -1,5 +1,13 @@
 # Grand Line patch notes
 
+## v0.18.1 — Jungle Trees
+**Fixes (Verdant Wilds)**
+- Giant jungle trees rebuilt: thick 2×2 trunks that run up into the crown, buttress roots, and offset branches. The crowns are now full, irregular clusters of leaves instead of flat sheets with gaps and floating tops.
+- Medium jungle trees get irregular clustered crowns too.
+- Hanging vines now attach to the side of the leaves, so they no longer disappear when a nearby block changes.
+- Every tree is one connected piece, and trees line up across chunk borders.
+- Applies to newly generated Verdant Wilds land. Trees that are already generated stay as they are.
+
 ## v0.18.0 — Verdant Wilds Rebuilt
 **Island update: Verdant Wilds (Lv. 15)**
 - Now two jungle islands split by an ocean channel: a 112 × 89 main island and a 60 × 51 west island, with low rocky shores.

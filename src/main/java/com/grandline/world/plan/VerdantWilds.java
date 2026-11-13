@@ -40,7 +40,7 @@ final class VerdantWilds extends BasePlan {
 	static final int BRIDGE_Z = 6, BRIDGE_X1 = -84, BRIDGE_X2 = -46, BRIDGE_Y = 64;
 	static final int DOCK_X1 = -2, DOCK_X2 = 2, DOCK_HEAD_Z = 56, DOCK_END_Z = 60;
 
-	/** A tree: kind 0 giant (2x2), 1 medium, 2 bush, 3 colossal (3x3). */
+	/** A tree: kind 0 giant (2x2), 1 medium, 2 bush, 3 grand giant (2x2, the boss-clearing tree). */
 	record Tree(int x, int z, int kind, int height) {
 	}
 
@@ -182,14 +182,14 @@ final class VerdantWilds extends BasePlan {
 			}
 		}
 		for (Tree t : trees) {
-			if (!c.near(t.x(), t.z(), t.kind() == 3 ? 12 : 7)) {
+			if (!c.near(t.x(), t.z(), t.kind() == 3 ? 20 : t.kind() == 0 ? 15 : 7)) {
 				continue;
 			}
 			switch (t.kind()) {
-				case 0 -> giantTree(c, t.x(), t.z(), t.height());
+				case 0 -> giantTree(c, t, false);
 				case 1 -> jungleTree(c, t.x(), t.z(), t.height());
 				case 2 -> bush(c, t.x(), t.z());
-				default -> colossalTree(c, t.x(), t.z(), t.height());
+				default -> giantTree(c, t, true);
 			}
 		}
 		if (c.near(0, -17, 22)) {
@@ -252,81 +252,61 @@ final class VerdantWilds extends BasePlan {
 		}
 	}
 
-	/** Vines down the four sides of a trunk spanning (x1..x2, z1..z2), sparse and seeded. */
-	private static void trunkVines(Canvas c, int x1, int z1, int x2, int z2, int fromY, int toY) {
-		for (int y = fromY; y <= toY; y++) {
-			for (int x = x1; x <= x2; x++) {
-				if (Math.floorMod(hash(x, y * 7 + z1), 3) == 0) {
-					c.set(x, y, z1 - 1, vine(Direction.SOUTH));
-				}
-				if (Math.floorMod(hash(x + 11, y * 7 + z2), 3) == 0) {
-					c.set(x, y, z2 + 1, vine(Direction.NORTH));
-				}
-			}
-			for (int z = z1; z <= z2; z++) {
-				if (Math.floorMod(hash(x1 + 5, y * 7 + z), 3) == 0) {
-					c.set(x1 - 1, y, z, vine(Direction.EAST));
-				}
-				if (Math.floorMod(hash(x2 + 3, y * 7 + z + 1), 3) == 0) {
-					c.set(x2 + 1, y, z, vine(Direction.WEST));
-				}
+	/** Built giant-tree models, by tree (a tree's model is the same in every chunk, so it is built once). */
+	private final java.util.concurrent.ConcurrentHashMap<Tree, JungleTrees.Model> giants = new java.util.concurrent.ConcurrentHashMap<>();
+
+	/**
+	 * Which way a giant's branches should lean: away from the main trail or the temple when the tree stands near them
+	 * (keeps the path and the temple front in view), else NaN (all round).
+	 */
+	static double awayAngle(int x, int z) {
+		double[] p = MAIN_TRAIL;
+		double best = Double.MAX_VALUE, nx = 0, nz = 0;
+		for (int i = 0; i + 3 < p.length; i += 2) {
+			double ax = p[i], az = p[i + 1], vx = p[i + 2] - ax, vz = p[i + 3] - az, len = vx * vx + vz * vz;
+			double t = len == 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / len));
+			double px = ax + t * vx, pz = az + t * vz, d = Math.hypot(x - px, z - pz);
+			if (d < best) {
+				best = d;
+				nx = px;
+				nz = pz;
 			}
 		}
-	}
-
-	/** Vines hanging from a canopy ring of radius {@code r} under {@code y}. */
-	private static void hangingVines(Canvas c, int cx, int cz, int r, int y, int maxLength) {
-		for (int dx = -r; dx <= r; dx++) {
-			for (int dz = -r; dz <= r; dz++) {
-				int d2 = dx * dx + dz * dz;
-				if (d2 > r * r || d2 <= (r - 1) * (r - 1)) {
-					continue;
-				}
-				long h = hash(cx + dx, cz + dz + y);
-				if (Math.floorMod(h, 3) != 0) {
-					continue;
-				}
-				int length = 1 + (int) Math.floorMod(h >>> 7, maxLength);
-				for (int i = 1; i <= length; i++) {
-					c.set(cx + dx, y - i, cz + dz, vine(Direction.UP));
-				}
-			}
+		if (best < 18) {
+			return Math.atan2(z - nz, x - nx);
 		}
+		if (Math.hypot(x, z + 17) < 32) {
+			return Math.atan2(z + 17, x);
+		}
+		return Double.NaN;
 	}
 
-	/** 2x2 jungle giant with a layered canopy, trunk vines and hanging vines. */
-	private static void giantTree(Canvas c, int x, int z, int height) {
-		int g = c.ground(x, z);
+	private void giantTree(Canvas c, Tree t, boolean grand) {
+		int g = c.ground(t.x(), t.z());
 		if (g <= Terrain.WATER_TOP) {
 			return;
 		}
-		Kit.bigJungleTree(c, x, z, height);
-		trunkVines(c, x, z, x + 1, z + 1, g + 3, g + height - 4);
-		hangingVines(c, x, z, 5, g + height - 2, 4);
+		giants.computeIfAbsent(t, k -> JungleTrees.giant(k.x(), k.z(), g, k.height(), grand ? Double.NaN : awayAngle(k.x(), k.z()), grand))
+				.write(c);
 	}
 
-	/** Medium jungle tree: single trunk, round crown, a few vines. */
+	/** The model of a giant tree (tests). */
+	JungleTrees.Model giantModel(Tree t) {
+		return JungleTrees.giant(t.x(), t.z(), terrain.ground(t.x(), t.z()), t.height(),
+				t.kind() == 3 ? Double.NaN : awayAngle(t.x(), t.z()), t.kind() == 3);
+	}
+
+	List<Tree> trees() {
+		return List.copyOf(trees);
+	}
+
+	/** Medium jungle tree: single trunk, irregular clustered crown, vines (see {@link JungleTrees#medium}). */
 	private static void jungleTree(Canvas c, int x, int z, int height) {
 		int g = c.ground(x, z);
 		if (g <= Terrain.WATER_TOP) {
 			return;
 		}
-		BlockState leaf = Kit.leaves(Blocks.JUNGLE_LEAVES);
-		int top = g + height;
-		for (int dx = -3; dx <= 3; dx++) {
-			for (int dz = -3; dz <= 3; dz++) {
-				for (int dy = -2; dy <= 2; dy++) {
-					if (dx * dx + dz * dz + dy * dy * 2.4 <= 10.5) {
-						c.set(x + dx, top + dy, z + dz, leaf);
-					}
-				}
-			}
-		}
-		c.fill(x, g + 1, z, x, top, z, s(Blocks.JUNGLE_LOG));
-		hangingVines(c, x, z, 3, top - 1, 3);
-		if (Math.floorMod(hash(x, z), 2) == 0) {
-			trunkVines(c, x, z, x, z, g + 2, top - 3);
-		}
+		JungleTrees.medium(x, z, g, height).write(c);
 	}
 
 	/** Low jungle bush: a log stub inside a leaf mound. */
@@ -346,65 +326,6 @@ final class VerdantWilds extends BasePlan {
 			}
 		}
 		c.set(x, g + 1, z, s(Blocks.JUNGLE_LOG));
-	}
-
-	/** The giant tree beside the boss clearing: 3x3 trunk, buttress roots, a huge layered crown and side boughs. */
-	private static void colossalTree(Canvas c, int x, int z, int height) {
-		int g = c.ground(x, z);
-		BlockState log = s(Blocks.JUNGLE_LOG);
-		BlockState leaf = Kit.leaves(Blocks.JUNGLE_LEAVES);
-		c.foundation(x - 1, z - 1, x + 1, z + 1, g, s(Blocks.ROOTED_DIRT));
-		c.fill(x - 1, g + 1, z - 1, x + 1, g + height, z + 1, log);
-		// Buttress roots spreading on all sides.
-		int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
-		for (int[] d : dirs) {
-			int len = (d[0] != 0 && d[1] != 0) ? 3 : 4;
-			for (int i = 1; i <= len; i++) {
-				int rx = x + d[0] * (1 + i), rz = z + d[1] * (1 + i);
-				int top = g + Math.max(0, 3 - i);
-				int rg = c.ground(rx, rz);
-				BlockState axis = log.setValue(RotatedPillarBlock.AXIS, d[0] != 0 && d[1] == 0 ? Direction.Axis.X
-						: d[1] != 0 && d[0] == 0 ? Direction.Axis.Z : Direction.Axis.Y);
-				c.fill(rx, Math.min(rg, top), rz, rx, top, rz, axis);
-			}
-		}
-		// Crown: four layers, widest at the bottom.
-		int[][] layers = {{9, -3}, {8, -1}, {6, 1}, {4, 3}};
-		for (int[] layer : layers) {
-			int r = layer[0];
-			int yy = g + height + layer[1];
-			for (int dx = -r; dx <= r; dx++) {
-				for (int dz = -r; dz <= r; dz++) {
-					int d2 = dx * dx + dz * dz;
-					if (d2 <= r * r && (d2 < (r - 1) * (r - 1) || Math.floorMod(hash(x + dx, z + dz + yy), 4) != 0)) {
-						c.set(x + dx, yy, z + dz, leaf);
-						if (Math.floorMod(hash(x + dx, z + dz), 5) == 0) {
-							c.set(x + dx, yy + 1, z + dz, leaf);
-						}
-					}
-				}
-			}
-		}
-		// Side boughs with leaf clumps halfway up.
-		int[][] boughs = {{1, 0, 10}, {-1, 0, 13}, {0, 1, 16}, {0, -1, 11}};
-		for (int[] b : boughs) {
-			int by = g + b[2];
-			for (int i = 2; i <= 6; i++) {
-				c.set(x + b[0] * i, by + i / 3, z + b[1] * i, log.setValue(RotatedPillarBlock.AXIS, b[0] != 0 ? Direction.Axis.X : Direction.Axis.Z));
-			}
-			int bx = x + b[0] * 7, bz = z + b[1] * 7;
-			for (int dx = -3; dx <= 3; dx++) {
-				for (int dz = -3; dz <= 3; dz++) {
-					for (int dy = -1; dy <= 2; dy++) {
-						if (dx * dx + dz * dz + dy * dy * 2 <= 9) {
-							c.set(bx + dx, by + 2 + dy, bz + dz, leaf);
-						}
-					}
-				}
-			}
-		}
-		trunkVines(c, x - 1, z - 1, x + 1, z + 1, g + 4, g + height - 5);
-		hangingVines(c, x, z, 9, g + height - 3, 6);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- temple
