@@ -59,7 +59,8 @@ public final class ModWorld {
 		});
 		ServerLifecycleEvents.SERVER_STARTED.register(ModWorld::placeSpawnOnStarterIsland);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			discoverStarter(handler.getPlayer());
+			migrateDiscoveries(handler.getPlayer());
+			checkDiscovery(handler.getPlayer()); // the island they spawn or log in on counts at once
 			sync(handler.getPlayer());
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -140,12 +141,44 @@ public final class ModWorld {
 		return new HashSet<>(player.getAttachedOrCreate(ModAttachments.DISCOVERED_ISLANDS));
 	}
 
-	private static void discoverStarter(ServerPlayer player) {
+	/** Current discovery rules (see ModAttachments.DISCOVERY_VERSION). */
+	private static final int DISCOVERY_VERSION = 1;
+
+	/**
+	 * Saves from before arrival-based discovery: every starter island (all seas) was granted on join without a visit,
+	 * so those entries are dropped and re-earned by arriving. Other islands in the history were really approached and
+	 * are kept.
+	 */
+	private static void migrateDiscoveries(ServerPlayer player) {
+		if (player.getAttachedOrElse(ModAttachments.DISCOVERY_VERSION, 0) >= DISCOVERY_VERSION) {
+			return;
+		}
+		Set<Long> known = discovered(player);
 		for (Island island : IslandRegistry.get(player.server).all()) {
 			if (island.starter()) {
-				discover(player, island, false);
+				known.remove(island.id());
 			}
 		}
+		player.setAttached(ModAttachments.DISCOVERED_ISLANDS, List.copyOf(known));
+		player.setAttached(ModAttachments.DISCOVERY_VERSION, DISCOVERY_VERSION);
+	}
+
+	/**
+	 * Arrival: the player stands in an island's gameplay area, meaning on its land (a planned island's terrain above
+	 * the water, or inside a random island's radius). Sailing past, even close by, does not count.
+	 */
+	public static boolean inGameplayArea(ServerPlayer player, Island island) {
+		if (player.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat) {
+			return false;
+		}
+		int lx = player.getBlockX() - island.x();
+		int lz = player.getBlockZ() - island.z();
+		com.grandline.world.plan.IslandPlan plan = com.grandline.world.plan.IslandPlans.get(island);
+		if (plan != null) {
+			return (long) lx * lx + (long) lz * lz <= (long) plan.extent() * plan.extent()
+					&& plan.terrain().ground(lx, lz) > com.grandline.world.plan.Terrain.WATER_TOP;
+		}
+		return (long) lx * lx + (long) lz * lz <= (long) island.radius() * island.radius();
 	}
 
 	private static void checkDiscovery(ServerPlayer player) {
@@ -153,7 +186,9 @@ public final class ModWorld {
 			return;
 		}
 		for (Island island : IslandRegistry.nearby(player.server, player.getBlockX(), player.getBlockZ(), DISCOVERY_RANGE)) {
-			discover(player, island, true);
+			if (inGameplayArea(player, island)) {
+				discover(player, island, true);
+			}
 		}
 	}
 
@@ -185,6 +220,12 @@ public final class ModWorld {
 				visible.add(island);
 			}
 		}
-		ServerPlayNetworking.send(player, new IslandListPayload(visible));
+		List<Long> discoveredIds = new ArrayList<>();
+		for (Island island : visible) {
+			if (known.contains(island.id())) {
+				discoveredIds.add(island.id());
+			}
+		}
+		ServerPlayNetworking.send(player, new IslandListPayload(visible, discoveredIds));
 	}
 }

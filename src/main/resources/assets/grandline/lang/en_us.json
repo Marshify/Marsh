@@ -734,5 +734,6 @@
   "npc.grandline.result.gun_money": "Not enough money for that.",
   "message.grandline.quest.safe_zone": "Your quest on %s was cleared: it's a safe zone with no enemies to fight.",
   "item.grandline.flame_fruit": "Flame Fruit",
-  "power.grandline.flame": "Flame"
+  "power.grandline.flame": "Flame",
+  "screen.grandline.map.undiscovered": "Undiscovered"
 }

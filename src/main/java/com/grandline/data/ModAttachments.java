@@ -80,6 +80,15 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("ships"));
 
+	/**
+	 * Which discovery rules the player's DISCOVERED_ISLANDS list was built under (persistent). 0 = before arrival-based
+	 * discovery: starter islands were granted on join, so they are re-earned by arriving; other entries are kept.
+	 */
+	public static final AttachmentType<Integer> DISCOVERY_VERSION = AttachmentRegistry.<Integer>builder()
+			.persistent(com.mojang.serialization.Codec.INT)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("discovery_version"));
+
 	private ModAttachments() {
 	}
 

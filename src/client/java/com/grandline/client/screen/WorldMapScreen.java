@@ -81,6 +81,40 @@ public final class WorldMapScreen extends Screen {
 
 	private static final Map<ResourceLocation, Boolean> EXISTS = new HashMap<>();
 	private static final Set<ResourceLocation> FILTERED = new HashSet<>();
+	/** Grayscale copies of island art, made on first use from the original texture (by original location). */
+	private static final Map<ResourceLocation, ResourceLocation> GRAY = new HashMap<>();
+
+	/**
+	 * The muted grayscale version of {@code art} for undiscovered islands. Built once from the original image: each
+	 * pixel's luminance pulled toward a mid gray and darkened slightly; alpha (silhouette, transparency) is unchanged.
+	 * The original texture is left untouched, so discovery shows it immediately.
+	 */
+	private ResourceLocation gray(ResourceLocation art) {
+		return GRAY.computeIfAbsent(art, original -> {
+			try (java.io.InputStream in = minecraft.getResourceManager().getResourceOrThrow(original).open()) {
+				com.mojang.blaze3d.platform.NativeImage image = com.mojang.blaze3d.platform.NativeImage.read(in);
+				for (int y = 0; y < image.getHeight(); y++) {
+					for (int x = 0; x < image.getWidth(); x++) {
+						int abgr = image.getPixelRGBA(x, y);
+						int a = abgr >>> 24, b = (abgr >> 16) & 255, g = (abgr >> 8) & 255, r = abgr & 255;
+						int lum = (int) (0.299 * r + 0.587 * g + 0.114 * b);
+						int v = Math.min(255, (int) (lum * 0.62 + 52));
+						image.setPixelRGBA(x, y, (a << 24) | (v << 16) | (v << 8) | v);
+					}
+				}
+				ResourceLocation location = new ResourceLocation(original.getNamespace(), "gray/" + original.getPath());
+				minecraft.getTextureManager().register(location, new net.minecraft.client.renderer.texture.DynamicTexture(image));
+				return location;
+			} catch (java.io.IOException e) {
+				return original;
+			}
+		});
+	}
+
+	/** The art to draw for an island: the original once discovered, its grayscale copy until then. */
+	private ResourceLocation art(Island island, ResourceLocation original) {
+		return ClientProfileCache.discovered(island) ? original : gray(original);
+	}
 
 	/** Hover animation progress (0..1) per island id, eased towards 1 while the cursor is over the island. */
 	private final Map<Long, Float> hoverProgress = new HashMap<>();
@@ -235,11 +269,11 @@ public final class WorldMapScreen extends Screen {
 			double rise = HOVER_RISE * eased;
 			if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
 				// Lotus Palace lies under the sea: the submerged rendering, then the water surface over it.
-				blitChart(graphics, PALACE_SUBMERGED, ax - w * grow / 2, ay - h * grow * ANCHOR_Y + SUBMERGED_DROP - rise,
+				blitChart(graphics, art(island, PALACE_SUBMERGED), ax - w * grow / 2, ay - h * grow * ANCHOR_Y + SUBMERGED_DROP - rise,
 						SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
 			} else if (art != null) {
 				// Grows around the island's base point and lifts gently; its surf ring moves with it.
-				blitChart(graphics, art, ax - w * grow / 2, ay - h * grow * ANCHOR_Y - rise, SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
+				blitChart(graphics, art(island, art), ax - w * grow / 2, ay - h * grow * ANCHOR_Y - rise, SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
 				int[] shore = firstSeaArt ? SHORE_PIECES.get(island.theme().toLowerCase(Locale.ROOT)) : null;
 				if (shore != null) {
 					double half = SeaChart.WIDTH / (double) BACKGROUND_W; // art pixels -> chart units
@@ -253,8 +287,9 @@ public final class WorldMapScreen extends Screen {
 				int sy = screenY(ay);
 				int r = Math.max(3, (int) Math.round(22 * chartScale));
 				fillCircle(graphics, sx, sy + 1, r + 1, 0x60000000);
-				fillCircle(graphics, sx, sy, r, 0xFFE3C98A);
-				fillCircle(graphics, sx, sy - 1, Math.max(2, r * 2 / 3), 0xFF5FA84A);
+				boolean seen = ClientProfileCache.discovered(island);
+				fillCircle(graphics, sx, sy, r, seen ? 0xFFE3C98A : 0xFFA8A8A8);
+				fillCircle(graphics, sx, sy - 1, Math.max(2, r * 2 / 3), seen ? 0xFF5FA84A : 0xFF7C7C7C);
 				w = r * 2.6 / chartScale;
 				h = r * 2.6 / chartScale;
 			} else {
@@ -262,7 +297,7 @@ public final class WorldMapScreen extends Screen {
 				double size = island.radius() < 25 ? 0.65 : 1.0;
 				w *= size;
 				h *= size;
-				blitChart(graphics, tex(island.theme().toLowerCase(Locale.ROOT)), ax - w / 2, ay - h * ANCHOR_Y,
+				blitChart(graphics, art(island, tex(island.theme().toLowerCase(Locale.ROOT))), ax - w / 2, ay - h * ANCHOR_Y,
 						w / OLD_ICON_W, OLD_ICON_W, OLD_ICON_H);
 			}
 			placed.add(new Placed(island, ax, ay, screenX(ax - w * 0.4), screenY(ay - h * ANCHOR_Y + h * 0.08),
@@ -325,8 +360,10 @@ public final class WorldMapScreen extends Screen {
 		if (hovered != null) {
 			Island island = hovered.island();
 			int color = island.level() <= playerLevel ? 0x9CFF9C : island.level() <= playerLevel + 50 ? 0xFFE080 : 0xFF9C9C;
-			List<Component> lines = new ArrayList<>(List.of(Component.literal(island.name()),
-					Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))));
+			List<Component> lines = ClientProfileCache.discovered(island)
+					? new ArrayList<>(List.of(Component.literal(island.name()),
+							Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))))
+					: new ArrayList<>(List.of(Component.translatable("screen.grandline.map.undiscovered").withStyle(net.minecraft.ChatFormatting.GRAY)));
 			if (minecraft.player != null && minecraft.player.isCreative()) {
 				lines.add(Component.translatable("screen.grandline.map.teleport").withStyle(net.minecraft.ChatFormatting.AQUA));
 			}

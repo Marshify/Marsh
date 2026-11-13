@@ -1,5 +1,22 @@
 # Grand Line patch notes
 
+## v0.21.0 — Uncharted Waters
+**New**
+- **Fog of war on the M chart.** Every island starts gray. It switches to full colour on *your* chart once you set foot on it, the same moment the "Discovered" message appears.
+  - Sailing past doesn't count.
+  - Hovering a gray island shows "Undiscovered".
+  - Discoveries are saved per player, through death, relog and restarts.
+- **No geodes, lava pools, dungeons or lava/water springs** in Grand Line worlds. There are no caves either.
+
+**Changes (Dawnreach civic hall)**
+- The drum windows and the lantern tower use light blue glass blocks instead of panes.
+- The rotunda lantern hangs from a chain.
+- The dome ceiling is solid, with no gaps showing sky.
+- The front entrance is a clean square opening framed in smooth quartz.
+
+**Note for existing worlds**
+- Your discovered islands are kept. Starter islands are re-earned when you next stand on one, since they used to be given to everyone automatically.
+
 ## v0.20.2 — Volcano Smoke
 **Fixes**
 - Emberfall's smoke on the map no longer shows outlines or borders. It's one solid, crisp plume that billows in the wind: a sway that travels up from the crater, strongest at the top.

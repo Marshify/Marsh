@@ -35,7 +35,7 @@ public final class ClientNetworking {
 				(packet, player, responseSender) -> ClientProfileCache.acceptEnergy(packet.current(), packet.max()));
 
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.IslandListPayload.TYPE,
-				(packet, player, responseSender) -> ClientProfileCache.acceptIslands(packet.islands()));
+				(packet, player, responseSender) -> ClientProfileCache.acceptIslands(packet.islands(), packet.discovered()));
 
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.OpenNpcPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.client.screen.NpcScreens.open(packet));

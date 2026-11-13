@@ -18,6 +18,7 @@ public final class ClientProfileCache {
 	private static List<CooldownSyncPayload.Entry> cooldowns = List.of();
 	private static long cooldownsReceivedAtMillis;
 	private static List<com.grandline.world.Island> islands = List.of();
+	private static java.util.Set<Long> discovered = java.util.Set.of();
 	@Nullable
 	private static com.grandline.npc.QuestState quest;
 	private static float energy;
@@ -58,8 +59,14 @@ public final class ClientProfileCache {
 		return islands;
 	}
 
-	public static void acceptIslands(List<com.grandline.world.Island> list) {
+	/** Whether this player has discovered the island (undiscovered islands show gray on the chart). */
+	public static boolean discovered(com.grandline.world.Island island) {
+		return discovered.contains(island.id());
+	}
+
+	public static void acceptIslands(List<com.grandline.world.Island> list, List<Long> discoveredIds) {
 		islands = List.copyOf(list);
+		discovered = java.util.Set.copyOf(discoveredIds);
 	}
 
 	@Nullable
@@ -101,6 +108,7 @@ public final class ClientProfileCache {
 		energy = 0;
 		maxEnergy = 0;
 		islands = List.of();
+		discovered = java.util.Set.of();
 		quest = null;
 	}
 }

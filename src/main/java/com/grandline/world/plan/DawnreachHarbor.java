@@ -926,7 +926,7 @@ public final class DawnreachHarbor extends BasePlan {
 				if (d > DRUM_R - 1.2) {
 					p.fill(x, WALK, z, x, drumTop, z, s(Blocks.SMOOTH_QUARTZ));
 					if (Math.floorMod(x * 3 + z * 5, 3) == 0) {
-						p.fill(x, top + 3, z, x, drumTop - 2, z, s(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE));
+						p.fill(x, top + 3, z, x, drumTop - 2, z, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
 					}
 				} else {
 					p.fill(x, WALK, z, x, drumTop, z, air);
@@ -951,7 +951,14 @@ public final class DawnreachHarbor extends BasePlan {
 					continue;
 				}
 				int y = tops[i][j];
-				int low = Math.min(Math.min(tops[i + 1][j], tops[i - 1][j]), Math.min(tops[i][j + 1], tops[i][j - 1]));
+				// Solid shell: fill down to the lowest of all eight neighbours, so no diagonal gap shows the sky.
+				int low = y;
+				for (int di = -1; di <= 1; di++) {
+					for (int dj = -1; dj <= 1; dj++) {
+						low = Math.min(low, tops[i + di][j + dj]);
+					}
+				}
+				low = Math.min(low, y - 2); // at least three blocks thick
 				p.fill(x, Math.min(low + 1, y), z, x, y - 1, z, s(Blocks.OXIDIZED_CUT_COPPER));
 				Direction up = null;
 				int best = y;
@@ -971,15 +978,18 @@ public final class DawnreachHarbor extends BasePlan {
 		for (int[] c : new int[][]{{30, -4}, {32, -4}, {30, -2}, {32, -2}}) {
 			p.fill(c[0], crown, c[1], c[0], crown + 2, c[1], s(Blocks.SMOOTH_QUARTZ));
 		}
-		p.fill(31, crown, -4, 31, crown + 2, -4, Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, true));
-		p.fill(31, crown, -2, 31, crown + 2, -2, Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, true));
-		p.fill(30, crown, -3, 30, crown + 2, -3, Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, false));
-		p.fill(32, crown, -3, 32, crown + 2, -3, Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, false));
+		p.fill(31, crown, -4, 31, crown + 2, -4, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
+		p.fill(31, crown, -2, 31, crown + 2, -2, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
+		p.fill(30, crown, -3, 30, crown + 2, -3, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
+		p.fill(32, crown, -3, 32, crown + 2, -3, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
 		p.set(31, crown, -3, s(Blocks.LANTERN));
 		p.fill(30, crown + 3, -4, 32, crown + 3, -2, Kit.slab(Blocks.OXIDIZED_CUT_COPPER_SLAB, false));
 		p.set(31, crown + 3, -3, s(Blocks.OXIDIZED_CUT_COPPER));
 		p.set(31, crown + 4, -3, s(Blocks.LANTERN));
 		// Hanging lanterns in the rotunda.
+		// The rotunda lantern hangs on a chain from the crown of the dome.
+		int crownUnderside = drumTop + 8 - 3;   // the shell is three blocks thick at the crown
+		p.fill(31, drumTop + 1, -3, 31, crownUnderside, -3, s(Blocks.CHAIN));
 		p.set(31, drumTop, -3, s(Blocks.LANTERN).setValue(LanternBlock.HANGING, true));
 	}
 
@@ -1126,6 +1136,24 @@ public final class DawnreachHarbor extends BasePlan {
 		for (int[] col : new int[][]{{26, -8}, {37, -8}, {26, 3}, {37, 3}}) {
 			p.fill(col[0], floor + 1, col[1], col[0], ceiling - 1, col[1], s(Blocks.QUARTZ_PILLAR));
 		}
+		// Front entrance: a clean 4 x 4 opening through the wall and lining (x 17..19, z -4..-1), framed on every side
+		// in smooth quartz (jambs, lintel and threshold), with nothing else crowding it.
+		BlockState quartzFrame = s(Blocks.SMOOTH_QUARTZ);
+		for (int x = 17; x <= 19; x++) {
+			for (int z = -5; z <= 0; z++) {
+				boolean jamb = z == -5 || z == 0;
+				p.set(x, floor, z, quartzFrame);                                  // threshold
+				for (int y = floor + 1; y <= floor + 5; y++) {
+					boolean lintel = y == floor + 5;
+					if (x == 17 && !jamb && !lintel) {
+						p.set(x, y, z, air);                                        // the outer face of the opening
+						continue;
+					}
+					p.set(x, y, z, jamb || lintel ? quartzFrame : air);
+				}
+			}
+		}
+
 		// Upstairs window alcove at the north end of the east gallery: three barrels (one stacked) by the window.
 		p.set(HX2, gallery + 1, HZ1, s(Blocks.BARREL));
 		p.set(HX2, gallery + 2, HZ1, s(Blocks.BARREL));

@@ -9,8 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Server → client: the islands this player has discovered, for the world map. */
-public record IslandListPayload(List<Island> islands) implements FabricPacket {
+/** Server → client: the islands on this player's chart, and which of them the player has discovered (by id). */
+public record IslandListPayload(List<Island> islands, List<Long> discovered) implements FabricPacket {
 	public static final int MAX_ISLANDS = 4096;
 
 	public static final PacketType<IslandListPayload> TYPE = PacketType.create(GrandLineMod.id("island_list"), IslandListPayload::read);
@@ -24,7 +24,15 @@ public record IslandListPayload(List<Island> islands) implements FabricPacket {
 		for (int i = 0; i < size; i++) {
 			islands.add(Island.read(buf));
 		}
-		return new IslandListPayload(islands);
+		int known = buf.readVarInt();
+		if (known < 0 || known > MAX_ISLANDS) {
+			throw new IllegalArgumentException("Invalid discovered count " + known);
+		}
+		List<Long> discovered = new ArrayList<>(known);
+		for (int i = 0; i < known; i++) {
+			discovered.add(buf.readLong());
+		}
+		return new IslandListPayload(islands, discovered);
 	}
 
 	@Override
@@ -33,6 +41,11 @@ public record IslandListPayload(List<Island> islands) implements FabricPacket {
 		buf.writeVarInt(size);
 		for (int i = 0; i < size; i++) {
 			islands.get(i).write(buf);
+		}
+		int known = Math.min(discovered.size(), MAX_ISLANDS);
+		buf.writeVarInt(known);
+		for (int i = 0; i < known; i++) {
+			buf.writeLong(discovered.get(i));
 		}
 	}
 
