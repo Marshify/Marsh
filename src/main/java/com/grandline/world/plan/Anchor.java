@@ -4,7 +4,7 @@ package com.grandline.world.plan;
  * A gameplay spot on a planned island, in island-local block coordinates. Population, enemy spawning, quests and
  * treasure read these instead of guessing positions, so each island decides where its NPCs and fights belong.
  */
-public record Anchor(Type type, int x, int y, int z, int radius) {
+public record Anchor(Type type, int x, int y, int z, int radius, float yaw) {
 	/** {@link #y} value meaning "stand on the surface at (x, z)". */
 	public static final int SURFACE = Integer.MIN_VALUE;
 
@@ -23,7 +23,23 @@ public record Anchor(Type type, int x, int y, int z, int radius) {
 		/** Where boats wait. */
 		DOCK,
 		/** Buried treasure chest (placed during generation). */
-		TREASURE
+		TREASURE,
+		/** Where players arrive: the world spawn on a starter island and sea-travel landings. */
+		ARRIVAL,
+		/** The Fruit Gacha NPC (starter islands). */
+		GACHA
+	}
+
+	/** {@link #yaw} value meaning "any facing". */
+	public static final float ANY_YAW = Float.NaN;
+
+	public Anchor(Type type, int x, int y, int z, int radius) {
+		this(type, x, y, z, radius, ANY_YAW);
+	}
+
+	/** A spot at an exact height, facing {@code yaw} degrees (Minecraft yaw: 0 south, 90 west, 180 north, -90 east). */
+	public static Anchor at(Type type, int x, int y, int z, float yaw) {
+		return new Anchor(type, x, y, z, 0, yaw);
 	}
 
 	public static Anchor of(Type type, int x, int z) {

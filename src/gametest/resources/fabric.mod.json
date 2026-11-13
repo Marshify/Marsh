@@ -13,6 +13,7 @@
       "com.grandline.test.GrandLineShipGameTests",
       "com.grandline.test.GrandLineVerdantWildsGameTests",
       "com.grandline.test.GrandLineTreeGameTests",
+      "com.grandline.test.GrandLineDawnreachGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

@@ -49,6 +49,18 @@ public final class Terrain {
 	private final double phaseB;
 	private final double wobble;
 	private int extent;
+	/** Flat platforms: a rectangle with chamfered corners, level at {@code y}, sheer edges. */
+	public record Platform(int x1, int z1, int x2, int z2, int chamfer, int y, Ground ground) {
+		public boolean contains(int x, int z) {
+			if (x < x1 || x > x2 || z < z1 || z > z2) {
+				return false;
+			}
+			int c = chamfer;
+			return (x - x1) + (z - z1) >= c && (x2 - x) + (z - z1) >= c && (x - x1) + (z2 - z) >= c && (x2 - x) + (z2 - z) >= c;
+		}
+	}
+
+	private final List<Platform> platforms = new ArrayList<>();
 	/** Optional surface mixes: the forest floor on grass/podzol/moss land, and the rocks of a stony shoreline. */
 	private BlockState[] floorMix;
 	private BlockState[] shoreMix;
@@ -73,6 +85,13 @@ public final class Terrain {
 
 	public Terrain path(BlockState block, double width, double... points) {
 		paths.add(new Path(points, width, block));
+		return this;
+	}
+
+	/** A level platform with sheer, chamfered edges (a town quay). */
+	public Terrain platform(int x1, int z1, int x2, int z2, int chamfer, int y, Ground ground) {
+		platforms.add(new Platform(x1, z1, x2, z2, chamfer, y, ground));
+		extent = Math.max(extent, (int) Math.ceil(Math.hypot(Math.max(Math.abs(x1), Math.abs(x2)), Math.max(Math.abs(z1), Math.abs(z2)))) + 4);
 		return this;
 	}
 
@@ -136,6 +155,11 @@ public final class Terrain {
 	/** Surface y (the top solid block) at island-local (x, z). Below {@link #WATER_TOP} means under water. */
 	public int ground(int x, int z) {
 		double h = WATER_TOP + raw(x, z);
+		for (Platform p : platforms) {
+			if (p.contains(x, z)) {
+				h = p.y();
+			}
+		}
 		for (Flat f : flats) {
 			double dx = (x - f.cx()) / f.rx();
 			double dz = (z - f.cz()) / f.rz();
@@ -154,6 +178,11 @@ public final class Terrain {
 
 	/** The mass whose surface style applies at (x, z): the one this point is most inside of. */
 	private Ground groundStyle(double x, double z) {
+		for (Platform p : platforms) {
+			if (p.contains((int) Math.floor(x), (int) Math.floor(z))) {
+				return p.ground();
+			}
+		}
 		Ground best = Ground.GRASS;
 		double bestD = Double.MAX_VALUE;
 		for (Mass m : masses) {

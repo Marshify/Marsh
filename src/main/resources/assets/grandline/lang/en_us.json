@@ -727,5 +727,6 @@
   "npc.grandline.result.ship_combat": "You can't launch a ship while in combat.",
   "npc.grandline.result.ship_sunk": "Your ship sank recently. It's being repaired.",
   "message.grandline.ship.sunk": "Your %s sank! It can sail again in %s seconds.",
-  "hud.grandline.ship.hull": "Hull"
+  "hud.grandline.ship.hull": "Hull",
+  "entity.grandline.islander.gacha": "Fruit Gacha"
 }

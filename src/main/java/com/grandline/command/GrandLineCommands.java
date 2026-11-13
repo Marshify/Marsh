@@ -57,6 +57,36 @@ public final class GrandLineCommands {
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> registerTree(dispatcher));
 	}
 
+	/** Writes x,z,y,rgb lines for the top non-air block of each column to grandline_map.txt in the server folder. */
+	private static int dumpMap(CommandSourceStack source, int x1, int z1, int x2, int z2) {
+		var level = source.getLevel();
+		java.nio.file.Path out = source.getServer().getServerDirectory().toPath().resolve("grandline_map.txt");
+		StringBuilder sb = new StringBuilder();
+		int n = 0;
+		for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+			for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
+				int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x, z) - 1;
+				var pos = new net.minecraft.core.BlockPos(x, y, z);
+				var state = level.getBlockState(pos);
+				int rgb = state.getMapColor(level, pos).col;
+				sb.append(x).append(',').append(z).append(',').append(y).append(',').append(rgb).append(',')
+						.append(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath()).append(',')
+						.append(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(
+								level.getBlockState(new net.minecraft.core.BlockPos(x, 68, z)).getBlock()).getPath()).append('\n');
+				n++;
+			}
+		}
+		try {
+			java.nio.file.Files.writeString(out, sb.toString());
+		} catch (java.io.IOException e) {
+			source.sendFailure(Component.literal("Could not write " + out + ": " + e));
+			return 0;
+		}
+		int count = n;
+		source.sendSuccess(() -> Component.literal("Wrote " + count + " columns to " + out), false);
+		return n;
+	}
+
 	private static void registerTree(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("grandline")
 				.then(Commands.literal("test").executes(GrandLineCommands::runTest))
@@ -110,6 +140,15 @@ public final class GrandLineCommands {
 											context.getSource().sendSuccess(() -> Component.literal("Call ship for " + p.getGameProfile().getName() + ": " + result), false);
 											return result.equals("ship_launched") ? 1 : 0;
 										}))))
+				// Dev tool: save the top block (height + map colour) of every column in an area, for overhead maps and chart art.
+				.then(Commands.literal("dumpmap").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("x1", IntegerArgumentType.integer())
+								.then(Commands.argument("z1", IntegerArgumentType.integer())
+										.then(Commands.argument("x2", IntegerArgumentType.integer())
+												.then(Commands.argument("z2", IntegerArgumentType.integer())
+														.executes(context -> dumpMap(context.getSource(),
+																IntegerArgumentType.getInteger(context, "x1"), IntegerArgumentType.getInteger(context, "z1"),
+																IntegerArgumentType.getInteger(context, "x2"), IntegerArgumentType.getInteger(context, "z2"))))))))
 				// Plate travel between structures (run by command blocks; operators only).
 				.then(Commands.literal("travel").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("players", EntityArgument.players())

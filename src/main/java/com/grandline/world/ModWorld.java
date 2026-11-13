@@ -115,6 +115,13 @@ public final class ModWorld {
 		overworld.getChunk(0, 0); // make sure the starter chunk is generated
 		for (Island island : registry.all()) {
 			if (island.starter() && (!island.designed() || island.sea() == 1)) {
+				BlockPos arrival = com.grandline.world.plan.IslandPlans.arrival(island.name(), island.x(), island.z());
+				if (arrival != null) {
+					overworld.getChunk(arrival.getX() >> 4, arrival.getZ() >> 4);
+					overworld.setDefaultSpawnPos(arrival, 0);
+					GrandLineMod.LOGGER.info("World spawn moved onto {} at its arrival point {}", island.name(), arrival);
+					break;
+				}
 				int y = overworld.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, island.x(), island.z());
 				overworld.setDefaultSpawnPos(new BlockPos(island.x(), y, island.z()), 0);
 				GrandLineMod.LOGGER.info("World spawn moved onto {} at {}, {}, {}", island.name(), island.x(), y, island.z());

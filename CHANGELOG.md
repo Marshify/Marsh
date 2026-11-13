@@ -1,5 +1,20 @@
 # Grand Line patch notes
 
+## v0.19.0 — Dawnreach Harbor Rebuilt
+**Island update: Dawnreach Harbor (starter island)**
+- A low, paved harbour town on a long platform with chamfered corners, pale quay walls and a rocky base.
+- A four-lobed quartz fountain sits in an open courtyard, with the domed white civic hall beside it. The hall has two long copper-roofed wings, a tall drum, a stepped green dome and a lantern on top.
+- Fourteen buildings and pavilions with their own roof colours: rose, tan, blue, teal, red tile and copper. Each has a door, usable floors, a ladder, lanterns and windows.
+- Three stone piers on each waterfront, with mooring posts and stairs up to the town.
+- Planted strips run along both long edges, with wedge beds by the west piers and hedged beds between the east piers.
+- **New: the Fruit Gacha cart.** It's in the lane behind the civic hall: a wooden cart with big dark wheels and a white canopy. Its keeper opens the gacha directly, with the same prices, cooldown and rolls as before.
+- The Fruit Dealer now has a shop with a counter on the north side of the plaza.
+- New players spawn on the plaza, and sea travel lands there too.
+- The M chart shows the new Dawnreach.
+
+**Note for existing worlds**
+- Worlds created before this update keep their old Dawnreach Harbor. The new town appears in new worlds.
+
 ## v0.18.1 — Jungle Trees
 **Fixes (Verdant Wilds)**
 - Giant jungle trees rebuilt: thick 2×2 trunks that run up into the crown, buttress roots, and offset branches. The crowns are now full, irregular clusters of leaves instead of flat sheets with gaps and floating tops.

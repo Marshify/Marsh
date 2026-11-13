@@ -73,7 +73,7 @@ public final class GrandLineNetworking {
 			case FruitActionPayload.SHOP_BUY -> result = nearDealer(player, packet.arg())
 					? FruitService.buy(player, packet.fruitId()) : FruitService.Result.NOT_IN_STOCK;
 			case FruitActionPayload.GACHA_ROLL -> {
-				if (!nearDealer(player, packet.arg())) {
+				if (!nearGacha(player, packet.arg())) {
 					result = FruitService.Result.NOT_IN_STOCK;
 				} else {
 					FruitService.GachaRoll roll = FruitService.rollGacha(player);
@@ -98,6 +98,13 @@ public final class GrandLineNetworking {
 					"result.grandline." + result.name().toLowerCase(java.util.Locale.ROOT)));
 		}
 		return result;
+	}
+
+	/** A Fruit Dealer or the Fruit Gacha keeper, alive and within reach. */
+	private static boolean nearGacha(ServerPlayer player, int entityId) {
+		Entity entity = player.serverLevel().getEntity(entityId);
+		return entity instanceof com.grandline.entity.Islander npc && npc.offersGacha() && entity.isAlive()
+				&& entity.distanceTo(player) <= FruitDealer.INTERACTION_RANGE;
 	}
 
 	private static boolean nearDealer(ServerPlayer player, int entityId) {

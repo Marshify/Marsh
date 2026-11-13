@@ -41,20 +41,23 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans for worlds created with island layout 1. */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy());
 	}
 
 	public static List<IslandPlan> all() {
-		return List.of(new DawnreachHarbor(), new VerdantWilds(), new MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
+		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new GladiatorsRing(),
 				new EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
 
 	// ==================================================================================================== Lv 1
 
-	/** Starter town: fountain plaza, ring road, blue-roofed hall with a clock tower on the hill, market, two piers. */
-	static final class DawnreachHarbor extends BasePlan {
-		DawnreachHarbor() {
+	/**
+	 * The original Dawnreach Harbor (fountain plaza, ring road, hall with a clock tower, two piers). Kept for worlds
+	 * created before the redesign; new worlds use {@link com.grandline.world.plan.DawnreachHarbor}.
+	 */
+	static final class DawnreachHarborLegacy extends BasePlan {
+		DawnreachHarborLegacy() {
 			super("Dawnreach Harbor", 0.06);
 			terrain.mass(0, 0, 48, 38, 4, 2.4, Ground.GRASS)
 					.mass(-16, -18, 20, 15, 9, 1.8, Ground.GRASS)

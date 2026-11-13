@@ -92,6 +92,7 @@ public final class IslandPopulation {
 				case FRUIT_DEALER -> Islander.Role.FRUIT_DEALER;
 				case FISHERMAN -> Islander.Role.FISHERMAN;
 				case NAVIGATOR -> island.starter() ? Islander.Role.NAVIGATOR : null;
+				case GACHA -> island.starter() ? Islander.Role.GACHA : null;
 				default -> null;
 			};
 			if (role != null) {
@@ -115,7 +116,10 @@ public final class IslandPopulation {
 		int z = island.z() + anchor.z();
 		int y = anchor.y() != com.grandline.world.plan.Anchor.SURFACE ? anchor.y()
 				: level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-		npc.moveTo(x + 0.5, y, z + 0.5, level.getRandom().nextFloat() * 360, 0);
+		float yaw = Float.isNaN(anchor.yaw()) ? level.getRandom().nextFloat() * 360 : anchor.yaw();
+		npc.moveTo(x + 0.5, y, z + 0.5, yaw, 0);
+		npc.setYHeadRot(yaw);
+		npc.setYBodyRot(yaw);
 		npc.setup(role, island.id(), island.level());
 		npc.setPersistenceRequired();
 		level.addFreshEntity(npc);

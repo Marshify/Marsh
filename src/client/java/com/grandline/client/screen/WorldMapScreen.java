@@ -49,7 +49,7 @@ public final class WorldMapScreen extends Screen {
 	 * island when hovered): theme -> {x, y, width, height} in the 2880 x 1536 art.
 	 */
 	private static final Map<String, int[]> SHORE_PIECES = Map.ofEntries(
-			Map.entry("town", new int[]{1260, 788, 444, 85}),
+			Map.entry("town", new int[]{1252, 860, 454, 58}),
 			Map.entry("jungle", new int[]{1216, 494, 434, 81}),
 			Map.entry("village", new int[]{1763, 897, 410, 83}),
 			Map.entry("brick_town", new int[]{780, 906, 427, 86}),

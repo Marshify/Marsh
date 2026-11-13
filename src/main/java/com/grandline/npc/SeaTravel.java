@@ -30,10 +30,12 @@ public final class SeaTravel {
 		}
 		SeaLayout.Spec harbor = SeaLayout.starter(sea);
 		ServerLevel level = player.server.overworld();
-		int x = harbor.x() + 3;
-		int z = harbor.z() + 3;
+		BlockPos arrival = com.grandline.world.plan.IslandPlans.arrival(harbor.name(), harbor.x(), harbor.z());
+		int x = arrival != null ? arrival.getX() : harbor.x() + 3;
+		int z = arrival != null ? arrival.getZ() : harbor.z() + 3;
 		level.getChunk(x >> 4, z >> 4); // generate the destination first
-		int y = Math.max(level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), IslandBuilder.WATER_TOP + 1);
+		int y = arrival != null ? arrival.getY()
+				: Math.max(level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), IslandBuilder.WATER_TOP + 1);
 		player.teleportTo(level, x + 0.5, y, z + 0.5, player.getYRot(), player.getXRot());
 		player.sendSystemMessage(Component.translatable("message.grandline.sailed", sea, harbor.name()).withStyle(ChatFormatting.AQUA));
 		level.playSound(null, BlockPos.containing(x, y, z), SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F);

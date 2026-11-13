@@ -27,6 +27,7 @@ public final class NpcScreens {
 			case FRUIT_DEALER -> fruitDealer(data);
 			case FISHERMAN -> fisherman(data);
 			case NAVIGATOR -> navigator(data);
+			case GACHA -> new GachaScreen(data); // the cart keeper opens the gacha straight away
 		});
 	}
 

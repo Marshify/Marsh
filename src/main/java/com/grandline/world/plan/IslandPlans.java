@@ -13,8 +13,10 @@ import java.util.Map;
  */
 public final class IslandPlans {
 	private static final Map<String, IslandPlan> PLANS = new HashMap<>();
-	/** Plans that layout-1 worlds (created before an island was redesigned) keep using, by island name. */
+	/** Old plans that worlds created before an island's redesign keep using, by island name. */
 	private static final Map<String, IslandPlan> LEGACY = new HashMap<>();
+	/** The world layout version in which each redesigned island got its new plan. */
+	private static final Map<String, Integer> REDESIGNED_IN = Map.of("Verdant Wilds", 2, "Dawnreach Harbor", 3);
 
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);
@@ -33,7 +35,7 @@ public final class IslandPlans {
 	/** The plan this world uses for the island: the redesigned one, or the old one in worlds created before it. */
 	public static IslandPlan get(String islandName) {
 		com.grandline.world.IslandRegistry registry = com.grandline.world.IslandRegistry.current();
-		if (registry != null && registry.layout() < com.grandline.world.IslandRegistry.CURRENT_LAYOUT) {
+		if (registry != null && registry.layout() < REDESIGNED_IN.getOrDefault(islandName, 0)) {
 			IslandPlan legacy = LEGACY.get(islandName);
 			if (legacy != null) {
 				return legacy;
@@ -59,6 +61,23 @@ public final class IslandPlans {
 	public static List<Anchor> anchors(Island island, Anchor.Type type) {
 		IslandPlan plan = get(island);
 		return plan == null ? List.of() : plan.anchors().stream().filter(a -> a.type() == type).toList();
+	}
+
+	/**
+	 * Where players arrive on an island (world spawn, sea travel): its plan's ARRIVAL anchor in world coordinates, or
+	 * null when the plan has none (callers keep their old behaviour).
+	 */
+	public static net.minecraft.core.BlockPos arrival(String islandName, int islandX, int islandZ) {
+		IslandPlan plan = get(islandName);
+		if (plan == null) {
+			return null;
+		}
+		for (Anchor a : plan.anchors()) {
+			if (a.type() == Anchor.Type.ARRIVAL) {
+				return new net.minecraft.core.BlockPos(islandX + a.x(), a.y(), islandZ + a.z());
+			}
+		}
+		return null;
 	}
 
 	/** Whether any part of the planned island can touch the chunk with these minimum block coordinates. */

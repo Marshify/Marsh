@@ -26,7 +26,9 @@ import net.minecraft.world.level.Level;
  */
 public class Islander extends PathfinderMob implements FruitDealer {
 	public enum Role {
-		QUEST_GIVER, FRUIT_DEALER, FISHERMAN, NAVIGATOR;
+		QUEST_GIVER, FRUIT_DEALER, FISHERMAN, NAVIGATOR,
+		/** Fruit Gacha keeper (the starter island's cart). New roles go last: the role is saved by its index. */
+		GACHA;
 
 		public static Role byId(int id) {
 			Role[] values = values();
@@ -93,6 +95,11 @@ public class Islander extends PathfinderMob implements FruitDealer {
 	@Override
 	public boolean isFruitDealer() {
 		return role() == Role.FRUIT_DEALER;
+	}
+
+	/** The Fruit Dealer and the Fruit Gacha keeper both run the gacha (same prices, cooldown and rolls). */
+	public boolean offersGacha() {
+		return role() == Role.FRUIT_DEALER || role() == Role.GACHA;
 	}
 
 	@Override
