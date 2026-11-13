@@ -45,6 +45,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.player.loadout.LoadoutOrderService.register();
 		com.grandline.ship.ShipEntities.register();
 		com.grandline.ship.ShipService.register();
+		com.grandline.world.VanillaSpawns.register();
 		com.grandline.reputation.Leaderboards.register();
 		com.grandline.world.structure.MarkerProcessor.register();
 		com.grandline.world.structure.StructurePlacements.register();

@@ -3,7 +3,8 @@
 	"package": "com.grandline.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"LivingEntityPvpBonusMixin"
+		"LivingEntityPvpBonusMixin",
+		"NaturalSpawnerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

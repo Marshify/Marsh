@@ -1,5 +1,14 @@
 # Grand Line patch notes
 
+## v0.19.2 — Fountain & No Vanilla Mobs
+**Changes**
+- Dawnreach's fountain is rebuilt:
+  - A cross-shaped quartz basin with a raised rim and a low step around it.
+  - Light-blue tiles with glowing panels under the water.
+  - A fluted column carrying a smaller upper basin.
+  - Water pours from the upper basin's four corners into the pool below.
+- **No vanilla mobs in Grand Line worlds.** No zombies, skeletons, creepers, animals, fish, bats, phantoms, pillager patrols or wandering traders spawn, in any dimension. Grand Line's own enemies, bosses and NPCs work as before. Other world types are unchanged.
+
 ## v0.19.1 — Dawnreach Chart Art
 **Changes**
 - Dawnreach Harbor's picture on the M chart is now your hand-drawn pixel art, with a blue surf ripple along its shore.

@@ -449,36 +449,95 @@ public final class DawnreachHarbor extends BasePlan {
 
 	// ---------------------------------------------------------------------------------------------------- fountain
 
-	static boolean fountainCell(int x, int z) {
-		double r2 = 3.3 * 3.3;
-		return (Math.abs(x) <= 2 && Math.abs(z) <= 2)
-				|| (x - 2) * (x - 2) + z * z <= r2 || (x + 2) * (x + 2) + z * z <= r2
-				|| x * x + (z - 2) * (z - 2) <= r2 || x * x + (z + 2) * (z + 2) <= r2;
+	/** The basin: an 11 x 11 cross (arms 5 wide) with 3 x 3 notches at the corners. */
+	static boolean basinCell(int x, int z) {
+		return Math.abs(x) <= 5 && Math.abs(z) <= 5 && !(Math.abs(x) >= 3 && Math.abs(z) >= 3);
 	}
 
-	/** Four-lobed quartz fountain (11 x 11) with a raised central basin; the water is held inside the rims. */
+	/** The fountain's whole footprint: the basin plus the low step around it (13 x 13). */
+	static boolean fountainCell(int x, int z) {
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				if (basinCell(x + dx, z + dz)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/** The upper basin: a 5 x 5 cross (corners cut) carried on the centre column. */
+	static boolean trayCell(int x, int z) {
+		return Math.abs(x) <= 2 && Math.abs(z) <= 2 && !(Math.abs(x) == 2 && Math.abs(z) == 2);
+	}
+
+	/**
+	 * The plaza fountain: a cross-shaped quartz basin with a raised rim and a low step around it, light-blue tiles with
+	 * four glowing panels under the water, and a quartz column carrying a smaller cross-shaped basin. Water fills the
+	 * upper basin and pours from its four cut corners into the pool; a carved block and cap crown the column.
+	 */
 	private void fountain(P p) {
+		BlockState quartz = s(Blocks.SMOOTH_QUARTZ);
+		BlockState water = s(Blocks.WATER);
+		BlockState air = s(Blocks.AIR);
 		for (int x = -6; x <= 6; x++) {
 			for (int z = -6; z <= 6; z++) {
 				if (!fountainCell(x, z)) {
 					continue;
 				}
-				boolean rim = !fountainCell(x + 1, z) || !fountainCell(x - 1, z) || !fountainCell(x, z + 1) || !fountainCell(x, z - 1);
-				p.set(x, STREET - 1, z, s(Blocks.SMOOTH_QUARTZ));
+				p.fill(x, WALK, z, x, WALK + 6, z, air);
+				p.set(x, STREET - 1, z, quartz);
+				if (!basinCell(x, z)) {
+					p.set(x, STREET, z, quartz);
+					p.set(x, WALK, z, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false)); // low step around the basin
+					continue;
+				}
+				boolean rim = !basinCell(x + 1, z) || !basinCell(x - 1, z) || !basinCell(x, z + 1) || !basinCell(x, z - 1);
 				if (rim) {
-					p.set(x, STREET, z, s(Blocks.SMOOTH_QUARTZ));
-					p.set(x, WALK, z, s(Blocks.SMOOTH_QUARTZ));
-					p.set(x, WALK + 1, z, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
-				} else if (Math.abs(x) <= 1 && Math.abs(z) <= 1) {
-					p.set(x, STREET, z, s(Blocks.SMOOTH_QUARTZ));
-					p.set(x, WALK, z, s(Blocks.SMOOTH_QUARTZ));
-					p.set(x, WALK + 1, z, x == 0 && z == 0 ? s(Blocks.WATER) : Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
+					p.set(x, STREET, z, quartz);
+					p.set(x, WALK, z, quartz);
 				} else {
-					p.set(x, STREET, z, s(Blocks.LIGHT_BLUE_TERRACOTTA)); // basin floor
-					p.set(x, WALK, z, s(Blocks.WATER));
-					p.set(x, WALK + 1, z, s(Blocks.AIR));
+					boolean glow = (Math.abs(x) == 3 && z == 0) || (x == 0 && Math.abs(z) == 3);
+					p.set(x, STREET, z, glow ? s(Blocks.SEA_LANTERN) : s(Blocks.LIGHT_BLUE_TERRACOTTA));
+					p.set(x, WALK, z, water);
 				}
 			}
+		}
+		// Fluted centre column, three blocks of it showing above the pool.
+		BlockState pillar = s(Blocks.QUARTZ_PILLAR);
+		p.set(0, STREET, 0, quartz);
+		p.fill(0, WALK, 0, 0, WALK + 2, 0, pillar);
+		// Upper basin: a cross with a lip underneath its arms, a rim, water inside, and the crown in the middle.
+		int tray = WALK + 3;
+		for (int x = -2; x <= 2; x++) {
+			for (int z = -2; z <= 2; z++) {
+				if (!trayCell(x, z)) {
+					continue;
+				}
+				boolean edge = Math.abs(x) == 2 || Math.abs(z) == 2;
+				p.set(x, tray, z, quartz);
+				if (edge) {
+					p.set(x, tray - 1, z, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, true)); // lip
+					p.set(x, tray + 1, z, quartz);                                   // rim
+				} else if (x != 0 || z != 0) {
+					p.set(x, tray + 1, z, water);
+				}
+			}
+		}
+		p.fill(0, tray + 1, 0, 0, tray + 2, 0, s(Blocks.CHISELED_QUARTZ_BLOCK));
+		p.set(0, tray + 3, 0, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
+		// Waterfalls from the four cut corners down into the pool: a source at the top, falling water below it
+		// (placed directly, since water set during world generation does not start flowing on its own).
+		BlockState falling = water.setValue(net.minecraft.world.level.block.LiquidBlock.LEVEL, 8);
+		for (int[] c : new int[][]{{2, 2}, {-2, 2}, {2, -2}, {-2, -2}}) {
+			p.set(c[0], tray + 1, c[1], water);
+			p.fill(c[0], WALK + 1, c[1], c[0], tray, c[1], falling);
+			// A source in open air also pours sideways; invisible barriers on its two open sides keep each spout a
+			// single clean stream (they sit level with the upper basin, out of reach from the plaza).
+			int ox = Integer.signum(c[0]), oz = Integer.signum(c[1]);
+			p.set(c[0] + ox, tray + 1, c[1], s(Blocks.BARRIER));
+			p.set(c[0], tray + 1, c[1] + oz, s(Blocks.BARRIER));
+			p.c.tickFluid(c[0] + OX, tray + 1, c[1]);
 		}
 	}
 

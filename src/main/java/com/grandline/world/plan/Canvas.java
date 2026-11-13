@@ -66,6 +66,13 @@ public final class Canvas {
 		level.setBlock(pos.set(originX + x, y, originZ + z), state, 2);
 	}
 
+	/** Asks the world to update the water at (x, y, z) once the chunk is live, so placed water starts flowing. */
+	public void tickFluid(int x, int y, int z) {
+		if (inChunk(x, z)) {
+			level.scheduleTick(new BlockPos(originX + x, y, originZ + z), net.minecraft.world.level.material.Fluids.WATER, 1);
+		}
+	}
+
 	public void fill(int x1, int y1, int z1, int x2, int y2, int z2, BlockState state) {
 		for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
 			for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
