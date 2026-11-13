@@ -82,7 +82,15 @@ public final class ModWorld {
 	private static void registerDesignedIslands(IslandRegistry registry) {
 		removeRetiredDesignedIslands(registry);
 		for (SeaLayout.Spec spec : SeaLayout.all()) {
-			registry.add(new Island(SeaLayout.idOf(spec), spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), spec.starter(),
+			long id = SeaLayout.idOf(spec);
+			Island saved = registry.get(id);
+			if (saved != null && saved.level() != spec.level()) {
+				// A designed island's level was retuned (Millbrook became the Lv 1 starting island): follow it.
+				registry.update(new Island(saved.id(), saved.x(), saved.z(), saved.radius(), spec.level(), saved.name(), saved.starter(),
+						saved.npcsSpawned(), saved.theme()));
+				GrandLineMod.LOGGER.info("{} is now Lv {}", spec.name(), spec.level());
+			}
+			registry.add(new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), spec.starter(),
 					false, spec.theme().name().toLowerCase(java.util.Locale.ROOT)));
 		}
 	}

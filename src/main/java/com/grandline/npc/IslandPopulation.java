@@ -58,6 +58,18 @@ public final class IslandPopulation {
 				spawnEnemies(server);
 			}
 		});
+		// Enemies saved before their island was retuned (Millbrook's Lv 30 bandits) take the island's level when they load.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity instanceof GrandLineEnemy enemy && EnemyRespawns.respawns(enemy) && level.dimension() == Level.OVERWORLD) {
+				Island island = enemy.islandId() != Long.MIN_VALUE ? IslandRegistry.get(level.getServer()).get(enemy.islandId())
+						: EnemyRespawns.islandAt(level, enemy.blockPosition());
+				if (island != null && com.grandline.world.plan.IslandPlans.get(island) != null && outOfLine(enemy.grandLineLevel(), island)) {
+					float ratio = enemy.getHealth() / enemy.getMaxHealth();
+					enemy.setGrandLineLevel(levelFor(island, level.getRandom()));
+					enemy.setHealth(enemy.getMaxHealth() * ratio);
+				}
+			}
+		});
 	}
 
 	private static void placeNpcs(ServerLevel level, Island island) {
@@ -127,6 +139,27 @@ public final class IslandPopulation {
 	}
 
 	/** Random spawn point inside one of the island's enemy camps, or null if it has none. */
+	/** Regular enemies alive on (and just around) the island. */
+	public static int enemiesOn(ServerLevel level, Island island) {
+		com.grandline.world.plan.IslandPlan plan = com.grandline.world.plan.IslandPlans.get(island);
+		int r = plan != null ? Math.max(island.radius(), plan.extent()) : island.radius();
+		AABB area = new AABB(island.x() - r - 8, level.getMinBuildHeight(), island.z() - r - 8, island.x() + r + 8,
+				level.getMaxBuildHeight(), island.z() + r + 8);
+		return level.getEntitiesOfClass(GrandLineEnemy.class, area, EnemyRespawns::respawns).size();
+	}
+
+	/** A level around the island's recommended level (a tenth either way). */
+	public static int levelFor(Island island, RandomSource random) {
+		int spread = Math.max(1, island.level() / 10);
+		return Math.max(1, island.level() - spread + random.nextInt(spread * 2 + 1));
+	}
+
+	/** Whether an enemy's level is out of line with its island's (the island was retuned): it is then re-levelled. */
+	public static boolean outOfLine(int level, Island island) {
+		int spread = Math.max(1, island.level() / 10);
+		return Math.abs(level - island.level()) > spread;
+	}
+
 	/** Keeps a camp enemy wandering inside its camp (it still chases anyone who comes for it). */
 	static void leash(GrandLineEnemy enemy, Island island) {
 		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
@@ -219,8 +252,7 @@ public final class IslandPopulation {
 				enemy.moveTo(x + 0.5, y, z + 0.5, random.nextFloat() * 360, 0);
 				enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(enemy.blockPosition()), MobSpawnType.EVENT, null, null);
 				enemy.equip();
-				int spread = Math.max(1, island.level() / 10);
-				enemy.setGrandLineLevel(Math.max(1, island.level() - spread + random.nextInt(spread * 2 + 1)));
+				enemy.setGrandLineLevel(levelFor(island, random));
 				enemy.setOrigin(new BlockPos(x, y, z), island.id());
 				leash(enemy, island);
 				level.addFreshEntity(enemy);

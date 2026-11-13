@@ -24,7 +24,7 @@ public final class SeaLayout {
 		// --- Sea 1 (levels 1-700). Layout follows a classic first-sea chart around a central starter town. ---
 		s1("Dawnreach Harbor", IslandTheme.TOWN, 0, 0, 40, 1, true);
 		s1("Verdant Wilds", IslandTheme.JUNGLE, -60, -400, 36, 15, false);
-		s1("Millbrook Village", IslandTheme.VILLAGE, 630, 120, 34, 30, false);
+		s1("Millbrook Village", IslandTheme.VILLAGE, 630, 120, 34, 1, false); // the starting island: the weakest enemies
 		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -630, 120, 34, 60, false);
 		s1("Sunscorch Dunes", IslandTheme.DESERT, 570, 540, 36, 75, false);
 		s1("Frostpeak Isle", IslandTheme.SNOW, 630, -420, 38, 90, false);

@@ -1,5 +1,7 @@
 # Millbrook Village (rebuild, layout 4)
 
+Millbrook is the **Lv 1 starting island**: new players arrive on its dock, and its bandits (Lv 1–2) are the weakest in the game. Verdant Wilds (Lv 15) is next.
+
 New worlds use the rebuilt Millbrook. Worlds created before it (island layout 1–3) keep the original Millbrook exactly as it generated: nothing already in a world is regenerated or overwritten.
 
 Island-local coordinates: +x east, +z south. The island centre is the registry anchor (630, 120 in a standard world).
@@ -21,7 +23,7 @@ Island-local coordinates: +x east, +z south. The island centre is the registry a
 | East windmill and wheat field | (38, -28), sails facing east |
 | Quest giver and notice board | (29, 12), facing the village |
 | Combat field A (training meadow) | centre (46, 0), radius 9 |
-| Combat field B (bandit camp); quest bosses appear here | centre (48, 28), radius 9 |
+| Combat field B (bandit camp) | centre (48, 28), radius 9 |
 | West landing | the shore at z = 4 |
 | North-east landing | the shore at x = 40 |
 | Fisherman | on the dock's T-head (1, 72) |

@@ -1,5 +1,16 @@
 # Grand Line patch notes
 
+## v0.25.1 — Starting Island
+**Changes**
+- **Millbrook Village is now a Lv 1 island**, the starting island with the weakest enemies in the game (Lv 1–2 bandits). Its quests pay starter rewards.
+- **Verdant Wilds (Lv 15) is next**, with the second-weakest enemies.
+- Millbrook's bandits stay in the combat fields on the east side, away from the dock where new players arrive.
+- Millbrook no longer offers a boss quest: boss quests start at Lv 15, on Verdant Wilds.
+
+**Existing worlds**
+- Millbrook becomes Lv 1 in existing worlds too. Its bandits drop to Lv 1–2 as they load.
+- Any extra enemies left over from older versions thin out to the normal 4 per island as they're defeated.
+
 ## v0.25.0 — Millbrook Reborn
 **New: Millbrook Village rebuilt (new worlds)**
 - A rolling green island of about 138 × 122 blocks, with sculpted beaches all round.

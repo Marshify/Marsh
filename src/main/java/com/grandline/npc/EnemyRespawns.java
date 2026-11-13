@@ -78,7 +78,7 @@ public final class EnemyRespawns {
 		data.setDirty();
 	}
 
-	private static Island islandAt(ServerLevel level, BlockPos pos) {
+	static Island islandAt(ServerLevel level, BlockPos pos) {
 		for (Island island : IslandRegistry.nearby(level.getServer(), pos.getX(), pos.getZ(), 260)) {
 			long dx = pos.getX() - island.x(), dz = pos.getZ() - island.z();
 			var plan = com.grandline.world.plan.IslandPlans.get(island);
@@ -118,6 +118,10 @@ public final class EnemyRespawns {
 			}
 			it.remove(); // removed before spawning: one death, one respawn
 			data.setDirty();
+			Island island = IslandRegistry.get(server).get(p.islandId());
+			if (island != null && IslandPopulation.enemiesOn(level, island) >= IslandPopulation.MAX_ENEMIES_PER_ISLAND) {
+				continue; // the island already has its full share (worlds that once held extras thin out to the limit)
+			}
 			spawn(level, p);
 		}
 	}
@@ -131,7 +135,9 @@ public final class EnemyRespawns {
 		enemy.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, level.getRandom().nextFloat() * 360, 0);
 		enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
 		enemy.equip();
-		enemy.setGrandLineLevel(p.level());
+		Island home = IslandRegistry.get(level.getServer()).get(p.islandId());
+		// Same level as before, unless the island has since been retuned (then a level that fits it).
+		enemy.setGrandLineLevel(home != null && IslandPopulation.outOfLine(p.level(), home) ? IslandPopulation.levelFor(home, level.getRandom()) : p.level());
 		enemy.setOrigin(p.pos(), p.islandId());
 		Island island = IslandRegistry.get(level.getServer()).get(p.islandId());
 		if (island != null) {
