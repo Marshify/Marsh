@@ -89,6 +89,18 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("discovery_version"));
 
+	/** The player's chosen home island id (persistent, survives death); respawn fallback. Set by NPCs (Part 2). */
+	public static final AttachmentType<Long> HOME_ISLAND = AttachmentRegistry.<Long>builder()
+			.persistent(com.mojang.serialization.Codec.LONG)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("home_island"));
+
+	/** Set once the player has been placed on the spawn island on their very first join. */
+	public static final AttachmentType<Boolean> FIRST_SPAWN_DONE = AttachmentRegistry.<Boolean>builder()
+			.persistent(com.mojang.serialization.Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("first_spawn_done"));
+
 	private ModAttachments() {
 	}
 

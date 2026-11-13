@@ -46,6 +46,10 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.ship.ShipEntities.register();
 		com.grandline.ship.ShipService.register();
 		com.grandline.world.VanillaSpawns.register();
+		com.grandline.player.rules.CoreRules.register();
+		com.grandline.world.IslandSpawns.register();
+		com.grandline.world.IslandArrival.register();
+		com.grandline.world.ClearWeather.register();
 		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register(
 				(handler, sender, server) -> com.grandline.npc.QuestService.dropImpossibleQuest(handler.getPlayer()));
 		com.grandline.reputation.Leaderboards.register();

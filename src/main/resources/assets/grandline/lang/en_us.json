@@ -740,5 +740,9 @@
   "setting.grandline.fx_density.desc": "Sparks, embers and smoke around moves. Attack shapes always show.",
   "screen.grandline.settings.low": "Low",
   "screen.grandline.settings.medium": "Med",
-  "screen.grandline.settings.high": "High"
+  "screen.grandline.settings.high": "High",
+  "death.attack.grandline.sea_weakness": "%1$s was claimed by the sea",
+  "death.attack.grandline.sea_weakness.player": "%1$s was claimed by the sea while fleeing %2$s",
+  "message.grandline.sea_weakness": "The sea drains your strength!",
+  "hud.grandline.island_arrival": "Lv. %s  ·  %s"
 }

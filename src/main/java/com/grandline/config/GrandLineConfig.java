@@ -122,6 +122,38 @@ public final class GrandLineConfig {
 	/** PvP damage reduction factor per tier (grows faster than damage). */
 	public double pvpDefensePerTier = 0.006;
 
+	// ---- Core survival rules ----
+	/** Vanilla experience is disabled for players (no XP bar, no orbs, no XP gain or drops). */
+	public boolean disableVanillaExperience = true;
+	/** Hunger and saturation stay full; no exhaustion, starvation or vanilla natural regeneration. */
+	public boolean infiniteHunger = true;
+	/** Passive health regeneration: percent of maximum health per second (replaces vanilla regeneration). */
+	public double baseHealthRegenPercentPerSecond = 1.0;
+	/** Players never take fall damage. */
+	public boolean disableFallDamage = true;
+	/** Vanilla advancement messages are not announced in chat (gamerule announceAdvancements). */
+	public boolean hideAdvancementAnnouncements = true;
+
+	// ---- Ocean weakness (fruit users) ----
+	/** Damage per second to fruit users in ocean water, as a percent of maximum health. 0 disables it. */
+	public double oceanDamagePercentPerSecond = 5.0;
+	/** How deep in water (blocks, from the feet) a fruit user must be before the sea weakens them. */
+	public double oceanMinSubmersion = 0.6;
+	/** Only ocean water counts (sea-level water in ocean biomes); false = any water. */
+	public boolean oceanOnly = true;
+	/** Water whose surface is above this height is not the ocean (fountains, ponds on hills). */
+	public int oceanMaxSurfaceY = 63;
+
+	// ---- Spawning ----
+	/** Island new players start on and the final respawn fallback. */
+	public String spawnIsland = "Millbrook Village";
+	/** Respawn on the island where the player died (else their home island, else the spawn island). */
+	public boolean islandRespawn = true;
+
+	// ---- World ----
+	/** Grand Line worlds keep permanently clear weather. */
+	public boolean disableWeather = true;
+
 	// ---- Gunsmith (Dawnreach) ----
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */
 	public long[] gunPrices = {1_500, 12_000};
@@ -300,6 +332,12 @@ public final class GrandLineConfig {
 		}
 		for (int i = 0; i < fruitPrices.length; i++) {
 			fruitPrices[i] = clamp(fruitPrices[i], 0, maxCurrency);
+		}
+		baseHealthRegenPercentPerSecond = clamp(baseHealthRegenPercentPerSecond, 0, 100);
+		oceanDamagePercentPerSecond = clamp(oceanDamagePercentPerSecond, 0, 100);
+		oceanMinSubmersion = clamp(oceanMinSubmersion, 0.05, 2.0);
+		if (spawnIsland == null || spawnIsland.isBlank()) {
+			spawnIsland = defaults().spawnIsland;
 		}
 		gachaCost = clamp(gachaCost, 0, maxCurrency);
 		gachaCostPerLevel = clamp(gachaCostPerLevel, 0, maxCurrency);

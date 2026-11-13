@@ -202,6 +202,7 @@ public final class FirstSeaPlans {
 					.path(s(Blocks.DIRT_PATH), 3, -44, 0, 44, 0)
 					.path(s(Blocks.DIRT_PATH), 3, 0, -34, 0, 34);
 			anchor(Anchor.of(Type.QUEST, 2, -2));
+			anchor(new Anchor(Type.ARRIVAL, -4, Anchor.SURFACE, 3, 0, 180)); // new players start on the village square
 			anchor(Anchor.of(Type.FISHERMAN, -56, 0));
 			anchor(Anchor.at(Type.DOCK, -58, 63, 4));
 			anchor(Anchor.area(Type.ENEMY_CAMP, 30, 26, 8));

@@ -74,7 +74,8 @@ public final class IslandPlans {
 		}
 		for (Anchor a : plan.anchors()) {
 			if (a.type() == Anchor.Type.ARRIVAL) {
-				return new net.minecraft.core.BlockPos(islandX + a.x(), a.y(), islandZ + a.z());
+				int y = a.y() != Anchor.SURFACE ? a.y() : plan.terrain().ground(a.x(), a.z()) + 1;
+				return new net.minecraft.core.BlockPos(islandX + a.x(), y, islandZ + a.z());
 			}
 		}
 		return null;

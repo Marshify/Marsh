@@ -57,6 +57,10 @@ public final class PlayerProfileService {
 		sync(player);
 
 		if (after.level() > before.level()) {
+			// Level up: back to full health, after the new maximum is applied (one heal, however many levels).
+			if (player.isAlive()) {
+				player.setHealth(player.getMaxHealth());
+			}
 			int points = after.unallocatedStatPoints() - before.unallocatedStatPoints();
 			player.sendSystemMessage(Component.translatable("message.grandline.level_up", after.level(), Math.max(0, points))
 					.withStyle(ChatFormatting.GOLD));

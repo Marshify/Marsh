@@ -119,6 +119,15 @@ public final class ModWorld {
 			return;
 		}
 		overworld.getChunk(0, 0); // make sure the starter chunk is generated
+		// New worlds start players on the configured spawn island (Millbrook Village by default).
+		Island spawn = IslandSpawns.spawnIsland(server);
+		BlockPos spawnSpot = spawn == null ? null : IslandSpawns.safeSpot(overworld, spawn);
+		if (spawnSpot != null) {
+			overworld.setDefaultSpawnPos(spawnSpot, 0);
+			GrandLineMod.LOGGER.info("World spawn moved onto {} at {}", spawn.name(), spawnSpot);
+			registry.markSpawnPlaced();
+			return;
+		}
 		for (Island island : registry.all()) {
 			if (island.starter() && (!island.designed() || island.sea() == 1)) {
 				BlockPos arrival = com.grandline.world.plan.IslandPlans.arrival(island.name(), island.x(), island.z());
@@ -171,8 +180,13 @@ public final class ModWorld {
 		if (player.getVehicle() instanceof net.minecraft.world.entity.vehicle.Boat) {
 			return false;
 		}
-		int lx = player.getBlockX() - island.x();
-		int lz = player.getBlockZ() - island.z();
+		return inGameplayArea(player.getBlockX(), player.getBlockZ(), island);
+	}
+
+	/** Whether the column (x, z) is part of the island's land (see {@link #inGameplayArea(ServerPlayer, Island)}). */
+	public static boolean inGameplayArea(int x, int z, Island island) {
+		int lx = x - island.x();
+		int lz = z - island.z();
 		com.grandline.world.plan.IslandPlan plan = com.grandline.world.plan.IslandPlans.get(island);
 		if (plan != null) {
 			return (long) lx * lx + (long) lz * lz <= (long) plan.extent() * plan.extent()

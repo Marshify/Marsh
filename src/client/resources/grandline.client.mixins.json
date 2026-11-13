@@ -6,7 +6,8 @@
 		"WorldCreationUiStateMixin",
 		"HumanoidModelPunchMixin",
 		"GameRendererShakeMixin",
-		"GuiHotbarMixin"
+		"GuiHotbarMixin",
+		"GuiExperienceBarMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

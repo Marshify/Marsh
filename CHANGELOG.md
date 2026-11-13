@@ -1,5 +1,25 @@
 # Grand Line patch notes
 
+## v0.23.0 — Core Rules (Update Part 1)
+**New rules**
+- **No vanilla XP.** The green bar and level number are gone. No orbs drop and nothing gives vanilla XP; old XP is cleared when you join. Grand Line levels work as before.
+- **Hunger is always full**, so you never need to eat.
+- **New regeneration:** 1% of max health per second, starting right after you're hit. Vanilla's food-based healing is gone.
+- **No fall damage.**
+- **No advancement messages in chat.**
+- **The sea weakens fruit users:** fully in the ocean, you lose 5% of max health per second and see "The sea drains your strength!". Rain, standing next to water, boats and fountains are safe. Players without a fruit are unaffected.
+- **Millbrook Village is the starting island** for new players.
+- **Respawning:** you come back on the island where you died. If you died at sea, you return to your home island (set by the coming NPCs), or to Millbrook if you have none.
+- **Levelling up restores your health to full.**
+- **Clear skies:** rain and thunder are switched off in Grand Line worlds.
+- **Island arrival banner:** stepping onto an island shows its name, level and sea at the top of the screen. It fades in, stays about 3 seconds and fades out. Each player sees only their own, and it never flickers while you walk along a shore, a pier or through a fountain.
+
+**Settings**
+- Every rule above can be changed in `config/grandline.json` (see `docs/CORE_RULES.md`).
+
+**Existing worlds**
+- Nothing is regenerated. Players who already played stay where they are. Only brand-new players are placed on Millbrook.
+
 ## v0.22.0 — Flame Reforged
 **Flame Fruit overhaul.** Every move is now a full sequence: windup, release, travel, impact, recovery. Each uses new custom visuals made from Grand Line's own textures, with glowing cores, flame shells, trails and rings instead of vanilla particles. Hits land exactly where and when you see them.
 - **Z Cinder Shots:** fire coils round your hand, then three quick fireballs, one per punch. Each has a white-hot core, flickering shell and ember trail, with a flash and burst on contact. A miss flies until it hits the ground or burns out.
