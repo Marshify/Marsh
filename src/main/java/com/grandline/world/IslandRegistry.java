@@ -70,6 +70,17 @@ public final class IslandRegistry extends SavedData {
 		setDirty();
 	}
 
+	/** Removes every island matching {@code filter}; returns how many were removed. Generated blocks are not touched. */
+	public synchronized int removeIf(java.util.function.Predicate<Island> filter) {
+		int before = islands.size();
+		islands.values().removeIf(filter);
+		int removed = before - islands.size();
+		if (removed > 0) {
+			setDirty();
+		}
+		return removed;
+	}
+
 	public synchronized List<Island> all() {
 		return new ArrayList<>(islands.values());
 	}

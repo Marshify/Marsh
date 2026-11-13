@@ -74,10 +74,35 @@ public final class ModWorld {
 
 	/** Adds every designed island of all seas to the registry (they exist from the start, like a real map). */
 	private static void registerDesignedIslands(IslandRegistry registry) {
+		removeRetiredDesignedIslands(registry);
 		for (SeaLayout.Spec spec : SeaLayout.all()) {
 			registry.add(new Island(SeaLayout.idOf(spec), spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), spec.starter(),
 					false, spec.theme().name().toLowerCase(java.util.Locale.ROOT)));
 		}
+	}
+
+	/**
+	 * Drops designed islands that a world saved but {@link SeaLayout} no longer has (e.g. Hollow Islet), so they leave
+	 * the chart, travel and island lookups. Already-generated blocks and entities in those chunks are left as they are.
+	 * Random (undesigned) islands are never touched. Returns how many were removed.
+	 */
+	public static int removeRetiredDesignedIslands(IslandRegistry registry) {
+		java.util.Set<Long> current = new java.util.HashSet<>();
+		for (SeaLayout.Spec spec : SeaLayout.all()) {
+			current.add(SeaLayout.idOf(spec));
+		}
+		java.util.List<String> names = new java.util.ArrayList<>();
+		int removed = registry.removeIf(island -> {
+			boolean retired = island.designed() && !current.contains(island.id());
+			if (retired) {
+				names.add(island.name());
+			}
+			return retired;
+		});
+		if (removed > 0) {
+			GrandLineMod.LOGGER.info("Removed {} retired designed island(s) from the island registry: {}", removed, names);
+		}
+		return removed;
 	}
 
 	/** First start of a world with a starter island: move the world spawn onto it. */

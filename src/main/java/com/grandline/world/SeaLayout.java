@@ -28,7 +28,6 @@ public final class SeaLayout {
 		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -630, 120, 34, 60, false);
 		s1("Sunscorch Dunes", IslandTheme.DESERT, 570, 540, 36, 75, false);
 		s1("Frostpeak Isle", IslandTheme.SNOW, 630, -420, 38, 90, false);
-		s1("Hollow Islet", IslandTheme.CAVE, -720, 480, 18, 100, false);
 		s1("Ironhold Bastion", IslandTheme.FORTRESS, 1380, 0, 38, 120, false);
 		s1("Cloudtop Isles", IslandTheme.SKY, -1500, -540, 30, 150, false);
 		s1("Stonewall Prison", IslandTheme.PRISON, -1170, 270, 32, 190, false);

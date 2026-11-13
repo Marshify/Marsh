@@ -14,7 +14,8 @@
       "com.grandline.test.GrandLineFruitGameTests",
       "com.grandline.test.GrandLineNpcGameTests",
       "com.grandline.test.GrandLineFlameGameTests",
-      "com.grandline.test.GrandLineRosterGameTests"
+      "com.grandline.test.GrandLineRosterGameTests",
+      "com.grandline.test.GrandLineIslandGameTests"
     ]
   },
   "depends": {

@@ -1,5 +1,13 @@
 # Grand Line patch notes
 
+## v0.8.4 — Hollow Islet Removed
+**Changes**
+- Hollow Islet has been removed. It no longer generates in new worlds and no longer appears on the sea chart or in travel.
+- The First Sea now has 14 islands.
+
+**Notes**
+- In existing worlds, Hollow Islet is removed from the chart and travel automatically. Any blocks and NPCs already generated there stay in the world.
+
 ## v0.8.3 — Retired Fruits Removed
 **Changes**
 - The 24 retired fruits from the old lineup are gone for good: Thorn, Pebble, Ash, Tide, Coral, Iron, Sludge, Glass, Rust, Pollen, Bloom, Prism, Monsoon, Mirage, Hornet, Wolf, Grizzly, Tempest, Solar, Leviathan, Aegis, Hydra, Titan and Seraph.
