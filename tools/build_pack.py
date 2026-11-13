@@ -533,7 +533,7 @@ def build_meta():
 def main():
     if os.path.exists(PACK):
         shutil.rmtree(PACK)
-    build_meta(); build_widgets(); build_icons(); build_controls(); build_containers(); build_mod()
+    build_meta(); build_widgets(); build_icons(); build_controls(); build_mod()  # containers left vanilla (too intense)
     os.makedirs(DIST, exist_ok=True)
     out = os.path.join(DIST, "MarshUI.zip")
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:

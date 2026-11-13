@@ -130,11 +130,9 @@ def hud():
 
 
 def vanilla():
-    w, ic, inv = tex(V + "widgets.png"), tex(V + "icons.png"), tex(V + "container/inventory.png")
-    img = bg(200, 262)
-    put(img, crop(inv, 0, 0, 176, 166), 12, 4)
-    text(img, 12 + 97, 4 + 7, "Crafting", 6, fill=(64, 64, 64), outline=False)
-    y = 232
+    w, ic = tex(V + "widgets.png"), tex(V + "icons.png")
+    img = bg(200, 96)
+    y = 66
     put(img, crop(w, 0, 0, 182, 22), 9, y)
     put(img, crop(w, 0, 22, 24, 24), 9 - 1 + 2 * 20, y - 1)
     put(img, crop(ic, 0, 64, 182, 5), 9, y - 7)
@@ -145,10 +143,10 @@ def vanilla():
         put(img, crop(ic, 16, 27, 9, 9), 182 + 9 - 9 - k * 8, y - 18)
         put(img, crop(ic, 52 if k < 6 else 16, 27, 9, 9), 182 + 9 - 9 - k * 8, y - 18)
         put(img, crop(ic, 34 if k < 5 else 16, 9, 9, 9), 9 + k * 8, y - 28)
-    put(img, stretch(crop(w, 0, 66, 200, 20), 90), 6, 174)
-    put(img, stretch(crop(w, 0, 86, 200, 20), 90), 104, 174)
-    text(img, 51, 184, "Done", 7, anchor="mm", outline=False)
-    text(img, 149, 184, "Hovered", 7, anchor="mm", outline=False)
+    put(img, stretch(crop(w, 0, 66, 200, 20), 90), 6, 8)
+    put(img, stretch(crop(w, 0, 86, 200, 20), 90), 104, 8)
+    text(img, 51, 18, "Done", 7, anchor="mm", outline=False)
+    text(img, 149, 18, "Hovered", 7, anchor="mm", outline=False)
     return img
 
 

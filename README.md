@@ -24,7 +24,6 @@ All colours are in the `PALETTE` block at the top of `tools/build_pack.py`.
 | `gui/icons.png` | hearts (all variants + hardcore), armor, hunger, air, purple XP bar, jump bar |
 | `gui/slider.png`, `gui/checkbox.png` | settings controls |
 | `gui/options_background.png`, `light_dirt_background.png` | charcoal swirl menu background (replaces dirt) |
-| `gui/container/inventory.png`, `generic_54.png`, `crafting_table.png` | yellow frame, charcoal slot wells |
 
 ## Mod textures (`assets/<modid>/textures/gui/`)
 Your mod's HUD and screens draw these with `GuiGraphics.blit(texture, x, y, u, v, w, h)`.
