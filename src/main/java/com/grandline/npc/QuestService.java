@@ -111,7 +111,22 @@ public final class QuestService {
 		double angle = player.getRandom().nextDouble() * Math.PI * 2;
 		int x = npc.getBlockX() + (int) Math.round(Math.cos(angle) * 8);
 		int z = npc.getBlockZ() + (int) Math.round(Math.sin(angle) * 8);
-		int y = player.serverLevel().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		int y = Integer.MIN_VALUE;
+		// Planned islands have a boss arena: the boss waits there instead of next to the quest giver.
+		com.grandline.world.Island island = com.grandline.world.IslandRegistry.get(player.server).get(npc.islandId());
+		java.util.List<com.grandline.world.plan.Anchor> arenas = com.grandline.world.plan.IslandPlans.anchors(island,
+				com.grandline.world.plan.Anchor.Type.BOSS_ARENA);
+		if (!arenas.isEmpty()) {
+			com.grandline.world.plan.Anchor arena = arenas.get(0);
+			x = island.x() + arena.x();
+			z = island.z() + arena.z();
+			if (arena.y() != com.grandline.world.plan.Anchor.SURFACE) {
+				y = arena.y() + 1;
+			}
+		}
+		if (y == Integer.MIN_VALUE) {
+			y = player.serverLevel().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		}
 		boss.moveTo(new BlockPos(x, y, z), 0, 0);
 		boss.finalizeSpawn(player.serverLevel(), player.serverLevel().getCurrentDifficultyAt(boss.blockPosition()), MobSpawnType.EVENT, null, null);
 		boss.equip();

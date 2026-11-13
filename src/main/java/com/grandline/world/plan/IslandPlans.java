@@ -1,0 +1,87 @@
+package com.grandline.world.plan;
+
+import com.grandline.world.Island;
+import com.grandline.world.SeaLayout;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Registry of hand-designed island plans, by island name. To add an island: put its spec in {@link SeaLayout} and its
+ * plan here. Islands without a plan fall back to the generic themed builder.
+ */
+public final class IslandPlans {
+	private static final Map<String, IslandPlan> PLANS = new HashMap<>();
+
+	static {
+		FirstSeaPlans.all().forEach(IslandPlans::add);
+	}
+
+	private IslandPlans() {
+	}
+
+	public static void add(IslandPlan plan) {
+		if (PLANS.put(plan.name(), plan) != null) {
+			throw new IllegalStateException("Duplicate island plan " + plan.name());
+		}
+	}
+
+	public static IslandPlan get(String islandName) {
+		return PLANS.get(islandName);
+	}
+
+	public static IslandPlan get(Island island) {
+		return island == null ? null : PLANS.get(island.name());
+	}
+
+	public static List<IslandPlan> all() {
+		return List.copyOf(PLANS.values());
+	}
+
+	/** Anchors of {@code type} for an island (empty if it has no plan). */
+	public static List<Anchor> anchors(Island island, Anchor.Type type) {
+		IslandPlan plan = get(island);
+		return plan == null ? List.of() : plan.anchors().stream().filter(a -> a.type() == type).toList();
+	}
+
+	/** Whether any part of the planned island can touch the chunk with these minimum block coordinates. */
+	public static boolean touches(SeaLayout.Spec spec, IslandPlan plan, int chunkMinX, int chunkMinZ) {
+		int reach = plan.extent();
+		int nearestX = Math.max(chunkMinX, Math.min(spec.x(), chunkMinX + 15));
+		int nearestZ = Math.max(chunkMinZ, Math.min(spec.z(), chunkMinZ + 15));
+		long dx = nearestX - spec.x();
+		long dz = nearestZ - spec.z();
+		return dx * dx + dz * dz <= (long) reach * reach;
+	}
+
+	/** Builds the part of a planned island inside one chunk: terrain columns first, then structures. */
+	public static void build(net.minecraft.world.level.WorldGenLevel level, SeaLayout.Spec spec, IslandPlan plan, int chunkMinX, int chunkMinZ) {
+		Terrain terrain = plan.terrain();
+		Canvas canvas = new Canvas(level, terrain, spec.x(), spec.z(), chunkMinX, chunkMinZ);
+		net.minecraft.world.level.block.state.BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+		for (int wx = chunkMinX; wx < chunkMinX + 16; wx++) {
+			for (int wz = chunkMinZ; wz < chunkMinZ + 16; wz++) {
+				int x = wx - spec.x();
+				int z = wz - spec.z();
+				if (x * x + z * z > plan.extent() * plan.extent()) {
+					continue;
+				}
+				int g = terrain.ground(x, z);
+				if (g <= Terrain.FLOOR + 1) {
+					continue; // open sea: leave the generated ocean alone
+				}
+				for (int y = Terrain.FLOOR; y < g; y++) {
+					canvas.set(x, y, z, terrain.under(x, z));
+				}
+				canvas.set(x, g, z, terrain.top(x, z));
+				if (g >= Terrain.WATER_TOP) {
+					for (int y = g + 1; y <= g + 24; y++) {
+						canvas.set(x, y, z, air);
+					}
+				}
+			}
+		}
+		plan.build(canvas);
+	}
+}

@@ -1,5 +1,30 @@
 # Grand Line patch notes
 
+## v0.9.0 — The First Sea, Rebuilt
+**New**
+- All 14 First Sea islands have been rebuilt as hand-designed islands with their own shapes, landmarks, roads and docks:
+  - **Dawnreach Harbor:** fountain plaza, hilltop hall with a clock tower, market stalls, a lighthouse and two piers.
+  - **Verdant Wilds:** a four-tier jungle temple with a grand stairway, an inner chamber and a summit shrine.
+  - **Millbrook Village:** windmills, crop fields, cottages, a barn and a well.
+  - **Redbrick Port:** brick terraces climbing to a stone keep.
+  - **Sunscorch Dunes:** a stepped pyramid with a burial chamber, and a palm oasis.
+  - **Frostpeak Isle:** a snowy peak, a frozen waterfall, a lodge and igloos.
+  - **Ironhold Bastion:** walls, towers, a gatehouse and a keep.
+  - **Cloudtop Isles:** four floating islands joined by rope bridges.
+  - **Stonewall Prison:** cell blocks and a watchtower.
+  - **Gladiator's Ring:** a full colosseum with tiered seating.
+  - **Emberfall Isle:** a volcano with a lava crater and magma streams.
+  - **Saltmarket Docks:** a trade hall, warehouses and cranes.
+  - **Lotus Palace:** a four-tier pagoda over a lotus pond.
+  - **Crystal Fountain:** tiered quartz fountains and crystal spires.
+- Buildings have doors and furnished interiors.
+- Quest givers, shops and fishermen stand in their proper spots. Enemies spawn in camps, and quest bosses wait in each island's arena.
+- Every island has a dock with a boat waiting, and buried treasure with a fruit inside.
+
+**Notes**
+- Only new worlds, or parts of the sea you haven't explored yet, get the new islands. Islands you've already visited stay as they were.
+- Second and Third Sea islands are next.
+
 ## v0.8.4 — Hollow Islet Removed
 **Changes**
 - Hollow Islet has been removed. It no longer generates in new worlds and no longer appears on the sea chart or in travel.

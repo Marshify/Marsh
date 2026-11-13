@@ -65,6 +65,12 @@ public final class IslandPopulation {
 		if (current == null || current.npcsSpawned()) {
 			return;
 		}
+		com.grandline.world.plan.IslandPlan plan = com.grandline.world.plan.IslandPlans.get(island);
+		if (plan != null) {
+			placePlannedNpcs(level, island, plan);
+			IslandRegistry.get(level.getServer()).update(current.withNpcsSpawned());
+			return;
+		}
 		spawnNpc(level, island, Islander.Role.QUEST_GIVER, 0, 0);
 		if (island.starter() || Math.floorMod(island.id(), 4) == 0) {
 			spawnNpc(level, island, Islander.Role.FRUIT_DEALER, 3, 1);
@@ -76,6 +82,59 @@ public final class IslandPopulation {
 			spawnNpc(level, island, Islander.Role.NAVIGATOR, 1, -4);
 		}
 		IslandRegistry.get(level.getServer()).update(current.withNpcsSpawned());
+	}
+
+	/** NPCs (and a boat at each dock) at the spots the island's plan marks for them. */
+	private static void placePlannedNpcs(ServerLevel level, Island island, com.grandline.world.plan.IslandPlan plan) {
+		for (com.grandline.world.plan.Anchor anchor : plan.anchors()) {
+			Islander.Role role = switch (anchor.type()) {
+				case QUEST -> Islander.Role.QUEST_GIVER;
+				case FRUIT_DEALER -> Islander.Role.FRUIT_DEALER;
+				case FISHERMAN -> Islander.Role.FISHERMAN;
+				case NAVIGATOR -> island.starter() ? Islander.Role.NAVIGATOR : null;
+				default -> null;
+			};
+			if (role != null) {
+				spawnNpcAt(level, island, role, anchor);
+			} else if (anchor.type() == com.grandline.world.plan.Anchor.Type.DOCK) {
+				net.minecraft.world.entity.vehicle.Boat boat = net.minecraft.world.entity.EntityType.BOAT.create(level);
+				if (boat != null) {
+					boat.moveTo(island.x() + anchor.x() + 0.5, com.grandline.world.plan.Terrain.WATER_TOP + 1, island.z() + anchor.z() + 0.5, 0, 0);
+					level.addFreshEntity(boat);
+				}
+			}
+		}
+	}
+
+	private static void spawnNpcAt(ServerLevel level, Island island, Islander.Role role, com.grandline.world.plan.Anchor anchor) {
+		Islander npc = GrandLineEntities.ISLANDER.create(level);
+		if (npc == null) {
+			return;
+		}
+		int x = island.x() + anchor.x();
+		int z = island.z() + anchor.z();
+		int y = anchor.y() != com.grandline.world.plan.Anchor.SURFACE ? anchor.y()
+				: level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		npc.moveTo(x + 0.5, y, z + 0.5, level.getRandom().nextFloat() * 360, 0);
+		npc.setup(role, island.id(), island.level());
+		npc.setPersistenceRequired();
+		level.addFreshEntity(npc);
+	}
+
+	/** Random spawn point inside one of the island's enemy camps, or null if it has none. */
+	private static BlockPos campSpot(ServerLevel level, Island island, RandomSource random) {
+		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
+				com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
+		if (camps.isEmpty()) {
+			return null;
+		}
+		com.grandline.world.plan.Anchor camp = camps.get(random.nextInt(camps.size()));
+		double angle = random.nextDouble() * Math.PI * 2;
+		double distance = random.nextDouble() * Math.max(1, camp.radius());
+		int x = island.x() + camp.x() + (int) Math.round(Math.cos(angle) * distance);
+		int z = island.z() + camp.z() + (int) Math.round(Math.sin(angle) * distance);
+		int y = camp.y() != com.grandline.world.plan.Anchor.SURFACE ? camp.y() + 1 : level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		return new BlockPos(x, y, z);
 	}
 
 	private static void spawnNpc(ServerLevel level, Island island, Islander.Role role, int dx, int dz) {
@@ -105,14 +164,27 @@ public final class IslandPopulation {
 				if (level.getEntitiesOfClass(GrandLineEnemy.class, area).size() >= MAX_ENEMIES_PER_ISLAND) {
 					continue;
 				}
-				double angle = random.nextDouble() * Math.PI * 2;
-				double distance = random.nextDouble() * r * 0.7;
-				int x = island.x() + (int) Math.round(Math.cos(angle) * distance);
-				int z = island.z() + (int) Math.round(Math.sin(angle) * distance);
+				int x;
+				int z;
+				int y;
+				BlockPos camp = campSpot(level, island, random);
+				if (camp != null) {
+					x = camp.getX();
+					z = camp.getZ();
+					y = camp.getY();
+				} else {
+					double angle = random.nextDouble() * Math.PI * 2;
+					double distance = random.nextDouble() * r * 0.7;
+					x = island.x() + (int) Math.round(Math.cos(angle) * distance);
+					z = island.z() + (int) Math.round(Math.sin(angle) * distance);
+					y = Integer.MIN_VALUE;
+				}
 				if (!level.hasChunk(x >> 4, z >> 4)) {
 					continue;
 				}
-				int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+				if (y == Integer.MIN_VALUE) {
+					y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+				}
 				BlockPos ground = new BlockPos(x, y - 1, z);
 				if (!level.getFluidState(ground).isEmpty() || level.getBlockState(ground).is(Blocks.WATER)
 						|| player.distanceToSqr(x, y, z) < 12 * 12) {
