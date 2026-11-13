@@ -93,8 +93,11 @@ public final class Fruits {
 			FruitMoves.dash(Element.METAL, 2, 5f),
 			"spike_needle", "spike_urchin", "spike_bed", "spike_maiden", "spike_quill");
 
-	/** Flame (id "ember" kept for saves): hand-made moveset, see FlameMoves. */
-	public static final FruitDef FLAME = register("ember", FruitRarity.UNCOMMON, 0xFF7A33, com.grandline.fruit.flame.FlameMoves.moves());
+	/** Flame: hand-made moveset, see FlameMoves. Formerly "ember" (saves are migrated, see PowerState.RENAMED). */
+	public static final FruitDef FLAME = register("flame", FruitRarity.UNCOMMON, 0xFF7A33, com.grandline.fruit.flame.FlameMoves.moves());
+	/** The old "ember_fruit" item: turns into a Flame Fruit as soon as it is in a player's inventory. */
+	public static final Item EMBER_FRUIT_LEGACY = Registry.register(BuiltInRegistries.ITEM, GrandLineMod.id("ember_fruit"),
+			new RenamedItem(() -> FLAME.item(), new Item.Properties().stacksTo(1).fireResistant()));
 
 	/** Ice (id "frost" kept so saves carry over). */
 	public static final FruitDef ICE = register("frost", FruitRarity.UNCOMMON, Element.ICE, 0x8FD0FF,

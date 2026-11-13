@@ -28,6 +28,7 @@ public final class NpcScreens {
 			case FISHERMAN -> fisherman(data);
 			case NAVIGATOR -> navigator(data);
 			case GACHA -> new GachaScreen(data); // the cart keeper opens the gacha straight away
+			case GUNSMITH -> gunsmith(data);
 		});
 	}
 
@@ -72,6 +73,20 @@ public final class NpcScreens {
 						() -> Minecraft.getInstance().setScreen(new FruitShopScreen(data)), true),
 				new DialogScreen.Option(gacha, () -> Minecraft.getInstance().setScreen(new GachaScreen(data)), true),
 				DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
+	}
+
+	private static DialogScreen gunsmith(OpenNpcPayload data) {
+		List<DialogScreen.Option> options = new ArrayList<>();
+		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
+		for (int i = 0; i < data.stock().size() && i < data.prices().size(); i++) {
+			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
+			int index = i;
+			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.gunsmith.buy", item.getDescription(),
+					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_GUN + index)));
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		return new DialogScreen(Component.translatable("entity.grandline.islander.gunsmith"),
+				List.of(Component.translatable("npc.grandline.gunsmith.greeting")), options);
 	}
 
 	private static DialogScreen fisherman(OpenNpcPayload data) {

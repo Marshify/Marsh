@@ -30,14 +30,15 @@ public final class GrandLinePlanGameTests implements FabricGameTest {
 				helper.assertTrue(a.x() * a.x() + a.z() * a.z() <= plan.extent() * plan.extent(),
 						spec.name() + " " + a.type() + " anchor lies inside the generated area");
 				switch (a.type()) {
-					case QUEST, FISHERMAN, NAVIGATOR, FRUIT_DEALER -> {
+					case QUEST, FISHERMAN, NAVIGATOR, FRUIT_DEALER, GUNSMITH -> {
 						if (a.y() == Anchor.SURFACE) {
 							// NPCs on the surface must stand on land or a pier, never in open water.
 							boolean land = terrain.ground(a.x(), a.z()) >= Terrain.WATER_TOP;
 							helper.assertTrue(land || a.type() == Anchor.Type.FISHERMAN || a.type() == Anchor.Type.NAVIGATOR,
 									spec.name() + " " + a.type() + " stands on land");
 						}
-						quest |= a.type() == Anchor.Type.QUEST;
+						// Starter islands are safe zones (no enemies): they have a gun shop instead of quests.
+						quest |= a.type() == Anchor.Type.QUEST || (spec.starter() && a.type() == Anchor.Type.GUNSMITH);
 						navigator |= a.type() == Anchor.Type.NAVIGATOR;
 					}
 					case DOCK -> dock = true;

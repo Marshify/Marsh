@@ -39,6 +39,10 @@ public final class NpcService {
 		List<String> stock = new ArrayList<>();
 		List<Long> prices = new ArrayList<>();
 		List<String> available = new ArrayList<>();
+		if (npc.role() == Islander.Role.GUNSMITH) {
+			stock.addAll(GunShop.ids());
+			prices.addAll(GunShop.prices());
+		}
 		if (npc.role() == Islander.Role.FRUIT_DEALER) {
 			for (Fruits.FruitDef fruit : Fruits.all()) {
 				stock.add(fruit.id());
@@ -79,10 +83,12 @@ public final class NpcService {
 			case NpcActionPayload.LAUNCH_SHIP, NpcActionPayload.LAUNCH_SHIP + 1, NpcActionPayload.LAUNCH_SHIP + 2 -> npc.role() == Islander.Role.NAVIGATOR
 					? com.grandline.ship.ShipService.launchFromNavigator(player, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP], npc)
 					: "too_far";
+			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
+					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
 			default -> "too_far";
 		};
 		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
-				|| result.equals("ship_launched") || result.equals("ship_bought");
+				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought");
 		return reply(player, success, result);
 	}
 

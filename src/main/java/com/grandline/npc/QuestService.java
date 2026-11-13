@@ -47,6 +47,26 @@ public final class QuestService {
 		return new QuestState(EnemyKind.forLevel(level).name(), name, KILL_COUNT, 0, xp, currency, x, z, false);
 	}
 
+	/**
+	 * Drops the player's quest if it targets a starter island: those are safe zones without enemies, so it could never
+	 * be finished (worlds from before Dawnreach's rebuild could hand these out). Called when the player joins.
+	 */
+	public static void dropImpossibleQuest(ServerPlayer player) {
+		QuestState quest = active(player);
+		if (quest == null) {
+			return;
+		}
+		for (com.grandline.world.Island island : com.grandline.world.IslandRegistry.get(player.server).all()) {
+			if (island.starter() && island.name().equals(quest.islandName())) {
+				player.removeAttached(ModAttachments.ACTIVE_QUEST);
+				sync(player);
+				player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.grandline.quest.safe_zone", quest.islandName())
+						.withStyle(net.minecraft.ChatFormatting.YELLOW));
+				return;
+			}
+		}
+	}
+
 	public static QuestState active(ServerPlayer player) {
 		return player.getAttached(ModAttachments.ACTIVE_QUEST);
 	}

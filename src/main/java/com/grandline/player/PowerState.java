@@ -15,7 +15,13 @@ import java.util.Map;
 public record PowerState(String fightingStyle, String fruit, Map<String, Long> mastery, Map<String, Integer> stash,
 		long gachaReadyAtMillis) {
 	public static final String DEFAULT_STYLE = "grandline:brawler";
+	/** Power ids that were renamed: old saves load with the new id (equipped fruit, mastery and stash). */
+	public static final Map<String, String> RENAMED = Map.of("grandline:ember", "grandline:flame");
 	public static final PowerState DEFAULT = new PowerState(DEFAULT_STYLE, "", Map.of(), Map.of(), 0L);
+
+	private static String renamed(String id) {
+		return id == null ? null : RENAMED.getOrDefault(id, id);
+	}
 
 	public static final Codec<PowerState> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.STRING.optionalFieldOf("style", DEFAULT_STYLE).forGetter(PowerState::fightingStyle),
@@ -27,12 +33,13 @@ public record PowerState(String fightingStyle, String fruit, Map<String, Long> m
 
 	public PowerState {
 		fightingStyle = fightingStyle == null || fightingStyle.isEmpty() ? DEFAULT_STYLE : fightingStyle;
-		fruit = fruit == null ? "" : fruit;
+		fruit = fruit == null ? "" : renamed(fruit);
+		fightingStyle = renamed(fightingStyle);
 		Map<String, Long> copy = new HashMap<>();
 		if (mastery != null) {
 			mastery.forEach((id, xp) -> {
 				if (id != null && xp != null && xp > 0) {
-					copy.put(id, xp);
+					copy.merge(renamed(id), xp, Math::max);
 				}
 			});
 		}
@@ -41,7 +48,7 @@ public record PowerState(String fightingStyle, String fruit, Map<String, Long> m
 		if (stash != null) {
 			stash.forEach((id, count) -> {
 				if (id != null && count != null && count > 0) {
-					stashCopy.put(id, count);
+					stashCopy.merge(renamed(id), count, Integer::sum);
 				}
 			});
 		}

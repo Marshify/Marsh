@@ -30,9 +30,10 @@ public final class DawnreachHarbor extends BasePlan {
 	/** Island-local x = plan x + OX (centres the town, x -63..98, on the anchor). */
 	public static final int OX = -17;
 	/** Street surface block; people walk at STREET + 1. */
-	public static final int STREET = 65;
+	/** Street surface block (5 above the sea, so pier stairs climb four steps from the deck); people walk at STREET + 1. */
+	public static final int STREET = 67;
 	public static final int WALK = STREET + 1;
-	/** Pier deck block (walk at 64): two steps below the street. */
+	/** Pier deck block (walk at 64): one block above the sea, four steps below the street. */
 	static final int DECK = 63;
 	/** Platform (plan coordinates). */
 	static final int PX1 = -51, PX2 = 84, PZ1 = -44, PZ2 = 44, CHAMFER = 8;
@@ -218,7 +219,7 @@ public final class DawnreachHarbor extends BasePlan {
 		super("Dawnreach Harbor", 0.0);
 		terrain.platform(PX1 + OX, PZ1, PX2 + OX, PZ2, CHAMFER, STREET, Ground.STONE).reach(100);
 		anchor(Anchor.at(Type.ARRIVAL, -12 + OX, WALK, 0, -90));
-		anchor(Anchor.at(Type.QUEST, -9 + OX, WALK, -7, -45));
+		anchor(Anchor.at(Type.GUNSMITH, -9 + OX, WALK, -7, -45)); // safe zone: a gun shop instead of quests
 		anchor(Anchor.at(Type.FRUIT_DEALER, -7 + OX, WALK, -26, 0));
 		anchor(Anchor.at(Type.GACHA, CART_X + OX, WALK, CART_Z, 90));
 		anchor(Anchor.at(Type.NAVIGATOR, -46 + OX, WALK, -4, 90));
@@ -352,10 +353,20 @@ public final class DawnreachHarbor extends BasePlan {
 		p.set(x, top, z, rock);
 	}
 
+	/** Steps from the pier deck to the street: one per block of height. */
+	static final int STAIR_STEPS = STREET - DECK;
+
+	/** Middle row of a pier's stairway (the 3-wide channel is this row and one either side). */
+	static int stairCentre(int[] pier) {
+		return Math.floorDiv(pier[2] + pier[3], 2);
+	}
+
+	/** Cells of the stairway channels cut into the quay (no curb there). */
 	static boolean pierStairs(int x, int z) {
 		for (int[] pier : PIERS) {
 			boolean west = pier[0] < 0;
-			if (z >= pier[2] && z <= pier[3] && (west ? x == PX1 || x == PX1 + 1 : x == PX2 || x == PX2 - 1)) {
+			int k = west ? x - PX1 : PX2 - x;
+			if (Math.abs(z - stairCentre(pier)) <= 1 && k >= 0 && k < STAIR_STEPS) {
 				return true;
 			}
 		}
@@ -422,30 +433,78 @@ public final class DawnreachHarbor extends BasePlan {
 			if (!p.near((from + to) / 2, (pier[2] + pier[3]) / 2, (to - from) / 2 + 6)) {
 				continue;
 			}
+			pierBody(p, pier, from, to, outer);
 			for (int x = from; x <= to; x++) {
 				for (int z = pier[2]; z <= pier[3]; z++) {
 					boolean side = z == pier[2] || z == pier[3];
 					boolean end = x == outer;
 					p.set(x, DECK, z, s(Blocks.STONE_BRICKS));
 					p.fill(x, DECK + 1, z, x, DECK + 3, z, s(Blocks.AIR));
-					if ((side || end) && Math.floorMod(x, 4) == 0 || (side && end)) {
-						p.fill(x, Terrain.FLOOR, z, x, DECK - 1, z, s(Blocks.STONE_BRICKS)); // pile
-					}
 					if (side || end) {
 						boolean post = (side && end) || Math.floorMod(x, 4) == 0;
 						p.set(x, DECK + 1, z, post ? s(Blocks.SPRUCE_FENCE) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
 					}
 				}
 			}
-			// Two steps up through the quay wall to the street.
+			// Stairway cut straight into the quay: 3 wide, one stone-brick step per block from the deck up to the street,
+			// between pale quartz cheek walls capped with stone-brick slabs.
 			Direction up = west ? Direction.EAST : Direction.WEST;
-			int wallX = west ? PX1 : PX2, stepX = west ? PX1 + 1 : PX2 - 1;
-			for (int z = pier[2]; z <= pier[3]; z++) {
-				p.set(wallX, DECK, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false));
-				p.fill(wallX, DECK + 1, z, wallX, WALK + 2, z, s(Blocks.AIR));
-				p.set(stepX, DECK + 1, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false));
-				p.fill(stepX, DECK + 2, z, stepX, WALK + 2, z, s(Blocks.AIR));
+			int step = west ? 1 : -1;
+			int wall = west ? PX1 : PX2;
+			int c = stairCentre(pier);
+			for (int k = 0; k < STAIR_STEPS; k++) {
+				int x = wall + k * step;
+				int y = DECK + 1 + k;
+				for (int z = c - 1; z <= c + 1; z++) {
+					p.fill(x, DECK, z, x, y - 1, z, s(Blocks.STONE_BRICKS));
+					p.set(x, y, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false));
+					p.fill(x, y + 1, z, x, WALK + 3, z, s(Blocks.AIR));
+				}
+				for (int z : new int[]{c - 2, c + 2}) {
+					p.fill(x, DECK, z, x, STREET, z, s(Blocks.SMOOTH_QUARTZ));
+					p.set(x, WALK, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+				}
 			}
+		}
+	}
+
+	/** Whether a pier's underwater body has an opening at this distance from its outer end (2-wide, every 4). */
+	static boolean pierOpening(int fromOuter, int length) {
+		return fromOuter >= 2 && fromOuter <= length - 3 && Math.floorMod(fromOuter, 4) >= 2;
+	}
+
+	private static BlockState wetStairs(Direction facing) {
+		return Kit.stairs(Blocks.STONE_BRICK_STAIRS, facing, true)
+				.setValue(net.minecraft.world.level.block.StairBlock.WATERLOGGED, true);
+	}
+
+	/**
+	 * A pier's underwater body: solid stone-brick walls from the sea floor to the deck with tall, narrow openings
+	 * through the pier from side to side. Upside-down stairs bevel the top corners of each opening under a solid band
+	 * just below the deck, and a ledge of upside-down stairs runs along the top of both sides.
+	 */
+	private void pierBody(P p, int[] pier, int from, int to, int outer) {
+		BlockState brick = s(Blocks.STONE_BRICKS), water = s(Blocks.WATER);
+		int length = to - from + 1;
+		int band = DECK - 1, bevel = DECK - 2;
+		for (int x = from; x <= to; x++) {
+			int fromOuter = Math.abs(x - outer);
+			boolean open = pierOpening(fromOuter, length);
+			for (int z = pier[2]; z <= pier[3]; z++) {
+				if (!open) {
+					p.fill(x, Terrain.FLOOR, z, x, band, z, brick);
+					continue;
+				}
+				p.fill(x, Terrain.FLOOR, z, x, bevel - 1, z, water);
+				// Bevel: the stair's full top leans on the pillar beside this opening column.
+				boolean pillarTowardOuter = !pierOpening(fromOuter - 1, length);
+				Direction toOuter = outer < x ? Direction.WEST : Direction.EAST;
+				p.set(x, bevel, z, wetStairs(pillarTowardOuter ? toOuter : toOuter.getOpposite()));
+				p.set(x, band, z, brick);
+			}
+			// Ledge along both sides, its full top against the pier.
+			p.set(x, band, pier[2] - 1, wetStairs(Direction.SOUTH));
+			p.set(x, band, pier[3] + 1, wetStairs(Direction.NORTH));
 		}
 	}
 
@@ -875,8 +934,7 @@ public final class DawnreachHarbor extends BasePlan {
 				}
 			}
 		}
-		// Doorways from the rotunda into the hall on the fountain side.
-		p.fill(23, WALK, -4, 25, WALK + 3, -1, air);
+		hallInterior(p);
 		// Dome: stepped copper rings, a shell over the open rotunda.
 		int[][] tops = new int[19][19];
 		for (int i = 0; i < 19; i++) {
@@ -923,6 +981,187 @@ public final class DawnreachHarbor extends BasePlan {
 		p.set(31, crown + 4, -3, s(Blocks.LANTERN));
 		// Hanging lanterns in the rotunda.
 		p.set(31, drumTop, -3, s(Blocks.LANTERN).setValue(LanternBlock.HANGING, true));
+	}
+
+	// Hall interior (plan coordinates): walls at x 18 / 43 and z -14 / 12, an inner lining one block in, a free floor
+	// x 20..41, z -12..10. Ground floor walks at STREET + 1, the gallery at STREET + 5, the ceiling is at STREET + 8.
+	static final int HX1 = 20, HX2 = 41, HZ1 = -12, HZ2 = 10;
+
+	/** Windows of the hall's outer walls, as the building() pass places them (every third block along each wall). */
+	static boolean hallWindow(int along) {
+		return Math.floorMod(along, 3) == 1;
+	}
+
+	/**
+	 * The civic hall's interior: a double-height atrium opening into the dome, a three-block gallery along the south and
+	 * east walls with a staircase on the west wall, a timber frame (posts through both stories, beams with brackets and
+	 * dark green ceiling panels), a bar with two bottle racks on the north wall, a stepped quartz centrepiece under the
+	 * dome, and an upstairs window alcove. The exterior shell is untouched: the stone and white walls are an inner lining.
+	 */
+	private void hallInterior(P p) {
+		BlockState air = s(Blocks.AIR);
+		int floor = STREET, gallery = STREET + 4, ceiling = STREET + 8;
+		BlockState log = s(Blocks.STRIPPED_OAK_LOG);
+		BlockState logX = log.setValue(RotatedPillarBlock.AXIS, Direction.Axis.X);
+		BlockState logZ = log.setValue(RotatedPillarBlock.AXIS, Direction.Axis.Z);
+		// Clear the old two-storey interior and the drum's lower walls (the drum still stands on the ceiling above).
+		p.fill(HX1 - 1, floor + 1, HZ1 - 1, HX2 + 1, ceiling, HZ2 + 1, air);
+		p.fill(HX1 - 1, floor, HZ1 - 1, HX2 + 1, floor, HZ2 + 1, s(Blocks.DARK_OAK_PLANKS));
+		// Lining: andesite base, stone bricks below the gallery, white terracotta above, framed window recesses.
+		for (int x = HX1 - 1; x <= HX2 + 1; x++) {
+			for (int z = HZ1 - 1; z <= HZ2 + 1; z++) {
+				boolean westOrEast = x == HX1 - 1 || x == HX2 + 1, northOrSouth = z == HZ1 - 1 || z == HZ2 + 1;
+				if (!westOrEast && !northOrSouth) {
+					continue;
+				}
+				boolean entrance = x == HX1 - 1 && z >= -4 && z <= -1;
+				for (int y = floor + 1; y < ceiling; y++) {
+					if (entrance && y <= floor + 4) {
+						continue;
+					}
+					p.set(x, y, z, y == floor + 1 ? s(Blocks.ANDESITE) : y <= gallery ? s(Blocks.STONE_BRICKS) : s(Blocks.WHITE_TERRACOTTA));
+				}
+				// Window recesses (only along a wall, not at the lining's corners).
+				if (westOrEast && northOrSouth) {
+					continue;
+				}
+				int along = northOrSouth ? x : z;
+				for (int story = 0; story < 2; story++) {
+					int y0 = floor + 1 + 4 * story;
+					if (story == 0 && entrance) {
+						continue;
+					}
+					if (hallWindow(along)) {
+						p.set(x, y0, z, Kit.slab(Blocks.OAK_SLAB, true));               // ledge
+						p.fill(x, y0 + 1, z, x, y0 + 2, z, air);                        // the window shows through
+						p.set(x, y0 + 3, z, northOrSouth ? logX : logZ);                // lintel
+					} else if (hallWindow(along - 1) || hallWindow(along + 1)) {
+						p.fill(x, y0 + 1, z, x, y0 + 2, z, log);                        // frame sides
+					}
+				}
+			}
+		}
+		// Gallery: three blocks deep along the south and east walls, spruce floor.
+		for (int x = HX1; x <= HX2; x++) {
+			for (int z = HZ1; z <= HZ2; z++) {
+				if (z >= HZ2 - 2 || x >= HX2 - 2) {
+					p.set(x, gallery, z, s(Blocks.SPRUCE_PLANKS));
+				}
+			}
+		}
+		for (int x = HX1 + 1; x <= HX2 - 3; x++) {
+			p.set(x, gallery + 1, HZ2 - 2, Kit.connected(Blocks.OAK_FENCE, true));   // south railing (x 20: stair landing)
+		}
+		for (int z = HZ1; z <= HZ2 - 3; z++) {
+			p.set(HX2 - 2, gallery + 1, z, Kit.connected(Blocks.OAK_FENCE, false));   // east railing
+		}
+		// Staircase on the west wall: four steps up to the gallery's west end, open above.
+		for (int k = 0; k < 4; k++) {
+			int z = HZ2 - 6 + k, y = floor + 1 + k;
+			p.fill(HX1, floor + 1, z, HX1, y - 1, z, s(Blocks.SPRUCE_PLANKS));
+			p.set(HX1, y, z, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
+		}
+		// Timber frame: posts through both stories, beams under the ceiling, brackets, dark green panels between.
+		int[][] posts = {{24, HZ2 - 2}, {32, HZ2 - 2}, {HX2 - 2, HZ2 - 2}, {HX2 - 2, -4}, {HX2 - 2, 2}};
+		for (int[] post : posts) {
+			p.fill(post[0], floor + 1, post[1], post[0], ceiling - 1, post[1], log);
+		}
+		for (int x = HX1 - 1; x <= HX2 + 1; x++) {
+			for (int z = HZ1 - 1; z <= HZ2 + 1; z++) {
+				double d = Math.hypot(x + 0.5 - DOME_X, z + 0.5 - DOME_Z);
+				if (d < DRUM_R - 1.2) {
+					continue; // oculus: the atrium opens into the dome
+				}
+				boolean beamZ = x == 24 || x == 32 || x == HX2 - 2;
+				boolean beamX = z == HZ2 - 2;
+				p.set(x, ceiling, z, beamX ? logX : beamZ ? logZ : s(Blocks.DARK_PRISMARINE));
+			}
+		}
+		for (int x : new int[]{24, 32, HX2 - 2}) {
+			p.set(x, ceiling - 1, HZ1, Kit.stairs(Blocks.OAK_STAIRS, Direction.NORTH, true));
+		}
+		p.set(HX1, ceiling - 1, HZ2 - 2, Kit.stairs(Blocks.OAK_STAIRS, Direction.WEST, true));
+		p.set(HX2, ceiling - 1, HZ2 - 2, Kit.stairs(Blocks.OAK_STAIRS, Direction.EAST, true));
+		// Bar on the north wall: a straight counter (stone front, oak top), three red stools facing the room.
+		p.fill(26, floor + 1, HZ1 + 2, 37, floor + 1, HZ1 + 2, s(Blocks.SMOOTH_STONE));
+		p.fill(26, floor + 2, HZ1 + 2, 37, floor + 2, HZ1 + 2, Kit.slab(Blocks.OAK_SLAB, false));
+		for (int x : new int[]{28, 31, 34}) {
+			p.set(x, floor + 1, HZ1 + 3, Kit.stairs(Blocks.CRIMSON_STAIRS, Direction.NORTH, false));
+		}
+		// Two matching bottle racks behind it, with a gap at x 31-32 so the window behind stays in view.
+		for (int x0 : new int[]{27, 33}) {
+			for (int x = x0; x <= x0 + 3; x++) {
+				boolean post = x == x0 || x == x0 + 3;
+				if (post) {
+					p.fill(x, floor + 1, HZ1, x, ceiling - 1, HZ1, log);
+					continue;
+				}
+				p.set(x, floor + 1, HZ1, s(Blocks.BARREL));
+				p.set(x, floor + 3, HZ1, Kit.slab(Blocks.OAK_SLAB, true));               // bottom open shelf above the barrels
+				BlockState lattice = s(Blocks.OAK_TRAPDOOR).setValue(TrapDoorBlock.FACING, Direction.SOUTH).setValue(TrapDoorBlock.OPEN, true);
+				p.set(x, floor + 4, HZ1, lattice);
+				p.set(x, floor + 5, HZ1, lattice.setValue(TrapDoorBlock.HALF, Half.TOP));
+				p.set(x, ceiling - 1, HZ1, Kit.slab(Blocks.OAK_SLAB, false));            // top shelf cap
+			}
+			// Potion bottles in item frames on the open shelves (bottom and top), hung on the solid lining.
+			bottle(p, x0 + 2, floor + 2, 0);
+			bottle(p, x0 + 2, ceiling - 2, x0 == 27 ? 1 : 2);
+		}
+		// Blue centrepiece under the dome: a low stepped quartz platform, a glowing blue centre, tall columns round it.
+		for (int x = 28; x <= 35; x++) {
+			for (int z = -6; z <= 1; z++) {
+				boolean edge = x == 28 || x == 35 || z == -6 || z == 1;
+				Direction up = x == 28 ? Direction.EAST : x == 35 ? Direction.WEST : z == -6 ? Direction.SOUTH : Direction.NORTH;
+				boolean corner = (x == 28 || x == 35) && (z == -6 || z == 1);
+				p.set(x, floor + 1, z, edge && !corner ? Kit.stairs(Blocks.SMOOTH_QUARTZ_STAIRS, up, false) : s(Blocks.SMOOTH_QUARTZ));
+			}
+		}
+		for (int x = 30; x <= 33; x++) {
+			for (int z = -4; z <= -1; z++) {
+				boolean centre = (x == 31 || x == 32) && (z == -3 || z == -2);
+				p.set(x, floor + 1, z, centre ? s(Blocks.SEA_LANTERN) : s(Blocks.SMOOTH_QUARTZ));
+				p.set(x, floor + 2, z, centre ? s(Blocks.BLUE_STAINED_GLASS) : Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
+			}
+		}
+		for (int[] col : new int[][]{{26, -8}, {37, -8}, {26, 3}, {37, 3}}) {
+			p.fill(col[0], floor + 1, col[1], col[0], ceiling - 1, col[1], s(Blocks.QUARTZ_PILLAR));
+		}
+		// Upstairs window alcove at the north end of the east gallery: three barrels (one stacked) by the window.
+		p.set(HX2, gallery + 1, HZ1, s(Blocks.BARREL));
+		p.set(HX2, gallery + 2, HZ1, s(Blocks.BARREL));
+		p.set(HX2 - 1, gallery + 1, HZ1, s(Blocks.BARREL));
+		// Crates and barrels tucked against the walls and posts.
+		for (int[] b : new int[][]{{HX1, HZ1}, {HX1 + 1, HZ1}, {HX2, HZ2 - 3}, {HX2, HZ2 - 4}, {25, HZ2 - 2}, {33, HZ2}, {34, HZ2}}) {
+			p.set(b[0], floor + 1, b[1], s(Blocks.BARREL));
+		}
+		p.set(HX1, floor + 2, HZ1, s(Blocks.BARREL));
+		// Lighting: lanterns on chains from the ceiling over the floor, lanterns hung under the gallery.
+		BlockState hanging = s(Blocks.LANTERN).setValue(LanternBlock.HANGING, true);
+		for (int[] l : new int[][]{{22, -8}, {22, 3}, {29, 6}, {35, 6}, {29, -10}, {35, -10}}) {
+			p.set(l[0], ceiling - 1, l[1], s(Blocks.CHAIN));
+			p.set(l[0], ceiling - 2, l[1], hanging);
+		}
+		for (int[] l : new int[][]{{27, HZ2 - 1}, {36, HZ2 - 1}, {HX2 - 1, -8}, {HX2 - 1, 0}, {HX2 - 1, 5}}) {
+			p.set(l[0], gallery - 1, l[1], hanging);
+		}
+	}
+
+	/** A potion in an item frame hung on the lining behind the bar (spawned with the chunk that holds it). */
+	private static void bottle(P p, int x, int y, int kind) {
+		if (!p.in(x, HZ1)) {
+			return;
+		}
+		var region = p.c.level();
+		net.minecraft.core.BlockPos pos = p.c.world(x + OX, y, HZ1);
+		var frame = new net.minecraft.world.entity.decoration.ItemFrame(region.getLevel(), pos, Direction.SOUTH);
+		var potion = switch (kind) {
+			case 1 -> net.minecraft.world.item.alchemy.Potions.SWIFTNESS;
+			case 2 -> net.minecraft.world.item.alchemy.Potions.LEAPING;
+			default -> net.minecraft.world.item.alchemy.Potions.HEALING;
+		};
+		frame.setItem(net.minecraft.world.item.alchemy.PotionUtils.setPotion(
+				new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.POTION), potion), false);
+		region.addFreshEntity(frame);
 	}
 
 	/** Highest block of the dome's lantern (tests). */

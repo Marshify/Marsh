@@ -122,6 +122,10 @@ public final class GrandLineConfig {
 	/** PvP damage reduction factor per tier (grows faster than damage). */
 	public double pvpDefensePerTier = 0.006;
 
+	// ---- Gunsmith (Dawnreach) ----
+	/** Gun prices at the Gunsmith: Slingshot, Musket. */
+	public long[] gunPrices = {1_500, 12_000};
+
 	// ---- Ships ----
 	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
 	public long[] shipPrices = {5_000, 60_000, 300_000};
@@ -265,6 +269,12 @@ public final class GrandLineConfig {
 		masteryExperiencePerLevel = clamp(masteryExperiencePerLevel, 1, 1_000_000);
 		maxMastery = clamp(maxMastery, 1, 100_000);
 		masteryPerKilledHealth = clamp(masteryPerKilledHealth, 0, 1_000_000);
+		if (gunPrices == null || gunPrices.length != 2) {
+			gunPrices = defaults().gunPrices;
+		}
+		for (int i = 0; i < gunPrices.length; i++) {
+			gunPrices[i] = clamp(gunPrices[i], 0, maxCurrency);
+		}
 		if (shipPrices == null || shipPrices.length != 3) {
 			shipPrices = defaults().shipPrices;
 		}

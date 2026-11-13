@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "grandline:item/ember_fruit"
-  }
+  "parent": "grandline:item/flame_fruit"
 }

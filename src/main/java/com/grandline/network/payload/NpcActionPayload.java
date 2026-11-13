@@ -17,6 +17,8 @@ public record NpcActionPayload(int entityId, int action) implements FabricPacket
 	public static final int BUY_SHIP = 20;
 	/** Launch an owned ship class {@code LAUNCH_SHIP + ordinal} near the Navigator. */
 	public static final int LAUNCH_SHIP = 30;
+	/** Buy gun {@code BUY_GUN + i} from the Gunsmith's stock ({@link com.grandline.npc.GunShop#STOCK}). */
+	public static final int BUY_GUN = 40;
 
 	public static final PacketType<NpcActionPayload> TYPE = PacketType.create(GrandLineMod.id("npc_action"),
 			buf -> new NpcActionPayload(buf.readVarInt(), buf.readVarInt()));

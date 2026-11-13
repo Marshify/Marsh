@@ -65,8 +65,14 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 
 	@GameTest(template = EMPTY_STRUCTURE, batch = "flame_1")
 	public void flameKeepsIdsAndUsesBloxMasteryLevels(GameTestHelper helper) {
-		eq(helper, Fruits.FLAME.id(), "grandline:ember", "power id kept for saves");
-		eq(helper, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(Fruits.FLAME.item()).toString(), "grandline:ember_fruit", "item id kept");
+		eq(helper, Fruits.FLAME.id(), "grandline:flame", "power id renamed to flame");
+		eq(helper, net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(Fruits.FLAME.item()).toString(), "grandline:flame_fruit", "item id renamed");
+		// Old saves: the ember id loads as flame everywhere, and old ember_fruit stacks become Flame Fruits.
+		var old = new com.grandline.player.PowerState("grandline:brawler", "grandline:ember", java.util.Map.of("grandline:ember", 40L),
+				java.util.Map.of("grandline:ember", 2), 0L);
+		eq(helper, old.fruit(), "grandline:flame", "equipped ember fruit migrates");
+		helper.assertTrue(old.mastery().get("grandline:flame") == 40L && old.stash().get("grandline:flame") == 2, "mastery and stash migrate");
+		eq(helper, ((com.grandline.fruit.RenamedItem) Fruits.EMBER_FRUIT_LEGACY).replacement(), Fruits.FLAME.item(), "old item turns into the flame fruit");
 		List<AbilityDef> moves = Fruits.FLAME.power().abilities();
 		eq(helper, moves.stream().map(AbilityDef::requiredMastery).toList(), List.of(1, 25, 50, 100, 10), "mastery Z X C V R");
 		eq(helper, moves.get(3).activation(), AbilityDef.Activation.CHARGED, "Flame Destroyer charges");

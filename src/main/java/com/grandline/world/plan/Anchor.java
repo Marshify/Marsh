@@ -27,7 +27,9 @@ public record Anchor(Type type, int x, int y, int z, int radius, float yaw) {
 		/** Where players arrive: the world spawn on a starter island and sea-travel landings. */
 		ARRIVAL,
 		/** The Fruit Gacha NPC (starter islands). */
-		GACHA
+		GACHA,
+		/** The gun shop keeper (starter islands, which have no quests: they are safe zones). */
+		GUNSMITH
 	}
 
 	/** {@link #yaw} value meaning "any facing". */

@@ -93,6 +93,7 @@ public final class IslandPopulation {
 				case FISHERMAN -> Islander.Role.FISHERMAN;
 				case NAVIGATOR -> island.starter() ? Islander.Role.NAVIGATOR : null;
 				case GACHA -> island.starter() ? Islander.Role.GACHA : null;
+				case GUNSMITH -> Islander.Role.GUNSMITH;
 				default -> null;
 			};
 			if (role != null) {

@@ -88,12 +88,22 @@ public final class MarshUi {
 		nineSlice(g, ROWS, 256, 192, x, y, w, h, 0, row.ordinal() * 30, 220, 28, 6);
 	}
 
+	/**
+	 * Scissor for a rectangle in the current pose. Vanilla's enableScissor ignores pose translation, so on a moved HUD
+	 * element (the HUD editor translates it) the clip would land where the element used to be and hide the fill.
+	 */
+	public static void clip(GuiGraphics g, int x1, int y1, int x2, int y2) {
+		org.joml.Vector4f a = g.pose().last().pose().transform(new org.joml.Vector4f(x1, y1, 0, 1));
+		org.joml.Vector4f b = g.pose().last().pose().transform(new org.joml.Vector4f(x2, y2, 0, 1));
+		g.enableScissor(Math.round(Math.min(a.x, b.x)), Math.round(Math.min(a.y, b.y)), Math.round(Math.max(a.x, b.x)), Math.round(Math.max(a.y, b.y)));
+	}
+
 	/** A HUD bar: frame plus a fill clipped to {@code fraction}. Kind: 0 health (green), 1 energy (cyan). */
 	public static void bar(GuiGraphics g, int x, int y, int w, int h, double fraction, int kind) {
 		nineSlice(g, BARS, 256, 128, x, y, w, h, 0, 0, 180, 22, 4);
 		int fillW = (int) Math.round(w * Math.max(0, Math.min(1, fraction)));
 		if (fillW > 0) {
-			g.enableScissor(x, y, x + fillW, y + h);
+			clip(g, x, y, x + fillW, y + h);
 			nineSlice(g, BARS, 256, 128, x, y, w, h, 0, kind == 0 ? 24 : 48, 180, 22, 4);
 			g.disableScissor();
 		}
@@ -104,7 +114,7 @@ public final class MarshUi {
 		nineSlice(g, BARS, 256, 128, x, y, w, h, 0, 72, 180, 16, 3);
 		int fillW = (int) Math.round(w * Math.max(0, Math.min(1, fraction)));
 		if (fillW > 0) {
-			g.enableScissor(x, y, x + fillW, y + h);
+			clip(g, x, y, x + fillW, y + h);
 			nineSlice(g, BARS, 256, 128, x, y, w, h, 0, 92, 180, 16, 3);
 			g.disableScissor();
 		}

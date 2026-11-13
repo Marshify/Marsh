@@ -1,5 +1,23 @@
 # Grand Line patch notes
 
+## v0.20.0 — Dawnreach Upgrades
+**New**
+- **Gunsmith** on Dawnreach's plaza sells the Slingshot ($1,500) and the Musket ($12,000). He replaces the quest giver, since Dawnreach is a safe zone with no enemies. Any leftover Dawnreach quest is cleared automatically when you join.
+- **Civic hall interior rebuilt** as a double-height atrium:
+  - Gallery on two sides, with a staircase up.
+  - Timber frame with dark green ceiling panels.
+  - Bar with red stools and two bottle racks.
+  - Stepped quartz centrepiece with a glowing blue centre under the dome.
+  - Upstairs window alcove, and lanterns on chains.
+
+**Changes**
+- **Pier stairways** are cut into the quay: four stone-brick steps between pale walls. The town now sits higher above the water.
+- **Piers** have solid stone-brick bodies underwater, with tall arched openings and ledges.
+- The **Ember fruit is now called Flame** everywhere, including its id (`grandline:flame`). Existing saves are converted automatically: equipped fruit, mastery, stash and old fruit items.
+
+**Fixes**
+- Health and energy bars no longer appear greyed out after you move the HUD.
+
 ## v0.19.3 — Small Fixes
 **Fixes**
 - The **Back** button on the Fruit Gacha cart's menu now closes it. It used to reopen the same menu. At the Fruit Dealer, Back still returns to the conversation.
