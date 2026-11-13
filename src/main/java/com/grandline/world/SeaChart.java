@@ -22,14 +22,27 @@ public final class SeaChart {
 	public static final int PAD_BOTTOM = 100;
 
 	private final double scale;
+	private final double scaleZ;
 	private final double originX;
 	private final double originY;
 
 	private SeaChart(double scale, double originX, double originY) {
-		this.scale = scale;
+		this(scale, scale, originX, originY);
+	}
+
+	private SeaChart(double scaleX, double scaleZ, double originX, double originY) {
+		this.scale = scaleX;
+		this.scaleZ = scaleZ;
 		this.originX = originX;
 		this.originY = originY;
 	}
+
+	/**
+	 * The First Sea chart art places its islands (and the shoreline overlay drawn around them) with this projection,
+	 * measured from the art itself. Islands and the player marker both use it, so they stay aligned with the art.
+	 * If the First Sea layout changes, the art and these numbers must be updated together.
+	 */
+	public static final SeaChart FIRST_SEA_ART = new SeaChart(0.38643, 0.38257, 739.63, 391.92);
 
 	/** Fits the given island bounds (block coordinates) into the chart. */
 	public static SeaChart fit(double minX, double maxX, double minZ, double maxZ) {
@@ -63,7 +76,7 @@ public final class SeaChart {
 	}
 
 	public double toChartY(double worldZ) {
-		return originY + worldZ * scale;
+		return originY + worldZ * scaleZ;
 	}
 
 	/** Chart pixels per block. */

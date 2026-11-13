@@ -43,23 +43,37 @@ public final class WorldMapScreen extends Screen {
 	/** The chart background is drawn at twice the chart's resolution for sharpness. */
 	private static final int BACKGROUND_W = 2880;
 	private static final int BACKGROUND_H = 1536;
-	private static final int CLOUD_W = 360;
-	private static final int CLOUD_H = 156;
+	private static final ResourceLocation FRAME = tex("first_sea/pirate_frame");
+	private static final ResourceLocation SHORELINES = tex("first_sea/shorelines_overlay");
+	private static final ResourceLocation UNDERWATER_SURFACE = tex("first_sea/underwater_surface");
+	private static final ResourceLocation PALACE_SUBMERGED = tex("first_sea/palace_submerged");
+	private static final ResourceLocation SMOKE = tex("first_sea/volcanic_smoke");
+	private static final ResourceLocation DOUBLOONS_SCATTERED = tex("first_sea/doubloons_scattered");
+	private static final ResourceLocation DOUBLOONS_STACKED = tex("first_sea/doubloons_stacked");
+	/** The submerged palace sits this many chart units below the surface sprite's position. */
+	private static final double SUBMERGED_DROP = 13;
 	/** Fraction of the sprite height, from the top, that sits on the island's world position. */
 	private static final double ANCHOR_Y = 0.6;
 	/** Edge clouds: texture, x, y, scale, drift phase (chart units). */
 	private static final Object[][] CLOUDS = {
-			{CLOUD_WIDE, 525.0, -20.0, 0.9, 0.0},
-			{CLOUD_TALL, 0.0, 268.0, 0.42, 2.3},
-			{CLOUD_WIDE, 1285.0, 160.0, 0.45, 0.9},
-			{CLOUD_TALL, 1330.0, 415.0, 0.3, 5.2},
-			{CLOUD_WIDE, 575.0, 690.0, 0.75, 1.7},
-			{CLOUD_TALL, 0.0, 705.0, 0.5, 3.1},
-			{CLOUD_WIDE, 1215.0, 680.0, 0.65, 4.4},
+			{CLOUD_WIDE, 547.0, 24.0, 0.47, 0.0},
+			{CLOUD_TALL, 29.0, 262.0, 0.36, 2.3},
+			{CLOUD_WIDE, 1235.0, 184.0, 0.28, 0.9},
+			{CLOUD_TALL, 1314.0, 466.0, 0.21, 5.2},
+			{CLOUD_WIDE, 425.0, 655.0, 0.37, 1.7},
 	};
 
 	private static final Map<ResourceLocation, Boolean> EXISTS = new HashMap<>();
 	private static final Set<ResourceLocation> FILTERED = new HashSet<>();
+
+	/** Hover animation progress (0..1) per island id, eased towards 1 while the cursor is over the island. */
+	private final Map<Long, Float> hoverProgress = new HashMap<>();
+	/** Island boxes from the previous frame, used to find the hovered island before drawing this one. */
+	private List<Placed> lastPlaced = List.of();
+	private long lastFrameNanos;
+	/** How far a hovered island rises (chart units) and how much it grows. */
+	private static final double HOVER_RISE = 7;
+	private static final double HOVER_GROW = 0.06;
 
 	private double chartScale;
 	private double chartLeft;
@@ -127,6 +141,15 @@ public final class WorldMapScreen extends Screen {
 		graphics.pose().popPose();
 	}
 
+	/** Like {@link #blitChart} but with nearest-pixel sampling, for small pixel-art sprites. */
+	private void blitCrisp(GuiGraphics graphics, ResourceLocation texture, double x, double y, double scale, int w, int h) {
+		graphics.pose().pushPose();
+		graphics.pose().translate(chartLeft + x * chartScale, chartTop + y * chartScale, 0);
+		graphics.pose().scale((float) (scale * chartScale), (float) (scale * chartScale), 1);
+		graphics.blit(texture, 0, 0, w, h, 0, 0, w, h, w, h);
+		graphics.pose().popPose();
+	}
+
 	/** One island as placed on the chart: anchor and the art's on-screen box. */
 	private record Placed(Island island, double ax, double ay, int left, int top, int right, int bottom) {
 	}
@@ -142,7 +165,7 @@ public final class WorldMapScreen extends Screen {
 
 		// Layer 1: ocean, grid, frame and compass.
 		blitChart(graphics, BACKGROUND, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
-		drawCompass(graphics, 1345, 92);
+		drawCompass(graphics, 1336, 100);
 
 		int sea = currentSea();
 		List<Island> islands = islandsInSea(sea);
@@ -164,7 +187,21 @@ public final class WorldMapScreen extends Screen {
 			minZ = Math.min(minZ, island.z());
 			maxZ = Math.max(maxZ, island.z());
 		}
-		SeaChart chart = SeaChart.fit(minX, maxX, minZ, maxZ);
+		// The First Sea art was drawn for a measured projection; other seas are fitted to their islands.
+		SeaChart chart = sea == 1 ? SeaChart.FIRST_SEA_ART : SeaChart.fit(minX, maxX, minZ, maxZ);
+		boolean firstSeaArt = sea == 1 && exists(FRAME);
+
+		// Hover animation: find the island under the cursor (from last frame's boxes) and ease every island's progress.
+		long now = System.nanoTime();
+		float dt = lastFrameNanos == 0 ? 0 : Math.min(0.1f, (now - lastFrameNanos) / 1.0e9f);
+		lastFrameNanos = now;
+		Placed hoveredBox = hitTest(lastPlaced, mouseX, mouseY);
+		for (Island island : islands) {
+			float target = hoveredBox != null && hoveredBox.island().id() == island.id() ? 1f : 0f;
+			float current = hoverProgress.getOrDefault(island.id(), 0f);
+			current += (target - current) * Math.min(1f, dt * 10f);
+			hoverProgress.put(island.id(), current);
+		}
 
 		// Layer 2: island art, drawn north to south so nearer islands overlap the ones behind them.
 		List<Island> ordered = new ArrayList<>(islands);
@@ -176,8 +213,18 @@ public final class WorldMapScreen extends Screen {
 			ResourceLocation art = sprite(island, sea);
 			double w = SPRITE_W * SPRITE_SCALE;
 			double h = SPRITE_H * SPRITE_SCALE;
-			if (art != null) {
-				blitChart(graphics, art, ax - w / 2, ay - h * ANCHOR_Y, SPRITE_SCALE, SPRITE_W, SPRITE_H);
+			float t = hoverProgress.getOrDefault(island.id(), 0f);
+			double eased = t * t * (3 - 2 * t);
+			double grow = 1 + HOVER_GROW * eased;
+			double rise = HOVER_RISE * eased;
+			if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
+				// Lotus Palace lies under the sea: the submerged rendering, then the water surface over it.
+				blitChart(graphics, PALACE_SUBMERGED, ax - w * grow / 2, ay - h * grow * ANCHOR_Y + SUBMERGED_DROP - rise,
+						SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
+				blitChart(graphics, UNDERWATER_SURFACE, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
+			} else if (art != null) {
+				// Grows around the island's base point and lifts gently.
+				blitChart(graphics, art, ax - w * grow / 2, ay - h * grow * ANCHOR_Y - rise, SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
 			} else if (sea == 1) {
 				// No illustration in the First Sea art pack: a small sand-and-grass islet that fits the chart style.
 				int sx = screenX(ax);
@@ -200,14 +247,34 @@ public final class WorldMapScreen extends Screen {
 					screenX(ax + w * 0.4), screenY(ay + h * (1 - ANCHOR_Y) - h * 0.1)));
 		}
 
-		// Layer 3: clouds along the edges, drifting gently, clipped to the ocean.
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
+		if (firstSeaArt) {
+			// Surf around the island shores (aligned to the art's island positions).
+			blitChart(graphics, SHORELINES, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
+			// Volcanic smoke above Emberfall: rises and fades in a slow loop.
+			double phase = (time * 0.35) % 1.0;
+			double smokeScale = Math.min(91.0 / 98, 45.0 / 58) * (0.95 + 0.1 * phase);
+			graphics.setColor(1, 1, 1, (float) (1.0 - 0.35 * phase));
+			blitChart(graphics, SMOKE, 156 - 98 * smokeScale / 2, 542 - 58 * smokeScale / 2 - phase * 6, smokeScale, 98, 58);
+			graphics.setColor(1, 1, 1, 1);
+		}
+
+		// Layer 3: clouds along the edges, drifting gently, clipped to the ocean.
 		graphics.enableScissor(screenX(SeaChart.INNER_LEFT), screenY(SeaChart.INNER_TOP), screenX(SeaChart.INNER_RIGHT), screenY(SeaChart.INNER_BOTTOM));
 		for (Object[] cloud : CLOUDS) {
-			double drift = Math.sin(time * 0.25 + (double) cloud[4]) * 10;
-			blitChart(graphics, (ResourceLocation) cloud[0], (double) cloud[1] + drift, (double) cloud[2], (double) cloud[3], CLOUD_W, CLOUD_H);
+			double drift = Math.sin(time * 0.25 + (double) cloud[4]) * 8;
+			boolean wide = cloud[0] == CLOUD_WIDE;
+			blitChart(graphics, (ResourceLocation) cloud[0], (double) cloud[1] + drift, (double) cloud[2], (double) cloud[3],
+					wide ? 640 : 520, wide ? 240 : 252);
 		}
 		graphics.disableScissor();
+
+		if (firstSeaArt) {
+			// Pirate frame over the sea, doubloons on its bottom corners (pixel art, kept crisp).
+			blitChart(graphics, FRAME, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
+			blitCrisp(graphics, DOUBLOONS_SCATTERED, 2, 678, 2.0, 54, 38);
+			blitCrisp(graphics, DOUBLOONS_STACKED, 1320, 680, 2.0, 60, 40);
+		}
 
 		int playerLevel = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
 
@@ -223,17 +290,8 @@ public final class WorldMapScreen extends Screen {
 		drawChrome(graphics, sea, textScale);
 
 		// Hover: island name and level.
-		Placed hovered = null;
-		double best = Double.MAX_VALUE;
-		for (Placed p : placed) {
-			if (mouseX >= p.left() && mouseX <= p.right() && mouseY >= p.top() && mouseY <= p.bottom()) {
-				double d = Math.hypot(mouseX - screenX(p.ax()), mouseY - screenY(p.ay()));
-				if (d < best) {
-					best = d;
-					hovered = p;
-				}
-			}
-		}
+		lastPlaced = placed;
+		Placed hovered = hitTest(placed, mouseX, mouseY);
 		super.render(graphics, mouseX, mouseY, partialTick);
 		if (hovered != null) {
 			Island island = hovered.island();
@@ -249,12 +307,13 @@ public final class WorldMapScreen extends Screen {
 		Component title = Component.translatable("screen.grandline.map.sea_name." + sea);
 		String text = title.getString().toUpperCase(Locale.ROOT);
 		graphics.pose().pushPose();
-		graphics.pose().translate(screenX(32), screenY(26), 0);
+		graphics.pose().translate(screenX(43), screenY(45), 0);
 		graphics.pose().scale(textScale, textScale, 1);
-		int w = font.width(text) + 16;
-		graphics.fill(0, 0, w, 15, 0xE0123A63);
-		graphics.fill(0, 0, w, 1, 0x60FFFFFF);
-		graphics.drawString(font, text, 8, 4, 0xFFFFFF, false);
+		int w = font.width(text) + 20;
+		graphics.fill(-2, -2, w + 2, 17, 0xFF4A2E14);
+		graphics.fill(0, 0, w, 15, 0xFFE3C48C);
+		graphics.fill(0, 13, w, 15, 0xFFB8925A);
+		graphics.drawString(font, text, 10, 4, 0x3A2410, false);
 		graphics.pose().popPose();
 
 		int[] close = closeBox();
@@ -264,9 +323,9 @@ public final class WorldMapScreen extends Screen {
 	}
 
 	private int[] closeBox() {
-		int size = Math.max(12, (int) Math.round(32 * chartScale));
-		int right = screenX(SeaChart.INNER_RIGHT) - 2;
-		int top = screenY(SeaChart.INNER_TOP) + 2;
+		int size = Math.max(12, (int) Math.round(30 * chartScale));
+		int right = screenX(1401);
+		int top = screenY(34);
 		return new int[]{right - size, top, right, top + size};
 	}
 
@@ -320,6 +379,22 @@ public final class WorldMapScreen extends Screen {
 		fillCircle(graphics, 0, 0, 10, 0xFF1C2C40);
 		PlayerFaceRenderer.draw(graphics, minecraft.player.getSkinTextureLocation(), -6, -6, 12);
 		graphics.pose().popPose();
+	}
+
+	/** The island whose box contains the cursor (the one whose anchor is closest, where boxes overlap). */
+	private Placed hitTest(List<Placed> boxes, int mouseX, int mouseY) {
+		Placed hovered = null;
+		double best = Double.MAX_VALUE;
+		for (Placed p : boxes) {
+			if (mouseX >= p.left() && mouseX <= p.right() && mouseY >= p.top() && mouseY <= p.bottom()) {
+				double d = Math.hypot(mouseX - screenX(p.ax()), mouseY - screenY(p.ay()));
+				if (d < best) {
+					best = d;
+					hovered = p;
+				}
+			}
+		}
+		return hovered;
 	}
 
 	private static void fillCircle(GuiGraphics graphics, int cx, int cy, int r, int color) {

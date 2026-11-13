@@ -1,5 +1,15 @@
 # Grand Line patch notes
 
+## v0.9.1 — Refined Sea Chart
+**New**
+- The sea chart (M) has a brand-new pirate look: a torn parchment frame, gold doubloons in the corners, surf around every island and smoke rising from Emberfall's volcano.
+- Lotus Palace now appears sunken beneath the waves.
+- Islands gently rise and grow when you hover over them.
+
+**Changes**
+- New, more detailed pictures for all 14 First Sea islands.
+- A wooden "First Sea" title plate and a repositioned close button, to match the new frame.
+
 ## v0.9.0 — The First Sea, Rebuilt
 **New**
 - All 14 First Sea islands have been rebuilt as hand-designed islands with their own shapes, landmarks, roads and docks:
