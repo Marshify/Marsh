@@ -49,6 +49,9 @@ public final class Terrain {
 	private final double phaseB;
 	private final double wobble;
 	private int extent;
+	/** Optional surface mixes: the forest floor on grass/podzol/moss land, and the rocks of a stony shoreline. */
+	private BlockState[] floorMix;
+	private BlockState[] shoreMix;
 
 	public Terrain(String name, double wobble) {
 		java.util.Random random = new java.util.Random(name.hashCode() * 0x9E3779B97F4A7C15L);
@@ -71,6 +74,32 @@ public final class Terrain {
 	public Terrain path(BlockState block, double width, double... points) {
 		paths.add(new Path(points, width, block));
 		return this;
+	}
+
+	/** Forest floor: grass, podzol and moss land is covered with these blocks in soft, irregular patches. */
+	public Terrain floorMix(BlockState... blocks) {
+		this.floorMix = blocks;
+		return this;
+	}
+
+	/** Rocky coast: beaches and shallows use these blocks (mixed) instead of sand. */
+	public Terrain shoreMix(BlockState... blocks) {
+		this.shoreMix = blocks;
+		return this;
+	}
+
+	/** Smooth value in [0, 1) that drifts over ~10-20 blocks (patches), plus a little per-block grain. */
+	private double patch(int x, int z, double grain) {
+		double n = (Math.sin(x * 0.19 + phaseA) + Math.sin(z * 0.23 + phaseB) + Math.sin((x - z) * 0.13 + phaseA * 0.5)
+				+ Math.sin((x + z) * 0.071 + phaseB * 1.7)) / 4.0;
+		long h = (x * 73856093L) ^ (z * 19349663L);
+		double r = ((h ^ (h >>> 13)) & 1023) / 1023.0 - 0.5;
+		double v = (n + 1) / 2 + r * grain;
+		return Math.max(0, Math.min(0.9999, v));
+	}
+
+	private static BlockState pick(BlockState[] blocks, double v) {
+		return blocks[(int) (v * blocks.length)];
 	}
 
 	/** Makes sure structures out to {@code blocks} from the centre are generated (e.g. floating islets, long piers). */
@@ -167,8 +196,14 @@ public final class Terrain {
 			return paved;
 		}
 		Ground style = groundStyle(x, z);
+		if (g <= WATER_TOP + 1 && shoreMix != null) {
+			return pick(shoreMix, patch(x, z, 0.6));
+		}
 		if (g <= WATER_TOP + 1 && style != Ground.SNOW && style != Ground.BASALT && style != Ground.STONE) {
 			return Blocks.SAND.defaultBlockState(); // beaches and shallows
+		}
+		if (floorMix != null && (style == Ground.GRASS || style == Ground.PODZOL || style == Ground.MOSS)) {
+			return pick(floorMix, patch(x, z, 0.25));
 		}
 		return style.top;
 	}
@@ -176,6 +211,9 @@ public final class Terrain {
 	public BlockState under(int x, int z) {
 		int g = ground(x, z);
 		Ground style = groundStyle(x, z);
+		if (g <= WATER_TOP + 1 && shoreMix != null) {
+			return Blocks.STONE.defaultBlockState();
+		}
 		if (g <= WATER_TOP + 1 && style != Ground.SNOW && style != Ground.BASALT && style != Ground.STONE) {
 			return Blocks.SANDSTONE.defaultBlockState();
 		}

@@ -25,7 +25,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public final class QuestService {
 	public static final int KILL_COUNT = 6;
 	/** Boss quests are offered on islands of at least this level. */
-	public static final int BOSS_MIN_ISLAND_LEVEL = 30;
+	public static final int BOSS_MIN_ISLAND_LEVEL = 15; // Verdant Wilds (Lv 15) is the first island with a boss
 
 	public enum Result {
 		ACCEPTED, ALREADY_ON_QUEST, NO_BOSS_HERE, TOO_FAR, ABANDONED, NO_QUEST

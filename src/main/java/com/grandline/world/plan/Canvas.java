@@ -48,6 +48,13 @@ public final class Canvas {
 		return wx >= minX && wx < minX + 16 && wz >= minZ && wz < minZ + 16;
 	}
 
+	/** Whether anything within {@code r} blocks of island-local (x, z) can land in this chunk (skip far-away pieces). */
+	public boolean near(int x, int z, int r) {
+		int wx = originX + x;
+		int wz = originZ + z;
+		return wx + r >= minX && wx - r < minX + 16 && wz + r >= minZ && wz - r < minZ + 16;
+	}
+
 	public BlockPos world(int x, int y, int z) {
 		return new BlockPos(originX + x, y, originZ + z);
 	}

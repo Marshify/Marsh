@@ -39,6 +39,11 @@ public final class FirstSeaPlans {
 	private FirstSeaPlans() {
 	}
 
+	/** Pre-redesign plans for worlds created with island layout 1. */
+	public static List<IslandPlan> legacy() {
+		return List.of(new VerdantWildsLegacy());
+	}
+
 	public static List<IslandPlan> all() {
 		return List.of(new DawnreachHarbor(), new VerdantWilds(), new MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new GladiatorsRing(),
@@ -105,9 +110,12 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 15
 
-	/** Jungle: giant trees and a four-tier temple on a hill, with a stairway, an inner chamber and a summit shrine. */
-	static final class VerdantWilds extends BasePlan {
-		VerdantWilds() {
+	/**
+	 * The original Verdant Wilds (one island, four-tier temple hill). Kept for worlds created before the redesign, so
+	 * their half-explored island never mixes with the new one; new worlds use {@link VerdantWilds}.
+	 */
+	static final class VerdantWildsLegacy extends BasePlan {
+		VerdantWildsLegacy() {
 			super("Verdant Wilds", 0.1);
 			terrain.mass(0, 0, 50, 44, 8, 1.7, Ground.GRASS)
 					.mass(6, -12, 24, 22, 16, 1.4, Ground.PODZOL)

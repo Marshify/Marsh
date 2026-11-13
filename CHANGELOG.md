@@ -1,5 +1,17 @@
 # Grand Line patch notes
 
+## v0.18.0 — Verdant Wilds Rebuilt
+**Island update: Verdant Wilds (Lv. 15)**
+- Now two jungle islands split by an ocean channel: a 112 × 89 main island and a 60 × 51 west island, with low rocky shores.
+- Arrive at a new jungle-wood dock. A lantern-lit trail runs through towering jungle trees to the quest clearing, then climbs to the temple.
+- **The Temple:** a 29 × 25 stone temple, 22 blocks tall, on a raised terrace. It has a broad stairway, six thick pillars, a recessed doorway and a stepped roof. Inside are a pillared central chamber, side alcoves, an altar and an upper gallery reached by stairs.
+- A side trail crosses a jungle-plank bridge to the west island, where the **Island Captain** now waits in an open clearing beside a giant jungle tree.
+- Bandits camp in a clearing on the main island.
+- Verdant Wilds now has a **boss quest** ("Challenge the Captain"): it's the first island with one.
+
+**Note for existing worlds**
+- Worlds created before this update keep their old Verdant Wilds, so half-explored islands never mix old and new. The new island appears in **new worlds**.
+
 ## v0.17.0 — Set Sail
 **New: Ships**
 - Three ships to sail the seas, all original designs:

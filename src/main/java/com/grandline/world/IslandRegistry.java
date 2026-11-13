@@ -24,6 +24,12 @@ public final class IslandRegistry extends SavedData {
 
 	private final Map<Long, Island> islands = new LinkedHashMap<>();
 	private boolean spawnPlaced;
+	/**
+	 * Island layout version the world was created with. Worlds saved before versioning load as 1 and keep generating
+	 * the islands they started with (no half-old, half-new islands); new worlds get {@link #CURRENT_LAYOUT}.
+	 */
+	public static final int CURRENT_LAYOUT = 2;
+	private int layout = CURRENT_LAYOUT;
 
 	/**
 	 * Loaded once on the main thread when the overworld loads. World-generation threads must only use this instance:
@@ -106,6 +112,7 @@ public final class IslandRegistry extends SavedData {
 		}
 		tag.put("islands", list);
 		tag.putBoolean("spawn_placed", spawnPlaced);
+		tag.putInt("layout", layout);
 		return tag;
 	}
 
@@ -116,7 +123,13 @@ public final class IslandRegistry extends SavedData {
 					.ifPresent(island -> registry.islands.put(island.id(), island));
 		}
 		registry.spawnPlaced = tag.getBoolean("spawn_placed");
+		registry.layout = tag.contains("layout") ? tag.getInt("layout") : 1;
 		return registry;
+	}
+
+	/** The island layout version this world generates (see {@link #CURRENT_LAYOUT}). */
+	public int layout() {
+		return layout;
 	}
 
 	public static Collection<Island> nearby(MinecraftServer server, int x, int z, int range) {

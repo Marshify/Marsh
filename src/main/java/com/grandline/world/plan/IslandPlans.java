@@ -13,9 +13,12 @@ import java.util.Map;
  */
 public final class IslandPlans {
 	private static final Map<String, IslandPlan> PLANS = new HashMap<>();
+	/** Plans that layout-1 worlds (created before an island was redesigned) keep using, by island name. */
+	private static final Map<String, IslandPlan> LEGACY = new HashMap<>();
 
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);
+		FirstSeaPlans.legacy().forEach(plan -> LEGACY.put(plan.name(), plan));
 	}
 
 	private IslandPlans() {
@@ -27,12 +30,25 @@ public final class IslandPlans {
 		}
 	}
 
+	/** The plan this world uses for the island: the redesigned one, or the old one in worlds created before it. */
 	public static IslandPlan get(String islandName) {
+		com.grandline.world.IslandRegistry registry = com.grandline.world.IslandRegistry.current();
+		if (registry != null && registry.layout() < com.grandline.world.IslandRegistry.CURRENT_LAYOUT) {
+			IslandPlan legacy = LEGACY.get(islandName);
+			if (legacy != null) {
+				return legacy;
+			}
+		}
 		return PLANS.get(islandName);
 	}
 
+	/** The pre-redesign plan of an island, if it has one (tests, tools). */
+	public static IslandPlan legacy(String islandName) {
+		return LEGACY.get(islandName);
+	}
+
 	public static IslandPlan get(Island island) {
-		return island == null ? null : PLANS.get(island.name());
+		return island == null ? null : get(island.name());
 	}
 
 	public static List<IslandPlan> all() {
