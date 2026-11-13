@@ -31,3 +31,4 @@ replay_*.log
 
 # Runtime logs written by fabric-loader-junit
 logs/
+__pycache__/
