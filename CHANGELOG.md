@@ -1,5 +1,9 @@
 # Grand Line patch notes
 
+## v0.20.2 — Volcano Smoke
+**Fixes**
+- Emberfall's smoke on the map no longer shows outlines or borders. It's one solid, crisp plume that billows in the wind: a sway that travels up from the crater, strongest at the top.
+
 ## v0.20.1 — Smoke & Curbs
 **Fixes**
 - Emberfall's smoke on the map no longer shows a dark outline around its edges.

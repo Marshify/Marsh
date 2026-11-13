@@ -271,25 +271,21 @@ public final class WorldMapScreen extends Screen {
 
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
 		if (firstSeaArt) {
-			// Volcanic smoke above Emberfall: a continuous plume. Puffs leave the crater one after another, rise and drift
-			// downwind, swell and thin out, and fade; their staggered lifetimes overlap so the column never empties.
-			double baseScale = Math.min(91.0 / 98, 45.0 / 58);
-			double craterX = 156 + 98 * baseScale / 2 - 4;   // the plume's root (texture bottom-right) sits on the crater
-			double craterY = 542 + 58 * baseScale / 2 - 2;
-			int puffs = 4;
-			double period = 7.0;                               // seconds for one puff to rise and vanish
-			for (int i = puffs - 1; i >= 0; i--) {             // oldest (highest, faintest) first, newest on top
-				double life = ((time / period) + i / (double) puffs) % 1.0;
-				double ease = 1 - (1 - life) * (1 - life);
-				double scale = baseScale * (0.32 + 0.78 * ease);
-				double sway = Math.sin(time * 0.9 + i * 1.7) * 2.5 * life;
-				double x = craterX - 26 * ease + sway;         // the wind carries it west
-				double y = craterY - 30 * ease;
-				float alpha = (float) (Math.min(1.0, life / 0.12) * Math.pow(1 - life, 1.3) * 0.95);
-				graphics.setColor(1, 1, 1, alpha);
-				blitChart(graphics, SMOKE, x - 98 * scale, y - 58 * scale, scale, 98, 58);
+			// Volcanic smoke above Emberfall: one plume, drawn as one-pixel strips that sway with a wave rising from the
+			// crater, so the smoke billows in the wind. Strips never overlap and pixels stay crisp, so no edges show.
+			double scale = Math.min(91.0 / 98, 45.0 / 58);
+			double left = 156 - 98 * scale / 2;
+			double top = 542 - 58 * scale / 2;
+			for (int row = 0; row < 58; row++) {
+				double up = 1 - row / 57.0;                 // 0 at the crater (bottom), 1 at the plume's top
+				double sway = (Math.sin(time * 1.4 - row * 0.16) * 1.8 + Math.sin(time * 0.5 + row * 0.05) * 1.4) * up * up;
+				double lift = Math.sin(time * 0.8) * 0.8 * up;
+				graphics.pose().pushPose();
+				graphics.pose().translate(chartLeft + (left + sway * scale) * chartScale, chartTop + (top + row * scale - lift * scale) * chartScale, 0);
+				graphics.pose().scale((float) (scale * chartScale), (float) (scale * chartScale), 1);
+				graphics.blit(SMOKE, 0, 0, 98, 1, 0, row, 98, 1, 98, 58);
+				graphics.pose().popPose();
 			}
-			graphics.setColor(1, 1, 1, 1);
 		}
 
 		// Layer 3: clouds along the edges, drifting gently, clipped to the ocean.
