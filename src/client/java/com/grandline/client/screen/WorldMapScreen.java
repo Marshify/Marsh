@@ -44,7 +44,23 @@ public final class WorldMapScreen extends Screen {
 	private static final int BACKGROUND_W = 2880;
 	private static final int BACKGROUND_H = 1536;
 	private static final ResourceLocation FRAME = tex("first_sea/pirate_frame");
-	private static final ResourceLocation SHORELINES = tex("first_sea/shorelines_overlay");
+	/**
+	 * Each island's piece of the shoreline overlay (split from shorelines_overlay.png so the surf can move with its
+	 * island when hovered): theme -> {x, y, width, height} in the 2880 x 1536 art.
+	 */
+	private static final Map<String, int[]> SHORE_PIECES = Map.ofEntries(
+			Map.entry("town", new int[]{1260, 788, 444, 85}),
+			Map.entry("jungle", new int[]{1216, 494, 434, 81}),
+			Map.entry("village", new int[]{1763, 897, 410, 83}),
+			Map.entry("brick_town", new int[]{780, 906, 427, 86}),
+			Map.entry("desert", new int[]{1720, 1133, 403, 153}),
+			Map.entry("snow", new int[]{1750, 469, 437, 93}),
+			Map.entry("fortress", new int[]{2351, 714, 395, 166}),
+			Map.entry("prison", new int[]{418, 918, 368, 183}),
+			Map.entry("colosseum", new int[]{771, 378, 442, 86}),
+			Map.entry("volcano", new int[]{199, 1348, 426, 75}),
+			Map.entry("harbor", new int[]{1235, 1236, 446, 85}),
+			Map.entry("crystal", new int[]{2214, 1338, 390, 69}));
 	private static final ResourceLocation UNDERWATER_SURFACE = tex("first_sea/underwater_surface");
 	private static final ResourceLocation PALACE_SUBMERGED = tex("first_sea/palace_submerged");
 	private static final ResourceLocation SMOKE = tex("first_sea/volcanic_smoke");
@@ -223,8 +239,15 @@ public final class WorldMapScreen extends Screen {
 						SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
 				blitChart(graphics, UNDERWATER_SURFACE, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
 			} else if (art != null) {
-				// Grows around the island's base point and lifts gently.
+				// Grows around the island's base point and lifts gently; its surf ring moves with it.
 				blitChart(graphics, art, ax - w * grow / 2, ay - h * grow * ANCHOR_Y - rise, SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
+				int[] shore = firstSeaArt ? SHORE_PIECES.get(island.theme().toLowerCase(Locale.ROOT)) : null;
+				if (shore != null) {
+					double half = SeaChart.WIDTH / (double) BACKGROUND_W; // art pixels -> chart units
+					double px = ax + (shore[0] * half - ax) * grow;
+					double py = ay + (shore[1] * half - ay) * grow - rise;
+					blitChart(graphics, tex("first_sea/shore_" + island.theme().toLowerCase(Locale.ROOT)), px, py, half * grow, shore[2], shore[3]);
+				}
 			} else if (sea == 1) {
 				// No illustration in the First Sea art pack: a small sand-and-grass islet that fits the chart style.
 				int sx = screenX(ax);
@@ -249,8 +272,6 @@ public final class WorldMapScreen extends Screen {
 
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
 		if (firstSeaArt) {
-			// Surf around the island shores (aligned to the art's island positions).
-			blitChart(graphics, SHORELINES, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
 			// Volcanic smoke above Emberfall: rises and fades in a slow loop.
 			double phase = (time * 0.35) % 1.0;
 			double smokeScale = Math.min(91.0 / 98, 45.0 / 58) * (0.95 + 0.1 * phase);

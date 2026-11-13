@@ -1,5 +1,9 @@
 # Grand Line patch notes
 
+## v0.10.1 — Chart Hover Fix
+**Fixes**
+- The surf around each island on the sea chart now rises and grows with the island when you hover over it, instead of staying behind.
+
 ## v0.10.0 — Swords, Guns & Accessories
 **New**
 - **4 swords:** Katana, Cutlass, Saber and Trident. Hold one and Z / X / C use its moves (Rising Draw, Crescent Arc, Hundred Cuts, and more).
