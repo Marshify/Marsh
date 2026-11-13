@@ -127,7 +127,7 @@ public final class IslandPopulation {
 	}
 
 	/** Random spawn point inside one of the island's enemy camps, or null if it has none. */
-	private static BlockPos campSpot(ServerLevel level, Island island, RandomSource random) {
+	static BlockPos campSpot(ServerLevel level, Island island, RandomSource random) {
 		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
 				com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
 		if (camps.isEmpty()) {
@@ -166,7 +166,9 @@ public final class IslandPopulation {
 				int r = island.radius();
 				AABB area = new AABB(island.x() - r - 8, level.getMinBuildHeight(), island.z() - r - 8, island.x() + r + 8,
 						level.getMaxBuildHeight(), island.z() + r + 8);
-				if (level.getEntitiesOfClass(GrandLineEnemy.class, area).size() >= MAX_ENEMIES_PER_ISLAND) {
+				if (level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> !(e instanceof com.grandline.entity.IslandBoss)
+						&& !(e instanceof com.grandline.entity.SaberBoss)).size() + EnemyRespawns.pending(level, island.id())
+						>= MAX_ENEMIES_PER_ISLAND) {
 					continue;
 				}
 				int x;
@@ -205,6 +207,7 @@ public final class IslandPopulation {
 				enemy.equip();
 				int spread = Math.max(1, island.level() / 10);
 				enemy.setGrandLineLevel(Math.max(1, island.level() - spread + random.nextInt(spread * 2 + 1)));
+				enemy.setOrigin(new BlockPos(x, y, z), island.id());
 				level.addFreshEntity(enemy);
 			}
 		}

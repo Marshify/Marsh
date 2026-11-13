@@ -29,7 +29,13 @@ public record Anchor(Type type, int x, int y, int z, int radius, float yaw) {
 		/** The Fruit Gacha NPC (starter islands). */
 		GACHA,
 		/** The gun shop keeper (starter islands, which have no quests: they are safe zones). */
-		GUNSMITH
+		GUNSMITH,
+		/** The innkeeper, who lets players make the island their home (every island has one; see KeeperNpcs). */
+		HOME,
+		/** The sword dealer (Millbrook Village). */
+		SWORDSMITH,
+		/** Where the island's temple boss stands (Verdant Wilds' Saber boss). */
+		TEMPLE_BOSS
 	}
 
 	/** {@link #yaw} value meaning "any facing". */

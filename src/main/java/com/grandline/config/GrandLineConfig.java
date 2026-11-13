@@ -158,6 +158,41 @@ public final class GrandLineConfig {
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */
 	public long[] gunPrices = {1_500, 12_000};
 
+	// ---- Enemies ----
+	/** Seconds after a regular island enemy dies before it respawns at its spawn point (bosses use their own timers). */
+	public double enemyRespawnSeconds = 10.0;
+
+	// ---- Saber (Verdant Wilds temple boss drop) ----
+	/** Saber melee damage per hit, before the Sword stat and gear bonuses (Katana 6, Cutlass 5). */
+	public double saberAttackDamage = 9.0;
+	/** Saber attacks per second (Katana 1.8, Cutlass 2.0). */
+	public double saberAttackSpeed = 2.0;
+	/** Multiplier on the Saber's Z/X/C move damage (base 10, 12, 14). */
+	public double saberMoveDamageMultiplier = 1.3;
+
+	// ---- Saber Warden (Verdant Wilds temple boss) ----
+	/** Boss health for one player. */
+	public double saberBossHealth = 400.0;
+	/** Extra health per additional player in the temple when the fight starts (0.5 = +50% each). */
+	public double saberBossHealthPerExtraPlayer = 0.5;
+	/** Damage of a plain sword swing. */
+	public double saberBossSwingDamage = 6.0;
+	/** Saber Slash damage. */
+	public double saberBossSlashDamage = 9.0;
+	/** Flying Saber Slash damage. */
+	public double saberBossFlyingDamage = 8.0;
+	/** Heavy Combo: damage of each of the first two cuts, and of the finishing cut. */
+	public double saberBossComboDamage = 5.0;
+	public double saberBossComboFinisherDamage = 9.0;
+	/** No single boss hit takes more than this percent of a player's maximum health. */
+	public double saberBossMaxHitPercent = 35.0;
+	/** Seconds after the boss is defeated before it returns. */
+	public double saberBossRespawnSeconds = 600.0;
+
+	// ---- Swordsmith (Millbrook Village) ----
+	/** Sword prices at the Swordsmith: Katana, Cutlass. */
+	public long[] swordPrices = {8_000, 2_500};
+
 	// ---- Ships ----
 	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
 	public long[] shipPrices = {5_000, 60_000, 300_000};
@@ -306,6 +341,25 @@ public final class GrandLineConfig {
 		}
 		for (int i = 0; i < gunPrices.length; i++) {
 			gunPrices[i] = clamp(gunPrices[i], 0, maxCurrency);
+		}
+		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
+		saberAttackDamage = clamp(saberAttackDamage, 1, 100);
+		saberAttackSpeed = clamp(saberAttackSpeed, 0.5, 4);
+		saberMoveDamageMultiplier = clamp(saberMoveDamageMultiplier, 0.1, 10);
+		saberBossHealth = clamp(saberBossHealth, 1, 1_000_000);
+		saberBossHealthPerExtraPlayer = clamp(saberBossHealthPerExtraPlayer, 0, 10);
+		saberBossSwingDamage = clamp(saberBossSwingDamage, 0, 1000);
+		saberBossSlashDamage = clamp(saberBossSlashDamage, 0, 1000);
+		saberBossFlyingDamage = clamp(saberBossFlyingDamage, 0, 1000);
+		saberBossComboDamage = clamp(saberBossComboDamage, 0, 1000);
+		saberBossComboFinisherDamage = clamp(saberBossComboFinisherDamage, 0, 1000);
+		saberBossMaxHitPercent = clamp(saberBossMaxHitPercent, 1, 100);
+		saberBossRespawnSeconds = clamp(saberBossRespawnSeconds, 0, 86_400);
+		if (swordPrices == null || swordPrices.length != 2) {
+			swordPrices = defaults().swordPrices;
+		}
+		for (int i = 0; i < swordPrices.length; i++) {
+			swordPrices[i] = clamp(swordPrices[i], 0, maxCurrency);
 		}
 		if (shipPrices == null || shipPrices.length != 3) {
 			shipPrices = defaults().shipPrices;

@@ -27,6 +27,9 @@ import net.minecraft.util.RandomSource;
 public class GrandLineEnemy extends Monster {
 	private static final String LEVEL_KEY = "GrandLineLevel";
 	private int grandLineLevel = 1;
+	/** Where the island's spawner placed this enemy (its respawn point), and its island; null / -1 if unknown. */
+	private net.minecraft.core.BlockPos origin;
+	private long islandId = -1;
 
 	public GrandLineEnemy(EntityType<? extends GrandLineEnemy> type, Level level) {
 		super(type, level);
@@ -61,6 +64,20 @@ public class GrandLineEnemy extends Monster {
 		updateName();
 	}
 
+	/** Records where this enemy belongs, so it can respawn there (see EnemyRespawns). */
+	public void setOrigin(net.minecraft.core.BlockPos origin, long islandId) {
+		this.origin = origin;
+		this.islandId = islandId;
+	}
+
+	public net.minecraft.core.BlockPos origin() {
+		return origin;
+	}
+
+	public long islandId() {
+		return islandId;
+	}
+
 	protected void updateName() {
 		setCustomName(Component.translatable("entity.grandline." + kind().id()).append(" [Lv. " + grandLineLevel + "]"));
 		setCustomNameVisible(true);
@@ -91,12 +108,20 @@ public class GrandLineEnemy extends Monster {
 	public void addAdditionalSaveData(CompoundTag tag) {
 		super.addAdditionalSaveData(tag);
 		tag.putInt(LEVEL_KEY, grandLineLevel);
+		if (origin != null) {
+			tag.putLong("GrandLineOrigin", origin.asLong());
+			tag.putLong("GrandLineIsland", islandId);
+		}
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag tag) {
 		super.readAdditionalSaveData(tag);
 		grandLineLevel = Math.max(1, tag.getInt(LEVEL_KEY));
+		if (tag.contains("GrandLineOrigin")) {
+			origin = net.minecraft.core.BlockPos.of(tag.getLong("GrandLineOrigin"));
+			islandId = tag.getLong("GrandLineIsland");
+		}
 	}
 
 	@Override

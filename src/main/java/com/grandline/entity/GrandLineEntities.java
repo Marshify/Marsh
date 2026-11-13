@@ -20,6 +20,11 @@ public final class GrandLineEntities {
 	public static final EntityType<IslandBoss> CAPTAIN = Registry.register(BuiltInRegistries.ENTITY_TYPE, GrandLineMod.id("captain"),
 			FabricEntityTypeBuilder.<IslandBoss>create(MobCategory.MONSTER, IslandBoss::new).dimensions(EntityDimensions.fixed(0.8F, 2.6F)).build());
 
+	/** Verdant Wilds' temple boss (player-sized, wields the Saber). */
+	public static final EntityType<SaberBoss> SABER_BOSS = Registry.register(BuiltInRegistries.ENTITY_TYPE, GrandLineMod.id("saber_boss"),
+			FabricEntityTypeBuilder.<SaberBoss>create(MobCategory.MONSTER, SaberBoss::new).dimensions(EntityDimensions.fixed(0.65F, 2.1F))
+					.trackRangeBlocks(64).build());
+
 	private GrandLineEntities() {
 	}
 
@@ -45,7 +50,7 @@ public final class GrandLineEntities {
 		if (type == CORSAIR) {
 			return EnemyKind.CORSAIR;
 		}
-		if (type == CAPTAIN) {
+		if (type == CAPTAIN || type == SABER_BOSS) {
 			return EnemyKind.CAPTAIN;
 		}
 		return EnemyKind.BANDIT;
@@ -57,5 +62,6 @@ public final class GrandLineEntities {
 		FabricDefaultAttributeRegistry.register(RAIDER, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(CORSAIR, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(CAPTAIN, GrandLineEnemy.createAttributes());
+		FabricDefaultAttributeRegistry.register(SABER_BOSS, SaberBoss.createAttributes());
 	}
 }

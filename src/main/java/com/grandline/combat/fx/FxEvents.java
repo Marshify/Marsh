@@ -29,6 +29,19 @@ public final class FxEvents {
 		}
 	}
 
+	/** A beat from any entity (a boss, for instance) to the players around it. */
+	public static void sendFrom(net.minecraft.world.entity.Entity source, String effect, Vec3 pos, Vec3 dir, double speed, double range, double size) {
+		if (!(source.level() instanceof ServerLevel level)) {
+			return;
+		}
+		FxEventPayload payload = new FxEventPayload(effect, source.getId(), pos, dir, (float) speed, (float) range, (float) size);
+		for (ServerPlayer viewer : PlayerLookup.around(level, pos, VIEW_DISTANCE)) {
+			if (ServerPlayNetworking.canSend(viewer, FxEventPayload.TYPE)) {
+				ServerPlayNetworking.send(viewer, payload);
+			}
+		}
+	}
+
 	public static void send(ServerPlayer caster, String effect, Vec3 pos) {
 		send(caster, effect, pos, Vec3.ZERO, 0, 0, 0);
 	}

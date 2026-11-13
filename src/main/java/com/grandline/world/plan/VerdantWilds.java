@@ -68,6 +68,8 @@ final class VerdantWilds extends BasePlan {
 		anchor(Anchor.at(Type.DOCK, 7, 63, 58));
 		anchor(Anchor.area(Type.ENEMY_CAMP, CAMP_X, CAMP_Z, 7));
 		anchor(Anchor.of(Type.BOSS_ARENA, BOSS_X, BOSS_Z));
+		// The Saber boss waits in the temple hall, in front of the altar dais, facing the door.
+		anchor(new Anchor(Type.TEMPLE_BOSS, 0, FLOOR + 1, -22, 11, 0));
 		anchor(Anchor.of(Type.TREASURE, -36, -27));
 		placeTrees();
 		placeBoulders();

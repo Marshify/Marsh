@@ -29,6 +29,8 @@ public final class NpcScreens {
 			case NAVIGATOR -> navigator(data);
 			case GACHA -> new GachaScreen(data); // the cart keeper opens the gacha straight away
 			case GUNSMITH -> gunsmith(data);
+			case INNKEEPER -> innkeeper(data);
+			case SWORDSMITH -> swordsmith(data);
 		});
 	}
 
@@ -87,6 +89,27 @@ public final class NpcScreens {
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
 		return new DialogScreen(Component.translatable("entity.grandline.islander.gunsmith"),
 				List.of(Component.translatable("npc.grandline.gunsmith.greeting")), options);
+	}
+
+	private static DialogScreen innkeeper(OpenNpcPayload data) {
+		return new DialogScreen(Component.translatable("entity.grandline.islander.innkeeper"),
+				List.of(Component.translatable("npc.grandline.innkeeper.ask")), List.of(
+				DialogScreen.Option.of(Component.translatable("npc.grandline.innkeeper.set_home"), () -> send(data, NpcActionPayload.SET_HOME)),
+				DialogScreen.Option.of(Component.translatable("npc.grandline.innkeeper.cancel"), () -> { })));
+	}
+
+	private static DialogScreen swordsmith(OpenNpcPayload data) {
+		List<DialogScreen.Option> options = new ArrayList<>();
+		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
+		for (int i = 0; i < data.stock().size() && i < data.prices().size(); i++) {
+			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
+			int index = i;
+			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.swordsmith.buy", item.getDescription(),
+					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_SWORD + index)));
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		return new DialogScreen(Component.translatable("entity.grandline.islander.swordsmith"),
+				List.of(Component.translatable("npc.grandline.swordsmith.greeting")), options);
 	}
 
 	private static DialogScreen fisherman(OpenNpcPayload data) {

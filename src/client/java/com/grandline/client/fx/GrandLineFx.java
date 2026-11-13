@@ -135,12 +135,15 @@ public final class GrandLineFx {
 		}
 		boolean own = mc.player != null && packet.caster() == mc.player.getId();
 		// Settings: other players' move effects can be hidden (their poses and damage still happen).
-		if (!own && !com.grandline.client.settings.ClientSettings.get().allyVfx && !packet.effect().equals("flight_end")) {
+		if (!own && !com.grandline.client.settings.ClientSettings.get().allyVfx && !packet.effect().equals("flight_end")
+				&& !packet.effect().startsWith("boss_")) {
 			return;
 		}
 		Entity caster = level.getEntity(packet.caster());
 		if (FlameFx.handles(packet.effect())) {
 			FlameFx.handle(packet, level, caster, own);
+		} else if (SaberFx.handles(packet.effect())) {
+			SaberFx.handle(packet, level, caster, own);
 		}
 	}
 

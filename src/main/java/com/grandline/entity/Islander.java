@@ -30,7 +30,11 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Fruit Gacha keeper (the starter island's cart). New roles go last: the role is saved by its index. */
 		GACHA,
 		/** Sells guns (the starter island's shop). */
-		GUNSMITH;
+		GUNSMITH,
+		/** Lets players make this island their home (every island). */
+		INNKEEPER,
+		/** Sells swords (Millbrook Village). */
+		SWORDSMITH;
 
 		public static Role byId(int id) {
 			Role[] values = values();

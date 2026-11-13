@@ -43,10 +43,11 @@ public final class Gear {
 	public static final Item CUTLASS = sword("cutlass", Tiers.IRON, 2, -2.0F, Rarity.COMMON, 0xD8C08A,
 			move("cutlass_plunder", FruitMoves.burst(Element.METAL, 4, 8f)),
 			move("cutlass_lunge", FruitMoves.dash(Element.METAL, 2.4, 10f)));
-	public static final Item SABER = sword("saber", Tiers.DIAMOND, 3, -2.3F, Rarity.RARE, 0xC9D3E0,
-			move("saber_thrust", FruitMoves.strike(Element.METAL, 6, 10f)),
-			move("saber_twin_arc", FruitMoves.bolt(Element.METAL, 12, 2, 12f)),
-			move("saber_flourish", FruitMoves.burst(Element.METAL, 5, 14f)));
+	// The Saber (Verdant Wilds' temple boss drop): melee damage, attack speed and move damage come from the config.
+	public static final Item SABER = sword("saber", new SaberItem(new Item.Properties().rarity(Rarity.RARE)), Rarity.RARE, 0xC9D3E0,
+			move("saber_thrust", ctx -> FruitMoves.strike(Element.METAL, 6, saberMove(10f)).execute(ctx)),
+			move("saber_twin_arc", ctx -> FruitMoves.bolt(Element.METAL, 12, 2, saberMove(12f)).execute(ctx)),
+			move("saber_flourish", ctx -> FruitMoves.burst(Element.METAL, 5, saberMove(14f)).execute(ctx)));
 	public static final Item TRIDENT = sword("trident", Tiers.DIAMOND, 4, -2.8F, Rarity.RARE, 0x7FB7C9,
 			move("trident_thrust", FruitMoves.strike(Element.WATER, 8, 12f)),
 			move("trident_riptide", FruitMoves.vortex(Element.WATER, 8, 5, 12f)),
@@ -87,9 +88,18 @@ public final class Gear {
 	}
 
 	private static Item sword(String name, Tiers tier, int damage, float speed, Rarity rarity, int color, Move... moves) {
-		Item item = register(name, new GearSwordItem(tier, damage, speed, new Item.Properties().rarity(rarity)));
+		return sword(name, new GearSwordItem(tier, damage, speed, new Item.Properties().rarity(rarity)), rarity, color, moves);
+	}
+
+	private static Item sword(String name, Item sword, Rarity rarity, int color, Move... moves) {
+		Item item = register(name, sword);
 		weaponPower(item, name, StatType.SWORD, rarity, color, moves);
 		return item;
+	}
+
+	/** A Saber move's base damage times {@code saberMoveDamageMultiplier} (read when the move is used). */
+	static float saberMove(float base) {
+		return (float) (base * GrandLineMod.config().saberMoveDamageMultiplier);
 	}
 
 	private static Item gun(String name, double damage, float velocity, int reload, int knockback, Rarity rarity, int color, Move... moves) {

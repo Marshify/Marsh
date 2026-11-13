@@ -43,6 +43,10 @@ public final class NpcService {
 			stock.addAll(GunShop.ids());
 			prices.addAll(GunShop.prices());
 		}
+		if (npc.role() == Islander.Role.SWORDSMITH) {
+			stock.addAll(SwordShop.ids());
+			prices.addAll(SwordShop.prices());
+		}
 		if (npc.role() == Islander.Role.FRUIT_DEALER) {
 			for (Fruits.FruitDef fruit : Fruits.all()) {
 				stock.add(fruit.id());
@@ -85,11 +89,37 @@ public final class NpcService {
 					: "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
 					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
+			case NpcActionPayload.BUY_SWORD, NpcActionPayload.BUY_SWORD + 1 -> npc.role() == Islander.Role.SWORDSMITH
+					? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far";
+			case NpcActionPayload.SET_HOME -> npc.role() == Islander.Role.INNKEEPER ? setHome(player, npc) : "too_far";
 			default -> "too_far";
 		};
 		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
-				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought");
+				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
+				|| result.equals("sword_bought");
+		if (result.equals("home_set")) {
+			return result; // the confirmation names the island (see setHome)
+		}
 		return reply(player, success, result);
+	}
+
+	/**
+	 * Makes the Innkeeper's island the player's home: where they respawn after dying at sea or off any island (dying on
+	 * an island still brings them back on that island). Can be changed any number of times.
+	 */
+	public static String setHome(ServerPlayer player, Islander npc) {
+		Island island = IslandRegistry.get(player.server).get(npc.islandId());
+		if (island == null) {
+			return "home_invalid";
+		}
+		player.setAttached(com.grandline.data.ModAttachments.HOME_ISLAND, island.id());
+		net.minecraft.network.chat.Component done = net.minecraft.network.chat.Component.translatable("message.grandline.home_set", island.name())
+				.withStyle(net.minecraft.ChatFormatting.GREEN);
+		player.sendSystemMessage(done);
+		player.displayClientMessage(done, true);
+		player.serverLevel().playSound(null, npc.blockPosition(), net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP,
+				net.minecraft.sounds.SoundSource.NEUTRAL, 0.6F, 1.4F);
+		return "home_set";
 	}
 
 	/** Buys a ship and launches it beside the Navigator (if that fails, the ship is still bought). */

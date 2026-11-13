@@ -744,5 +744,18 @@
   "death.attack.grandline.sea_weakness": "%1$s was claimed by the sea",
   "death.attack.grandline.sea_weakness.player": "%1$s was claimed by the sea while fleeing %2$s",
   "message.grandline.sea_weakness": "The sea drains your strength!",
-  "hud.grandline.island_arrival": "Lv. %s  ·  %s"
+  "hud.grandline.island_arrival": "Lv. %s  ·  %s",
+  "entity.grandline.islander.innkeeper": "Innkeeper",
+  "entity.grandline.islander.swordsmith": "Swordsmith",
+  "npc.grandline.innkeeper.ask": "Would you like to make this island your home?",
+  "npc.grandline.innkeeper.set_home": "Set Home",
+  "npc.grandline.innkeeper.cancel": "Cancel",
+  "message.grandline.home_set": "Home successfully set to %s!",
+  "npc.grandline.result.home_invalid": "This island can't be your home.",
+  "npc.grandline.swordsmith.greeting": "Every sailor needs a good blade. Take a look.",
+  "npc.grandline.swordsmith.buy": "Buy %s — $%s",
+  "npc.grandline.result.sword_bought": "A fine choice! It's in your bag.",
+  "npc.grandline.result.sword_money": "Not enough money for that.",
+  "entity.grandline.saber_boss": "Saber Warden",
+  "message.grandline.saber_boss.reward": "The Saber Warden falls. You claim the Saber!"
 }

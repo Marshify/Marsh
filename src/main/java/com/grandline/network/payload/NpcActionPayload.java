@@ -19,6 +19,10 @@ public record NpcActionPayload(int entityId, int action) implements FabricPacket
 	public static final int LAUNCH_SHIP = 30;
 	/** Buy gun {@code BUY_GUN + i} from the Gunsmith's stock ({@link com.grandline.npc.GunShop#STOCK}). */
 	public static final int BUY_GUN = 40;
+	/** Make the Innkeeper's island your home. */
+	public static final int SET_HOME = 50;
+	/** Buy sword {@code BUY_SWORD + i} from the Swordsmith's stock ({@link com.grandline.npc.SwordShop#STOCK}). */
+	public static final int BUY_SWORD = 60;
 
 	public static final PacketType<NpcActionPayload> TYPE = PacketType.create(GrandLineMod.id("npc_action"),
 			buf -> new NpcActionPayload(buf.readVarInt(), buf.readVarInt()));
