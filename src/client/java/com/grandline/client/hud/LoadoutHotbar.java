@@ -64,9 +64,18 @@ public final class LoadoutHotbar {
 				var def = profile != null && profile.powers().hasFruit() ? Fruits.get(profile.powers().fruit()) : null;
 				yield def == null ? ItemStack.EMPTY : new ItemStack(def.item());
 			}
-			case SWORD -> player == null ? ItemStack.EMPTY : player.getInventory().getItem(hotbarSlotOf(player, GearSwordItem.class));
-			case GUN -> player == null ? ItemStack.EMPTY : player.getInventory().getItem(hotbarSlotOf(player, GunItem.class));
+			case SWORD -> itemIn(player, GearSwordItem.class);
+			case GUN -> itemIn(player, GunItem.class);
 		};
+	}
+
+	/** The hotbar item of {@code type}, or EMPTY when there is none (never asks the inventory for slot -1). */
+	private static ItemStack itemIn(Player player, Class<?> type) {
+		if (player == null) {
+			return ItemStack.EMPTY;
+		}
+		int slot = hotbarSlotOf(player, type);
+		return slot < 0 ? ItemStack.EMPTY : player.getInventory().getItem(slot);
 	}
 
 	/** First hotbar slot holding an item of {@code type} (the selected slot wins), or -1. */

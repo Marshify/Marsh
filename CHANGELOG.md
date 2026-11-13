@@ -1,5 +1,9 @@
 # Grand Line patch notes
 
+## v0.14.1 — Hotfix
+**Fixes**
+- Fixed a crash when entering a world with no sword or gun in your hotbar (the new loadout panel).
+
 ## v0.14.0 — Loadout Hotbar
 **New**
 - **Loadout hotbar:** a new hotbar in the Grand Line style, with numbered slots and a highlighted selection. Same keys, scrolling and items as before.
