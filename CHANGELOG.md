@@ -1,5 +1,14 @@
 # Grand Line patch notes
 
+## v0.13.0 — Build Tools & Creative Map Teleport
+**New**
+- **Creative map teleport:** in creative mode, click an island on the sea chart to teleport there.
+- **Custom structures:** island builds made with Structure Blocks can now be placed into the Grand Line sea, with markers for docks, NPCs, quest areas and travel landings.
+- **Travel plates:** step on a special pressure plate to travel to a landing elsewhere. Only the player on the plate goes.
+
+**Fixes**
+- Removed the light streaks drawn over the sunken Lotus Palace on the sea chart.
+
 ## v0.12.0 — New UI
 **New**
 - The whole interface uses the Marsh UI look: yellow-titled windows, chunky buttons, coloured stat rows and new health, energy and XP bars.

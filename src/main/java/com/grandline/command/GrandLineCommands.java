@@ -60,6 +60,20 @@ public final class GrandLineCommands {
 	private static void registerTree(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("grandline")
 				.then(Commands.literal("test").executes(GrandLineCommands::runTest))
+				// Plate travel between structures (run by command blocks; operators only).
+				.then(Commands.literal("travel").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("players", EntityArgument.players())
+								.then(Commands.argument("arrival", com.mojang.brigadier.arguments.StringArgumentType.word())
+										.executes(context -> {
+											String arrival = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "arrival");
+											int sent = 0;
+											for (var player : EntityArgument.getPlayers(context, "players")) {
+												if (com.grandline.world.structure.TravelService.travel(player, arrival)) {
+													sent++;
+												}
+											}
+											return sent;
+										}))))
 				.then(Commands.literal("profile")
 						.executes(context -> showProfile(context.getSource(), context.getSource().getPlayerOrException()))
 						.then(Commands.argument("player", EntityArgument.player())

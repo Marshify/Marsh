@@ -237,7 +237,6 @@ public final class WorldMapScreen extends Screen {
 				// Lotus Palace lies under the sea: the submerged rendering, then the water surface over it.
 				blitChart(graphics, PALACE_SUBMERGED, ax - w * grow / 2, ay - h * grow * ANCHOR_Y + SUBMERGED_DROP - rise,
 						SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
-				blitChart(graphics, UNDERWATER_SURFACE, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
 			} else if (art != null) {
 				// Grows around the island's base point and lifts gently; its surf ring moves with it.
 				blitChart(graphics, art, ax - w * grow / 2, ay - h * grow * ANCHOR_Y - rise, SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
@@ -317,9 +316,12 @@ public final class WorldMapScreen extends Screen {
 		if (hovered != null) {
 			Island island = hovered.island();
 			int color = island.level() <= playerLevel ? 0x9CFF9C : island.level() <= playerLevel + 50 ? 0xFFE080 : 0xFF9C9C;
-			graphics.renderComponentTooltip(font, List.of(Component.literal(island.name()),
-					Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))),
-					mouseX, mouseY);
+			List<Component> lines = new ArrayList<>(List.of(Component.literal(island.name()),
+					Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))));
+			if (minecraft.player != null && minecraft.player.isCreative()) {
+				lines.add(Component.translatable("screen.grandline.map.teleport").withStyle(net.minecraft.ChatFormatting.AQUA));
+			}
+			graphics.renderComponentTooltip(font, lines, mouseX, mouseY);
 		}
 	}
 
@@ -427,6 +429,17 @@ public final class WorldMapScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		// Creative only: click an island to teleport there (the server re-checks the game mode).
+		if (button == 0 && minecraft.player != null && minecraft.player.isCreative()) {
+			Placed hit = hitTest(lastPlaced, (int) mouseX, (int) mouseY);
+			if (hit != null && net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(
+					com.grandline.network.payload.MapTeleportPayload.TYPE)) {
+				net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(
+						new com.grandline.network.payload.MapTeleportPayload(hit.island().id()));
+				onClose();
+				return true;
+			}
+		}
 		int[] close = closeBox();
 		if (button == 0 && mouseX >= close[0] && mouseX <= close[2] && mouseY >= close[1] && mouseY <= close[3]) {
 			onClose();

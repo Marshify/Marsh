@@ -671,5 +671,6 @@
   "team.grandline.pirates": "Pirates",
   "team.grandline.marines": "Marines",
   "message.grandline.team.joined": "%s joined the %s!",
-  "stat.grandline.effect.gun": "boosts gun move damage"
+  "stat.grandline.effect.gun": "boosts gun move damage",
+  "screen.grandline.map.teleport": "Click to teleport (creative)"
 }

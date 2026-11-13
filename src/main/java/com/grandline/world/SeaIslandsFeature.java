@@ -33,6 +33,8 @@ public final class SeaIslandsFeature extends Feature<NoneFeatureConfiguration> {
 				placed = true;
 			}
 		}
+		// Supplied structures (data/<ns>/structure_placements) after the generated islands, so they sit on top.
+		placed |= com.grandline.world.structure.StructurePlacements.placeInChunk(context.level(), chunk);
 		return placed;
 	}
 }
