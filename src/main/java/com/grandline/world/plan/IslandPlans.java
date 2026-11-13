@@ -16,7 +16,7 @@ public final class IslandPlans {
 	/** Old plans that worlds created before an island's redesign keep using, by island name. */
 	private static final Map<String, IslandPlan> LEGACY = new HashMap<>();
 	/** The world layout version in which each redesigned island got its new plan. */
-	private static final Map<String, Integer> REDESIGNED_IN = Map.of("Verdant Wilds", 2, "Dawnreach Harbor", 3);
+	private static final Map<String, Integer> REDESIGNED_IN = Map.of("Verdant Wilds", 2, "Dawnreach Harbor", 3, "Millbrook Village", 4);
 
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);

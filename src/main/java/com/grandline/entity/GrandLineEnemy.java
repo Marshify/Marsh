@@ -87,6 +87,7 @@ public class GrandLineEnemy extends Monster {
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.1, false));
+		goalSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal(this, 0.9));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.8));
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -112,6 +113,9 @@ public class GrandLineEnemy extends Monster {
 			tag.putLong("GrandLineOrigin", origin.asLong());
 			tag.putLong("GrandLineIsland", islandId);
 		}
+		if (hasRestriction()) {
+			tag.putInt("GrandLineLeash", (int) getRestrictRadius());
+		}
 	}
 
 	@Override
@@ -121,6 +125,9 @@ public class GrandLineEnemy extends Monster {
 		if (tag.contains("GrandLineOrigin")) {
 			origin = net.minecraft.core.BlockPos.of(tag.getLong("GrandLineOrigin"));
 			islandId = tag.getLong("GrandLineIsland");
+		}
+		if (tag.contains("GrandLineLeash")) {
+			restrictTo(origin != null ? origin : blockPosition(), tag.getInt("GrandLineLeash"));
 		}
 	}
 

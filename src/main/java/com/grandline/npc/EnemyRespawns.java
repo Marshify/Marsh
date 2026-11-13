@@ -133,6 +133,10 @@ public final class EnemyRespawns {
 		enemy.equip();
 		enemy.setGrandLineLevel(p.level());
 		enemy.setOrigin(p.pos(), p.islandId());
+		Island island = IslandRegistry.get(level.getServer()).get(p.islandId());
+		if (island != null) {
+			IslandPopulation.leash(enemy, island);
+		}
 		level.addFreshEntity(enemy);
 	}
 

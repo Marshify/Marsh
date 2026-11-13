@@ -28,7 +28,7 @@ public final class IslandRegistry extends SavedData {
 	 * Island layout version the world was created with. Worlds saved before versioning load as 1 and keep generating
 	 * the islands they started with (no half-old, half-new islands); new worlds get {@link #CURRENT_LAYOUT}.
 	 */
-	public static final int CURRENT_LAYOUT = 3;
+	public static final int CURRENT_LAYOUT = 4;
 	private int layout = CURRENT_LAYOUT;
 
 	/**

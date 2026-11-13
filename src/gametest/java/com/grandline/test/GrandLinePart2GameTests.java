@@ -333,4 +333,41 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 			helper.succeed();
 		});
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "millbrook_plan", timeoutTicks = 20)
+	public void millbrookRebuildKeepsEveryRole(GameTestHelper helper) {
+		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		int layout = registry.layout();
+		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
+		var plan = com.grandline.world.plan.IslandPlans.get("Millbrook Village");
+		var anchors = plan.anchors();
+		java.util.function.Function<com.grandline.world.plan.Anchor.Type, List<com.grandline.world.plan.Anchor>> of =
+				t -> anchors.stream().filter(a -> a.type() == t).toList();
+		var quest = of.apply(com.grandline.world.plan.Anchor.Type.QUEST);
+		helper.assertTrue(quest.size() == 1 && quest.get(0).x() == 29 && quest.get(0).z() == 12, "quest giver at local (29, 12)");
+		helper.assertTrue(of.apply(com.grandline.world.plan.Anchor.Type.HOME).size() == 1, "innkeeper spot");
+		helper.assertTrue(of.apply(com.grandline.world.plan.Anchor.Type.SWORDSMITH).size() == 1, "swordsmith spot");
+		helper.assertTrue(of.apply(com.grandline.world.plan.Anchor.Type.GACHA).isEmpty(), "the gacha stays at Dawnreach");
+		var arrival = of.apply(com.grandline.world.plan.Anchor.Type.ARRIVAL).get(0);
+		helper.assertTrue(arrival.z() > 40, "arrival at the southern dock");
+		var camps = of.apply(com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
+		helper.assertTrue(camps.size() == 2, "two combat fields");
+		for (var camp : camps) {
+			helper.assertTrue(camp.x() > 35, "combat fields on the east side");
+			helper.assertTrue(Math.hypot(camp.x() - arrival.x(), camp.z() - arrival.z()) > 45, "fields well away from the arrival");
+			helper.assertTrue(plan.terrain().paving(camp.x(), camp.z()) == null, "no road through the middle of a field");
+		}
+		// About 138 x 122: measure the land through the centre lines.
+		int west = 0, east = 0, north = 0, south = 0;
+		for (int x = 0; x > -90 && plan.terrain().ground(x, 0) > com.grandline.world.plan.Terrain.WATER_TOP; x--) west = x;
+		for (int x = 0; x < 90 && plan.terrain().ground(x, 0) > com.grandline.world.plan.Terrain.WATER_TOP; x++) east = x;
+		for (int z = 0; z > -90 && plan.terrain().ground(0, z) > com.grandline.world.plan.Terrain.WATER_TOP; z--) north = z;
+		for (int z = 0; z < 90 && plan.terrain().ground(0, z) > com.grandline.world.plan.Terrain.WATER_TOP; z++) south = z;
+		int width = east - west + 1, depth = south - north + 1;
+		helper.assertTrue(width >= 125 && width <= 145 && depth >= 110 && depth <= 130, "island size " + width + " x " + depth);
+		setLayout(registry, 3);
+		helper.assertTrue(com.grandline.world.plan.IslandPlans.get("Millbrook Village") != plan, "older worlds keep the original Millbrook");
+		setLayout(registry, layout);
+		helper.succeed();
+	}
 }

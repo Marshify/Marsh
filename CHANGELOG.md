@@ -1,5 +1,24 @@
 # Grand Line patch notes
 
+## v0.25.0 — Millbrook Reborn
+**New: Millbrook Village rebuilt (new worlds)**
+- A rolling green island of about 138 × 122 blocks, with sculpted beaches all round.
+- **Main dock** on the south shore: a stone arrival plaza under a timber arch, then a broad lantern-lit pier out to a T-head with cargo and a moored boat. New players arrive here.
+- **Village green** with a great old oak, a stone bench ring and flower clusters. Seven cottages surround it, each with its own shape, roof and furnished interior:
+  - the two-storey **inn** (the Innkeeper is outside)
+  - the **smithy** with an open forge (the Swordsmith is outside)
+  - a bakery, a farmhouse, a weaver's cottage, the elder's house and a fisher's cottage
+- **Two windmills:** a tall one on a knoll to the west, and a squat one among the wheat to the north-east.
+- **Quest giver** at a notice board east of the village.
+- **Two combat fields** to the east: an open training meadow, and a rougher bandit camp farther out.
+- Small landings on the west and north-east shores, and a road network linking everything.
+
+**Changes**
+- Island enemies now wander only within their own camp, so they no longer stroll into villages. They still fight anyone who comes for them.
+
+**Existing worlds**
+- Worlds created before this version keep their original Millbrook untouched. Only new worlds get the rebuild.
+
 ## v0.24.0 — Homes, Blades & the Saber Warden (Update Part 2)
 **New**
 - **Innkeepers on every island.** Talk to one and choose **Set Home** to make that island your home. Your home is kept through death, logout and restarts, and you can change it whenever you like.

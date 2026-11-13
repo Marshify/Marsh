@@ -39,13 +39,13 @@ public final class FirstSeaPlans {
 	private FirstSeaPlans() {
 	}
 
-	/** Pre-redesign plans for worlds created with island layout 1. */
+	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy());
 	}
 
 	public static List<IslandPlan> all() {
-		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
+		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new GladiatorsRing(),
 				new EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
@@ -192,9 +192,12 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 30
 
-	/** Farming village: two windmills, three crop fields, cottages around a square, a barn and a pond. */
-	static final class MillbrookVillage extends BasePlan {
-		MillbrookVillage() {
+	/**
+	 * The original Millbrook Village (two windmills, three crop fields, cottages around a well). Kept for worlds created
+	 * before the rebuild; new worlds use {@link com.grandline.world.plan.MillbrookVillage}.
+	 */
+	static final class MillbrookVillageLegacy extends BasePlan {
+		MillbrookVillageLegacy() {
 			super("Millbrook Village", 0.07);
 			terrain.mass(0, 0, 48, 40, 4, 2.8, Ground.GRASS)
 					.flat(0, 0, 10, 8, 65, 5, s(Blocks.DIRT_PATH))
