@@ -1,5 +1,12 @@
 # Grand Line patch notes
 
+## v0.8.2 — Classic Sea Chart
+**Changes**
+- The sea chart (M) has a brand-new look: every First Sea island is drawn as a little block-built island, with a sharper ocean background and blocky clouds.
+- A compass rose sits in the top-right corner.
+- Hollow Islet shows as a small islet. Hover over it for its name and level.
+- The "Recommended" badge has been removed to match the new art.
+
 ## v0.8.1 — Movement on F
 **Changes**
 - The fifth move (flight, dashes, blinks and jumps) now uses **F** instead of R.

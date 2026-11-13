@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The sea chart (M key). Layers, back to front: ocean background, island art, drifting edge clouds, recommendation
- * badge, player marker with facing cone, title and close button, hover tooltip.
+ * The sea chart (M key). Layers, back to front: ocean background and compass, island art, drifting edge clouds,
+ * player marker with facing cone, title and close button, hover tooltip.
  *
  * <p>Everything except text and the player marker is drawn in chart units (the 1440 × 768 background) and scaled to
  * fit the screen with the background's aspect ratio kept. Island anchors and the player marker use the same
@@ -39,18 +39,23 @@ public final class WorldMapScreen extends Screen {
 	private static final int OLD_ICON_W = 128;
 	private static final int OLD_ICON_H = 96;
 	/** Island art size on the chart, in chart pixels per sprite pixel. */
-	private static final double SPRITE_SCALE = 0.56;
+	private static final double SPRITE_SCALE = 0.6;
+	/** The chart background is drawn at twice the chart's resolution for sharpness. */
+	private static final int BACKGROUND_W = 2880;
+	private static final int BACKGROUND_H = 1536;
+	private static final int CLOUD_W = 360;
+	private static final int CLOUD_H = 156;
 	/** Fraction of the sprite height, from the top, that sits on the island's world position. */
 	private static final double ANCHOR_Y = 0.6;
 	/** Edge clouds: texture, x, y, scale, drift phase (chart units). */
 	private static final Object[][] CLOUDS = {
-			{CLOUD_WIDE, 545.0, -40.0, 0.72, 0.0},
-			{CLOUD_WIDE, 600.0, 660.0, 0.55, 1.7},
-			{CLOUD_WIDE, -40.0, 670.0, 0.6, 3.1},
-			{CLOUD_WIDE, 1210.0, 680.0, 0.55, 4.4},
-			{CLOUD_TALL, -60.0, 230.0, 0.45, 2.3},
-			{CLOUD_TALL, 1300.0, 150.0, 0.42, 0.9},
-			{CLOUD_TALL, 1335.0, 410.0, 0.3, 5.2},
+			{CLOUD_WIDE, 525.0, -20.0, 0.9, 0.0},
+			{CLOUD_TALL, 0.0, 268.0, 0.42, 2.3},
+			{CLOUD_WIDE, 1285.0, 160.0, 0.45, 0.9},
+			{CLOUD_TALL, 1330.0, 415.0, 0.3, 5.2},
+			{CLOUD_WIDE, 575.0, 690.0, 0.75, 1.7},
+			{CLOUD_TALL, 0.0, 705.0, 0.5, 3.1},
+			{CLOUD_WIDE, 1215.0, 680.0, 0.65, 4.4},
 	};
 
 	private static final Map<ResourceLocation, Boolean> EXISTS = new HashMap<>();
@@ -136,7 +141,8 @@ public final class WorldMapScreen extends Screen {
 		RenderSystem.defaultBlendFunc();
 
 		// Layer 1: ocean, grid, frame and compass.
-		blitChart(graphics, BACKGROUND, 0, 0, 1, SeaChart.WIDTH, SeaChart.HEIGHT);
+		blitChart(graphics, BACKGROUND, 0, 0, SeaChart.WIDTH / (double) BACKGROUND_W, BACKGROUND_W, BACKGROUND_H);
+		drawCompass(graphics, 1345, 92);
 
 		int sea = currentSea();
 		List<Island> islands = islandsInSea(sea);
@@ -172,8 +178,18 @@ public final class WorldMapScreen extends Screen {
 			double h = SPRITE_H * SPRITE_SCALE;
 			if (art != null) {
 				blitChart(graphics, art, ax - w / 2, ay - h * ANCHOR_Y, SPRITE_SCALE, SPRITE_W, SPRITE_H);
+			} else if (sea == 1) {
+				// No illustration in the First Sea art pack: a small sand-and-grass islet that fits the chart style.
+				int sx = screenX(ax);
+				int sy = screenY(ay);
+				int r = Math.max(3, (int) Math.round(22 * chartScale));
+				fillCircle(graphics, sx, sy + 1, r + 1, 0x60000000);
+				fillCircle(graphics, sx, sy, r, 0xFFE3C98A);
+				fillCircle(graphics, sx, sy - 1, Math.max(2, r * 2 / 3), 0xFF5FA84A);
+				w = r * 2.6 / chartScale;
+				h = r * 2.6 / chartScale;
 			} else {
-				// Islands without First Sea art use the generic theme icon at the same footprint (smaller islets shrink).
+				// Other seas have no illustrated art yet: the generic theme icon (smaller islets shrink).
 				double size = island.radius() < 25 ? 0.65 : 1.0;
 				w *= size;
 				h *= size;
@@ -188,26 +204,12 @@ public final class WorldMapScreen extends Screen {
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
 		graphics.enableScissor(screenX(SeaChart.INNER_LEFT), screenY(SeaChart.INNER_TOP), screenX(SeaChart.INNER_RIGHT), screenY(SeaChart.INNER_BOTTOM));
 		for (Object[] cloud : CLOUDS) {
-			ResourceLocation texture = (ResourceLocation) cloud[0];
-			boolean wide = texture == CLOUD_WIDE;
 			double drift = Math.sin(time * 0.25 + (double) cloud[4]) * 10;
-			blitChart(graphics, texture, (double) cloud[1] + drift, (double) cloud[2], (double) cloud[3],
-					wide ? 420 : 430, wide ? 190 : 306);
+			blitChart(graphics, (ResourceLocation) cloud[0], (double) cloud[1] + drift, (double) cloud[2], (double) cloud[3], CLOUD_W, CLOUD_H);
 		}
 		graphics.disableScissor();
 
-		// Layer 4: recommendation badge above the best island for the player's level.
 		int playerLevel = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
-		Placed recommended = null;
-		for (Placed p : placed) {
-			if (!p.island().starter() && p.island().level() <= playerLevel + 15
-					&& (recommended == null || p.island().level() > recommended.island().level())) {
-				recommended = p;
-			}
-		}
-		if (recommended != null) {
-			drawBadge(graphics, (recommended.left() + recommended.right()) / 2, recommended.top(), textScale);
-		}
 
 		// Layer 5: player marker (face in a gold ring) with a facing cone, both from the same projection.
 		if (minecraft.player != null) {
@@ -268,18 +270,32 @@ public final class WorldMapScreen extends Screen {
 		return new int[]{right - size, top, right, top + size};
 	}
 
-	private void drawBadge(GuiGraphics graphics, int x, int y, float scale) {
-		graphics.pose().pushPose();
-		graphics.pose().translate(x, y, 0);
-		graphics.pose().scale(scale, scale, 1);
-		Component text = Component.translatable("screen.grandline.map.recommended");
-		int w = font.width(text) + 10;
-		fillCircle(graphics, 0, -24, 11, 0xFFFFD24B);
-		fillCircle(graphics, 0, -24, 9, 0xFF14243A);
-		graphics.drawCenteredString(font, "?", 1, -28, 0xFFFFD24B);
-		graphics.fill(-w / 2, -10, w / 2, 3, 0xE0142233);
-		graphics.drawCenteredString(font, text, 0, -7, 0xFFFFFF);
-		graphics.pose().popPose();
+	/** Compass rose (the background art has none): N-S and E-W points, small diagonals, letters. */
+	private void drawCompass(GuiGraphics graphics, double chartX, double chartY) {
+		int cx = screenX(chartX);
+		int cy = screenY(chartY);
+		int r = Math.max(8, (int) Math.round(38 * chartScale));
+		int w = Math.max(2, r / 6);
+		for (int i = -r; i <= r; i++) {
+			int half = Math.round(w * (1 - Math.abs(i) / (float) r));
+			graphics.fill(cx - half, cy + i, cx + half + 1, cy + i + 1, 0xE6FFFFFF);
+			graphics.fill(cx + i, cy - half, cx + i + 1, cy + half + 1, 0xE6FFFFFF);
+		}
+		int d = r * 2 / 3;
+		for (int i = -d; i <= d; i++) {
+			graphics.fill(cx + i, cy + i, cx + i + 1, cy + i + 1, 0x99FFFFFF);
+			graphics.fill(cx + i, cy - i, cx + i + 1, cy - i + 1, 0x99FFFFFF);
+		}
+		float scale = (float) Mth.clamp(chartScale * 1.2, 0.5, 1.0);
+		String[] letters = {"N", "E", "S", "W"};
+		int[][] offsets = {{0, -r - 7}, {r + 6, 0}, {0, r + 7}, {-r - 6, 0}};
+		for (int i = 0; i < 4; i++) {
+			graphics.pose().pushPose();
+			graphics.pose().translate(cx + offsets[i][0], cy + offsets[i][1] - 4 * scale, 0);
+			graphics.pose().scale(scale, scale, 1);
+			graphics.drawCenteredString(font, letters[i], 0, 0, 0xFFFFFF);
+			graphics.pose().popPose();
+		}
 	}
 
 	private void drawPlayer(GuiGraphics graphics, int x, int y, float yaw, float scale) {
