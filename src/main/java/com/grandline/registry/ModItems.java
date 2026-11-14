@@ -21,6 +21,11 @@ public final class ModItems {
 	public static final Item STARTER_FISHING_ROD = register("starter_fishing_rod", com.grandline.fishing.StarterRodItem::new,
 			new Item.Properties().stacksTo(1));
 
+	/** Race unlock parts and the awakening key (see race/RaceProgress). */
+	public static final Item MACHINE_CORE = register("machine_core", Item::new, new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(16));
+	public static final Item BLOOD_VIAL = register("blood_vial", Item::new, new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(16));
+	public static final Item AWAKENING_KEY = register("awakening_key", Item::new, new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).fireResistant());
+
 	private static <T extends Item> T register(String name, Function<Item.Properties, T> factory, Item.Properties properties) {
 		return Registry.register(BuiltInRegistries.ITEM, GrandLineMod.id(name), factory.apply(properties));
 	}

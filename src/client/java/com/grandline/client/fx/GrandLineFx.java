@@ -155,6 +155,8 @@ public final class GrandLineFx {
 				case "fishing_end" -> MovePoses.clear(packet.caster(), MovePoses.Kind.REEL);
 				default -> { }
 			}
+		} else if (RaceFx.handles(packet.effect())) {
+			RaceFx.handle(packet, level, caster);
 		} else if (SaberFx.handles(packet.effect())) {
 			SaberFx.handle(packet, level, caster, own);
 		}
@@ -194,12 +196,13 @@ public final class GrandLineFx {
 	private static void render(WorldRenderContext context) {
 		Minecraft mc = Minecraft.getInstance();
 		ClientLevel level = mc.level;
-		if (level == null || EFFECTS.isEmpty() && !FxSprites.any()) {
+		if (level == null) {
 			return;
 		}
 		PoseStack pose = context.matrixStack();
 		MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
 		FxDraw draw = new FxDraw(pose, context.camera(), buffers, context.tickDelta());
+		RaceFx.renderCosmetics(draw, level);
 		for (Effect e : EFFECTS) {
 			if (!e.done) {
 				e.render(draw, level);

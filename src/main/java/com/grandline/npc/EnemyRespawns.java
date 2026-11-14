@@ -51,7 +51,8 @@ public final class EnemyRespawns {
 
 	/** Whether this enemy is a regular island enemy that respawns. */
 	public static boolean respawns(GrandLineEnemy enemy) {
-		return !(enemy instanceof IslandBoss) && !(enemy instanceof SaberBoss) && enemy.kind() != EnemyKind.CAPTAIN;
+		return !(enemy instanceof IslandBoss) && !(enemy instanceof SaberBoss) && enemy.kind() != EnemyKind.CAPTAIN
+				&& !enemy.getTags().contains(com.grandline.race.RaceTrials.TAG);
 	}
 
 	static void onDeath(ServerLevel level, GrandLineEnemy enemy) {

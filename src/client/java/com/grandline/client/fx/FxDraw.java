@@ -38,6 +38,10 @@ public final class FxDraw {
 		this.up = new Vec3(u.x(), u.y(), u.z());
 	}
 
+	public Vec3 cameraPosition() {
+		return camPos;
+	}
+
 	public Vec3 cameraRight() {
 		return right;
 	}

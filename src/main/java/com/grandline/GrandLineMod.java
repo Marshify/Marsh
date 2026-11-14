@@ -84,6 +84,12 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.world.AdventureRules.register();
 		com.grandline.npc.EnemyRespawns.register();
 		com.grandline.npc.TempleBosses.register();
+		com.grandline.race.RaceService.register();
+		com.grandline.race.RacePassives.register();
+		com.grandline.race.RaceAbilities.register();
+		com.grandline.race.RaceAwakening.register();
+		com.grandline.race.RaceProgress.register();
+		com.grandline.race.RaceTrials.register();
 		com.grandline.registry.ModSpawnEggs.register();
 		GrandLineCommands.register();
 

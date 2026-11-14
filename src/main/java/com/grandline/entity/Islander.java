@@ -34,7 +34,15 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Lets players make this island their home (every island). */
 		INNKEEPER,
 		/** Sells swords (Millbrook Village). */
-		SWORDSMITH;
+		SWORDSMITH,
+		/** Race evolution (V2, V3), the awakening lore and race rerolls (Dawnreach Harbor). */
+		RACE_MYSTIC,
+		/** Cyborg unlock (Ironhold Bastion). */
+		TINKERER,
+		/** Ghoul unlock (Stonewall Prison). */
+		GRAVEKEEPER,
+		/** Awakening trials and V4 (Saltmarket Docks). */
+		TRIAL_KEEPER;
 
 		public static Role byId(int id) {
 			Role[] values = values();
@@ -93,7 +101,11 @@ public class Islander extends PathfinderMob implements FruitDealer {
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 		com.grandline.GrandLineMod.LOGGER.debug("Islander interact client={} role={} hand={}", level().isClientSide, role(), hand);
 		if (!level().isClientSide && player instanceof ServerPlayer serverPlayer) {
-			NpcService.open(serverPlayer, this);
+			if (com.grandline.race.RaceNpcs.isRaceNpc(role())) {
+				com.grandline.race.RaceNpcs.open(serverPlayer, this);
+			} else {
+				NpcService.open(serverPlayer, this);
+			}
 		}
 		return InteractionResult.sidedSuccess(level().isClientSide);
 	}

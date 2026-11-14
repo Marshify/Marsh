@@ -136,6 +136,7 @@ public final class ProfileHud {
 		spriteBar(graphics, font, x, y, width, Component.translatable("hud.grandline.energy"),
 				Math.round(energy) + "/" + Math.round(maxEnergy), maxEnergy <= 0 ? 0 : energy / maxEnergy, 1);
 		y += 17;
+		y = com.grandline.client.race.RaceHud.render(graphics, font, x, y, width);
 
 		if (profile.unallocatedStatPoints() > 0) {
 			graphics.drawString(font, Component.translatable("hud.grandline.points_hint", NUMBERS.format(profile.unallocatedStatPoints()),

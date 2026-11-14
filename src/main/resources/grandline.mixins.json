@@ -12,7 +12,8 @@
     "ExplosionNoBlockDamageMixin",
     "CraftingDisabledMixin",
     "ItemPickupFilterMixin",
-    "VanillaLootMixin"
+    "VanillaLootMixin",
+    "RaceDamageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

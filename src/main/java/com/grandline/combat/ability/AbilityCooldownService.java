@@ -27,7 +27,8 @@ public final class AbilityCooldownService {
 	}
 
 	public static void start(ServerPlayer player, ResourceLocation abilityId, int durationTicks) {
-		state(player).start(abilityId, now(player), durationTicks);
+		com.grandline.race.RaceProgress.onMoveUsed(player);
+		state(player).start(abilityId, now(player), (int) Math.round(durationTicks * com.grandline.race.RacePassives.cooldownMultiplier(player)));
 		sync(player);
 	}
 

@@ -66,7 +66,7 @@ public final class EnergyService {
 
 	/** Spends {@code fraction} of max energy if available. Returns false (nothing spent) if there is not enough. */
 	public static boolean trySpend(ServerPlayer player, double fraction) {
-		double cost = max(player) * Math.max(0, fraction);
+		double cost = max(player) * Math.max(0, fraction) * com.grandline.race.RacePassives.energyMultiplier(player);
 		double now = current(player);
 		if (now + 1.0e-9 < cost) {
 			return false;
@@ -78,13 +78,19 @@ public final class EnergyService {
 
 	/** Like {@link #trySpend} but without an immediate sync packet (for per-tick drains; the regular sync covers it). */
 	public static boolean trySpendQuiet(ServerPlayer player, double fraction) {
-		double cost = max(player) * Math.max(0, fraction);
+		double cost = max(player) * Math.max(0, fraction) * com.grandline.race.RacePassives.energyMultiplier(player);
 		double now = current(player);
 		if (now + 1.0e-9 < cost) {
 			return false;
 		}
 		state(player).current = now - cost;
 		return true;
+	}
+
+	/** Restores {@code fraction} of max energy (never above max). */
+	public static void restore(ServerPlayer player, double fraction) {
+		state(player).current = Math.min(max(player), current(player) + max(player) * Math.max(0, fraction));
+		sync(player, true);
 	}
 
 	public static void refill(ServerPlayer player) {

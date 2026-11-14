@@ -31,6 +31,7 @@ public final class GrandLineGearGameTests implements FabricGameTest {
 
 	private static ServerPlayer player(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		Vec3 home = helper.absoluteVec(new Vec3(1.5, 2, 1.5));
 		player.moveTo(home.x, home.y, home.z, 0, 0);
 		player.getInventory().clearContent();

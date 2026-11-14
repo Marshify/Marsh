@@ -116,6 +116,65 @@ public final class GrandLineCommands {
 															return 1;
 														}))))))
 				// Ships admin: give a ship class for free, or launch a player's ship beside them.
+				.then(Commands.literal("race").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("player", EntityArgument.player())
+								.executes(context -> {
+									ServerPlayer p = EntityArgument.getPlayer(context, "player");
+									var d = com.grandline.race.RaceService.get(p);
+									context.getSource().sendSuccess(() -> Component.literal(p.getGameProfile().getName() + ": " + d.race() + " V" + d.stage()
+											+ " energy " + d.energy() + " upgrades " + d.upgrades() + " flags " + d.flags() + " counters " + d.counters()), false);
+									return 1;
+								})
+								.then(Commands.literal("set")
+										.then(Commands.argument("race", StringArgumentType.word())
+												.then(Commands.argument("stage", IntegerArgumentType.integer(1, 4))
+														.executes(context -> {
+															ServerPlayer p = EntityArgument.getPlayer(context, "player");
+															var race = com.grandline.race.Race.byId(StringArgumentType.getString(context, "race"));
+															int stage = IntegerArgumentType.getInteger(context, "stage");
+															com.grandline.race.RaceNpcs.changeRace(p, race);
+															com.grandline.race.RaceService.update(p, d -> d.withStage(stage));
+															com.grandline.race.RacePassives.apply(p);
+															context.getSource().sendSuccess(() -> Component.literal("Set " + p.getGameProfile().getName() + " to " + race.id() + " V" + stage), true);
+															return 1;
+														}))))
+								.then(Commands.literal("energy")
+										.then(Commands.argument("amount", IntegerArgumentType.integer(0, 100))
+												.executes(context -> {
+													ServerPlayer p = EntityArgument.getPlayer(context, "player");
+													int amount = IntegerArgumentType.getInteger(context, "amount");
+													com.grandline.race.RaceService.update(p, d -> d.withEnergy(amount));
+													context.getSource().sendSuccess(() -> Component.literal("Awakening energy " + amount), true);
+													return 1;
+												})))
+								.then(Commands.literal("points")
+										.then(Commands.argument("amount", IntegerArgumentType.integer(0, 9))
+												.executes(context -> {
+													ServerPlayer p = EntityArgument.getPlayer(context, "player");
+													int amount = IntegerArgumentType.getInteger(context, "amount");
+													com.grandline.race.RaceService.update(p, d -> d.withCounter("awaken_points", amount));
+													context.getSource().sendSuccess(() -> Component.literal("Awakening Points " + amount), true);
+													return 1;
+												})))
+								.then(Commands.literal("v3").executes(context -> {
+									ServerPlayer p = EntityArgument.getPlayer(context, "player");
+									String r = com.grandline.race.RaceAbilities.useV3(p);
+									context.getSource().sendSuccess(() -> Component.literal("V3: " + (r == null ? "used" : r)), false);
+									return 1;
+								}))
+								.then(Commands.literal("v4").executes(context -> {
+									ServerPlayer p = EntityArgument.getPlayer(context, "player");
+									com.grandline.race.RaceService.update(p, d -> d.withEnergy(100));
+									String r = com.grandline.race.RaceAbilities.awaken(p);
+									context.getSource().sendSuccess(() -> Component.literal("V4: " + (r == null ? "awakened" : r)), false);
+									return 1;
+								}))
+								.then(Commands.literal("trial").executes(context -> {
+									ServerPlayer p = EntityArgument.getPlayer(context, "player");
+									String r = com.grandline.race.RaceTrials.start(p);
+									context.getSource().sendSuccess(() -> Component.literal("Trial: " + (r == null ? "started" : r)), false);
+									return 1;
+								}))))
 				.then(Commands.literal("ship").requires(source -> source.hasPermission(2))
 						.then(Commands.literal("give")
 								.then(Commands.argument("player", EntityArgument.player())

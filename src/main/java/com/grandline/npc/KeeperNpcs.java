@@ -58,6 +58,13 @@ public final class KeeperNpcs {
 		if (SWORD_ISLAND.equals(island.name()) || com.grandline.GrandLineMod.config().marineSpawnIsland.equals(island.name())) {
 			roles.add(Islander.Role.SWORDSMITH);
 		}
+		switch (island.name()) {
+			case com.grandline.race.RaceProgress.MYSTIC_ISLAND -> roles.add(Islander.Role.RACE_MYSTIC);
+			case com.grandline.race.RaceProgress.CYBORG_ISLAND -> roles.add(Islander.Role.TINKERER);
+			case com.grandline.race.RaceProgress.GHOUL_ISLAND -> roles.add(Islander.Role.GRAVEKEEPER);
+			case com.grandline.race.RaceProgress.TRIAL_ISLAND -> roles.add(Islander.Role.TRIAL_KEEPER);
+			default -> { }
+		}
 		return roles;
 	}
 
@@ -142,6 +149,9 @@ public final class KeeperNpcs {
 	}
 
 	private static Anchor plannedAnchor(Island island, Islander.Role role) {
+		if (com.grandline.race.RaceNpcs.isRaceNpc(role)) {
+			return null; // placed beside the island's main NPCs
+		}
 		Anchor.Type type = role == Islander.Role.SWORDSMITH ? Anchor.Type.SWORDSMITH : Anchor.Type.HOME;
 		List<Anchor> anchors = IslandPlans.anchors(island, type);
 		return anchors.isEmpty() ? null : anchors.get(0);

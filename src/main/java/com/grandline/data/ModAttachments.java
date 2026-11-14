@@ -132,6 +132,12 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("quest_navigation"));
 
+	/** Race and race progression (V1-V4, quests, unlocks, awakening): saved, kept through death. */
+	public static final AttachmentType<com.grandline.race.RaceData> RACE = AttachmentRegistry.<com.grandline.race.RaceData>builder()
+			.persistent(com.grandline.race.RaceData.CODEC)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("race"));
+
 	private ModAttachments() {
 	}
 

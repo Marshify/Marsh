@@ -174,6 +174,37 @@ public final class GrandLineConfig {
 	/** Item ids (besides every grandline: item) players may pick up; none by default. */
 	public java.util.List<String> allowedItems = new java.util.ArrayList<>();
 
+	// ---- Races ----
+	/** Starting race weights for new players (standard races only; Cyborg and Ghoul are unlocked). */
+	public java.util.Map<String, Integer> raceWeights = new java.util.LinkedHashMap<>(java.util.Map.of("human", 5, "shark", 1, "angel", 1, "rabbit", 1));
+	/** Per-race balance, per evolution stage (see RaceBalance). */
+	public java.util.Map<String, RaceBalance> races = RaceBalance.defaults();
+	/** Evolution requirements: player level and currency for V2, V3 and V4. */
+	public int[] raceEvolutionLevels = {50, 150, 400};
+	public long[] raceEvolutionCosts = {25_000, 100_000, 500_000};
+	/** V2 quest: enemies to defeat and islands to discover after accepting it. */
+	public int raceV2Kills = 25;
+	public int raceV2Islands = 3;
+	/** V3 quest: race-specific objective count (kills, catches, etc.). */
+	public int raceV3Goal = 40;
+	/** Special race unlocks: parts to collect, drop chance per qualifying kill, and cost. */
+	public int raceUnlockParts = 3;
+	public double raceUnlockDropChance = 0.08;
+	public long raceUnlockCost = 150_000;
+	/** Race reroll cost at the Race Mystic. */
+	public long raceRerollCost = 50_000;
+	/** The island boss level that can drop the Awakening Key, and its chance (V3 players without a key). */
+	public int raceKeyBossLevel = 300;
+	public double raceKeyDropChance = 0.35;
+	/** Awakening energy gained per point of damage dealt (and per kill), and the most per second. */
+	public double awakeningEnergyPerDamage = 0.6;
+	public int awakeningEnergyPerKill = 6;
+	public int awakeningEnergyPerSecondCap = 8;
+	/** Awakening points: first clear of a trial, each repeat clear, and the cap. */
+	public int awakeningPointsFirstClear = 3;
+	public int awakeningPointsRepeat = 1;
+	public int awakeningPointsMax = 9;
+
 	// ---- Fishing ----
 	/** Starter Fishing Rod price at the Fisherman. */
 	public long fishingRodPrice = 150;
@@ -377,6 +408,23 @@ public final class GrandLineConfig {
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);
+		if (raceWeights == null || raceWeights.isEmpty()) {
+			raceWeights = defaults().raceWeights;
+		}
+		if (races == null) {
+			races = RaceBalance.defaults();
+		}
+		for (var e : RaceBalance.defaults().entrySet()) {
+			races.putIfAbsent(e.getKey(), e.getValue());
+		}
+		if (raceEvolutionLevels == null || raceEvolutionLevels.length != 3) {
+			raceEvolutionLevels = defaults().raceEvolutionLevels;
+		}
+		if (raceEvolutionCosts == null || raceEvolutionCosts.length != 3) {
+			raceEvolutionCosts = defaults().raceEvolutionCosts;
+		}
+		raceUnlockDropChance = clamp(raceUnlockDropChance, 0, 1);
+		awakeningEnergyPerSecondCap = clamp(awakeningEnergyPerSecondCap, 1, 100);
 		adventureBypassPermission = clamp(adventureBypassPermission, 0, 4);
 		if (allowedBlockInteractions == null) {
 			allowedBlockInteractions = new java.util.ArrayList<>();

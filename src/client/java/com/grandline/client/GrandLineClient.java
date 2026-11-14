@@ -20,6 +20,7 @@ public final class GrandLineClient implements ClientModInitializer {
 		com.grandline.client.hud.QuestUnlockBanner.register();
 		ClientFishing.register();
 		ClientNavigation.register();
+		com.grandline.client.race.ClientRace.register();
 		com.grandline.client.hud.QuestCompass.register();
 		com.grandline.client.render.GrandLineRenderers.register();
 		com.grandline.client.screen.FruitDialogs.register();

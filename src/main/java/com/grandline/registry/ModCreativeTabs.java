@@ -22,6 +22,9 @@ public final class ModCreativeTabs {
 						// Everything the mod adds: crystal, fruits by rarity, sea creatures, spawn eggs.
 						output.accept(ModItems.GRAND_LINE_CRYSTAL);
 						output.accept(ModItems.STARTER_FISHING_ROD);
+						output.accept(ModItems.MACHINE_CORE);
+						output.accept(ModItems.BLOOD_VIAL);
+						output.accept(ModItems.AWAKENING_KEY);
 						com.grandline.fruit.Fruits.all().stream()
 								.sorted(java.util.Comparator.comparingInt(f -> f.rarity().ordinal()))
 								.forEach(f -> output.accept(f.item()));

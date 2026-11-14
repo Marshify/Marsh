@@ -21,6 +21,7 @@ public final class GrandLineReputationGameTests implements FabricGameTest {
 	private static ServerPlayer player(GameTestHelper helper, TeamService.Side side, int level) {
 		helper.getLevel().getServer().setPvpAllowed(true); // the game-test server starts with PvP off
 		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(p); // no race bonus in this feature's numbers
 		p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL); // mock players start in creative (cannot be hurt)
 		try { // and with spawn protection, which mock players never tick down
 			var field = ServerPlayer.class.getDeclaredField("spawnInvulnerableTime");
