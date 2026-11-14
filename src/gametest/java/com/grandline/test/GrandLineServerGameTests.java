@@ -34,6 +34,7 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void newPlayersGetDefaultProfile(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		assertEqual(helper, PlayerProfileService.get(player), PlayerProfile.createDefault(GrandLineMod.config().startingCurrency), "default profile");
 		helper.succeed();
 	}
@@ -42,6 +43,7 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void profileSurvivesPlayerSaveAndLoad(GameTestHelper helper) {
 		ServerPlayer original = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(original); // no race bonus in this feature's numbers
 		PlayerProfileService.addExperience(original, 260);
 		PlayerProfileService.addCurrency(original, 5_000);
 		PlayerProfile expected = PlayerProfileService.get(original);
@@ -53,6 +55,7 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 				"player NBT must contain the grandline:player_profile attachment, got keys " + attachments.getAllKeys());
 
 		ServerPlayer reloaded = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(reloaded); // no race bonus in this feature's numbers
 		helper.assertFalse(PlayerProfileService.get(reloaded).equals(expected), "fresh player starts with a different (default) profile");
 		reloaded.load(saved);
 
@@ -63,6 +66,7 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void cooldownAttachmentIsNotPersisted(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		AbilityCooldownService.start(player, GrandLineMod.id("test_ability"), 200);
 		helper.assertTrue(AbilityCooldownService.isOnCooldown(player, GrandLineMod.id("test_ability")), "cooldown active");
 
@@ -76,6 +80,7 @@ public final class GrandLineServerGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void abilityRequestsAreValidatedAndCannotModifyProfile(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfile before = PlayerProfileService.get(player);
 		long rejectedBefore = ServerRequestGuard.rejectedCount();
 

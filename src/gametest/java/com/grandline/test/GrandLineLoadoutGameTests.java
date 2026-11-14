@@ -18,6 +18,7 @@ public final class GrandLineLoadoutGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "loadout_order")
 	public void orderDefaultsValidatesAndPersists(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		helper.assertTrue(LoadoutOrderService.get(player).equals(LoadoutOrder.DEFAULT), "new players get Style, Fruit, Sword, Gun");
 		helper.assertTrue(!LoadoutOrderService.set(player, List.of(0, 0, 1, 2)), "a duplicate entry is refused");
 		helper.assertTrue(LoadoutOrderService.get(player).equals(LoadoutOrder.DEFAULT), "a refused order changes nothing");
@@ -26,12 +27,14 @@ public final class GrandLineLoadoutGameTests implements FabricGameTest {
 		// Relog / restart: the order is written into the player data and read back.
 		CompoundTag saved = new CompoundTag();
 		player.saveWithoutId(saved);
-		ServerPlayer reloaded = helper.makeMockServerPlayerInLevel(); // a fresh player, as after a relog
+		ServerPlayer reloaded = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(reloaded); // no race bonus in this feature's numbers // a fresh player, as after a relog
 		reloaded.load(saved);
 		helper.assertTrue(FRUIT_GUN_SWAPPED.equals(reloaded.getAttached(ModAttachments.LOADOUT_ORDER)), "order survives save and load");
 
 		// Death: the respawned player keeps the order.
 		ServerPlayer respawned = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(respawned); // no race bonus in this feature's numbers
 		respawned.restoreFrom(player, false);
 		helper.assertTrue(FRUIT_GUN_SWAPPED.equals(LoadoutOrderService.get(respawned)), "order survives death");
 		// Mock players are not cleaned up by the framework; leftovers would be hit by later tests' moves.

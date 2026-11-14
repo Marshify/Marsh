@@ -129,6 +129,14 @@ public final class IslandPopulation {
 		int z = island.z() + anchor.z();
 		int y = anchor.y() != com.grandline.world.plan.Anchor.SURFACE ? anchor.y()
 				: level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		if (anchor.y() == com.grandline.world.plan.Anchor.SURFACE && !level.hasChunk(x >> 4, z >> 4)) {
+			// The spot's chunk isn't generated yet (the height map would put the NPC at the bottom of the world):
+			// stand it on the plan's own ground instead.
+			com.grandline.world.plan.IslandPlan plan = com.grandline.world.plan.IslandPlans.get(island);
+			if (plan != null) {
+				y = plan.terrain().ground(anchor.x(), anchor.z()) + 1;
+			}
+		}
 		float yaw = Float.isNaN(anchor.yaw()) ? level.getRandom().nextFloat() * 360 : anchor.yaw();
 		npc.moveTo(x + 0.5, y, z + 0.5, yaw, 0);
 		npc.setYHeadRot(yaw);

@@ -46,6 +46,7 @@ public final class GrandLineNpcGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void killQuestTracksKillsAndPaysOut(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		Islander giver = npc(helper, Islander.Role.QUEST_GIVER, 10);
 		player.moveTo(giver.position());
 		eq(helper, QuestService.accept(player, giver, false), QuestService.Result.ACCEPTED, "accept");
@@ -69,6 +70,7 @@ public final class GrandLineNpcGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void bossQuestSpawnsBoss(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		Islander lowGiver = npc(helper, Islander.Role.QUEST_GIVER, 5);
 		player.moveTo(lowGiver.position());
 		eq(helper, QuestService.accept(player, lowGiver, true), QuestService.Result.NO_BOSS_HERE, "no boss on low islands");
@@ -86,6 +88,7 @@ public final class GrandLineNpcGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void npcActionsAreValidated(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		Islander fisher = npc(helper, Islander.Role.FISHERMAN, 1);
 		player.moveTo(fisher.position());
 		eq(helper, NpcService.handle(player, new NpcActionPayload(-5, NpcActionPayload.SELL_FISH)), "too_far", "unknown NPC");
@@ -102,6 +105,7 @@ public final class GrandLineNpcGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void npcsCannotBeHurt(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
 		Islander npc = npc(helper, Islander.Role.QUEST_GIVER, 1);
 		npc.hurt(helper.getLevel().damageSources().playerAttack(player), 1000f);

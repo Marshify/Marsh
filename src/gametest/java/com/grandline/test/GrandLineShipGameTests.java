@@ -38,6 +38,7 @@ public final class GrandLineShipGameTests implements FabricGameTest {
 
 	private static ServerPlayer sailor(GameTestHelper helper) {
 		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(p); // no race bonus in this feature's numbers
 		Vec3 pos = helper.absoluteVec(new Vec3(5.5, 4, 5.5));
 		p.moveTo(pos.x, pos.y, pos.z, 0, 0);
 		return p;

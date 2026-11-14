@@ -27,6 +27,7 @@ import java.util.Objects;
 public final class GrandLineStatsGameTests implements FabricGameTest {
 	private static ServerPlayer playerWithPoints(GameTestHelper helper, int points) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfileService.update(player, profile -> profile.withUnallocatedStatPoints(points));
 		return player;
 	}
@@ -76,6 +77,7 @@ public final class GrandLineStatsGameTests implements FabricGameTest {
 
 		CompoundTag saved = player.saveWithoutId(new CompoundTag());
 		ServerPlayer reloaded = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(reloaded); // no race bonus in this feature's numbers
 		reloaded.load(saved);
 		eq(helper, reloaded.getAttributeValue(Attributes.MAX_HEALTH), base + expectedBonus, "max health after reload");
 		eq(helper, reloaded.getHealth(), boostedHealth, "boosted current health kept after reload");
@@ -118,6 +120,7 @@ public final class GrandLineStatsGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void killingHostileMobGrantsReward(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfile before = PlayerProfileService.get(player);
 
 		Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 1));
@@ -138,6 +141,7 @@ public final class GrandLineStatsGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void killingPassiveMobGrantsNothing(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfile before = PlayerProfileService.get(player);
 
 		Cow cow = helper.spawn(EntityType.COW, new BlockPos(1, 2, 1));
@@ -151,6 +155,7 @@ public final class GrandLineStatsGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void mobDeathWithoutPlayerGrantsNothing(GameTestHelper helper) {
 		ServerPlayer bystander = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(bystander); // no race bonus in this feature's numbers
 		PlayerProfile before = PlayerProfileService.get(bystander);
 
 		Zombie zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 1));

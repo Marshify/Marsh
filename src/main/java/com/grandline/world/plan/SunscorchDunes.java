@@ -108,14 +108,14 @@ final class SunscorchDunes extends BasePlan {
 				.mass(OASIS_X - 4, OASIS_Z, 20, 22, 3.8, 3.0, Ground.SAND) // the western lobe (oasis)
 				.mass(DOCK_X, 44, 18, 10, 3.2, 3.0, Ground.SAND)           // the southern shore by the dock
 				// Dunes: soft, rounded mounds between the landmarks.
-				.mass(-38, -24, 13, 8, 7.8, 1.6, Ground.SAND)
-				.mass(38, -24, 10, 7, 7.2, 1.6, Ground.SAND)
-				.mass(58, 30, 11, 8, 6.6, 1.6, Ground.SAND)
-				.mass(-50, 36, 12, 8, 6.2, 1.6, Ground.SAND)
-				.mass(-64, -14, 9, 7, 6.0, 1.6, Ground.SAND)
-				.mass(30, 44, 9, 6, 5.6, 1.6, Ground.SAND)
-				.mass(-30, -38, 8, 6, 8.5, 1.6, Ground.SAND)
-				.mass(60, -26, 9, 6, 8.0, 1.3, Ground.RED_SAND)           // a red-sand ridge with exposed rock (north-east)
+				.mass(-38, -24, 17, 11, 5.6, 2.2, Ground.SAND)
+				.mass(40, -22, 13, 9, 5.2, 2.2, Ground.SAND)
+				.mass(56, 30, 14, 10, 5.0, 2.2, Ground.SAND)
+				.mass(-48, 36, 15, 10, 4.8, 2.2, Ground.SAND)
+				.mass(-60, -16, 12, 9, 4.8, 2.2, Ground.SAND)
+				.mass(30, 44, 12, 8, 4.4, 2.2, Ground.SAND)
+				.mass(-34, -36, 10, 8, 6.4, 2.2, Ground.SAND)
+				.mass(58, -28, 13, 8, 5.4, 2.0, Ground.SAND)               // a dune ridge with exposed sandstone faces (north-east)
 				// Level ground for the settlement and the landmarks.
 				.flat(0, 14, 36, 28, G, 8, null)                           // the village plateau
 				.flat(GREAT_X, GREAT_Z, GREAT_HALF + 4, GREAT_HALF + 4, GREAT_BASE, 6, null)
@@ -142,10 +142,10 @@ final class SunscorchDunes extends BasePlan {
 		}
 		terrain.reach(DOCK_END_Z + 4);
 
-		anchor(Anchor.at(Type.QUEST, QUEST_X, Anchor.SURFACE, QUEST_Z, 90));          // at the east gate, facing the village
+		anchor(Anchor.at(Type.QUEST, QUEST_X, G + 1, QUEST_Z, 90));          // at the east gate, facing the village
 		anchor(new Anchor(Type.ARRIVAL, DOCK_X, Anchor.SURFACE, PLAZA_Z - 1, 0, 180)); // the arrival plaza, facing the village
 		int[] inn = doorStep(BUILDINGS.get(0));
-		anchor(Anchor.at(Type.HOME, inn[0] + 1, Anchor.SURFACE, inn[1] + 2, 90));     // the Innkeeper, outside the inn
+		anchor(Anchor.at(Type.HOME, inn[0] + 4, G + 1, inn[1] + 3, 270));          // the Innkeeper, past the inn's porch, facing the market
 		anchor(Anchor.at(Type.FISHERMAN, DOCK_X + 4, DOCK_Y + 1, DOCK_END_Z - 2, 0)); // on the pier's T-head
 		anchor(Anchor.at(Type.DOCK, DOCK_X - 9, 63, DOCK_END_Z - 3));
 		anchor(Anchor.area(Type.ENEMY_CAMP, CAMP_X, CAMP_Z, 6));                      // the bandit camp
@@ -306,7 +306,7 @@ final class SunscorchDunes extends BasePlan {
 				for (int[] n : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
 					drop = Math.max(drop, g - c.ground(x + n[0], z + n[1]));
 				}
-				boolean redRidge = near(x, z, 60, -26, 11);
+				boolean redRidge = false;
 				if (drop >= 2) {
 					c.set(x, g, z, redRidge ? s(Blocks.SMOOTH_RED_SANDSTONE) : r < 0.5 ? s(Blocks.SANDSTONE) : s(Blocks.SMOOTH_SANDSTONE));
 					c.set(x, g - 1, z, redRidge ? s(Blocks.RED_SANDSTONE) : s(Blocks.SANDSTONE));
@@ -443,10 +443,11 @@ final class SunscorchDunes extends BasePlan {
 					if (unit(x, z, 31) < 0.06 && e < 0.8) {
 						c.set(x, 66, z, s(Blocks.LILY_PAD));
 					}
-				} else if (e <= 1.9 && c.terrain().paving(x, z) == null) {
+				} else if (e <= 1.75 && c.terrain().paving(x, z) == null) {
 					// Grass ring, thinning out into the sand.
 					double r = unit(x, z, 32);
-					if (e <= 1.45 || r < 0.55) {
+					double edge = 1.5 + 0.22 * Math.sin(Math.atan2(z - OASIS_Z, x - OASIS_X) * 3 + 0.8);
+					if (e <= edge) {
 						c.set(x, g, z, s(Blocks.GRASS_BLOCK));
 						c.set(x, g - 1, z, s(Blocks.DIRT));
 						if (e <= 1.25 && r < 0.18 && (z < OASIS_Z || x > OASIS_X + 3)) {

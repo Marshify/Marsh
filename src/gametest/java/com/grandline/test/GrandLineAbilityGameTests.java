@@ -31,6 +31,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_1")
 	public void slamDamagesNearbyMobsAndGrantsMastery(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		// Mock players spawn at world spawn, where other tests leave mobs; run this one inside its own test area.
 		net.minecraft.world.phys.Vec3 home = helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5, 2, 1.5));
 		player.moveTo(home.x, home.y, home.z, -90, 0);
@@ -65,6 +66,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_2")
 	public void lockedMovesAndMissingFruitAreRejected(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		eq(helper, use(player, PowerSource.STYLE, 3), Outcome.LOCKED, "Uppercut needs mastery 50");
 		helper.runAfterDelay(gap(), () -> {
 			eq(helper, use(player, PowerSource.FRUIT, 0), Outcome.NO_POWER, "no fruit eaten");
@@ -79,6 +81,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_3")
 	public void cooldownBlocksReuse(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		eq(helper, use(player, PowerSource.STYLE, 0), Outcome.USED, "first jab");
 		helper.runAfterDelay(gap(), () -> {
 			eq(helper, use(player, PowerSource.STYLE, 0), Outcome.ON_COOLDOWN, "second jab during cooldown");
@@ -89,6 +92,7 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_4")
 	public void movesNeedEnergy(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		helper.assertTrue(EnergyService.trySpend(player, 0.97), "drain energy");
 		eq(helper, use(player, PowerSource.STYLE, 0), Outcome.NO_ENERGY, "jab without energy");
 		helper.assertTrue(EnergyService.current(player) < EnergyService.max(player) * 0.1, "nothing refunded");

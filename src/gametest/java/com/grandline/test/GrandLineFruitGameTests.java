@@ -45,6 +45,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, timeoutTicks = 400, batch = "fruit_moves")
 	public void everyFruitMoveExecutes(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		player.moveTo(helper.absolutePos(new BlockPos(1, 2, 1)).getCenter()); // own test area, away from world spawn
 		int totalHits = 0;
 		for (Fruits.FruitDef fruit : Fruits.all()) {
@@ -73,6 +74,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void eatingReplacesFruitAndConsumesItem(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		player.setGameMode(GameType.SURVIVAL); // creative players keep items by design
 		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.FLAME.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.EAT), FruitService.Result.SUCCESS, "eat ember");
@@ -95,6 +97,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void stashStoresWithdrawsAndRespectsCapacity(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Fruits.SPIN.item(), 1));
 		eq(helper, FruitService.useHeldFruit(player, true, FruitService.FruitAction.STORE), FruitService.Result.SUCCESS, "store");
 		eq(helper, PlayerProfileService.get(player).powers().stashCount(Fruits.SPIN.id()), 1, "in stash");
@@ -114,6 +117,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void gachaChargesCurrencyAndHasCooldown(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		eq(helper, FruitService.rollGacha(player).result(), FruitService.Result.LEVEL_TOO_LOW, "level 1 cannot spin");
 		PlayerProfileService.setLevel(player, 100);
 		eq(helper, FruitService.rollGacha(player).result(), FruitService.Result.NOT_ENOUGH_CURRENCY, "broke");
@@ -134,6 +138,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void shopRequiresDealerAndStock(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfileService.addCurrency(player, 10_000_000);
 		long before = PlayerProfileService.get(player).currency();
 		Fruits.FruitDef inStock = FruitService.dealerStock(player.server).get(0);
@@ -155,6 +160,7 @@ public final class GrandLineFruitGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE)
 	public void refundCostsCurrency(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		PlayerProfileService.update(player, p -> p.withUnallocatedStatPoints(10));
 		PlayerProfileService.allocateStat(player, StatType.MELEE, 10);
 		eq(helper, GrandLineNetworking.handleFruitAction(player, new FruitActionPayload(FruitActionPayload.REFUND_STATS, "", 0)),

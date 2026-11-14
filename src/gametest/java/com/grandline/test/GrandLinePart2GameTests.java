@@ -39,6 +39,7 @@ import java.util.List;
 public final class GrandLinePart2GameTests implements FabricGameTest {
 	private static ServerPlayer survivor(GameTestHelper helper) {
 		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(p); // no race bonus in this feature's numbers
 		p.setGameMode(GameType.SURVIVAL);
 		try {
 			var field = ServerPlayer.class.getDeclaredField("spawnInvulnerableTime");

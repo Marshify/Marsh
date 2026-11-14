@@ -20,7 +20,9 @@ public final class GrandLineDiscoveryGameTests implements FabricGameTest {
 		// A random-style island (no plan): its gameplay area is its radius around the centre.
 		Island island = new Island(987654321L, 10_000, 10_000, 20, 5, "Test Isle", false, true, "village");
 		ServerPlayer alice = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(alice); // no race bonus in this feature's numbers
 		ServerPlayer bob = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(bob); // no race bonus in this feature's numbers
 		alice.moveTo(10_000 + 30, 70, 10_000);                        // just offshore
 		helper.assertTrue(!ModWorld.inGameplayArea(alice, island), "near the island but offshore: not arrived");
 		var boat = EntityType.BOAT.create(helper.getLevel());
@@ -39,9 +41,11 @@ public final class GrandLineDiscoveryGameTests implements FabricGameTest {
 		CompoundTag saved = new CompoundTag();
 		alice.saveWithoutId(saved);
 		ServerPlayer reloaded = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(reloaded); // no race bonus in this feature's numbers
 		reloaded.load(saved);
 		helper.assertTrue(ModWorld.discovered(reloaded).contains(island.id()), "discovery survives save and load");
 		ServerPlayer respawned = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(respawned); // no race bonus in this feature's numbers
 		respawned.restoreFrom(alice, false);
 		helper.assertTrue(ModWorld.discovered(respawned).contains(island.id()), "discovery survives death");
 		for (ServerPlayer p : List.of(alice, bob, reloaded, respawned)) {

@@ -41,6 +41,7 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 			}
 		}
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(player); // no race bonus in this feature's numbers
 		player.moveTo(helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5, 3, 1.5)));
 		player.setGameMode(GameType.SURVIVAL);
 		PlayerProfileService.update(player, p -> p.withPowers(p.powers().withFruit(Fruits.FLAME.id())));

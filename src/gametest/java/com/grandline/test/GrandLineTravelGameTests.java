@@ -35,7 +35,9 @@ public final class GrandLineTravelGameTests implements FabricGameTest {
 		StructurePlacements.registerArrival(arrival, landing);
 		TravelService.resetCooldowns();
 		ServerPlayer rider = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(rider); // no race bonus in this feature's numbers
 		ServerPlayer bystander = helper.makeMockServerPlayerInLevel();
+		GrandLineRaceGameTests.neutral(bystander); // no race bonus in this feature's numbers
 		rider.teleportTo(plate.getX() + 0.5, plate.getY(), plate.getZ() + 0.5);
 		bystander.teleportTo(plate.getX() + 1.5, plate.getY(), plate.getZ() + 0.5); // on the next block, touching the plate's edge
 		return new Setup(plate, cmd, landing, rider, bystander);
