@@ -79,7 +79,7 @@ New on hit: a sweep flash, sparks, a steel ring and a bright slash arc.
 - **Look:**
   - The full player model (both skin layers, standard 64×64 layout), 1.08× size, holding the Saber.
   - Posed through every attack: blade raised, blade drawn back, a crouch, three cuts, then a winded stance.
-  - It uses `textures/entity/saber_boss.png`, which is meant to be your supplied skin.
+  - It uses `textures/entity/saber_boss.png`: the supplied Saber Warden skin (64×64, wide arms, both layers), copied unchanged byte for byte (0.27.1).
 - **Stats:**
 
   | Stat | Value | Config |
