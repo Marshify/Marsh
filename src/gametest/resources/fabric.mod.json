@@ -20,6 +20,7 @@
       "com.grandline.test.GrandLineBatch3GameTests",
       "com.grandline.test.GrandLineRaceGameTests",
       "com.grandline.test.GrandLineSunscorchGameTests",
+      "com.grandline.test.GrandLineGladiatorGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

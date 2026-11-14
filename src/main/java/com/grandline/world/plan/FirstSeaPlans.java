@@ -41,12 +41,12 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy());
 	}
 
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
-				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new GladiatorsRing(),
+				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
 				new EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
 
@@ -558,8 +558,9 @@ public final class FirstSeaPlans {
 	// ==================================================================================================== Lv 225
 
 	/** Colosseum: oval sand arena ringed by stepped stone seating and an arched outer wall. */
-	static final class GladiatorsRing extends BasePlan {
-		GladiatorsRing() {
+	/** The original Gladiator's Ring. Kept for worlds created before the rebuild; new worlds use {@link com.grandline.world.plan.GladiatorsRing}. */
+	static final class GladiatorsRingLegacy extends BasePlan {
+		GladiatorsRingLegacy() {
 			super("Gladiator's Ring", 0.07);
 			terrain.mass(0, 0, 46, 42, 4, 3.0, Ground.SAND)
 					.flat(0, -4, 30, 26, 64, 4, s(Blocks.SMOOTH_SANDSTONE))
