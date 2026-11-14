@@ -757,5 +757,9 @@
   "npc.grandline.result.sword_bought": "A fine choice! It's in your bag.",
   "npc.grandline.result.sword_money": "Not enough money for that.",
   "entity.grandline.saber_boss": "Saber Warden",
-  "message.grandline.saber_boss.reward": "The Saber Warden falls. You claim the Saber!"
+  "message.grandline.saber_boss.reward": "The Saber Warden falls. You claim the Saber!",
+  "message.grandline.quest_unlock": "New quest available! You can now travel to %s (Lv. %s).",
+  "hud.grandline.quest_unlock.title": "NEW QUEST AVAILABLE!",
+  "hud.grandline.quest_unlock.where": "You can now travel to %s!",
+  "hud.grandline.quest_unlock.level": "Required Level: %s  ·  %s"
 }

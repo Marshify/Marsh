@@ -65,6 +65,7 @@ public final class PlayerProfileService {
 			player.sendSystemMessage(Component.translatable("message.grandline.level_up", after.level(), Math.max(0, points))
 					.withStyle(ChatFormatting.GOLD));
 			player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.75F, 1.0F);
+			com.grandline.quest.QuestUnlocks.onLevelChanged(player, before.level(), after.level());
 		}
 		return after;
 	}

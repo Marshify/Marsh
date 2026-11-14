@@ -20,8 +20,8 @@ import java.util.UUID;
  * Grants experience and currency when a player kills a hostile mob. Everything is decided on the server from the
  * actual death event; the client is only told the result.
  *
- * <p>Rules: only {@link Enemy} mobs give rewards (no farming passive animals or other players), the killer must be a
- * player (directly or via their projectile), and per-player per-minute caps limit mob-farm abuse.
+ * <p>Rules: only {@link Enemy} mobs give rewards (no farming passive animals or other players), the kill must be a
+ * player's (directly, via their projectile, or a death their attack caused: see CombatCredit), and per-player per-minute caps limit mob-farm abuse.
  */
 public final class MobKillRewards {
 	private static final Map<UUID, RewardRules.Budget> BUDGETS = new HashMap<>();
@@ -36,7 +36,12 @@ public final class MobKillRewards {
 	}
 
 	private static void onDeath(LivingEntity entity, DamageSource source) {
-		if (!(entity instanceof Enemy) || !(source.getEntity() instanceof ServerPlayer player)) {
+		if (!(entity instanceof Enemy)) {
+			return;
+		}
+		// The killer, or the player whose attack led to this death (burning, a knocked-off fall, a lingering move...).
+		ServerPlayer player = com.grandline.combat.CombatCredit.killer(entity, source);
+		if (player == null) {
 			return;
 		}
 		grant(player, entity.getMaxHealth());

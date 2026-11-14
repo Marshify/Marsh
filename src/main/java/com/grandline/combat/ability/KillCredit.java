@@ -15,7 +15,7 @@ import java.util.WeakHashMap;
  */
 public final class KillCredit {
 	/** A move hit counts for the kill if it landed within this many ticks before death. */
-	public static final int WINDOW_TICKS = 60;
+	public static final int WINDOW_TICKS = 300; // 15 s: covers burning and other delayed deaths
 
 	private record Hit(UUID player, Power power, int tick) {
 	}

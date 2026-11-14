@@ -17,6 +17,7 @@
       "com.grandline.test.GrandLineDiscoveryGameTests",
       "com.grandline.test.GrandLineCoreRulesGameTests",
       "com.grandline.test.GrandLinePart2GameTests",
+      "com.grandline.test.GrandLineBatch3GameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

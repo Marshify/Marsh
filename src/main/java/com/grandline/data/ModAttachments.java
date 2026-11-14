@@ -107,6 +107,12 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("death_island"));
 
+	/** Islands whose "new quest available" card the player has already seen (or had reached before the card existed). */
+	public static final AttachmentType<java.util.List<Long>> QUEST_UNLOCKS_SEEN = AttachmentRegistry.<java.util.List<Long>>builder()
+			.persistent(com.mojang.serialization.Codec.LONG.listOf())
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("quest_unlocks_seen"));
+
 	private ModAttachments() {
 	}
 

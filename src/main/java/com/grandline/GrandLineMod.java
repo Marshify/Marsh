@@ -69,6 +69,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.combat.ability.TimedEffects.register();
 		com.grandline.combat.ability.ChargeService.register();
 		com.grandline.combat.ability.FlightService.register();
+		com.grandline.combat.CombatCredit.register();
 		MobKillRewards.register();
 		LingeringAreas.register();
 		FruitService.register();
@@ -77,6 +78,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.npc.FishingService.register();
 		com.grandline.npc.IslandPopulation.register();
 		com.grandline.npc.KeeperNpcs.register();
+		com.grandline.quest.QuestUnlocks.register();
 		com.grandline.npc.EnemyRespawns.register();
 		com.grandline.npc.TempleBosses.register();
 		com.grandline.registry.ModSpawnEggs.register();

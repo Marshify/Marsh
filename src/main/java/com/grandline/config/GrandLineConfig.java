@@ -158,6 +158,10 @@ public final class GrandLineConfig {
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */
 	public long[] gunPrices = {1_500, 12_000};
 
+	// ---- Kill credit ----
+	/** A death with no attacker of its own (fire, a fall, a lingering move) counts for the last player who hit within this many seconds. */
+	public double killCreditSeconds = 15.0;
+
 	// ---- Enemies ----
 	/** Seconds after a regular island enemy dies before it respawns at its spawn point (bosses use their own timers). */
 	public double enemyRespawnSeconds = 10.0;
@@ -343,6 +347,7 @@ public final class GrandLineConfig {
 			gunPrices[i] = clamp(gunPrices[i], 0, maxCurrency);
 		}
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
+		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		saberAttackDamage = clamp(saberAttackDamage, 1, 100);
 		saberAttackSpeed = clamp(saberAttackSpeed, 0.5, 4);
 		saberMoveDamageMultiplier = clamp(saberMoveDamageMultiplier, 0.1, 10);
