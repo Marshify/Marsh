@@ -492,7 +492,7 @@ final class EmberfallIsle extends BasePlan {
 
 	/**
 	 * A volcanic-stone building: a polished blackstone plinth, stone brick base course, andesite walls between dark oak
-	 * posts, deepslate-tile roof (flat with a parapet for the barracks and storehouse, a low pitch for the homes and the
+	 * posts, deepslate-tile roof (flat with a parapet for the barracks and storehouse, a hipped for the homes and the
 	 * mayor's house), small windows, an open door with a step and a lantern, and furniture.
 	 */
 	private static void house(Canvas c, House h) {
@@ -550,31 +550,10 @@ final class EmberfallIsle extends BasePlan {
 				}
 			}
 		} else {
-			// A low pitch: tile stairs on the two long sides stepping up to a slab ridge.
-			boolean alongX = (h.x2() - h.x1()) >= (h.z2() - h.z1());
-			int lo = (alongX ? h.z1() : h.x1()) - 1, hi = (alongX ? h.z2() : h.x2()) + 1;
-			int a1 = (alongX ? h.x1() : h.z1()) - 1, a2 = (alongX ? h.x2() : h.z2()) + 1;
-			for (int i = 0; lo + i <= hi - i; i++) {
-				int yy = top + (i + 1) / 2;
-				for (int t = a1; t <= a2; t++) {
-					int p = lo + i, q = hi - i;
-					BlockState a = i % 2 == 0 ? stair(Blocks.DEEPSLATE_TILE_STAIRS, alongX ? Direction.SOUTH : Direction.EAST, false)
-							: Kit.slab(Blocks.DEEPSLATE_TILE_SLAB, true);
-					BlockState b = i % 2 == 0 ? stair(Blocks.DEEPSLATE_TILE_STAIRS, alongX ? Direction.NORTH : Direction.WEST, false)
-							: Kit.slab(Blocks.DEEPSLATE_TILE_SLAB, true);
-					if (p == q) {
-						a = Kit.slab(Blocks.DEEPSLATE_TILE_SLAB, false);
-						b = a;
-					}
-					if (alongX) {
-						c.set(t, yy, p, a);
-						c.set(t, yy, q, b);
-					} else {
-						c.set(p, yy, t, a);
-						c.set(q, yy, t, b);
-					}
-				}
-			}
+			// A hipped roof of deepslate tiles: a one-block overhang, rising a block per row to a slab ridge, solid
+			// underneath (it is also the ceiling of the top floor).
+			Kit.hipRoof(c, h.x1() - 1, h.z1() - 1, h.x2() + 1, h.z2() + 1, top, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.DEEPSLATE_TILE_SLAB,
+					Blocks.DEEPSLATE_TILES);
 		}
 		furnish(c, h, fy);
 	}
