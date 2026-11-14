@@ -61,6 +61,34 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("volcano", new int[]{199, 1348, 426, 75}),
 			Map.entry("harbor", new int[]{1235, 1236, 446, 85}),
 			Map.entry("crystal", new int[]{2214, 1338, 390, 69}));
+	/**
+	 * First Sea island art (one transparent sprite per island, 640 px wide): file, sprite size, width on the chart in
+	 * chart units, and the fraction of the sprite's height (from the top) that sits on the island's world position.
+	 * Sizes follow the reference chart and keep neighbours, the compass and the frame clear.
+	 */
+	private record IslandArt(ResourceLocation texture, int w, int h, double chartWidth, double anchorY) {
+	}
+
+	private static IslandArt islandArt(String file, int w, int h, double chartWidth, double anchorY) {
+		return new IslandArt(tex("first_sea/islands/" + file), w, h, chartWidth, anchorY);
+	}
+
+	private static final Map<String, IslandArt> ISLAND_ART = Map.ofEntries(
+			Map.entry("Dawnreach Harbor", islandArt("middle_town", 640, 274, 223, 0.5)),
+			Map.entry("Verdant Wilds", islandArt("jungle", 640, 298, 232, 0.55)),
+			Map.entry("Millbrook Village", islandArt("pirate_starter", 640, 397, 223, 0.55)),
+			Map.entry("Redbrick Port", islandArt("pirate_village", 640, 409, 216, 0.55)),
+			Map.entry("Sunscorch Dunes", islandArt("desert", 640, 418, 212, 0.55)),
+			Map.entry("Frostpeak Isle", islandArt("frozen_village", 640, 415, 220, 0.55)),
+			Map.entry("Ironhold Bastion", islandArt("marine_fortress", 640, 328, 223, 0.55)),
+			Map.entry("Cloudtop Isles", islandArt("lower_skylands", 640, 331, 212, 0.5)),
+			Map.entry("Stonewall Prison", islandArt("prison", 640, 530, 180, 0.55)),
+			Map.entry("Gladiator's Ring", islandArt("colosseum", 640, 434, 200, 0.55)),
+			Map.entry("Emberfall Isle", islandArt("magma_village", 640, 424, 215, 0.6)),
+			Map.entry("Saltmarket Docks", islandArt("marine_starter", 640, 319, 227, 0.5)),
+			Map.entry("Lotus Palace", islandArt("underwater_city", 640, 312, 205, 0.5)),
+			Map.entry("Crystal Fountain", islandArt("fountain_city", 640, 328, 223, 0.5)));
+
 	private static final ResourceLocation UNDERWATER_SURFACE = tex("first_sea/underwater_surface");
 	private static final ResourceLocation PALACE_SUBMERGED = tex("first_sea/palace_submerged");
 	private static final ResourceLocation SMOKE = tex("first_sea/volcanic_smoke");
@@ -267,7 +295,18 @@ public final class WorldMapScreen extends Screen {
 			double eased = t * t * (3 - 2 * t);
 			double grow = 1 + HOVER_GROW * eased;
 			double rise = HOVER_RISE * eased;
-			if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
+			IslandArt newArt = firstSeaArt ? ISLAND_ART.get(island.name()) : null;
+			if (newArt != null && exists(newArt.texture())) {
+				// The island's own illustration (it carries its own shoreline, water and smoke), grown around its base.
+				double scale = newArt.chartWidth() / newArt.w();
+				w = newArt.chartWidth();
+				h = newArt.h() * scale;
+				blitChart(graphics, art(island, newArt.texture()), ax - w * grow / 2, ay - h * grow * newArt.anchorY() - rise,
+						scale * grow, newArt.w(), newArt.h());
+				placed.add(new Placed(island, ax, ay, screenX(ax - w * 0.42), screenY(ay - h * newArt.anchorY() + h * 0.1),
+						screenX(ax + w * 0.42), screenY(ay + h * (1 - newArt.anchorY()) - h * 0.1)));
+				continue;
+			} else if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
 				// Lotus Palace lies under the sea: the submerged rendering, then the water surface over it.
 				blitChart(graphics, art(island, PALACE_SUBMERGED), ax - w * grow / 2, ay - h * grow * ANCHOR_Y + SUBMERGED_DROP - rise,
 						SPRITE_SCALE * grow, SPRITE_W, SPRITE_H);
@@ -305,7 +344,8 @@ public final class WorldMapScreen extends Screen {
 		}
 
 		double time = (System.currentTimeMillis() % 600_000L) / 1000.0;
-		if (firstSeaArt) {
+		boolean bakedSmoke = exists(ISLAND_ART.get("Emberfall Isle").texture()); // the new Emberfall art has its own plume
+		if (firstSeaArt && !bakedSmoke) {
 			// Volcanic smoke above Emberfall: one plume, drawn as one-pixel strips that sway with a wave rising from the
 			// crater, so the smoke billows in the wind. Strips never overlap and pixels stay crisp, so no edges show.
 			double scale = Math.min(91.0 / 98, 45.0 / 58);

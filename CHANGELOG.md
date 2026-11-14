@@ -1,5 +1,16 @@
 # Grand Line patch notes
 
+## v0.25.2 — New Sea Chart Art
+**Changes**
+- **Every First Sea island on the M chart has new artwork**, drawn island by island:
+  - **Millbrook:** a windmill village.
+  - **Verdant Wilds:** a temple jungle.
+  - **Dawnreach:** a fountain harbour town.
+  - **Lotus Palace:** a sunken city glowing under the waves.
+  - …and the rest, each with its own landmarks.
+- Undiscovered islands still show in grey, hovering still names an island, and your marker sits where it did before.
+- Emberfall's smoke is now part of its new art.
+
 ## v0.25.1 — Starting Island
 **Changes**
 - **Millbrook Village is now a Lv 1 island**, the starting island with the weakest enemies in the game (Lv 1–2 bandits). Its quests pay starter rewards.
