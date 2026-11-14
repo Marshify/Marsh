@@ -41,11 +41,11 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy());
 	}
 
 	public static List<IslandPlan> all() {
-		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new SunscorchDunes(),
+		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new CloudtopIsles(), new StonewallPrison(), new GladiatorsRing(),
 				new EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
@@ -291,9 +291,12 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 75
 
-	/** Desert: rolling dunes, a stepped pyramid with an entrance tunnel and burial chamber, a palm oasis. */
-	static final class SunscorchDunes extends BasePlan {
-		SunscorchDunes() {
+	/**
+	 * The original Sunscorch Dunes (rolling dunes, a stepped pyramid with a burial chamber, a palm oasis). Kept for worlds
+	 * created before the rebuild; new worlds use {@link com.grandline.world.plan.SunscorchDunes}.
+	 */
+	static final class SunscorchDunesLegacy extends BasePlan {
+		SunscorchDunesLegacy() {
 			super("Sunscorch Dunes", 0.1);
 			terrain.mass(0, 0, 50, 44, 4, 2.0, Ground.SAND)
 					.mass(24, 20, 14, 10, 8, 1.3, Ground.SAND)
