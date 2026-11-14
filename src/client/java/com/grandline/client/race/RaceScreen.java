@@ -116,7 +116,12 @@ public final class RaceScreen extends Screen {
 		int x = left + 12, y = top + 30;
 		g.drawString(font, Component.translatable("race.grandline." + race.id()).withStyle(ChatFormatting.BOLD), x, y, race.color);
 		g.drawString(font, "V" + d.stage(), x + font.width(Component.translatable("race.grandline." + race.id()).withStyle(ChatFormatting.BOLD)) + 6, y, 0xFFE8B84A);
-		g.drawString(font, Component.translatable("race.grandline." + race.id() + ".desc"), x, y + 12, 0xB8C2D0);
+		int dy = y + 12;
+		for (net.minecraft.util.FormattedCharSequence line : wrap(Component.translatable("race.grandline." + race.id() + ".desc"), W - 130)) {
+			g.drawString(font, line, x, dy, 0xB8C2D0);
+			dy += 10;
+		}
+		int body = Math.max(y + 30, dy + 6);
 		pageButton.visible = d.stage() >= 4;
 		pageButton.setMessage(Component.translatable(upgradesPage ? "screen.grandline.race.back" : "screen.grandline.race.upgrades"));
 
@@ -127,7 +132,7 @@ public final class RaceScreen extends Screen {
 		}
 
 		// Left: passives, V3 and V4.
-		int ly = y + 30;
+		int ly = body;
 		g.drawString(font, Component.translatable("screen.grandline.race.passives"), x, ly, 0xFFE8B84A);
 		ly += 11;
 		for (net.minecraft.util.FormattedCharSequence line : wrap(Component.translatable("race.grandline." + race.id() + ".passive." + d.stage()), 172)) {
@@ -157,7 +162,7 @@ public final class RaceScreen extends Screen {
 		}
 
 		// Right: what comes next (requirements from the server) or the NPC's own list.
-		int rx = left + 200, ry = y + 30;
+		int rx = left + 200, ry = body;
 		ListTag lines = npc != null && npc.contains("lines") ? npc.getList("lines", Tag.TAG_COMPOUND) : ClientRace.view().getList("view", Tag.TAG_COMPOUND);
 		Component heading = npc != null && npc.contains("lines")
 				? Component.translatable("screen.grandline.race.unlock", Component.translatable("race.grandline." + (role().equals("tinkerer") ? "cyborg" : "ghoul")))
@@ -191,8 +196,11 @@ public final class RaceScreen extends Screen {
 		if (role().equals("race_mystic") && npcButtons.size() == 3) {
 			npcButtons.get(0).active = (d.stage() == 1 && !d.has("q2")) || (d.stage() == 2 && !d.has("q3"));
 			npcButtons.get(1).active = d.stage() < 3 && allDone();
-			npcButtons.get(2).setMessage(confirmReroll ? Component.translatable("screen.grandline.race.reroll_confirm", npc.getLong("reroll"))
-					: Component.translatable("screen.grandline.race.reroll", npc.getLong("reroll")));
+			String cost = String.format(java.util.Locale.ROOT, "%,d", npc.getLong("reroll"));
+			npcButtons.get(2).setMessage(confirmReroll ? Component.translatable("screen.grandline.race.reroll_confirm", cost)
+					: Component.translatable("screen.grandline.race.reroll", cost));
+			var profile = com.grandline.client.ClientProfileCache.profile();
+			npcButtons.get(2).active = profile != null && profile.currency() >= npc.getLong("reroll");
 		}
 		if ((role().equals("tinkerer") || role().equals("gravekeeper")) && !npcButtons.isEmpty()) {
 			Race target = role().equals("tinkerer") ? Race.CYBORG : Race.GHOUL;

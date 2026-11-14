@@ -289,15 +289,16 @@ final class RaceFx {
 			case SHARK -> {
 				Vec3 back = pos.add(0, crouch ? 1.05 : 1.25, 0).subtract(bf.scale(0.17));
 				double h = 0.3 * grow, w = 0.36 * grow;
-				// The fin runs along the spine, turned up to 35 degrees toward the viewer so it never vanishes edge-on.
-				Vec3 toCam = d.cameraPosition().subtract(back).multiply(1, 0, 1);
-				double side = toCam.lengthSqr() < 1e-6 ? 0 : Math.signum(toCam.normalize().dot(br));
-				double turn = Math.toRadians(35) * side;
-				Vec3 along = bf.scale(-Math.cos(turn)).add(br.scale(Math.sin(turn))).normalize();
-				Vec3 a = back.subtract(along.scale(0.05)), b = back.add(along.scale(w));
 				float[] col = active ? FxDraw.rgba(0xBFE8FF, 1) : FxDraw.rgba(0xFFFFFF, 1);
-				Vec3 lean = up.add(along.scale(0.35)).normalize();
-				doubleQuad(d, FIN, false, a, b, b.add(lean.scale(h)), a.add(lean.scale(h)), col);
+				// The fin runs along the spine as a thin wedge (two planes 24 degrees apart): it has some width seen from
+				// behind and reads as one fin from the side.
+				for (int k = -1; k <= 1; k += 2) {
+					double turn = Math.toRadians(12) * k;
+					Vec3 along = bf.scale(-Math.cos(turn)).add(br.scale(Math.sin(turn))).normalize();
+					Vec3 a = back.subtract(along.scale(0.05)), b = back.add(along.scale(w));
+					Vec3 lean = up.add(along.scale(0.35)).normalize();
+					doubleQuad(d, FIN, false, a, b, b.add(lean.scale(h)), a.add(lean.scale(h)), col);
+				}
 				if (awakened) {
 					d.groundRing(pos.add(0, 0.9 + 0.4 * Mth.sin(time * 0.2f), 0), 0.9, 0.18, 28, FxDraw.rgba(0x7FD6FF, 0.6f));
 				}
