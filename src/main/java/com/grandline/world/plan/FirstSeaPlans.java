@@ -250,6 +250,7 @@ public final class FirstSeaPlans {
 					.flat(-6, -18, 12, 8, 75, 4, s(Blocks.POLISHED_ANDESITE))
 					.path(s(Blocks.STONE_BRICKS), 4, 0, 40, 0, 18, -6, -2, -6, -18);
 			anchor(Anchor.of(Type.QUEST, 3, 22));
+			anchor(new Anchor(Type.ARRIVAL, -4, Anchor.SURFACE, 16, 0, 180)); // the Marines arrive on the harbour quay
 			anchor(Anchor.of(Type.FISHERMAN, 0, 52));
 			anchor(Anchor.at(Type.DOCK, 5, 63, 54));
 			anchor(Anchor.area(Type.ENEMY_CAMP, -30, 6, 8));

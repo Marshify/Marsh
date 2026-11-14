@@ -29,6 +29,7 @@ public final class CoreRules {
 		});
 		ServerLifecycleEvents.SERVER_STARTED.register(CoreRules::applyGameRules);
 		HealthRegen.register();
+		KeepInventory.register();
 		OceanWeakness.register();
 	}
 

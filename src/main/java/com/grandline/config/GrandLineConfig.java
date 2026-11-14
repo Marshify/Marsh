@@ -133,6 +133,8 @@ public final class GrandLineConfig {
 	public boolean disableFallDamage = true;
 	/** Vanilla advancement messages are not announced in chat (gamerule announceAdvancements). */
 	public boolean hideAdvancementAnnouncements = true;
+	/** Players keep their whole inventory and equipment when they die (regardless of the keepInventory gamerule). */
+	public boolean keepInventoryOnDeath = true;
 
 	// ---- Ocean weakness (fruit users) ----
 	/** Damage per second to fruit users in ocean water, as a percent of maximum health. 0 disables it. */
@@ -147,6 +149,8 @@ public final class GrandLineConfig {
 	// ---- Spawning ----
 	/** Island new players start on and the final respawn fallback. */
 	public String spawnIsland = "Millbrook Village";
+	/** Starting island for players who join the Marines (new players start on spawnIsland until they pick a side). */
+	public String marineSpawnIsland = "Redbrick Port";
 	/** Respawn on the island where the player died (else their home island, else the spawn island). */
 	public boolean islandRespawn = true;
 
@@ -395,6 +399,9 @@ public final class GrandLineConfig {
 		baseHealthRegenPercentPerSecond = clamp(baseHealthRegenPercentPerSecond, 0, 100);
 		oceanDamagePercentPerSecond = clamp(oceanDamagePercentPerSecond, 0, 100);
 		oceanMinSubmersion = clamp(oceanMinSubmersion, 0.05, 2.0);
+		if (marineSpawnIsland == null || marineSpawnIsland.isBlank()) {
+			marineSpawnIsland = defaults().marineSpawnIsland;
+		}
 		if (spawnIsland == null || spawnIsland.isBlank()) {
 			spawnIsland = defaults().spawnIsland;
 		}

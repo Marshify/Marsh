@@ -28,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * NPCs that must always be on their island: the Innkeeper (on every island, sets your home) and Millbrook's Swordsmith.
+ * NPCs that must always be on their island: the Innkeeper (on every island, sets your home) and a Swordsmith on both
+ * starting islands (Millbrook for Pirates, the Marines' island).
  * Unlike the NPCs placed once when an island first loads, these are checked while players are near: if the spot's
  * chunk is loaded and the NPC is not there, it is (re)placed. That puts them on islands of existing worlds too, and
  * an NPC removed by any means comes back. Each NPC's spot is chosen once and saved, so the check always looks in the
@@ -54,7 +55,7 @@ public final class KeeperNpcs {
 	public static List<Islander.Role> rolesFor(Island island) {
 		List<Islander.Role> roles = new ArrayList<>();
 		roles.add(Islander.Role.INNKEEPER);
-		if (SWORD_ISLAND.equals(island.name())) {
+		if (SWORD_ISLAND.equals(island.name()) || com.grandline.GrandLineMod.config().marineSpawnIsland.equals(island.name())) {
 			roles.add(Islander.Role.SWORDSMITH);
 		}
 		return roles;

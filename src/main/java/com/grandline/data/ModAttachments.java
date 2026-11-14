@@ -113,6 +113,12 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("quest_unlocks_seen"));
 
+	/** A brand-new player who has not picked a side yet: picking the Marines then takes them to the Marines' island. */
+	public static final AttachmentType<Boolean> TEAM_SPAWN_PENDING = AttachmentRegistry.<Boolean>builder()
+			.persistent(com.mojang.serialization.Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("team_spawn_pending"));
+
 	private ModAttachments() {
 	}
 

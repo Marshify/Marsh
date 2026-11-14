@@ -120,4 +120,73 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 		remove(helper, p);
 		helper.succeed();
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_teams", timeoutTicks = 20)
+	public void marinesStartOnTheirOwnIsland(GameTestHelper helper) {
+		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		var config = com.grandline.GrandLineMod.config();
+		Island pirates = new Island(990040, 70_000, 70_000, 20, 1, "Test Pirate Start", false, true, "village");
+		Island marines = new Island(990041, 71_000, 70_000, 20, 1, "Test Marine Start", false, true, "brick_town");
+		registry.add(pirates);
+		registry.add(marines);
+		String oldSpawn = config.spawnIsland, oldMarine = config.marineSpawnIsland;
+		config.spawnIsland = pirates.name();
+		config.marineSpawnIsland = marines.name();
+		try {
+			ServerPlayer marine = survivor(helper);
+			ServerPlayer pirate = survivor(helper);
+			ServerPlayer veteran = survivor(helper);
+			marine.setAttached(ModAttachments.TEAM_SPAWN_PENDING, true);
+			pirate.setAttached(ModAttachments.TEAM_SPAWN_PENDING, true);
+			veteran.removeAttached(ModAttachments.TEAM_SPAWN_PENDING); // has played before: not waiting for a start
+			Vec3 stay = helper.absoluteVec(new Vec3(1.5, 2, 1.5));
+			veteran.teleportTo(stay.x, stay.y, stay.z);
+			com.grandline.player.TeamService.choose(marine, com.grandline.player.TeamService.Side.MARINES);
+			com.grandline.player.TeamService.choose(pirate, com.grandline.player.TeamService.Side.PIRATES);
+			com.grandline.player.TeamService.choose(veteran, com.grandline.player.TeamService.Side.MARINES);
+			helper.assertTrue(Math.abs(marine.getX() - marines.x()) < 80 && Math.abs(marine.getZ() - marines.z()) < 80,
+					"a new Marine starts on the Marines' island: " + marine.blockPosition());
+			helper.assertTrue(Math.abs(pirate.getX() - pirates.x()) < 80, "a new Pirate starts on the Pirates' island: " + pirate.blockPosition());
+			helper.assertTrue(Math.abs(veteran.getX() - marines.x()) > 1000, "an established player is never moved by picking a side");
+			helper.assertTrue(com.grandline.world.IslandSpawns.respawnIsland(veteran, com.grandline.world.IslandSpawns.NO_ISLAND).id() == marines.id(),
+					"a Marine without a home who dies at sea returns to the Marines' island");
+			veteran.setAttached(ModAttachments.HOME_ISLAND, pirates.id());
+			helper.assertTrue(com.grandline.world.IslandSpawns.respawnIsland(veteran, com.grandline.world.IslandSpawns.NO_ISLAND).id() == pirates.id(),
+					"a home always wins over the team island");
+			remove(helper, marine, pirate, veteran);
+		} finally {
+			config.spawnIsland = oldSpawn;
+			config.marineSpawnIsland = oldMarine;
+			registry.removeIf(i -> i.id() == pirates.id() || i.id() == marines.id());
+		}
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_keep", timeoutTicks = 40)
+	public void deathKeepsEveryItemWithoutDropping(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		ServerPlayer p = survivor(helper);
+		net.minecraft.world.item.ItemStack sword = new net.minecraft.world.item.ItemStack(com.grandline.gear.Gear.KATANA);
+		sword.setDamageValue(37);
+		sword.setHoverName(net.minecraft.network.chat.Component.literal("Old Faithful"));
+		p.getInventory().setItem(0, sword);
+		p.getInventory().setItem(5, new net.minecraft.world.item.ItemStack(com.grandline.npc.FishingService.SILVERFIN, 12));
+		p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_HELMET));
+		PlayerProfileService.update(p, pr -> pr.withCurrency(4321));
+		p.kill();
+		helper.runAfterDelay(2, () -> {
+			var drops = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, p.getBoundingBox().inflate(6));
+			helper.assertTrue(drops.isEmpty(), "nothing drops on death: " + drops.size());
+			ServerPlayer back = level.getServer().getPlayerList().respawn(p, false);
+			var stack = back.getInventory().getItem(0);
+			helper.assertTrue(stack.is(com.grandline.gear.Gear.KATANA) && stack.getDamageValue() == 37
+					&& stack.getHoverName().getString().equals("Old Faithful"), "sword kept with its damage and name");
+			helper.assertTrue(back.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 12, "fish kept");
+			helper.assertTrue(back.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(net.minecraft.world.item.Items.IRON_HELMET), "armour kept");
+			helper.assertTrue(PlayerProfileService.get(back).currency() == 4321, "currency kept");
+			helper.assertTrue(p.getInventory().isEmpty(), "the old body holds nothing (no duplicates)");
+			remove(helper, back);
+			helper.succeed();
+		});
+	}
 }

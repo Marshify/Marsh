@@ -86,6 +86,7 @@ public final class TeamService {
 		}
 		player.setAttached(ModAttachments.TEAM, side.key());
 		applyScoreboard(player, side);
+		com.grandline.world.IslandSpawns.onSideChosen(player);
 		com.grandline.reputation.ReputationService.sync(player); // the displayed/earned total follows the side
 		if (before != side) {
 			player.server.getPlayerList().broadcastSystemMessage(Component.translatable("message.grandline.team.joined",

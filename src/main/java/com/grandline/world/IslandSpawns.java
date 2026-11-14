@@ -49,7 +49,21 @@ public final class IslandSpawns {
 	}
 
 	public static Island spawnIsland(net.minecraft.server.MinecraftServer server) {
-		String name = GrandLineMod.config().spawnIsland;
+		return islandNamed(server, GrandLineMod.config().spawnIsland);
+	}
+
+	/** The starting island for the player's side: the Marines' island for Marines, the spawn island otherwise. */
+	public static Island spawnIslandFor(ServerPlayer player) {
+		if (com.grandline.player.TeamService.get(player) == com.grandline.player.TeamService.Side.MARINES) {
+			Island marine = islandNamed(player.server, GrandLineMod.config().marineSpawnIsland);
+			if (marine != null) {
+				return marine;
+			}
+		}
+		return spawnIsland(player.server);
+	}
+
+	static Island islandNamed(net.minecraft.server.MinecraftServer server, String name) {
 		for (Island island : IslandRegistry.get(server).all()) {
 			if (island.name().equals(name)) {
 				return island;
@@ -76,7 +90,7 @@ public final class IslandSpawns {
 			Long home = player.getAttached(ModAttachments.HOME_ISLAND);
 			island = home == null ? null : registry.get(home);
 		}
-		return island != null ? island : spawnIsland(player.server);
+		return island != null ? island : spawnIslandFor(player);
 	}
 
 	private static void respawn(ServerPlayer player, long diedOn) {
@@ -93,8 +107,24 @@ public final class IslandSpawns {
 		}
 		player.setAttached(ModAttachments.FIRST_SPAWN_DONE, true);
 		boolean brandNew = player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) < 40;
-		Island island = spawnIsland(player.server);
+		Island island = spawnIslandFor(player);
 		if (brandNew && island != null) {
+			moveTo(player, island);
+			player.setAttached(ModAttachments.TEAM_SPAWN_PENDING, true); // picking a side next decides the starting island
+		}
+	}
+
+	/**
+	 * A brand-new player just picked their side: Marines go to the Marines' island. Only once, and only before they have
+	 * a home, so an established player changing sides is never moved.
+	 */
+	public static void onSideChosen(ServerPlayer player) {
+		if (!Boolean.TRUE.equals(player.removeAttached(ModAttachments.TEAM_SPAWN_PENDING))) {
+			return;
+		}
+		Island island = spawnIslandFor(player);
+		Island here = islandAt(player.serverLevel(), player.getBlockX(), player.getBlockZ());
+		if (player.getAttached(ModAttachments.HOME_ISLAND) == null && island != null && (here == null || here.id() != island.id())) {
 			moveTo(player, island);
 		}
 	}
