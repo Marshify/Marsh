@@ -1005,5 +1005,7 @@
   "entity.grandline.islander.trial_keeper": "Trial Keeper",
   "item.grandline.machine_core": "Machine Core",
   "item.grandline.blood_vial": "Blood Vial",
-  "item.grandline.awakening_key": "Awakening Key"
+  "item.grandline.awakening_key": "Awakening Key",
+  "message.grandline.cloudtop.up": "The clouds carry you up to the Upper Sanctuary (Lv 450-625).",
+  "message.grandline.cloudtop.down": "The doorway returns you to the sanctuary gate."
 }

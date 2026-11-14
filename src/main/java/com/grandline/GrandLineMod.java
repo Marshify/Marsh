@@ -90,6 +90,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.race.RaceAwakening.register();
 		com.grandline.race.RaceProgress.register();
 		com.grandline.race.RaceTrials.register();
+		com.grandline.world.CloudtopPortals.register();
 		com.grandline.registry.ModSpawnEggs.register();
 		GrandLineCommands.register();
 
