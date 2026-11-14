@@ -25,6 +25,11 @@ public final class GrandLineEntities {
 			FabricEntityTypeBuilder.<SaberBoss>create(MobCategory.MONSTER, SaberBoss::new).dimensions(EntityDimensions.fixed(0.65F, 2.1F))
 					.trackRangeBlocks(64).build());
 
+	/** The fishing bobber (never saved; lives only while someone is fishing). */
+	public static final EntityType<com.grandline.fishing.BobberEntity> BOBBER = Registry.register(BuiltInRegistries.ENTITY_TYPE, GrandLineMod.id("bobber"),
+			FabricEntityTypeBuilder.<com.grandline.fishing.BobberEntity>create(MobCategory.MISC, com.grandline.fishing.BobberEntity::new)
+					.dimensions(EntityDimensions.fixed(0.25F, 0.25F)).trackRangeBlocks(64).trackedUpdateRate(2).disableSaving().build());
+
 	private GrandLineEntities() {
 	}
 

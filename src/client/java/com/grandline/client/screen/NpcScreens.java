@@ -115,9 +115,14 @@ public final class NpcScreens {
 	private static DialogScreen fisherman(OpenNpcPayload data) {
 		List<Component> lines = List.of(Component.translatable("npc.grandline.fisher.greeting"),
 				Component.translatable("npc.grandline.fisher.value", data.fishValue()).withStyle(ChatFormatting.GOLD));
+		lines = new ArrayList<>(lines);
+		lines.add(Component.translatable("npc.grandline.fisher.mastery", com.grandline.client.ClientFishing.level()).withStyle(ChatFormatting.AQUA));
+		long rodPrice = data.prices().isEmpty() ? 0 : data.prices().get(0);
 		return new DialogScreen(Component.translatable("entity.grandline.islander.fisherman"), lines, List.of(
 				DialogScreen.Option.of(Component.translatable("npc.grandline.fisher.sell", data.fishValue()),
 						() -> send(data, NpcActionPayload.SELL_FISH)),
+				DialogScreen.Option.of(Component.translatable("npc.grandline.fisher.buy_rod",
+						java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT).format(rodPrice)), () -> send(data, NpcActionPayload.BUY_ROD)),
 				DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
 	}
 

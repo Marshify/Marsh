@@ -189,4 +189,66 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 			helper.succeed();
 		});
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_fish_play", timeoutTicks = 700)
+	public void fishingMinigameRewardsSkillOnlyOnce(GameTestHelper helper) {
+		ServerPlayer good = survivor(helper);
+		ServerPlayer idle = survivor(helper);
+		for (ServerPlayer p : new ServerPlayer[]{good, idle}) {
+			p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD));
+			p.setAttached(ModAttachments.FISHING_MASTERY, com.grandline.fishing.FishingMastery.START);
+		}
+		var silverfin = com.grandline.fishing.FishingRules.byItem(com.grandline.npc.FishingService.SILVERFIN);
+		com.grandline.fishing.FishingSessions.startFightForTest(good, silverfin);
+		com.grandline.fishing.FishingSessions.startFightForTest(idle, silverfin);
+		boolean[] goodDone = {false}, idleDone = {false};
+		helper.onEachTick(() -> {
+			if (!goodDone[0]) {
+				goodDone[0] = !com.grandline.fishing.FishingSessions.stepForTest(good, true);
+			}
+			if (!idleDone[0]) {
+				idleDone[0] = !com.grandline.fishing.FishingSessions.stepForTest(idle, false);
+			}
+		});
+		helper.runAfterDelay(600, () -> {
+			helper.assertTrue(goodDone[0] && good.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 1,
+					"keeping the fish in the net lands exactly one fish: done=" + goodDone[0] + " fish=" + good.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) + " mastery=" + good.getAttached(ModAttachments.FISHING_MASTERY));
+			var m = good.getAttached(ModAttachments.FISHING_MASTERY);
+			helper.assertTrue(m.catches() == 1 && (m.xp() > 0 || m.level() > 1), "and earns Fishing Mastery: " + m);
+			helper.assertTrue(idleDone[0] && idle.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 0, "doing nothing loses it");
+			helper.assertTrue(idle.getAttached(ModAttachments.FISHING_MASTERY).catches() == 0, "and earns nothing");
+			helper.assertTrue(!com.grandline.fishing.FishingSessions.stepForTest(good, true), "a finished fight cannot pay out again");
+			remove(helper, good, idle);
+			helper.succeed();
+		});
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_fish_rules", timeoutTicks = 20)
+	public void fishingMasteryUnlocksAndPersists(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		var random = net.minecraft.util.RandomSource.create(42);
+		Vec3 at = helper.absoluteVec(new Vec3(2, 2, 2));
+		for (int i = 0; i < 400; i++) {
+			var f = com.grandline.fishing.FishingRules.roll(level, at, 1, random);
+			helper.assertTrue(f.minMastery() <= 1, "a beginner only hooks beginner fish: " + f.key());
+		}
+		var m = com.grandline.fishing.FishingMastery.START;
+		for (int i = 0; i < 30; i++) {
+			m = m.withCatch(50);
+		}
+		helper.assertTrue(m.level() > 5 && m.catches() == 30, "mastery levels up with catches: " + m);
+		ServerPlayer p = survivor(helper);
+		p.setAttached(ModAttachments.FISHING_MASTERY, m);
+		p.kill();
+		ServerPlayer back = level.getServer().getPlayerList().respawn(p, false);
+		helper.assertTrue(m.equals(back.getAttached(ModAttachments.FISHING_MASTERY)), "Fishing Mastery survives death");
+		PlayerProfileService.update(back, pr -> pr.withCurrency(com.grandline.GrandLineMod.config().fishingRodPrice - 1));
+		helper.assertTrue(com.grandline.npc.NpcService.buyRod(back).equals("rod_money"), "a rod costs money");
+		PlayerProfileService.update(back, pr -> pr.withCurrency(com.grandline.GrandLineMod.config().fishingRodPrice));
+		helper.assertTrue(com.grandline.npc.NpcService.buyRod(back).equals("rod_bought")
+				&& back.getInventory().countItem(com.grandline.registry.ModItems.STARTER_FISHING_ROD) == 1
+				&& PlayerProfileService.get(back).currency() == 0, "the Fisherman sells the Starter Fishing Rod");
+		remove(helper, back);
+		helper.succeed();
+	}
 }

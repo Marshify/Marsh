@@ -17,6 +17,10 @@ public final class ModItems {
 	private ModItems() {
 	}
 
+	/** The Starter Fishing Rod (sold by Fishermen). */
+	public static final Item STARTER_FISHING_ROD = register("starter_fishing_rod", com.grandline.fishing.StarterRodItem::new,
+			new Item.Properties().stacksTo(1));
+
 	private static <T extends Item> T register(String name, Function<Item.Properties, T> factory, Item.Properties properties) {
 		return Registry.register(BuiltInRegistries.ITEM, GrandLineMod.id(name), factory.apply(properties));
 	}

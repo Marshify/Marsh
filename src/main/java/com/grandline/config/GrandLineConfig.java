@@ -162,6 +162,18 @@ public final class GrandLineConfig {
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */
 	public long[] gunPrices = {1_500, 12_000};
 
+	// ---- Fishing ----
+	/** Starter Fishing Rod price at the Fisherman. */
+	public long fishingRodPrice = 150;
+	/** Seconds before a bite (before mastery shortens it). */
+	public double fishingBiteMinSeconds = 4.0;
+	public double fishingBiteMaxSeconds = 12.0;
+	/** Multiplier on Fishing Mastery experience per catch. */
+	public double fishingMasteryXpMultiplier = 1.0;
+	/** Per-fish catch weights and unlock mastery levels, by item id (e.g. "storm_eel"); empty = built-in values. */
+	public java.util.Map<String, Integer> fishWeights = new java.util.LinkedHashMap<>();
+	public java.util.Map<String, Integer> fishMinMastery = new java.util.LinkedHashMap<>();
+
 	// ---- Kill credit ----
 	/** A death with no attacker of its own (fire, a fall, a lingering move) counts for the last player who hit within this many seconds. */
 	public double killCreditSeconds = 15.0;
@@ -352,6 +364,16 @@ public final class GrandLineConfig {
 		}
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
+		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);
+		fishingBiteMinSeconds = clamp(fishingBiteMinSeconds, 0.5, 120);
+		fishingBiteMaxSeconds = clamp(fishingBiteMaxSeconds, fishingBiteMinSeconds, 240);
+		fishingMasteryXpMultiplier = clamp(fishingMasteryXpMultiplier, 0, 100);
+		if (fishWeights == null) {
+			fishWeights = new java.util.LinkedHashMap<>();
+		}
+		if (fishMinMastery == null) {
+			fishMinMastery = new java.util.LinkedHashMap<>();
+		}
 		saberAttackDamage = clamp(saberAttackDamage, 1, 100);
 		saberAttackSpeed = clamp(saberAttackSpeed, 0.5, 4);
 		saberMoveDamageMultiplier = clamp(saberMoveDamageMultiplier, 0.1, 10);

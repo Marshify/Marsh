@@ -24,7 +24,11 @@ public final class MovePoses {
 		/** Both arms raised overhead holding a mass, then hurled forward with a lean. */
 		HEAVY,
 		/** Arms swept back while flying (held until cleared). */
-		FLIGHT
+		FLIGHT,
+		/** Fishing cast: rod drawn back over the shoulder, then whipped forward. */
+		CAST,
+		/** Reeling a fish in: rod held out in front, bobbing with the fight (held until cleared). */
+		REEL
 	}
 
 	private record Anim(Kind kind, float start, float release, boolean left) {
@@ -79,7 +83,7 @@ public final class MovePoses {
 	private static float maxHold(Kind kind) {
 		return switch (kind) {
 			case HEAVY -> 70;
-			case FLIGHT -> Float.MAX_VALUE;
+			case FLIGHT, REEL -> Float.MAX_VALUE;
 			case READY -> 24;
 			default -> 14;
 		};
@@ -148,6 +152,16 @@ public final class MovePoses {
 				blend(rightArm, k, x, 0, Mth.lerp(r, -0.18f, 0));
 				blend(leftArm, k, x, 0, Mth.lerp(r, 0.18f, 0));
 				body.xRot += 0.35f * r * k;
+			}
+			case CAST -> {
+				float k = w * (1 - back);
+				blend(rightArm, k, Mth.lerp(r, -Mth.PI + 0.4f, forward * 0.85f), -0.15f, 0);
+				body.xRot += Mth.lerp(r, -0.12f, 0.15f) * k;
+			}
+			case REEL -> {
+				float bob = Mth.sin(age * 0.9f) * 0.08f;
+				blend(rightArm, w, forward * 0.7f + bob, -0.25f, 0.05f);
+				blend(leftArm, w * 0.8f, forward * 0.55f, 0.45f, 0);
 			}
 			case FLIGHT -> {
 				blend(rightArm, w, 0.55f, 0, 0.35f);

@@ -43,6 +43,10 @@ public final class NpcService {
 			stock.addAll(GunShop.ids());
 			prices.addAll(GunShop.prices());
 		}
+		if (npc.role() == Islander.Role.FISHERMAN) {
+			stock.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(com.grandline.registry.ModItems.STARTER_FISHING_ROD).toString());
+			prices.add(GrandLineMod.config().fishingRodPrice);
+		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
 			stock.addAll(SwordShop.ids());
 			prices.addAll(SwordShop.prices());
@@ -91,12 +95,13 @@ public final class NpcService {
 					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
 			case NpcActionPayload.BUY_SWORD, NpcActionPayload.BUY_SWORD + 1 -> npc.role() == Islander.Role.SWORDSMITH
 					? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far";
+			case NpcActionPayload.BUY_ROD -> npc.role() == Islander.Role.FISHERMAN ? buyRod(player) : "too_far";
 			case NpcActionPayload.SET_HOME -> npc.role() == Islander.Role.INNKEEPER ? setHome(player, npc) : "too_far";
 			default -> "too_far";
 		};
 		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
-				|| result.equals("sword_bought");
+				|| result.equals("sword_bought") || result.equals("rod_bought");
 		if (result.equals("home_set")) {
 			return result; // the confirmation names the island (see setHome)
 		}
@@ -120,6 +125,20 @@ public final class NpcService {
 		player.serverLevel().playSound(null, npc.blockPosition(), net.minecraft.sounds.SoundEvents.PLAYER_LEVELUP,
 				net.minecraft.sounds.SoundSource.NEUTRAL, 0.6F, 1.4F);
 		return "home_set";
+	}
+
+	/** Sells a Starter Fishing Rod for Grand Line money (checked and taken here, before the rod is handed over). */
+	public static String buyRod(ServerPlayer player) {
+		long price = GrandLineMod.config().fishingRodPrice;
+		if (com.grandline.player.PlayerProfileService.get(player).currency() < price) {
+			return "rod_money";
+		}
+		com.grandline.player.PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price));
+		net.minecraft.world.item.ItemStack rod = new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD);
+		if (!player.getInventory().add(rod)) {
+			player.drop(rod, false);
+		}
+		return "rod_bought";
 	}
 
 	/** Buys a ship and launches it beside the Navigator (if that fails, the ship is still bought). */

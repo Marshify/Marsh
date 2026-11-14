@@ -54,6 +54,7 @@ public final class GrandLineRenderers {
 		EntityRendererRegistry.register(GrandLineEntities.CORSAIR, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("corsair"), 1.1F));
 		EntityRendererRegistry.register(GrandLineEntities.CAPTAIN, ctx -> new Renderer<>(ctx, e -> tex("captain"), 1.35F));
 		EntityRendererRegistry.register(GrandLineEntities.SABER_BOSS, SaberBossRenderer::new);
+		EntityRendererRegistry.register(GrandLineEntities.BOBBER, com.grandline.client.fishing.BobberRenderer::new);
 		com.grandline.client.render.ship.PirateShipRenderer.register();
 	}
 }

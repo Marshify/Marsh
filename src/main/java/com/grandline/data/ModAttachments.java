@@ -119,6 +119,13 @@ public final class ModAttachments {
 			.copyOnDeath()
 			.buildAndRegister(GrandLineMod.id("team_spawn_pending"));
 
+	/** Fishing Mastery (level, experience, catches): saved, kept through death. */
+	public static final AttachmentType<com.grandline.fishing.FishingMastery> FISHING_MASTERY =
+			AttachmentRegistry.<com.grandline.fishing.FishingMastery>builder()
+					.persistent(com.grandline.fishing.FishingMastery.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("fishing_mastery"));
+
 	private ModAttachments() {
 	}
 

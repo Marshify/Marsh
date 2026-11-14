@@ -76,6 +76,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.world.ModWorld.register();
 		com.grandline.entity.GrandLineEntities.register();
 		com.grandline.npc.FishingService.register();
+		com.grandline.fishing.FishingSessions.register();
 		com.grandline.npc.IslandPopulation.register();
 		com.grandline.npc.KeeperNpcs.register();
 		com.grandline.quest.QuestUnlocks.register();

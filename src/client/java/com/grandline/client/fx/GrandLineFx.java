@@ -136,12 +136,25 @@ public final class GrandLineFx {
 		boolean own = mc.player != null && packet.caster() == mc.player.getId();
 		// Settings: other players' move effects can be hidden (their poses and damage still happen).
 		if (!own && !com.grandline.client.settings.ClientSettings.get().allyVfx && !packet.effect().equals("flight_end")
-				&& !packet.effect().startsWith("boss_")) {
+				&& !packet.effect().startsWith("boss_")
+				&& !packet.effect().startsWith("fishing_")) {
 			return;
 		}
 		Entity caster = level.getEntity(packet.caster());
 		if (FlameFx.handles(packet.effect())) {
 			FlameFx.handle(packet, level, caster, own);
+		} else if (packet.effect().startsWith("fishing_")) {
+			// Fishing poses: the cast whip, holding the rod out while reeling, back to normal at the end.
+			float age = caster == null ? 0 : caster.tickCount;
+			switch (packet.effect()) {
+				case "fishing_cast" -> {
+					MovePoses.windup(packet.caster(), MovePoses.Kind.CAST, age - 6);
+					MovePoses.release(packet.caster(), MovePoses.Kind.CAST, age, false);
+				}
+				case "fishing_reel" -> MovePoses.windup(packet.caster(), MovePoses.Kind.REEL, age);
+				case "fishing_end" -> MovePoses.clear(packet.caster(), MovePoses.Kind.REEL);
+				default -> { }
+			}
 		} else if (SaberFx.handles(packet.effect())) {
 			SaberFx.handle(packet, level, caster, own);
 		}
