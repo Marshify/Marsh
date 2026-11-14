@@ -126,6 +126,12 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("fishing_mastery"));
 
+	/** Quest navigation (compass + highlighted quest giver) on or off, per player. Absent = on. */
+	public static final AttachmentType<Boolean> QUEST_NAVIGATION = AttachmentRegistry.<Boolean>builder()
+			.persistent(com.mojang.serialization.Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("quest_navigation"));
+
 	private ModAttachments() {
 	}
 

@@ -7,7 +7,9 @@
 		"HumanoidModelPunchMixin",
 		"GameRendererShakeMixin",
 		"GuiHotbarMixin",
-		"GuiExperienceBarMixin"
+		"GuiExperienceBarMixin",
+    "NavigationGlowMixin",
+    "NavigationGlowColorMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -212,7 +212,7 @@ public final class KeeperNpcs {
 					}
 					boolean clear = true;
 					for (BlockPos t : taken) {
-						if (Math.abs(t.getX() - x) <= 1 && Math.abs(t.getZ() - z) <= 1) {
+						if (Math.abs(t.getX() - x) <= 2 && Math.abs(t.getZ() - z) <= 2) { // keep NPCs a few steps apart
 							clear = false;
 							break;
 						}

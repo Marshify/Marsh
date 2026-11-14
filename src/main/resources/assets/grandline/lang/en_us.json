@@ -786,5 +786,9 @@
   "fishing.grandline.tier.1": "Uncommon",
   "fishing.grandline.tier.2": "Rare",
   "fishing.grandline.tier.3": "Epic",
-  "fishing.grandline.tier.4": "Legendary"
+  "fishing.grandline.tier.4": "Legendary",
+  "key.grandline.navigation": "Quest navigation (on/off)",
+  "message.grandline.nav.on": "Quest navigation on",
+  "message.grandline.nav.off": "Quest navigation off",
+  "hud.grandline.nav.here": "Here!"
 }

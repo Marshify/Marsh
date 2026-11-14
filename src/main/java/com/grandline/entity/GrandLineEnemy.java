@@ -95,6 +95,22 @@ public class GrandLineEnemy extends Monster {
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
 	}
 
+	/**
+	 * Camp enemies only chase so far: once one is more than 12 blocks past its camp's edge it gives up and walks home,
+	 * so fights stay in the combat areas and never spill into towns or onto arrival docks.
+	 */
+	@Override
+	protected void customServerAiStep() {
+		super.customServerAiStep();
+		if (hasRestriction() && getTarget() != null && tickCount % 10 == 0) {
+			double limit = getRestrictRadius() + 12;
+			if (getRestrictCenter().distToCenterSqr(position()) > limit * limit) {
+				setTarget(null);
+				getNavigation().moveTo(getRestrictCenter().getX() + 0.5, getRestrictCenter().getY(), getRestrictCenter().getZ() + 0.5, 1.0);
+			}
+		}
+	}
+
 	@Override
 	protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
 		setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(kind().weapon()));

@@ -316,4 +316,42 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 		}
 		helper.succeed();
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_nav", timeoutTicks = 20)
+	public void navigationPointsEachPlayerToTheirQuestGiver(GameTestHelper helper) {
+		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		List<Long> added = new java.util.ArrayList<>();
+		for (String name : new String[]{"Millbrook Village", "Redbrick Port", "Verdant Wilds"}) {
+			SeaLayout.Spec spec = SeaLayout.all().stream().filter(sp -> sp.name().equals(name)).findFirst().orElseThrow();
+			long id = SeaLayout.idOf(spec);
+			if (registry.get(id) == null) {
+				registry.add(new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name()));
+				added.add(id);
+			}
+		}
+		try {
+			ServerPlayer pirate = survivor(helper);
+			ServerPlayer marine = survivor(helper);
+			com.grandline.player.TeamService.choose(pirate, com.grandline.player.TeamService.Side.PIRATES);
+			com.grandline.player.TeamService.choose(marine, com.grandline.player.TeamService.Side.MARINES);
+			helper.assertTrue("Millbrook Village".equals(com.grandline.quest.QuestNavigation.targetIsland(pirate).name()), "Lv 1 Pirate -> Millbrook");
+			helper.assertTrue("Redbrick Port".equals(com.grandline.quest.QuestNavigation.targetIsland(marine).name()), "Lv 1 Marine -> Redbrick Port");
+			for (ServerPlayer p : new ServerPlayer[]{pirate, marine}) {
+				PlayerProfileService.addExperience(p, 1_000_000);
+			}
+			int lv = PlayerProfileService.get(pirate).level();
+			helper.assertTrue(lv >= 15, "levelled: " + lv);
+			var target = com.grandline.quest.QuestNavigation.targetIsland(pirate);
+			helper.assertTrue(target.level() >= 15 && target.level() <= lv, "past Lv 15 both sides head on: " + target.name());
+			pirate.setAttached(ModAttachments.ACTIVE_QUEST, new QuestState("BANDIT", "Millbrook Village", 6, 0, 1, 1, 0, 0, false));
+			helper.assertTrue("Millbrook Village".equals(com.grandline.quest.QuestNavigation.targetIsland(pirate).name()), "an active quest leads to its island");
+			pirate.setAttached(ModAttachments.QUEST_NAVIGATION, false);
+			helper.assertTrue(!com.grandline.quest.QuestNavigation.enabled(pirate) && com.grandline.quest.QuestNavigation.enabled(marine),
+					"navigation is per player");
+			remove(helper, pirate, marine);
+		} finally {
+			registry.removeIf(i -> added.contains(i.id()));
+		}
+		helper.succeed();
+	}
 }

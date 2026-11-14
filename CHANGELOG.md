@@ -1,5 +1,23 @@
 # Grand Line patch notes
 
+## v0.26.0 — Batch 3: Rewards, Fishing & Navigation
+**New**
+- **Kills always count:** enemies that die from your fire, a fall after your knockback, or a lingering move now give you their XP, money, quest progress and mastery.
+- **"New Quest Available!" card** when you reach the level for the next island (shown once per island).
+- **Marines start on Redbrick Port**, now a Lv. 1 island with its own Swordsmith. Pirates start on Millbrook.
+- **You keep everything when you die:** items, equipment, money and mastery.
+- **Fishing:**
+  - Buy the Starter Fishing Rod from any Fisherman ($150), then cast, wait for the bite, and right-click to hook.
+  - In the reel-in minigame, hold to lift the net and keep the fish inside until the meter fills.
+  - Eight fish across five rarities, with rarer ones in open water and later seas.
+  - New **Fishing Mastery** levels make fishing easier and unlock rarer fish.
+- **Quest compass** (top right) points to your next quest giver with name and distance, and outlines them in gold through walls, for you only. Press **N** to toggle.
+
+**Changes**
+- **Cheaper starter weapons:** Cutlass $300, Katana $500, Slingshot $400, Musket $6,000.
+- **Adventure mode:** in Grand Line worlds you can't break or place blocks, open containers, craft, or use doors, switches or vanilla workstations. Explosions don't break the islands. Operators can build in creative mode.
+- Enemies give up the chase once you leave their camp, so they no longer follow you into towns.
+
 ## v0.25.2 — New Sea Chart Art
 **Changes**
 - **Every First Sea island on the M chart has new artwork**, drawn island by island:
