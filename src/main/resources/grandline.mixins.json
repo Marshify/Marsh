@@ -8,7 +8,11 @@
 		"FoodDataMixin",
 		"ExperienceOrbMixin",
 		"PlayerExperienceMixin",
-    "PlayerKeepInventoryMixin"
+    "PlayerKeepInventoryMixin",
+    "ExplosionNoBlockDamageMixin",
+    "CraftingDisabledMixin",
+    "ItemPickupFilterMixin",
+    "VanillaLootMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

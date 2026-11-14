@@ -251,4 +251,69 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 		remove(helper, back);
 		helper.succeed();
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "b3_adventure", timeoutTicks = 20)
+	public void adventureModeLocksTheWorldButNotGrandLine(GameTestHelper helper) {
+		var config = com.grandline.GrandLineMod.config();
+		boolean old = config.adventureModeAllWorlds;
+		config.adventureModeAllWorlds = true; // the test world is not a Grand Line world
+		try {
+			ServerLevel level = helper.getLevel();
+			ServerPlayer p = survivor(helper);
+			BlockPos stone = helper.absolutePos(new BlockPos(3, 1, 3));
+			BlockPos chest = helper.absolutePos(new BlockPos(5, 2, 5));
+			level.setBlockAndUpdate(stone, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+			level.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
+			helper.assertTrue(!p.gameMode.destroyBlock(stone) && level.getBlockState(stone).is(net.minecraft.world.level.block.Blocks.STONE),
+					"blocks cannot be broken");
+			var hand = net.minecraft.world.InteractionHand.MAIN_HAND;
+			var use = net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.invoker();
+			p.setItemInHand(hand, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIRT));
+			var onStone = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(stone), net.minecraft.core.Direction.UP, stone, false);
+			helper.assertTrue(use.interact(p, level, hand, onStone) == net.minecraft.world.InteractionResult.FAIL, "blocks cannot be placed");
+			p.setItemInHand(hand, new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD));
+			var onChest = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(chest), net.minecraft.core.Direction.UP, chest, false);
+			helper.assertTrue(use.interact(p, level, hand, onChest) == net.minecraft.world.InteractionResult.FAIL, "chests cannot be opened");
+			helper.assertTrue(use.interact(p, level, hand, onStone) == net.minecraft.world.InteractionResult.PASS,
+					"a Grand Line item still works when aimed at a plain block");
+			helper.assertTrue(com.grandline.world.AdventureRules.interactive(level, chest, level.getBlockState(chest)), "a chest counts as interactive");
+			// Crafting yields nothing.
+			p.getInventory().clearContent();
+			var menu = p.inventoryMenu;
+			menu.getCraftSlots().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.OAK_LOG));
+			menu.slotsChanged(menu.getCraftSlots());
+			helper.assertTrue(menu.getSlot(0).getItem().isEmpty(), "the crafting grid makes nothing");
+			menu.getCraftSlots().clearContent();
+			// Explosions leave the island standing.
+			level.explode(null, stone.getX() + 0.5, stone.getY() + 1, stone.getZ() + 0.5, 3, net.minecraft.world.level.Level.ExplosionInteraction.TNT);
+			helper.assertTrue(level.getBlockState(stone).is(net.minecraft.world.level.block.Blocks.STONE), "explosions break nothing");
+			// Pickups: Grand Line items yes, vanilla no.
+			var dirt = new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY(), p.getZ(), new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIRT));
+			var fish = new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY(), p.getZ(), new net.minecraft.world.item.ItemStack(com.grandline.npc.FishingService.SILVERFIN));
+			dirt.setNoPickUpDelay();
+			fish.setNoPickUpDelay();
+			level.addFreshEntity(dirt);
+			level.addFreshEntity(fish);
+			dirt.playerTouch(p);
+			fish.playerTouch(p);
+			helper.assertTrue(p.getInventory().countItem(net.minecraft.world.item.Items.DIRT) == 0, "vanilla items are not picked up");
+			helper.assertTrue(p.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 1, "Grand Line items are");
+			dirt.discard();
+			// An operator in creative bypasses everything.
+			int perm = config.adventureBypassPermission;
+			config.adventureBypassPermission = 0; // test players have no operator status; level 0 stands in for it
+			p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+			helper.assertTrue(!com.grandline.world.AdventureRules.restricted(p), "operators in creative can build");
+			config.adventureBypassPermission = perm;
+			// Prices: starter swords within 2-4 starter quests of income.
+			helper.assertTrue(config.swordPrices[1] <= 4 * 130 && config.swordPrices[0] <= 4 * 130 && config.swordPrices[1] >= 2 * 100,
+					"starter swords cost 2-4 starter quests: " + config.swordPrices[0] + "/" + config.swordPrices[1]);
+			level.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+			level.setBlockAndUpdate(stone, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+			remove(helper, p);
+		} finally {
+			config.adventureModeAllWorlds = old;
+		}
+		helper.succeed();
+	}
 }

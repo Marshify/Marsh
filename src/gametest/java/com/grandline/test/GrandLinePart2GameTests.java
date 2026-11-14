@@ -87,6 +87,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		BlockPos centre = helper.absolutePos(new BlockPos(5, 2, 5));
 		Island island = new Island(990010, centre.getX(), centre.getZ(), 6, 12, "Test Keeper Isle", false, true, "village");
 		IslandRegistry.get(level.getServer()).add(island);
+		KeeperNpcs.forget(level, island.id());
 		KeeperNpcs.ensure(level, island);
 		KeeperNpcs.ensure(level, island); // a second check never adds another
 		AABB area = new AABB(centre).inflate(16);

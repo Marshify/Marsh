@@ -66,6 +66,7 @@ public final class ClientProfileCache {
 
 	public static void acceptIslands(List<com.grandline.world.Island> list, List<Long> discoveredIds) {
 		islands = List.copyOf(list);
+		com.grandline.world.AdventureRules.GrandLineWorldClientFlag.grandLineWorld = islands.stream().anyMatch(com.grandline.world.Island::designed);
 		discovered = java.util.Set.copyOf(discoveredIds);
 	}
 

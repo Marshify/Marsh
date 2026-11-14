@@ -160,7 +160,19 @@ public final class GrandLineConfig {
 
 	// ---- Gunsmith (Dawnreach) ----
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */
-	public long[] gunPrices = {1_500, 12_000};
+	public long[] gunPrices = {400, 6_000};
+
+	// ---- Adventure mode (Grand Line worlds) ----
+	/** Grand Line worlds are an adventure RPG: no breaking, placing, crafting, containers or vanilla utility blocks. */
+	public boolean adventureMode = true;
+	/** Also apply adventure mode outside Grand Line worlds (normally off). */
+	public boolean adventureModeAllWorlds = false;
+	/** Operators at or above this permission level bypass adventure mode while in creative or tagged "grandline_build". */
+	public int adventureBypassPermission = 2;
+	/** Block ids players may still right-click (e.g. "minecraft:oak_door"); none by default. */
+	public java.util.List<String> allowedBlockInteractions = new java.util.ArrayList<>();
+	/** Item ids (besides every grandline: item) players may pick up; none by default. */
+	public java.util.List<String> allowedItems = new java.util.ArrayList<>();
 
 	// ---- Fishing ----
 	/** Starter Fishing Rod price at the Fisherman. */
@@ -211,7 +223,7 @@ public final class GrandLineConfig {
 
 	// ---- Swordsmith (Millbrook Village) ----
 	/** Sword prices at the Swordsmith: Katana, Cutlass. */
-	public long[] swordPrices = {8_000, 2_500};
+	public long[] swordPrices = {500, 300};
 
 	// ---- Ships ----
 	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
@@ -365,6 +377,13 @@ public final class GrandLineConfig {
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);
+		adventureBypassPermission = clamp(adventureBypassPermission, 0, 4);
+		if (allowedBlockInteractions == null) {
+			allowedBlockInteractions = new java.util.ArrayList<>();
+		}
+		if (allowedItems == null) {
+			allowedItems = new java.util.ArrayList<>();
+		}
 		fishingBiteMinSeconds = clamp(fishingBiteMinSeconds, 0.5, 120);
 		fishingBiteMaxSeconds = clamp(fishingBiteMaxSeconds, fishingBiteMinSeconds, 240);
 		fishingMasteryXpMultiplier = clamp(fishingMasteryXpMultiplier, 0, 100);
@@ -386,6 +405,13 @@ public final class GrandLineConfig {
 		saberBossComboFinisherDamage = clamp(saberBossComboFinisherDamage, 0, 1000);
 		saberBossMaxHitPercent = clamp(saberBossMaxHitPercent, 1, 100);
 		saberBossRespawnSeconds = clamp(saberBossRespawnSeconds, 0, 86_400);
+		// Prices left at the old defaults move to the rebalanced ones; prices a server set itself are kept.
+		if (swordPrices != null && java.util.Arrays.equals(swordPrices, new long[]{8_000, 2_500})) {
+			swordPrices = defaults().swordPrices;
+		}
+		if (gunPrices != null && java.util.Arrays.equals(gunPrices, new long[]{1_500, 12_000})) {
+			gunPrices = defaults().gunPrices;
+		}
 		if (swordPrices == null || swordPrices.length != 2) {
 			swordPrices = defaults().swordPrices;
 		}

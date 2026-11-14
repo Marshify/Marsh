@@ -80,6 +80,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.npc.IslandPopulation.register();
 		com.grandline.npc.KeeperNpcs.register();
 		com.grandline.quest.QuestUnlocks.register();
+		com.grandline.world.AdventureRules.register();
 		com.grandline.npc.EnemyRespawns.register();
 		com.grandline.npc.TempleBosses.register();
 		com.grandline.registry.ModSpawnEggs.register();

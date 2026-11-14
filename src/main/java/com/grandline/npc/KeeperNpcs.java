@@ -241,6 +241,13 @@ public final class KeeperNpcs {
 		return feet.getY() <= ground + 2;
 	}
 
+	/** Forgets an island's saved keeper spots (tests: the test world keeps saved data between runs). */
+	public static void forget(ServerLevel level, long islandId) {
+		Data data = Data.get(level);
+		data.spots.keySet().removeIf(k -> k.startsWith(islandId + ":"));
+		data.setDirty();
+	}
+
 	/** Where a keeper stands (null until chosen). Exposed for tests. */
 	public static BlockPos spot(ServerLevel level, Island island, Islander.Role role) {
 		return Data.get(level).spots.get(island.id() + ":" + role.name());
