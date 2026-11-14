@@ -23,6 +23,7 @@
       "com.grandline.test.GrandLineGladiatorGameTests",
       "com.grandline.test.GrandLineProgressionGameTests",
       "com.grandline.test.GrandLineCloudtopGameTests",
+      "com.grandline.test.GrandLineEmberfallGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

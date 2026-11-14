@@ -137,7 +137,7 @@ public final class GrandLineFx {
 		// Settings: other players' move effects can be hidden (their poses and damage still happen).
 		if (!own && !com.grandline.client.settings.ClientSettings.get().allyVfx && !packet.effect().equals("flight_end")
 				&& !packet.effect().startsWith("boss_")
-				&& !packet.effect().startsWith("fishing_")) {
+				&& !packet.effect().startsWith("fishing_") && !packet.effect().startsWith("volcano_")) {
 			return;
 		}
 		Entity caster = level.getEntity(packet.caster());
@@ -155,6 +155,8 @@ public final class GrandLineFx {
 				case "fishing_end" -> MovePoses.clear(packet.caster(), MovePoses.Kind.REEL);
 				default -> { }
 			}
+		} else if (VolcanoFx.handles(packet.effect())) {
+			VolcanoFx.handle(packet);
 		} else if (RaceFx.handles(packet.effect())) {
 			RaceFx.handle(packet, level, caster);
 		} else if (SaberFx.handles(packet.effect())) {

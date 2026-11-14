@@ -41,13 +41,13 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy());
 	}
 
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
-				new EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
+				new com.grandline.world.plan.EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
 
 	// ==================================================================================================== Lv 1
@@ -629,8 +629,9 @@ public final class FirstSeaPlans {
 	// ==================================================================================================== Lv 300
 
 	/** Volcano: blackstone cone with a lava crater, magma streams, obsidian, dead trees and a basalt arena ledge. */
-	static final class EmberfallIsle extends BasePlan {
-		EmberfallIsle() {
+	/** The original Emberfall Isle. Kept for worlds created before the rebuild; new worlds use {@link com.grandline.world.plan.EmberfallIsle}. */
+	static final class EmberfallIsleLegacy extends BasePlan {
+		EmberfallIsleLegacy() {
 			super("Emberfall Isle", 0.1);
 			terrain.mass(0, 0, 44, 40, 5, 2.0, Ground.BASALT)
 					.mass(0, -6, 26, 24, 32, 1.05, Ground.BASALT)
