@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.RailShape;
 
 /**
  * Emberfall Isle, rebuilt: a dark volcanic island (about 160 x 160) seen from the south dock as a small village and
@@ -783,7 +784,7 @@ final class EmberfallIsle extends BasePlan {
 				c.set(x, fy, z, s(Blocks.GRAVEL));
 				c.fill(x, fy + 1, z, x, fy + 4, z, s(Blocks.AIR));
 			}
-			c.set(x, fy + 1, ez, s(Blocks.RAIL));
+			c.set(x, fy + 1, ez, s(Blocks.RAIL).setValue(BlockStateProperties.RAIL_SHAPE, RailShape.EAST_WEST));
 			if ((x - ex) % 4 == 0) {
 				c.fill(x, fy + 1, ez - 2, x, fy + 4, ez - 2, s(Blocks.SPRUCE_LOG));
 				c.fill(x, fy + 1, ez + 2, x, fy + 4, ez + 2, s(Blocks.SPRUCE_LOG));
