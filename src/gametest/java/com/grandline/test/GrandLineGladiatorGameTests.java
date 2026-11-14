@@ -102,7 +102,7 @@ public final class GrandLineGladiatorGameTests implements FabricGameTest {
 		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
 		IslandPlan plan = IslandPlans.get("Gladiator's Ring");
 		Anchor boss = one(plan, Anchor.Type.BOSS_ARENA);
-		helper.assertTrue(boss.y() == 70, "the boss stands on the arena floor (y 70): " + boss.y());
+		helper.assertTrue(boss.y() == 69, "the boss arena is the arena floor (y 69; bosses stand on it): " + boss.y());
 		// Camps are outside the colosseum (92 x 80 around (0, -8)).
 		for (Anchor camp : plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList()) {
 			double px = (camp.x() - 0) / 46.0, pz = (camp.z() + 8) / 40.0;

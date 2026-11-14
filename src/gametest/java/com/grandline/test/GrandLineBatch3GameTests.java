@@ -108,12 +108,12 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 		}
 		ServerPlayer p = survivor(helper);
 		p.setAttached(ModAttachments.QUEST_UNLOCKS_SEEN, List.of());
-		QuestUnlocks.onLevelChanged(p, 1, 14);
-		helper.assertTrue(!p.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN).contains(island.id()), "not yet at Lv 14");
-		QuestUnlocks.onLevelChanged(p, 14, 15);
+		QuestUnlocks.onLevelChanged(p, 1, 9);
+		helper.assertTrue(!p.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN).contains(island.id()), "not yet at Lv 9 (Verdant Wilds opens at Lv 10)");
+		QuestUnlocks.onLevelChanged(p, 9, 10);
 		helper.assertTrue(p.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN).contains(island.id()), "Verdant unlocked at its level (read from the registry)");
 		int size = p.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN).size();
-		QuestUnlocks.onLevelChanged(p, 15, 16);
+		QuestUnlocks.onLevelChanged(p, 10, 11);
 		helper.assertTrue(p.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN).size() == size, "no repeat");
 		if (!had) {
 			registry.removeIf(i -> i.id() == island.id());
@@ -341,9 +341,9 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 				PlayerProfileService.addExperience(p, 1_000_000);
 			}
 			int lv = PlayerProfileService.get(pirate).level();
-			helper.assertTrue(lv >= 15, "levelled: " + lv);
+			helper.assertTrue(lv >= 10, "levelled: " + lv);
 			var target = com.grandline.quest.QuestNavigation.targetIsland(pirate);
-			helper.assertTrue(target.level() >= 15 && target.level() <= lv, "past Lv 15 both sides head on: " + target.name());
+			helper.assertTrue(target.level() >= 10 && target.level() <= lv, "past Lv 10 both sides head on: " + target.name());
 			pirate.setAttached(ModAttachments.ACTIVE_QUEST, new QuestState("BANDIT", "Millbrook Village", 6, 0, 1, 1, 0, 0, false));
 			helper.assertTrue("Millbrook Village".equals(com.grandline.quest.QuestNavigation.targetIsland(pirate).name()), "an active quest leads to its island");
 			pirate.setAttached(ModAttachments.QUEST_NAVIGATION, false);

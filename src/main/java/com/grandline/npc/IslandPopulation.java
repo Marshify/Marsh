@@ -1,5 +1,7 @@
 package com.grandline.npc;
 
+import com.grandline.world.FirstSeaProgression;
+
 import com.grandline.entity.EnemyKind;
 import com.grandline.entity.GrandLineEnemy;
 import com.grandline.entity.GrandLineEntities;
@@ -63,9 +65,15 @@ public final class IslandPopulation {
 			if (entity instanceof GrandLineEnemy enemy && EnemyRespawns.respawns(enemy) && level.dimension() == Level.OVERWORLD) {
 				Island island = enemy.islandId() != Long.MIN_VALUE ? IslandRegistry.get(level.getServer()).get(enemy.islandId())
 						: EnemyRespawns.islandAt(level, enemy.blockPosition());
+				BlockPos home = enemy.origin() != null ? enemy.origin() : enemy.blockPosition();
+				if (island != null && com.grandline.world.plan.IslandPlans.get(island) != null
+						&& FirstSeaProgression.stage(island.name(), FirstSeaProgression.LOWER) != null && enemy.kind() != kindAt(island, home)) {
+					enemy.discard(); // a kind this island no longer has (it moved up the ladder): the island refills with the right kind
+					return;
+				}
 				if (island != null && com.grandline.world.plan.IslandPlans.get(island) != null && outOfLine(enemy.grandLineLevel(), island)) {
 					float ratio = enemy.getHealth() / enemy.getMaxHealth();
-					enemy.setGrandLineLevel(levelFor(island, level.getRandom()));
+					enemy.setGrandLineLevel(levelAt(island, enemy.origin() != null ? enemy.origin() : enemy.blockPosition(), level.getRandom()));
 					enemy.setHealth(enemy.getMaxHealth() * ratio);
 				}
 			}
@@ -108,6 +116,9 @@ public final class IslandPopulation {
 				case GUNSMITH -> Islander.Role.GUNSMITH;
 				default -> null;
 			};
+			if (role == Islander.Role.QUEST_GIVER && anchor.region() != FirstSeaProgression.LOWER) {
+				continue; // a region's own quest giver is kept in place by KeeperNpcs (also in worlds already populated)
+			}
 			if (role != null) {
 				spawnNpcAt(level, island, role, anchor);
 			} else if (anchor.type() == com.grandline.world.plan.Anchor.Type.DOCK) {
@@ -142,6 +153,7 @@ public final class IslandPopulation {
 		npc.setYHeadRot(yaw);
 		npc.setYBodyRot(yaw);
 		npc.setup(role, island.id(), island.level());
+		npc.setRegion(anchor.region());
 		npc.setPersistenceRequired();
 		level.addFreshEntity(npc);
 	}
@@ -158,12 +170,76 @@ public final class IslandPopulation {
 
 	/** A level around the island's recommended level (a tenth either way). */
 	public static int levelFor(Island island, RandomSource random) {
+		FirstSeaProgression.Stage stage = FirstSeaProgression.stage(island.name(), FirstSeaProgression.LOWER);
+		if (stage != null) {
+			return stage.enemyLevel(0, random);
+		}
 		int spread = Math.max(1, island.level() / 10);
 		return Math.max(1, island.level() - spread + random.nextInt(spread * 2 + 1));
 	}
 
+	/**
+	 * The level for an enemy whose camp is nearest {@code at}: on the First Sea ladder, the camp's region picks the stage
+	 * and its place among that region's camps picks the band (the first camp holds the basic enemies, later camps the
+	 * stronger ones). Off the ladder: around the island's level.
+	 */
+	public static int levelAt(Island island, BlockPos at, RandomSource random) {
+		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
+				com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
+		com.grandline.world.plan.Anchor nearest = null;
+		double best = Double.MAX_VALUE;
+		for (com.grandline.world.plan.Anchor camp : camps) {
+			double d = at == null ? 0 : Math.pow(island.x() + camp.x() - at.getX(), 2) + Math.pow(island.z() + camp.z() - at.getZ(), 2);
+			if (d < best) {
+				best = d;
+				nearest = camp;
+			}
+		}
+		if (nearest == null) {
+			return levelFor(island, random);
+		}
+		FirstSeaProgression.Stage stage = FirstSeaProgression.stage(island.name(), nearest.region());
+		if (stage == null) {
+			return levelFor(island, random);
+		}
+		int band = 0;
+		for (com.grandline.world.plan.Anchor camp : camps) {
+			if (camp == nearest) {
+				break;
+			}
+			if (camp.region() == nearest.region()) {
+				band = 1;
+			}
+		}
+		return stage.enemyLevel(band, random);
+	}
+
+	/** The progression region of the camp nearest {@code at} (the island's main region if it has no camps). */
+	public static int regionAt(Island island, BlockPos at) {
+		com.grandline.world.plan.Anchor nearest = null;
+		double best = Double.MAX_VALUE;
+		for (com.grandline.world.plan.Anchor camp : com.grandline.world.plan.IslandPlans.anchors(island, com.grandline.world.plan.Anchor.Type.ENEMY_CAMP)) {
+			double d = at == null ? 0 : Math.pow(island.x() + camp.x() - at.getX(), 2) + Math.pow(island.z() + camp.z() - at.getZ(), 2);
+			if (d < best) {
+				best = d;
+				nearest = camp;
+			}
+		}
+		return nearest == null ? FirstSeaProgression.LOWER : nearest.region();
+	}
+
+	/** The regular enemy kind for the camp nearest {@code at}: by its stage's level (quests ask for the same kind). */
+	public static EnemyKind kindAt(Island island, BlockPos at) {
+		FirstSeaProgression.Stage stage = FirstSeaProgression.stage(island.name(), regionAt(island, at));
+		return EnemyKind.forLevel(stage != null ? stage.min() : island.level());
+	}
+
 	/** Whether an enemy's level is out of line with its island's (the island was retuned): it is then re-levelled. */
 	public static boolean outOfLine(int level, Island island) {
+		int[] span = FirstSeaProgression.islandSpan(island.name());
+		if (span != null) {
+			return level < span[0] || level > span[1];
+		}
 		int spread = Math.max(1, island.level() / 10);
 		return Math.abs(level - island.level()) > spread;
 	}
@@ -252,7 +328,7 @@ public final class IslandPopulation {
 						|| player.distanceToSqr(x, y, z) < 12 * 12) {
 					continue;
 				}
-				EnemyKind kind = EnemyKind.forLevel(island.level());
+				EnemyKind kind = kindAt(island, new BlockPos(x, y, z));
 				GrandLineEnemy enemy = GrandLineEntities.typeOf(kind).create(level);
 				if (enemy == null) {
 					continue;
@@ -260,7 +336,7 @@ public final class IslandPopulation {
 				enemy.moveTo(x + 0.5, y, z + 0.5, random.nextFloat() * 360, 0);
 				enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(enemy.blockPosition()), MobSpawnType.EVENT, null, null);
 				enemy.equip();
-				enemy.setGrandLineLevel(levelFor(island, random));
+				enemy.setGrandLineLevel(levelAt(island, new BlockPos(x, y, z), random));
 				enemy.setOrigin(new BlockPos(x, y, z), island.id());
 				leash(enemy, island);
 				level.addFreshEntity(enemy);

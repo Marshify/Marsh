@@ -464,9 +464,13 @@ public final class FirstSeaPlans {
 			anchor(Anchor.of(Type.QUEST, 4, 6));
 			anchor(Anchor.of(Type.FISHERMAN, 0, 34));
 			anchor(Anchor.at(Type.DOCK, 4, 63, 36));
+			// Lower Cloudtop (Lv 150-190): the landing's quest giver, the east islet camp and its boss spot.
+			// Upper Cloudtop (Lv 450-625): the west islet camp, the summit shrine's quest giver and boss.
 			anchor(Anchor.at(Type.ENEMY_CAMP, 28, 105, -48));
-			anchor(Anchor.at(Type.ENEMY_CAMP, -26, 113, -54));
-			anchor(Anchor.at(Type.BOSS_ARENA, 0, 125, -78));
+			anchor(Anchor.at(Type.ENEMY_CAMP, -26, 113, -54).upper());
+			anchor(Anchor.at(Type.BOSS_ARENA, 28, 105, -44));
+			anchor(Anchor.at(Type.BOSS_ARENA, 0, 125, -78).upper());
+			anchor(Anchor.at(Type.QUEST, 0, 125, -69, 0).upper());
 			anchor(Anchor.of(Type.TREASURE, -14, 10));
 		}
 

@@ -28,8 +28,9 @@ public final class NpcService {
 			return;
 		}
 		Island island = IslandRegistry.get(player.server).get(npc.islandId());
-		String islandName = island == null ? "" : island.name();
-		int level = island == null ? npc.islandLevel() : island.level();
+		var regionStage = QuestService.stageOf(island, npc);
+		String islandName = island == null ? "" : regionStage != null ? regionStage.label() : island.name();
+		int level = QuestService.questLevel(island, npc);
 
 		QuestState offer = npc.role() == Islander.Role.QUEST_GIVER ? QuestService.offer(island, npc, false) : null;
 		QuestState bossOffer = npc.role() == Islander.Role.QUEST_GIVER && level >= QuestService.BOSS_MIN_ISLAND_LEVEL

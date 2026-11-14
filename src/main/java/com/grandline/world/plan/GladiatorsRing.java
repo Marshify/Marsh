@@ -112,7 +112,7 @@ final class GladiatorsRing extends BasePlan {
 		anchor(Anchor.at(Type.DOCK, -8, 63, DOCK_END_Z - 3));
 		anchor(Anchor.area(Type.ENEMY_CAMP, TRAIN_X, TRAIN_Z, 8));                         // the training grounds
 		anchor(Anchor.area(Type.ENEMY_CAMP, RUINS_X, RUINS_Z, 8));                         // the warrior grounds
-		anchor(Anchor.at(Type.BOSS_ARENA, CX, F + 1, CZ - 2));                           // quest bosses fight on the arena floor
+		anchor(Anchor.at(Type.BOSS_ARENA, CX, F, CZ - 2));                           // quest bosses fight on the arena floor
 		anchor(Anchor.of(Type.TREASURE, -46, 50));
 	}
 

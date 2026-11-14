@@ -38,6 +38,15 @@ public final class TempleBosses {
 	}
 
 	public static void register() {
+		// Bosses saved before a rebalance take their island's current boss level when they load.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity instanceof SaberBoss boss) {
+				Island island = com.grandline.world.IslandRegistry.get(level.getServer()).get(boss.islandId());
+				if (island != null && boss.grandLineLevel() != bossLevel(island)) {
+					boss.setGrandLineLevel(bossLevel(island));
+				}
+			}
+		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTickCount() % CHECK_TICKS == 0) {
 				tick(server);
@@ -85,6 +94,12 @@ public final class TempleBosses {
 				}
 			}
 		}
+	}
+
+	/** The temple boss's level: near the top of the island's First Sea range (off the ladder: island level + 5). */
+	public static int bossLevel(Island island) {
+		var stage = com.grandline.world.FirstSeaProgression.stage(island.name(), com.grandline.world.FirstSeaProgression.LOWER);
+		return stage != null ? stage.bossLevel() : island.level() + 5;
 	}
 
 	/** Makes sure the island's boss is present (or its respawn timer is running). Exposed for tests. */
@@ -165,7 +180,7 @@ public final class TempleBosses {
 		boss.setYBodyRot(yaw);
 		boss.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
 		boss.equip();
-		boss.setup(home, yaw, island.id(), island.level() + 5);
+		boss.setup(home, yaw, island.id(), bossLevel(island));
 		level.addFreshEntity(boss);
 		state.boss = boss.getUUID();
 		data.setDirty();

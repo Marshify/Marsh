@@ -128,7 +128,10 @@ public final class EnemyRespawns {
 	}
 
 	private static void spawn(ServerLevel level, Pending p) {
-		GrandLineEnemy enemy = GrandLineEntities.typeOf(p.kind()).create(level);
+		Island ladder = IslandRegistry.get(level.getServer()).get(p.islandId());
+		EnemyKind kind = ladder != null && com.grandline.world.FirstSeaProgression.stage(ladder.name(), com.grandline.world.FirstSeaProgression.LOWER) != null
+				? IslandPopulation.kindAt(ladder, p.pos()) : p.kind(); // the camp's current kind (it changes when an island moves up the ladder)
+		GrandLineEnemy enemy = GrandLineEntities.typeOf(kind).create(level);
 		if (enemy == null) {
 			return;
 		}
@@ -138,7 +141,7 @@ public final class EnemyRespawns {
 		enemy.equip();
 		Island home = IslandRegistry.get(level.getServer()).get(p.islandId());
 		// Same level as before, unless the island has since been retuned (then a level that fits it).
-		enemy.setGrandLineLevel(home != null && IslandPopulation.outOfLine(p.level(), home) ? IslandPopulation.levelFor(home, level.getRandom()) : p.level());
+		enemy.setGrandLineLevel(home != null && IslandPopulation.outOfLine(p.level(), home) ? IslandPopulation.levelAt(home, p.pos(), level.getRandom()) : p.level());
 		enemy.setOrigin(p.pos(), p.islandId());
 		Island island = IslandRegistry.get(level.getServer()).get(p.islandId());
 		if (island != null) {

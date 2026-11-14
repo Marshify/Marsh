@@ -88,6 +88,48 @@ public final class KeeperNpcs {
 		for (Islander.Role role : rolesFor(island)) {
 			ensure(level, island, role);
 		}
+		for (Anchor a : IslandPlans.anchors(island, Anchor.Type.QUEST)) {
+			if (a.region() != com.grandline.world.FirstSeaProgression.LOWER) {
+				ensureRegionQuestGiver(level, island, a);
+			}
+		}
+	}
+
+	/**
+	 * A region's own quest giver (the upper Cloudtop Isles): kept at its spot like the other keepers, so worlds whose
+	 * island was populated before the region existed get one too. It hands out that region's quests.
+	 */
+	private static void ensureRegionQuestGiver(ServerLevel level, Island island, Anchor a) {
+		int x = island.x() + a.x(), z = island.z() + a.z();
+		BlockPos probe = new BlockPos(x, 64, z);
+		if (!level.isPositionEntityTicking(probe)) {
+			return;
+		}
+		IslandPlan plan = IslandPlans.get(island);
+		int y = a.y() != Anchor.SURFACE ? a.y() : plan.terrain().ground(a.x(), a.z()) + 1;
+		BlockPos spot = new BlockPos(x, y, z);
+		List<Islander> present = level.getEntitiesOfClass(Islander.class, new AABB(spot).inflate(12),
+				npc -> npc.isAlive() && npc.role() == Islander.Role.QUEST_GIVER && npc.islandId() == island.id() && npc.region() == a.region());
+		if (!present.isEmpty()) {
+			for (int i = 1; i < present.size(); i++) {
+				present.get(i).discard();
+			}
+			return;
+		}
+		Islander npc = GrandLineEntities.ISLANDER.create(level);
+		if (npc == null) {
+			return;
+		}
+		float yaw = Float.isNaN(a.yaw()) ? 0 : a.yaw();
+		npc.moveTo(x + 0.5, y, z + 0.5, yaw, 0);
+		npc.setYHeadRot(yaw);
+		npc.setYBodyRot(yaw);
+		com.grandline.world.FirstSeaProgression.Stage stage = com.grandline.world.FirstSeaProgression.stage(island.name(), a.region());
+		npc.setup(Islander.Role.QUEST_GIVER, island.id(), stage != null ? stage.min() : island.level());
+		npc.setRegion(a.region());
+		npc.setPersistenceRequired();
+		level.addFreshEntity(npc);
+		GrandLineMod.LOGGER.info("Placed the region {} quest giver on {} at {}", a.region(), island.name(), spot);
 	}
 
 	private static void ensure(ServerLevel level, Island island, Islander.Role role) {

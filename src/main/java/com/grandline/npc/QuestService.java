@@ -25,7 +25,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public final class QuestService {
 	public static final int KILL_COUNT = 6;
 	/** Boss quests are offered on islands of at least this level. */
-	public static final int BOSS_MIN_ISLAND_LEVEL = 15; // Verdant Wilds (Lv 15) is the first island with a boss
+	public static final int BOSS_MIN_ISLAND_LEVEL = 10; // Verdant Wilds (Lv 10-30) is the first island with a boss
 
 	public enum Result {
 		ACCEPTED, ALREADY_ON_QUEST, NO_BOSS_HERE, TOO_FAR, ABANDONED, NO_QUEST
@@ -34,13 +34,25 @@ public final class QuestService {
 	private QuestService() {
 	}
 
+	/** The First Sea stage this quest giver hands out (its island and region), or null off the ladder. */
+	public static com.grandline.world.FirstSeaProgression.Stage stageOf(Island island, Islander npc) {
+		return island == null ? null : com.grandline.world.FirstSeaProgression.stage(island.name(), npc.region());
+	}
+
+	/** The level a quest giver's quests are for: its stage's unlock level (off the ladder: the island's level). */
+	public static int questLevel(Island island, Islander npc) {
+		var stage = stageOf(island, npc);
+		return stage != null ? stage.min() : island == null ? npc.islandLevel() : island.level();
+	}
+
 	public static QuestState offer(Island island, Islander npc, boolean boss) {
-		int level = island == null ? npc.islandLevel() : island.level();
+		int level = questLevel(island, npc);
 		String name = island == null ? "?" : island.name();
 		int x = island == null ? npc.getBlockX() : island.x();
 		int z = island == null ? npc.getBlockZ() : island.z();
-		long xp = 120 + level * 60L;
-		long currency = 50 + level * 15L;
+		var stage = stageOf(island, npc);
+		long xp = stage != null ? com.grandline.world.FirstSeaProgression.questExperience(stage) : 120 + level * 60L;
+		long currency = stage != null ? com.grandline.world.FirstSeaProgression.questCurrency(stage) : 50 + level * 15L;
 		if (boss) {
 			return new QuestState(EnemyKind.CAPTAIN.name(), name, 1, 0, xp * 5, currency * 5, x, z, true);
 		}
@@ -55,6 +67,29 @@ public final class QuestService {
 		QuestState quest = active(player);
 		if (quest == null) {
 			return;
+		}
+		// A regular quest saved before its island moved up the First Sea ladder may ask for an enemy kind the island no
+		// longer has: it now asks for the island's current kind, keeping its progress and rewards.
+		if (!quest.boss()) {
+			for (com.grandline.world.Island island : com.grandline.world.IslandRegistry.get(player.server).all()) {
+				if (island.name().equals(quest.islandName()) && island.sea() == 1
+						&& com.grandline.world.FirstSeaProgression.stage(island.name(), com.grandline.world.FirstSeaProgression.LOWER) != null) {
+					java.util.Set<String> kinds = new java.util.HashSet<>();
+					for (com.grandline.world.FirstSeaProgression.Stage st : com.grandline.world.FirstSeaProgression.STAGES) {
+						if (st.island().equals(island.name())) {
+							kinds.add(EnemyKind.forLevel(st.min()).name());
+						}
+					}
+					if (!kinds.contains(quest.target())) {
+						String now = EnemyKind.forLevel(island.level()).name();
+						quest = new QuestState(now, quest.islandName(), quest.required(), quest.progress(), quest.rewardExperience(),
+								quest.rewardCurrency(), quest.x(), quest.z(), false);
+						player.setAttached(ModAttachments.ACTIVE_QUEST, quest);
+						sync(player);
+					}
+					break;
+				}
+			}
 		}
 		for (com.grandline.world.Island island : com.grandline.world.IslandRegistry.get(player.server).all()) {
 			if (island.starter() && island.name().equals(quest.islandName())) {
@@ -79,7 +114,7 @@ public final class QuestService {
 			return Result.ALREADY_ON_QUEST;
 		}
 		Island island = IslandRegistry.get(player.server).get(npc.islandId());
-		int level = island == null ? npc.islandLevel() : island.level();
+		int level = questLevel(island, npc);
 		if (boss && level < BOSS_MIN_ISLAND_LEVEL) {
 			return Result.NO_BOSS_HERE;
 		}
@@ -87,7 +122,8 @@ public final class QuestService {
 		QuestState quest = offer(island, npc, boss);
 		player.setAttached(ModAttachments.ACTIVE_QUEST, quest);
 		if (boss) {
-			spawnBoss(player, npc, level + 10);
+			var stage = stageOf(island, npc);
+			spawnBoss(player, npc, stage != null ? stage.bossLevel() : level + 10);
 		}
 		player.sendSystemMessage(Component.translatable("message.grandline.quest.accepted", describe(quest)).withStyle(ChatFormatting.GOLD));
 		sync(player);
@@ -138,6 +174,12 @@ public final class QuestService {
 				com.grandline.world.plan.Anchor.Type.BOSS_ARENA);
 		if (!arenas.isEmpty()) {
 			com.grandline.world.plan.Anchor arena = arenas.get(0);
+			for (com.grandline.world.plan.Anchor a : arenas) {
+				if (a.region() == npc.region()) {
+					arena = a; // the arena of the quest giver's own region
+					break;
+				}
+			}
 			x = island.x() + arena.x();
 			z = island.z() + arena.z();
 			if (arena.y() != com.grandline.world.plan.Anchor.SURFACE) {

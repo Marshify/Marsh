@@ -1,5 +1,7 @@
 package com.grandline.quest;
 
+import com.grandline.world.FirstSeaProgression;
+
 import com.grandline.data.ModAttachments;
 import com.grandline.network.payload.QuestUnlockPayload;
 import com.grandline.player.PlayerProfileService;
@@ -27,50 +29,75 @@ public final class QuestUnlocks {
 	private QuestUnlocks() {
 	}
 
+	/** One "new quests" card: its saved key, the place name, its level and sea. */
+	public record Milestone(long key, String name, int level, int sea) {
+	}
+
 	public static void register() {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			ServerPlayer player = handler.getPlayer();
-			if (player.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN) == null) {
-				List<Long> reached = new ArrayList<>();
-				for (Island island : milestones(player)) {
-					if (island.level() <= PlayerProfileService.get(player).level()) {
-						reached.add(island.id());
-					}
+			int level = PlayerProfileService.get(player).level();
+			List<Long> seen = player.getAttached(ModAttachments.QUEST_UNLOCKS_SEEN);
+			List<Long> reached = seen == null ? new ArrayList<>() : new ArrayList<>(seen);
+			boolean changed = seen == null;
+			for (Milestone m : milestones(player)) {
+				// Players already past a milestone (new saves, or a milestone that moved in a rebalance) are marked as
+				// told, without a flood of cards.
+				if (m.level() <= level && !reached.contains(m.key())) {
+					reached.add(m.key());
+					changed = true;
 				}
+			}
+			if (changed) {
 				player.setAttached(ModAttachments.QUEST_UNLOCKS_SEEN, reached);
 			}
 		});
 	}
 
-	/** Islands with quests above the starting level, lowest first. */
-	public static List<Island> milestones(ServerPlayer player) {
+	/**
+	 * Milestones above the starting level, lowest first. The First Sea follows {@link FirstSeaProgression} (Lv 10, 30,
+	 * ... 450 for the upper Cloudtop Isles, 625); other seas: each designed island with quests at its level.
+	 */
+	public static List<Milestone> milestones(ServerPlayer player) {
+		List<Milestone> list = new ArrayList<>();
+		java.util.Map<String, Island> byName = new java.util.HashMap<>();
+		for (Island island : IslandRegistry.get(player.server).all()) {
+			byName.putIfAbsent(island.name(), island);
+		}
+		for (FirstSeaProgression.Stage stage : FirstSeaProgression.STAGES) {
+			Island island = byName.get(stage.island());
+			if (stage.min() <= 1 || island == null) {
+				continue;
+			}
+			long key = stage.region() == FirstSeaProgression.LOWER ? island.id() : ~island.id();
+			list.add(new Milestone(key, stage.label(), stage.min(), 1));
+		}
 		Set<Long> designed = new HashSet<>();
 		for (SeaLayout.Spec spec : SeaLayout.all()) {
-			if (!spec.starter()) {
+			if (!spec.starter() && spec.sea() > 1) {
 				designed.add(SeaLayout.idOf(spec));
 			}
 		}
-		List<Island> list = new ArrayList<>();
 		for (Island island : IslandRegistry.get(player.server).all()) {
 			if (designed.contains(island.id()) && island.level() > 1) {
-				list.add(island);
+				list.add(new Milestone(island.id(), island.name(), island.level(), island.sea()));
 			}
 		}
-		list.sort(Comparator.comparingInt(Island::level).thenComparingInt(Island::sea));
+		list.sort(Comparator.comparingInt(Milestone::level).thenComparingInt(Milestone::sea));
 		return list;
 	}
 
-	/** Called after the player's level changes: shows the card for the highest newly reached island. */
+	/** Called after the player's level changes: shows the card for the highest newly reached milestone. */
 	public static void onLevelChanged(ServerPlayer player, int oldLevel, int newLevel) {
 		if (newLevel <= oldLevel) {
 			return;
 		}
 		List<Long> seen = new ArrayList<>(player.getAttachedOrElse(ModAttachments.QUEST_UNLOCKS_SEEN, List.of()));
-		Island newest = null;
-		for (Island island : milestones(player)) {
-			if (island.level() <= newLevel && !seen.contains(island.id())) {
-				seen.add(island.id());
-				newest = island;
+		Milestone newest = null;
+		for (Milestone m : milestones(player)) {
+			if (m.level() <= newLevel && !seen.contains(m.key())) {
+				seen.add(m.key());
+				newest = m;
 			}
 		}
 		if (newest == null) {

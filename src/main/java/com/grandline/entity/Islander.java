@@ -54,6 +54,8 @@ public class Islander extends PathfinderMob implements FruitDealer {
 	private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(Islander.class, EntityDataSerializers.INT);
 	private long islandId;
 	private int islandLevel = 1;
+	/** Which progression region of its island this NPC serves (see FirstSeaProgression). */
+	private int region;
 
 	public Islander(EntityType<? extends Islander> type, Level level) {
 		super(type, level);
@@ -81,6 +83,14 @@ public class Islander extends PathfinderMob implements FruitDealer {
 
 	public int islandLevel() {
 		return islandLevel;
+	}
+
+	public int region() {
+		return region;
+	}
+
+	public void setRegion(int region) {
+		this.region = region;
 	}
 
 	public void setup(Role role, long islandId, int islandLevel) {
@@ -141,6 +151,7 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		tag.putInt("GrandLineRole", role().ordinal());
 		tag.putLong("GrandLineIsland", islandId);
 		tag.putInt("GrandLineIslandLevel", islandLevel);
+		tag.putInt("GrandLineRegion", region);
 	}
 
 	@Override
@@ -149,5 +160,6 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		entityData.set(ROLE, Role.byId(tag.getInt("GrandLineRole")).ordinal());
 		islandId = tag.getLong("GrandLineIsland");
 		islandLevel = Math.max(1, tag.getInt("GrandLineIslandLevel"));
+		region = tag.getInt("GrandLineRegion");
 	}
 }

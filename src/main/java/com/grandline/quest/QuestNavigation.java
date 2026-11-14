@@ -74,6 +74,17 @@ public final class QuestNavigation {
 		}
 		int level = PlayerProfileService.get(player).level();
 		boolean marine = TeamService.get(player) == TeamService.Side.MARINES;
+		if (SeaLayout.seaAt(player.getX()) == 1) {
+			// First Sea: the progression ladder decides (island and region).
+			com.grandline.world.FirstSeaProgression.Stage stage = com.grandline.world.FirstSeaProgression.stageFor(level, marine);
+			if (stage != null) {
+				for (Island island : all) {
+					if (island.name().equals(stage.island()) && island.sea() == 1) {
+						return island;
+					}
+				}
+			}
+		}
 		String ownStart = marine ? GrandLineMod.config().marineSpawnIsland : GrandLineMod.config().spawnIsland;
 		String otherStart = marine ? GrandLineMod.config().spawnIsland : GrandLineMod.config().marineSpawnIsland;
 		int sea = SeaLayout.seaAt(player.getX());
@@ -96,12 +107,30 @@ public final class QuestNavigation {
 		return best;
 	}
 
+	/** Which region of the target island this player should go to (the upper Cloudtop Isles from Lv 450). */
+	public static int targetRegion(ServerPlayer player, Island island) {
+		boolean marine = TeamService.get(player) == TeamService.Side.MARINES;
+		var stage = com.grandline.world.FirstSeaProgression.stageFor(PlayerProfileService.get(player).level(), marine);
+		return stage != null && island != null && stage.island().equals(island.name()) ? stage.region() : com.grandline.world.FirstSeaProgression.LOWER;
+	}
+
 	/** Where the island's quest giver stands: its plan's quest spot, else the island centre. */
 	public static BlockPos questGiverSpot(Island island) {
+		return questGiverSpot(island, com.grandline.world.FirstSeaProgression.LOWER);
+	}
+
+	/** Where the island's quest giver for {@code region} stands (falls back to the main one). */
+	public static BlockPos questGiverSpot(Island island, int region) {
 		List<Anchor> quest = IslandPlans.anchors(island, Anchor.Type.QUEST);
 		var plan = IslandPlans.get(island);
 		if (!quest.isEmpty() && plan != null) {
 			Anchor a = quest.get(0);
+			for (Anchor q : quest) {
+				if (q.region() == region) {
+					a = q;
+					break;
+				}
+			}
 			int y = a.y() != Anchor.SURFACE ? a.y() : plan.terrain().ground(a.x(), a.z()) + 1;
 			return new BlockPos(island.x() + a.x(), y, island.z() + a.z());
 		}
@@ -114,18 +143,20 @@ public final class QuestNavigation {
 		if (island == null) {
 			payload = new NavTargetPayload(enabled(player), "", "", 0, 0, 0, -1);
 		} else {
-			BlockPos spot = questGiverSpot(island);
+			int region = targetRegion(player, island);
+			BlockPos spot = questGiverSpot(island, region);
 			int entityId = -1;
 			if (player.level() == player.server.overworld() && player.blockPosition().closerThan(spot, 128)
 					&& player.serverLevel().isPositionEntityTicking(spot)) {
 				for (Islander npc : player.serverLevel().getEntitiesOfClass(Islander.class, new AABB(spot).inflate(24),
-						n -> n.role() == Islander.Role.QUEST_GIVER && n.islandId() == island.id())) {
+						n -> n.role() == Islander.Role.QUEST_GIVER && n.islandId() == island.id() && n.region() == region)) {
 					entityId = npc.getId();
 					spot = npc.blockPosition();
 					break;
 				}
 			}
-			payload = new NavTargetPayload(true, "entity.grandline.islander.quest_giver", island.name(), spot.getX(), spot.getY(), spot.getZ(), entityId);
+			var regionStage = com.grandline.world.FirstSeaProgression.stage(island.name(), region);
+			payload = new NavTargetPayload(true, "entity.grandline.islander.quest_giver", regionStage != null ? regionStage.label() : island.name(), spot.getX(), spot.getY(), spot.getZ(), entityId);
 		}
 		if (!force && payload.equals(LAST_SENT.get(player.getUUID()))) {
 			return;

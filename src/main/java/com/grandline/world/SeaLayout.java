@@ -70,7 +70,7 @@ public final class SeaLayout {
 	}
 
 	private static void s1(String n, IslandTheme t, int x, int z, int r, int l, boolean s) {
-		add(1, n, t, x, z, r, l, s);
+		add(1, n, t, x, z, r, FirstSeaProgression.islandLevel(n, l), s); // First Sea levels: FirstSeaProgression
 	}
 
 	private static void s2(String n, IslandTheme t, int x, int z, int r, int l, boolean s) {

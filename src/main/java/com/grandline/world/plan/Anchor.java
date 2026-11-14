@@ -4,7 +4,17 @@ package com.grandline.world.plan;
  * A gameplay spot on a planned island, in island-local block coordinates. Population, enemy spawning, quests and
  * treasure read these instead of guessing positions, so each island decides where its NPCs and fights belong.
  */
-public record Anchor(Type type, int x, int y, int z, int radius, float yaw) {
+public record Anchor(Type type, int x, int y, int z, int radius, float yaw, int region) {
+	/** An anchor in the island's main (lower) region. */
+	public Anchor(Type type, int x, int y, int z, int radius, float yaw) {
+		this(type, x, y, z, radius, yaw, com.grandline.world.FirstSeaProgression.LOWER);
+	}
+
+	/** This anchor in the island's upper region (a separate progression stage, e.g. the upper Cloudtop Isles). */
+	public Anchor upper() {
+		return new Anchor(type, x, y, z, radius, yaw, com.grandline.world.FirstSeaProgression.UPPER);
+	}
+
 	/** {@link #y} value meaning "stand on the surface at (x, z)". */
 	public static final int SURFACE = Integer.MIN_VALUE;
 
