@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Saber visuals (the Saber's own hits and the Saber Warden's attacks): crisp steel-white sword trails that sweep with
+ * Saber visuals (the Saber's own hits and the Saber Warden's attacks): vibrant red sword trails that sweep with
  * the blade, red ground arcs that show where a telegraphed cut will land (filling up until it strikes), a charging
  * glint on the blade, and the flying crescent of sword energy. Drawn with Grand Line's own glow/streak textures.
  */
 final class SaberFx {
-	static final int WHITE = 0xFFFFFF;
-	static final int STEEL = 0xCFE6FF;
-	static final int BLUE = 0x79B6FF;
+	static final int WHITE = 0xFF8A80;
+	static final int STEEL = 0xFF1F2E;
+	static final int BLUE = 0x9E0010;
 	static final int WARN = 0xFF3B2E;
 	static final int WARN_DARK = 0x8E1208;
 

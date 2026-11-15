@@ -45,9 +45,18 @@ public final class Gear {
 			move("cutlass_lunge", FruitMoves.dash(Element.METAL, 2.4, 10f)));
 	// The Saber (Verdant Wilds' temple boss drop): melee damage, attack speed and move damage come from the config.
 	public static final Item SABER = sword("saber", new SaberItem(new Item.Properties().rarity(Rarity.RARE)), Rarity.RARE, 0xC9D3E0,
-			move("saber_thrust", ctx -> FruitMoves.strike(Element.METAL, 6, saberMove(10f)).execute(ctx)),
-			move("saber_twin_arc", ctx -> FruitMoves.bolt(Element.METAL, 12, 2, saberMove(12f)).execute(ctx)),
-			move("saber_flourish", ctx -> FruitMoves.burst(Element.METAL, 5, saberMove(14f)).execute(ctx)));
+			move("saber_thrust", ctx -> {
+				saberArcs(ctx, 3.2, 0);
+				return FruitMoves.strike(Element.METAL, 6, saberMove(10f)).execute(ctx);
+			}),
+			move("saber_twin_arc", ctx -> {
+				saberArcs(ctx, 3.6, 1, 2);
+				return FruitMoves.bolt(Element.METAL, 12, 2, saberMove(12f)).execute(ctx);
+			}),
+			move("saber_flourish", ctx -> {
+				saberArcs(ctx, 4.2, 3, 1, 2);
+				return FruitMoves.burst(Element.METAL, 5, saberMove(14f)).execute(ctx);
+			}));
 	public static final Item TRIDENT = sword("trident", Tiers.DIAMOND, 4, -2.8F, Rarity.RARE, 0x7FB7C9,
 			move("trident_thrust", FruitMoves.strike(Element.WATER, 8, 12f)),
 			move("trident_riptide", FruitMoves.vortex(Element.WATER, 8, 5, 12f)),
@@ -95,6 +104,19 @@ public final class Gear {
 		Item item = register(name, sword);
 		weaponPower(item, name, StatType.SWORD, rarity, color, moves);
 		return item;
+	}
+
+	/**
+	 * The Saber boss's sword arcs, drawn for the player's Saber moves so they look like the boss's cuts. Styles as the
+	 * boss uses them: 0 slash, 1 left-to-right, 2 right-to-left, 3 overhead.
+	 */
+	static void saberArcs(com.grandline.combat.ability.AbilityContext ctx, double range, int... styles) {
+		var player = ctx.player();
+		net.minecraft.world.phys.Vec3 look = player.getLookAngle().multiply(1, 0, 1);
+		net.minecraft.world.phys.Vec3 forward = look.lengthSqr() < 1e-6 ? new net.minecraft.world.phys.Vec3(0, 0, 1) : look.normalize();
+		for (int style : styles) {
+			com.grandline.combat.fx.FxEvents.send(player, "boss_slash", player.position().add(0, 1.0, 0), forward, 0, range, style);
+		}
 	}
 
 	/** A Saber move's base damage times {@code saberMoveDamageMultiplier} (read when the move is used). */
