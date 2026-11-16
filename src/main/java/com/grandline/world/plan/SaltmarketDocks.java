@@ -1232,9 +1232,9 @@ public final class SaltmarketDocks extends BasePlan {
 			c.set(t[0], y + 1, t[1], s(Blocks.DARK_OAK_FENCE));
 			c.set(t[0], y + 2, t[1], s(Blocks.DARK_OAK_PRESSURE_PLATE));
 			for (Direction d : Direction.Plane.HORIZONTAL) {
-				c.set(t[0] + d.getStepX(), y + 1, t[1] + d.getStepZ(), stair(Blocks.SPRUCE_STAIRS, d.getOpposite(), false));
+				c.set(t[0] + d.getStepX(), y + 1, t[1] + d.getStepZ(), stair(Blocks.SPRUCE_STAIRS, d, false));
 			}
-			c.set(t[0] + 1, y, t[1] + 1, s(Blocks.BLUE_CARPET));
+			c.set(t[0] + 1, y + 1, t[1] + 1, s(Blocks.BLUE_CARPET)); // a rug on the floor, not in it
 		}
 		for (int x = -2; x <= 2; x++) {
 			for (int z = -14; z <= -11; z++) {
