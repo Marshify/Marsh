@@ -114,3 +114,7 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 **Known compromises:** Saltmarket Docks, Lotus Palace, Redbrick Port and Crystal Fountain are simpler builds with few
 hidden corners, so some of their chests sit at camps, under awnings or at landmarks rather than in hidden rooms. When
 an island is rebuilt (Saltmarket Docks is next), its chests are re-picked from the new build.
+
+**When an island is rebuilt:** re-pick its chests from the new build with `/grandline treasure scan` and the tools
+above. The owner's preference is **outdoor spots only** (behind buildings, by crates, ledges, rocks, caves), well
+spread out; no chests inside buildings.
