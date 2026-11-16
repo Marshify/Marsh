@@ -85,7 +85,7 @@ public final class AbilityActivationHandler {
 
 		if (ability.activation() == AbilityDef.Activation.CHARGED) {
 			// Energy is checked now and spent on release; the server times the charge itself.
-			if (EnergyService.current(player) + 1.0e-9 < EnergyService.max(player) * ability.energyCost()) {
+			if (!EnergyService.canAfford(player, ability.energyCost())) {
 				tell(player, "message.grandline.ability.no_energy");
 				return Outcome.NO_ENERGY;
 			}

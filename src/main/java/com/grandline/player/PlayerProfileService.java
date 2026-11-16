@@ -85,6 +85,7 @@ public final class PlayerProfileService {
 			result[0] = allocation.result();
 			return allocation.profile();
 		});
+		energyChanged(player);
 		return result[0];
 	}
 
@@ -117,7 +118,15 @@ public final class PlayerProfileService {
 	}
 
 	public static PlayerProfile resetStats(ServerPlayer player) {
-		return update(player, profile -> statRules().resetStats(profile));
+		PlayerProfile after = update(player, profile -> statRules().resetStats(profile));
+		energyChanged(player);
+		return after;
+	}
+
+	/** Melee changed: max energy follows at once (current kept, clamped if the max dropped) and the bar updates now. */
+	private static void energyChanged(ServerPlayer player) {
+		com.grandline.combat.EnergyService.clampToMax(player);
+		com.grandline.combat.EnergyService.sync(player, true);
 	}
 
 	public static PlayerProfile addCurrency(ServerPlayer player, long amount) {

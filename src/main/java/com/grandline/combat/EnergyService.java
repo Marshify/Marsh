@@ -9,8 +9,17 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Server-authoritative energy. Moves spend a fraction of max energy; energy regenerates every tick. Max energy grows
- * with level. Energy is not saved (players log in full), like most action RPGs.
+ * Server-authoritative energy.
+ * <ul>
+ *   <li>Max energy = {@code baseEnergy} + Melee points x {@code energyPerMeleePoint} (5) + accessory bonus. It is
+ *   computed live from the allocated Melee stat (never from level), so allocating or resetting Melee changes it at once;
+ *   current energy is kept (and clamped when the max drops), and new capacity fills by regeneration.</li>
+ *   <li>Regeneration: {@code energyRegenPerSecond} of max per second (8%), every server tick, never above max.</li>
+ *   <li>Costs: a fixed amount per move, its cost fraction x {@code baseEnergy} (see {@link #cost}), times the race
+ *   multiplier; checked and spent here, only when a move actually fires; never below zero.</li>
+ *   <li>Energy is not saved: players join and respawn full. The client bar is synced every 4 ticks and at once on
+ *   spends and stat changes.</li>
+ * </ul>
  */
 public final class EnergyService {
 	/** Mutable per-player state stored in a transient attachment. */
@@ -43,9 +52,24 @@ public final class EnergyService {
 	}
 
 	public static double max(ServerPlayer player) {
-		int level = PlayerProfileService.get(player).level();
-		return GrandLineMod.config().baseEnergy + GrandLineMod.config().energyPerLevel * Math.max(0, level - 1)
+		return max(PlayerProfileService.get(player).stats().get(com.grandline.player.StatType.MELEE))
 				+ com.grandline.gear.GearService.bonusEnergy(player);
+	}
+
+	/** Max energy for {@code melee} allocated Melee points, before accessory bonuses: 100 + 5 per point. */
+	public static double max(int melee) {
+		return GrandLineMod.config().baseEnergy + GrandLineMod.config().energyPerMeleePoint * Math.max(0, melee);
+	}
+
+	/** What a move with cost fraction {@code fraction} costs this player, in energy. */
+	public static double cost(ServerPlayer player, double fraction) {
+		double pool = GrandLineMod.config().energyCostsScaleWithMax ? max(player) : GrandLineMod.config().baseEnergy;
+		return pool * Math.max(0, fraction) * com.grandline.race.RacePassives.energyMultiplier(player);
+	}
+
+	/** Whether the player has the energy for a move with cost fraction {@code fraction} (spends nothing). */
+	public static boolean canAfford(ServerPlayer player, double fraction) {
+		return current(player) + 1.0e-9 >= cost(player, fraction);
 	}
 
 	/** Lowers stored energy to the current cap (after gear is removed). Never raises it. */
@@ -66,24 +90,24 @@ public final class EnergyService {
 
 	/** Spends {@code fraction} of max energy if available. Returns false (nothing spent) if there is not enough. */
 	public static boolean trySpend(ServerPlayer player, double fraction) {
-		double cost = max(player) * Math.max(0, fraction) * com.grandline.race.RacePassives.energyMultiplier(player);
+		double cost = cost(player, fraction);
 		double now = current(player);
 		if (now + 1.0e-9 < cost) {
 			return false;
 		}
-		state(player).current = now - cost;
+		state(player).current = Math.max(0, now - cost);
 		sync(player, true);
 		return true;
 	}
 
 	/** Like {@link #trySpend} but without an immediate sync packet (for per-tick drains; the regular sync covers it). */
 	public static boolean trySpendQuiet(ServerPlayer player, double fraction) {
-		double cost = max(player) * Math.max(0, fraction) * com.grandline.race.RacePassives.energyMultiplier(player);
+		double cost = cost(player, fraction);
 		double now = current(player);
 		if (now + 1.0e-9 < cost) {
 			return false;
 		}
-		state(player).current = now - cost;
+		state(player).current = Math.max(0, now - cost);
 		return true;
 	}
 

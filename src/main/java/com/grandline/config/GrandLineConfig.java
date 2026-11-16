@@ -270,9 +270,17 @@ public final class GrandLineConfig {
 	/** Hull regained per second (fraction of max) after 15 seconds without damage. */
 	public double shipRepairPerSecond = 0.01;
 
+	/** Max energy before any Melee points. */
 	public double baseEnergy = 100.0;
-	/** Extra max energy per level above 1. */
-	public double energyPerLevel = 2.0;
+	/** Max energy added by each allocated Melee point (max energy = base + Melee x this + accessory bonus). */
+	public double energyPerMeleePoint = 5.0;
+	/** No longer used: max energy does not grow with level (kept so old config files still load). */
+	public double energyPerLevel = 0.0;
+	/**
+	 * Move costs: false (default) = each move costs a fixed amount, its cost fraction x {@code baseEnergy} (what it cost
+	 * at the starting pool), so more Melee means more casts; true = the old rule, a fraction of current max energy.
+	 */
+	public boolean energyCostsScaleWithMax = false;
 	/** Fraction of max energy regenerated per second. */
 	public double energyRegenPerSecond = 0.08;
 
@@ -485,6 +493,7 @@ public final class GrandLineConfig {
 		shipRepairPerSecond = clamp(shipRepairPerSecond, 0, 1);
 		baseEnergy = clamp(baseEnergy, 1, 1_000_000);
 		energyPerLevel = clamp(energyPerLevel, 0, 10_000);
+		energyPerMeleePoint = clamp(energyPerMeleePoint, 0, 10_000);
 		energyRegenPerSecond = clamp(energyRegenPerSecond, 0, 10);
 		if (fruitPrices == null || fruitPrices.length != 5) {
 			fruitPrices = defaults().fruitPrices;

@@ -131,8 +131,8 @@ public final class ProfileHud {
 				Math.round(health) + "/" + Math.round(maxHealth), maxHealth <= 0 ? 0 : health / maxHealth, 0);
 		y += 16;
 
-		float energy = ClientProfileCache.energy();
-		float maxEnergy = ClientProfileCache.maxEnergy();
+		float energy = shownEnergy(ClientProfileCache.energy());
+		float maxEnergy = shownMaxEnergy(ClientProfileCache.maxEnergy());
 		spriteBar(graphics, font, x, y, width, Component.translatable("hud.grandline.energy"),
 				Math.round(energy) + "/" + Math.round(maxEnergy), maxEnergy <= 0 ? 0 : energy / maxEnergy, 1);
 		y += 17;
@@ -313,5 +313,34 @@ public final class ProfileHud {
 		graphics.pose().scale(scale, scale, 1);
 		graphics.drawString(font, text, 0, 0, color);
 		graphics.pose().popPose();
+	}
+
+	// The energy bar eases towards the server's values (synced a few times a second), so spends, regeneration and a
+	// bigger max from Melee animate smoothly at any frame rate. Big drops (a move) settle fast, regeneration glides.
+	private static float shownEnergy = -1, shownMax = -1;
+	private static long energyNanos;
+
+	private static float shownEnergy(float target) {
+		long now = System.nanoTime();
+		double dt = energyNanos == 0 ? 0 : Math.min(0.1, (now - energyNanos) / 1.0e9);
+		energyNanos = now;
+		if (shownEnergy < 0 || Math.abs(target - shownEnergy) > Math.max(1, shownMax) * 0.9) {
+			shownEnergy = target;
+		} else {
+			shownEnergy += (float) ((target - shownEnergy) * (1 - Math.exp(-12 * dt)));
+		}
+		return shownEnergy;
+	}
+
+	private static float shownMaxEnergy(float target) {
+		if (shownMax < 0) {
+			shownMax = target;
+		} else {
+			shownMax += (target - shownMax) * 0.25f;
+			if (Math.abs(target - shownMax) < 0.5f) {
+				shownMax = target;
+			}
+		}
+		return shownMax;
 	}
 }
