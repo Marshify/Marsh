@@ -1,5 +1,8 @@
 package com.grandline.client.fx;
 
+import com.grandline.audio.GrandLineSounds;
+import com.grandline.client.audio.GrandLineAudio;
+
 import com.grandline.client.settings.CameraShake;
 import com.grandline.fruit.flame.FlameMoves;
 import com.grandline.network.payload.FxEventPayload;
@@ -47,6 +50,7 @@ final class FlameFx {
 					MovePoses.windup(id, MovePoses.Kind.READY, age);
 					GrandLineFx.add(new Coil(id, FlameMoves.SHOT_COIL_TICKS + FlameMoves.SHOTS * FlameMoves.SHOT_INTERVAL + 2));
 				}
+				GrandLineAudio.play(GrandLineSounds.FLAME_SHOTS_CHARGE, p.pos(), 1f, 1f);
 			}
 			case "flame_shot" -> {
 				boolean left = ((int) p.size()) % 2 == 1;
@@ -56,13 +60,20 @@ final class FlameFx {
 				if (own && caster != null) {
 					mc.player.swing(left ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 				}
-				GrandLineFx.add(new Fireball(id, p.pos(), p.dir(), p.speed(), p.range(), FlameMoves.SHOT_SIZE, 7, false));
+				Fireball shot = new Fireball(id, p.pos(), p.dir(), p.speed(), p.range(), FlameMoves.SHOT_SIZE, 7, false);
+				GrandLineFx.add(shot);
 				burst(level, p.pos(), p.dir(), 0.35, 5);
+				// Each release is a little higher than the last; the rush follows the fireball until its impact beat.
+				GrandLineAudio.play(GrandLineSounds.FLAME_SHOTS_CAST, p.pos(), 1f, 1f + (float) p.size() * 0.05f);
+				GrandLineAudio.loop(GrandLineSounds.FLAME_SHOTS_TRAVEL, shot::position, () -> !shot.done, 0.6f, () -> 1.0, null);
 			}
 			case "flame_shot_hit" -> {
 				GrandLineFx.endProjectile(id, p.pos());
 				int kind = (int) p.size();
 				GrandLineFx.add(kind == 0 ? new Fizzle(p.pos()) : new Impact(p.pos(), kind == 2 ? 0.9 : 0.6, kind == 2 ? 10 : 8));
+				// Only a hit sounds like a hit: enemy, terrain, or the fireball burning out at range.
+				GrandLineAudio.play(kind == 2 ? GrandLineSounds.FLAME_SHOTS_IMPACT : kind == 1 ? GrandLineSounds.FLAME_SHOTS_IMPACT_TERRAIN
+						: GrandLineSounds.FLAME_SHOTS_FIZZLE, p.pos(), 1f, 1f);
 				if (kind == 2) {
 					shake(mc, p.pos(), own ? 1.0f : 0.6f);
 				}
@@ -72,6 +83,7 @@ final class FlameFx {
 					MovePoses.windup(id, MovePoses.Kind.SWEEP, age);
 					GrandLineFx.add(new ArmFlames(id, FlameMoves.WAVE_WINDUP_TICKS + 1));
 				}
+				GrandLineAudio.play(GrandLineSounds.FLAME_WAVE_CHARGE, p.pos(), 1f, 1f);
 			}
 			case "flame_wave" -> {
 				if (caster != null) {
@@ -80,24 +92,36 @@ final class FlameFx {
 				if (own) {
 					mc.player.swing(InteractionHand.MAIN_HAND);
 				}
-				GrandLineFx.add(new Wave(id, p.pos(), p.dir(), p.speed(), p.range(), p.size()));
+				Wave wave = new Wave(id, p.pos(), p.dir(), p.speed(), p.range(), p.size());
+				GrandLineFx.add(wave);
+				GrandLineAudio.play(GrandLineSounds.FLAME_WAVE_CAST, p.pos(), 1f, 1f);
+				// The roar rides the wave's front and ends, with its dying-out, when the wave stops (range or a wall).
+				GrandLineAudio.loop(GrandLineSounds.FLAME_WAVE_TRAVEL, () -> wave.origin.add(wave.dir.scale(wave.front(0))).add(0, 1, 0),
+						() -> !wave.done && wave.fade < 0, 0.9f, () -> 1.0, GrandLineSounds.FLAME_WAVE_AFTERMATH);
 			}
 			case "flame_wave_end" -> GrandLineFx.endWave(id, p.size());
 			case "flame_wave_hit" -> {
 				GrandLineFx.add(new Impact(p.pos(), 0.8, 9));
 				shake(mc, p.pos(), own ? 0.9f : 0.5f);
+				GrandLineAudio.play(GrandLineSounds.FLAME_WAVE_IMPACT, p.pos(), 1f, 1f);
 			}
 			case "flame_ring_gather" -> {
 				if (caster != null) {
 					MovePoses.windup(id, MovePoses.Kind.PLANT, age);
 				}
 				GrandLineFx.add(new Gather(id, p.pos(), FlameMoves.RING_GATHER_TICKS + 1));
+				GrandLineAudio.play(GrandLineSounds.FLAME_RING_CHARGE, p.pos(), 1f, 1f);
 			}
 			case "flame_ring" -> {
 				if (caster != null) {
 					MovePoses.release(id, MovePoses.Kind.PLANT, age, false);
 				}
-				GrandLineFx.add(new GroundRing(p.pos(), p.speed(), p.range(), p.size()));
+				GroundRing ring = new GroundRing(p.pos(), p.speed(), p.range(), p.size());
+				GrandLineFx.add(ring);
+				GrandLineAudio.play(GrandLineSounds.FLAME_RING_CAST, p.pos(), 1f, 1f);
+				// The rush lasts while the ring is still spreading; embers settle as it reaches full size.
+				GrandLineAudio.loop(GrandLineSounds.FLAME_RING_TRAVEL, () -> ring.center, () -> !ring.done && ring.over < 0, 0.8f, () -> 1.0,
+						GrandLineSounds.FLAME_RING_AFTERMATH);
 				shake(mc, p.pos(), own ? 1.2f : 0.8f);
 			}
 			case "flame_nova_charge" -> {
@@ -105,7 +129,14 @@ final class FlameFx {
 					MovePoses.windup(id, MovePoses.Kind.HEAVY, age);
 					NovaCharge charge = GrandLineFx.find(NovaCharge.class, id);
 					if (charge == null) {
-						GrandLineFx.add(new NovaCharge(id, p.size()));
+						NovaCharge mass = new NovaCharge(id, p.size());
+						GrandLineFx.add(mass);
+						// Sustained while V is held (the server's charge beats keep the mass alive); rises in pitch with the
+						// charge, and fades out if the charge is released or interrupted.
+						GrandLineAudio.loop(GrandLineSounds.FLAME_NOVA_CHARGE, () -> {
+							Entity c = mass.caster(level);
+							return c == null ? null : c.position().add(0, c.getBbHeight() + 1.0, 0);
+						}, () -> !mass.done && !mass.released, 1f, () -> 0.8 + mass.shown * 0.5, null);
 					} else {
 						charge.update(p.size());
 					}
@@ -122,20 +153,38 @@ final class FlameFx {
 				if (own) {
 					mc.player.swing(InteractionHand.MAIN_HAND);
 				}
-				GrandLineFx.add(new Fireball(id, p.pos(), p.dir(), p.speed(), p.range() + 4, p.size(), 13, true));
+				Fireball nova = new Fireball(id, p.pos(), p.dir(), p.speed(), p.range() + 4, p.size(), 13, true);
+				GrandLineFx.add(nova);
+				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_CAST, p.pos(), 1f, 1f);
+				GrandLineAudio.loop(GrandLineSounds.FLAME_NOVA_TRAVEL, nova::position, () -> !nova.done, 1f, () -> 1.0, null);
 				GrandLineFx.add(new TargetMarker(id, p.pos().add(p.dir().scale(p.range())), FlameMoves.novaRadius(p.size())));
 			}
 			case "flame_nova_impact" -> {
 				GrandLineFx.endProjectile(id, p.pos());
 				GrandLineFx.endMarker(id);
 				GrandLineFx.add(new NovaImpact(p.pos(), p.size()));
+				// A bigger charge, a heavier blast (lower and louder); the burning tail is layered on top.
+				float weight = (float) Math.min(1, (p.size() - 5) / 3.5);
+				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_IMPACT, p.pos(), 1f + weight * 0.4f, 1f - weight * 0.12f);
+				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_AFTERMATH, p.pos(), 1f, 1f);
 				shake(mc, p.pos(), own ? 2.4f : 1.8f);
 			}
 			case "flame_flight_start" -> {
 				if (caster != null) {
 					MovePoses.windup(id, MovePoses.Kind.FLIGHT, age);
-					GrandLineFx.add(new Flight(id));
+					Flight flight = new Flight(id);
+					GrandLineFx.add(flight);
+					// The roar of flight follows the flier, louder and higher the faster they go; it fades out when the
+					// "flight_end" beat lands (or the flier is gone), with the flames going out.
+					GrandLineAudio.loop(GrandLineSounds.FLAME_WINGS_TRAVEL, () -> {
+						Entity c = flight.caster(level);
+						return c == null ? null : c.position();
+					}, () -> !flight.done && !flight.ending, 0.8f, () -> {
+						Entity c = flight.caster(level);
+						return c == null ? 1.0 : 0.9 + Math.min(0.3, c.getDeltaMovement().length() * 0.4);
+					}, GrandLineSounds.FLAME_WINGS_AFTERMATH);
 				}
+				GrandLineAudio.play(GrandLineSounds.FLAME_WINGS_CAST, p.pos(), 1f, 1f);
 				GrandLineFx.add(new Ignition(p.pos()));
 			}
 			case "flight_end" -> {

@@ -72,9 +72,15 @@ public final class GrandLineFx {
 
 	public static void register() {
 		ClientPlayNetworking.registerGlobalReceiver(FxEventPayload.TYPE, (packet, player, sender) -> handle(packet));
-		ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			tick();
+			com.grandline.client.audio.GrandLineAudio.tick();
+		});
 		WorldRenderEvents.AFTER_TRANSLUCENT.register(GrandLineFx::render);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> clearAll());
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			clearAll();
+			com.grandline.client.audio.GrandLineAudio.clear();
+		});
 	}
 
 	static void add(Effect effect) {
@@ -165,6 +171,8 @@ public final class GrandLineFx {
 	}
 
 	private static void clearAll() {
+		EFFECTS.forEach(e -> e.done = true);
+		PENDING.forEach(e -> e.done = true);
 		EFFECTS.clear();
 		PENDING.clear();
 		FxSprites.clear();
@@ -189,6 +197,7 @@ public final class GrandLineFx {
 				e.cancel();
 			}
 			if (e.done || !e.tick(level)) {
+				e.done = true; // finished: anything following it (a sound loop, say) sees it end
 				it.remove();
 			}
 		}

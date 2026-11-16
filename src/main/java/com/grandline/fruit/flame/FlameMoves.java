@@ -11,9 +11,6 @@ import com.grandline.combat.fx.FxEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -108,7 +105,6 @@ public final class FlameMoves {
 		ServerPlayer player = ctx.player();
 		// Windup: fire coils tightly round the casting hand.
 		FxEvents.send(player, "flame_shot_coil", player.position());
-		sound(player, SoundEvents.FIRECHARGE_USE, 0.5F, 1.9F);
 		TimedEffects.start(age -> {
 			if (gone(player)) {
 				return false;
@@ -125,18 +121,12 @@ public final class FlameMoves {
 			Vec3 start = handPoint(player, shot % 2 == 0);
 			Vec3 dir = Projectiles.crosshairAim(player, SHOT_RANGE).subtract(start).normalize();
 			FxEvents.send(player, "flame_shot", start, dir, SHOT_SPEED, SHOT_RANGE, shot);
-			sound(player, SoundEvents.BLAZE_SHOOT, 0.7F, 1.5F + shot * 0.08F);
 			Projectiles.fire(player, start, dir, SHOT_SPEED, SHOT_RANGE, 0.35, (level, pos, a) -> {
 			}, impact -> {
 				boolean hit = impact.entity().isPresent();
 				// Impact at the real contact point: 2 = struck an enemy, 1 = struck terrain, 0 = burnt out at range.
 				boolean terrain = !hit && impact.position().distanceTo(start) < SHOT_RANGE - 0.5;
 				FxEvents.send(player, "flame_shot_hit", impact.position(), dir, 0, 0, hit ? 2 : terrain ? 1 : 0);
-				ServerLevel level = player.serverLevel();
-				if (hit || terrain) {
-					level.playSound(null, impact.position().x, impact.position().y, impact.position().z, SoundEvents.FIRECHARGE_USE,
-							SoundSource.PLAYERS, hit ? 0.9F : 0.5F, hit ? 1.2F : 1.6F);
-				}
 				impact.entity().ifPresent(target -> {
 					if (ctx.damage(target, SHOT_DAMAGE)) {
 						target.setSecondsOnFire(2);
@@ -162,7 +152,6 @@ public final class FlameMoves {
 		ServerPlayer player = ctx.player();
 		// Windup: the casting arm crosses the chest, flames running along it.
 		FxEvents.send(player, "flame_wave_windup", player.position());
-		sound(player, SoundEvents.FIRECHARGE_USE, 0.8F, 0.8F);
 		TimedEffects.later(WAVE_WINDUP_TICKS, () -> {
 			if (gone(player)) {
 				return;
@@ -171,8 +160,6 @@ public final class FlameMoves {
 			Vec3 dir = flat(player.getLookAngle());
 			Vec3 origin = player.position().add(dir.scale(1.0));
 			FxEvents.send(player, "flame_wave", origin, dir, WAVE_SPEED, WAVE_RANGE, WAVE_WIDTH);
-			sound(player, SoundEvents.BLAZE_SHOOT, 1.0F, 0.6F);
-			sound(player, SoundEvents.FIRE_AMBIENT, 1.0F, 0.7F);
 			Vec3 side = new Vec3(-dir.z, 0, dir.x);
 			Set<Integer> struck = new HashSet<>();
 			TimedEffects.start(age -> {
@@ -202,8 +189,6 @@ public final class FlameMoves {
 							target.setDeltaMovement(target.getDeltaMovement().add(dir.scale(1.0)).add(0, 0.35, 0));
 							target.hurtMarked = true;
 							FxEvents.send(player, "flame_wave_hit", target.position().add(0, target.getBbHeight() / 2, 0), dir, 0, 0, 1);
-							level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS,
-									0.9F, 0.9F);
 						}
 					}
 				}
@@ -220,15 +205,12 @@ public final class FlameMoves {
 		Vec3 center = player.position();
 		// Windup: feet planted, flames drawn inward along the ground.
 		FxEvents.send(player, "flame_ring_gather", center);
-		sound(player, SoundEvents.FIRECHARGE_USE, 0.8F, 0.5F);
 		TimedEffects.later(RING_GATHER_TICKS, () -> {
 			if (gone(player)) {
 				return;
 			}
 			// Release: a low ring races outward; each enemy is hit the tick the ring's front reaches them.
 			FxEvents.send(player, "flame_ring", center, Vec3.ZERO, RING_SPEED, RING_RADIUS, RING_HEIGHT);
-			sound(player, SoundEvents.GENERIC_EXPLODE, 0.8F, 1.5F);
-			sound(player, SoundEvents.BLAZE_SHOOT, 0.9F, 0.7F);
 			Set<Integer> struck = new HashSet<>();
 			TimedEffects.start(age -> {
 				double r = RING_SPEED * (age + 1);
@@ -260,9 +242,6 @@ public final class FlameMoves {
 		if (ticks % 4 == 0) {
 			FxEvents.send(player, "flame_nova_charge", player.position(), charge);
 		}
-		if (ticks % 8 == 0) {
-			sound(player, SoundEvents.FIRE_AMBIENT, 0.8F, 0.6F + (float) charge * 0.6F);
-		}
 	}
 
 	static int infernoNova(AbilityContext ctx) {
@@ -277,15 +256,10 @@ public final class FlameMoves {
 		double distance = Math.min(NOVA_RANGE, aim.distanceTo(start));
 		double speed = NOVA_SPEED - charge * 0.25;
 		FxEvents.send(player, "flame_nova", start, dir, speed, distance, size);
-		sound(player, SoundEvents.BLAZE_SHOOT, 1.0F, 0.45F);
-		sound(player, SoundEvents.WITHER_SHOOT, 0.5F, 0.6F);
 		Projectiles.fire(player, start, dir, speed, NOVA_RANGE, size * 0.7, (level, pos, age) -> {
 		}, impact -> {
 			Vec3 at = impact.position();
 			FxEvents.send(player, "flame_nova_impact", at, dir, 0, 0, radius);
-			ServerLevel level = player.serverLevel();
-			level.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.6F, 0.8F);
-			level.playSound(null, at.x, at.y, at.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.2F, 0.6F);
 			float damage = (float) (NOVA_DAMAGE + NOVA_BONUS_DAMAGE * charge);
 			for (LivingEntity target : AbilityHelpers.inRadius(player, at, radius)) {
 				double falloff = 1.0 - 0.4 * Math.min(1.0, target.position().distanceTo(at) / radius);
@@ -304,12 +278,7 @@ public final class FlameMoves {
 		ServerPlayer player = ctx.player();
 		// Ignition and lift-off; clients draw the streamers until the "flight_end" beat (FlightService.stop).
 		FxEvents.send(player, "flame_flight_start", player.position());
-		sound(player, SoundEvents.FIRECHARGE_USE, 1.0F, 0.9F);
-		sound(player, SoundEvents.BLAZE_SHOOT, 0.6F, 1.3F);
 		FlightService.start(player, ctx.power(), ctx.ability(), FLIGHT_MAX_TICKS, FLIGHT_DRAIN_PER_TICK, FLIGHT_SPEED, (flier, ticks) -> {
-			if (ticks % 20 == 0) {
-				sound(flier, SoundEvents.FIRE_AMBIENT, 0.7F, 1.0F);
-			}
 		});
 		return 0;
 	}
@@ -326,7 +295,4 @@ public final class FlameMoves {
 		return !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
 	}
 
-	private static void sound(ServerPlayer player, SoundEvent sound, float volume, float pitch) {
-		player.serverLevel().playSound(null, player.getX(), player.getY(), player.getZ(), sound, SoundSource.PLAYERS, volume, pitch);
-	}
 }

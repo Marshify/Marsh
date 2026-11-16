@@ -20,9 +20,14 @@ public final class SettingsScreen extends Screen {
 	private record Toggle(String key, Supplier<Boolean> get, Consumer<Boolean> set) {
 	}
 
-	/** A setting with three levels (Low / Medium / High). */
-	private record Choice(String key, Supplier<Integer> get, Consumer<Integer> set) {
+	/** A setting with a few levels (Low / Medium / High by default). */
+	private record Choice(String key, Supplier<Integer> get, Consumer<Integer> set, String[] labels) {
+		Choice(String key, Supplier<Integer> get, Consumer<Integer> set) {
+			this(key, get, set, new String[]{"low", "medium", "high"});
+		}
 	}
+
+	private static final String[] VOLUME = {"vol_off", "low", "medium", "vol_full"};
 
 	private final List<MarshButton[]> choiceButtons = new ArrayList<>();
 	private final List<Choice> choiceOf = new ArrayList<>();
@@ -41,6 +46,11 @@ public final class SettingsScreen extends Screen {
 		rows.add(new Toggle("ally_vfx", () -> s.allyVfx, v -> s.allyVfx = v));
 		rows.add(new Toggle("camera_shake", () -> s.cameraShake, v -> s.cameraShake = v));
 		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v));
+		rows.add("screen.grandline.settings.section.sound");
+		rows.add(new Choice("ability_sfx", () -> s.abilitySfx, v -> s.abilitySfx = v, VOLUME));
+		rows.add(new Choice("weapon_sfx", () -> s.weaponSfx, v -> s.weaponSfx = v, VOLUME));
+		rows.add(new Choice("movement_sfx", () -> s.movementSfx, v -> s.movementSfx = v, VOLUME));
+		rows.add(new Choice("environment_sfx", () -> s.environmentSfx, v -> s.environmentSfx = v, VOLUME));
 		rows.add("screen.grandline.settings.section.hud");
 		rows.add(new Toggle("move_list", () -> s.showMoveList, v -> s.showMoveList = v));
 		rows.add(new Toggle("quest_tracker", () -> s.showQuestTracker, v -> s.showQuestTracker = v));
@@ -68,11 +78,11 @@ public final class SettingsScreen extends Screen {
 				toggleOf.add(toggle);
 				y += ROW;
 			} else if (row instanceof Choice choice) {
-				MarshButton[] buttons = new MarshButton[3];
-				String[] labels = {"low", "medium", "high"};
-				for (int i = 0; i < 3; i++) {
+				String[] labels = choice.labels();
+				MarshButton[] buttons = new MarshButton[labels.length];
+				for (int i = 0; i < labels.length; i++) {
 					int level = i;
-					buttons[i] = addRenderableWidget(new MarshButton(left + WIDTH - 118 + i * 37, y + 7, 35, 20,
+					buttons[i] = addRenderableWidget(new MarshButton(left + WIDTH - 10 - labels.length * 37 + i * 37, y + 7, 35, 20,
 							Component.translatable("screen.grandline.settings." + labels[i]), MarshUi.Color.GRAY, () -> {
 								choice.set().accept(level);
 								ClientSettings.get().save();

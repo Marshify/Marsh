@@ -21,6 +21,11 @@ public final class ClientSettings {
 	public boolean allyVfx = true;
 	/** Move-effect density: 0 low, 1 medium, 2 high. Secondary sparks, embers and smoke scale; core shapes always show. */
 	public int fxDensity = 2;
+	/** Grand Line sound volumes per category: 0 off, 1 low, 2 medium, 3 full (on top of Minecraft's sliders). */
+	public int abilitySfx = 3;
+	public int weaponSfx = 3;
+	public int movementSfx = 3;
+	public int environmentSfx = 3;
 	/** Shake the camera on nearby move impacts. */
 	public boolean cameraShake = true;
 	/** Show the move list (bottom right). */

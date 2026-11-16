@@ -1007,5 +1007,16 @@
   "item.grandline.blood_vial": "Blood Vial",
   "item.grandline.awakening_key": "Awakening Key",
   "message.grandline.cloudtop.up": "The clouds carry you up to the Upper Sanctuary (Lv 450-625).",
-  "message.grandline.cloudtop.down": "The doorway returns you to the sanctuary gate."
+  "message.grandline.cloudtop.down": "The doorway returns you to the sanctuary gate.",
+  "screen.grandline.settings.section.sound": "Sound",
+  "screen.grandline.settings.vol_off": "Off",
+  "screen.grandline.settings.vol_full": "Full",
+  "setting.grandline.ability_sfx": "Ability sounds",
+  "setting.grandline.ability_sfx.desc": "Fruit and fighting-style moves.",
+  "setting.grandline.weapon_sfx": "Weapon sounds",
+  "setting.grandline.weapon_sfx.desc": "Swords and guns.",
+  "setting.grandline.movement_sfx": "Movement sounds",
+  "setting.grandline.movement_sfx.desc": "Dashes, flash steps and flight.",
+  "setting.grandline.environment_sfx": "World sounds",
+  "setting.grandline.environment_sfx.desc": "Volcanoes, islands and other ambience."
 }

@@ -37,6 +37,7 @@ public final class GrandLineMod implements ModInitializer {
 		config = GrandLineConfig.loadOrCreate(FabricLoader.getInstance().getConfigDir().resolve(MOD_ID + ".json"));
 
 		// Order matters only in that everything must be registered before registries freeze.
+		com.grandline.audio.GrandLineSounds.register();
 		ModItems.register();
 		com.grandline.gear.Gear.register();
 		com.grandline.gear.GearService.register();
