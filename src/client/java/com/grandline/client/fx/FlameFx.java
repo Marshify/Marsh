@@ -166,7 +166,7 @@ final class FlameFx {
 				// A bigger charge, a heavier blast (lower and louder); the burning tail is layered on top.
 				float weight = (float) Math.min(1, (p.size() - 5) / 3.5);
 				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_IMPACT, p.pos(), 1f + weight * 0.4f, 1f - weight * 0.12f);
-				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_AFTERMATH, p.pos(), 1f, 1f);
+				GrandLineAudio.play(GrandLineSounds.FLAME_NOVA_AFTERMATH, p.pos(), 0.7f, 1f); // under the impact: headroom when both land together
 				shake(mc, p.pos(), own ? 2.4f : 1.8f);
 			}
 			case "flame_flight_start" -> {

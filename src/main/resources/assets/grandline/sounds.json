@@ -1,1 +1,186 @@
-{}
+{
+  "fruits.flame.blaze_wave.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/blaze_wave/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.flame.blaze_wave.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/blaze_wave/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.flame.blaze_wave.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/blaze_wave/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.flame.blaze_wave.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/blaze_wave/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.flame.blaze_wave.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/blaze_wave/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.fizzle": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/fizzle",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.impact_terrain": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/impact_terrain",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.flame.cinder_shots.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/cinder_shots/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.flame.ember_wings.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/ember_wings/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.flame.ember_wings.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/ember_wings/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.flame.ember_wings.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/ember_wings/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.flame.inferno_nova.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/inferno_nova/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.flame.inferno_nova.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/inferno_nova/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.flame.inferno_nova.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/inferno_nova/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.flame.inferno_nova.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/inferno_nova/impact",
+        "attenuation_distance": 64
+      }
+    ]
+  },
+  "fruits.flame.inferno_nova.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/inferno_nova/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.flame.pyre_ring.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/pyre_ring/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.flame.pyre_ring.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/pyre_ring/cast",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "fruits.flame.pyre_ring.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/pyre_ring/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.flame.pyre_ring.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/flame/pyre_ring/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  }
+}

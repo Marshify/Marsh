@@ -102,7 +102,7 @@ public final class GrandLineGearGameTests implements FabricGameTest {
 		near(helper, abilityDamage(helper, player, Gear.powerFor(Gear.SABER)), BASE * 1.10, "sword ability +10%");
 		near(helper, abilityDamage(helper, player, Fruits.MAGMA.power()), BASE, "fruit unaffected");
 		// Normal hits: attack damage with the katana in hand is 10% higher than without the hat.
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Gear.KATANA));
+		equip(player, Gear.KATANA);
 		helper.runAfterDelay(2, () -> {
 			double withHat = player.getAttributeValue(Attributes.ATTACK_DAMAGE);
 			GearService.unequip(player, 0);
@@ -118,7 +118,7 @@ public final class GrandLineGearGameTests implements FabricGameTest {
 	public void tomoeRingBoostsFruitEvenWhileHoldingAWeapon(GameTestHelper helper) {
 		ServerPlayer player = player(helper);
 		equip(player, Gear.TOMOE_RING);
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Gear.KATANA)); // holding a sword
+		equip(player, Gear.KATANA); // holding a sword
 		near(helper, abilityDamage(helper, player, Fruits.LIGHTNING.power()), BASE * 1.10, "fruit ability +10% while holding a sword");
 		near(helper, abilityDamage(helper, player, Gear.powerFor(Gear.KATANA)), BASE, "sword unaffected");
 		helper.assertTrue(GearService.get(player).ring1().equals("grandline:tomoe_ring"), "ring in a ring slot");

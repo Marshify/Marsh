@@ -1,4 +1,4 @@
-# Grand Line combat audio (0.34.0)
+# Grand Line combat audio (0.34.0; Flame audio 0.36.0)
 
 ## Status
 
@@ -6,7 +6,7 @@
 |---|---|
 | Audio framework (cues, client playback, loops, voice limits, volume settings, asset pipeline) | **Done**, tested in the game |
 | Flame: all 5 moves wired to 23 staged cues | **Done**, tested in the game |
-| Flame's custom audio files | **Not supplied yet.** All 23 cues play **placeholders**: the vanilla sounds Flame used before, or silence for stages that had no sound. Flame does **not** have custom audio until the files below are added. |
+| Flame's custom audio files | **Done in 0.36.0**: all 23 cues have their own audio and no placeholders remain (details below). |
 | Other fruits, styles, swords, guns, races, movement | Still on their previous vanilla sounds (see the migration plan) |
 
 ## How it works
@@ -106,7 +106,22 @@ Every prompt ends with the same exclusions: **no voices, no music, no recognisab
 | `fruits.flame.ember_wings.travel` | Travel | **yes** | fire ambient | Steady flight on wings of fire: a smooth continuous flame roar like a jet of fire, soft wind rush and light crackle. Moderate level, sits under other sounds (the game raises the pitch with speed). A seamless 2.0 s loop with no start or end transient. Original fantasy SFX, no voice, no music, no recognisable samples. |
 | `fruits.flame.ember_wings.aftermath` | Aftermath | no | silent | Fiery wings going out on landing: a soft downward whoosh, flames sputtering out into a gentle hiss of embers. About 0.8 s. Original fantasy SFX, no voice, no music, no recognisable samples. |
 
-**Assets still needed for Flame: all 23 files above.**
+**Flame audio (0.36.0): all 23 files are in the mod.**
+
+How they were made:
+- **Generated** with ElevenLabs Sound Effects (`eleven_text_to_sound_v2`): 2 takes per sound, about 1,130 credits in all. The travel and charge loops used the model's seamless-loop option. Pyre Ring's travel is a 3 s slice of a long take, crossfaded so it loops cleanly.
+- **Picked** by measurement: attack, low end, tail and level.
+- **Layered:**
+  - Cinder Shots cast: punch snap + flame burst.
+  - Cinder Shots impact: body thump + flame burst.
+  - Blaze Wave cast: swing + flame wall.
+  - Pyre Ring cast: ground thump + detonation.
+  - Inferno Nova cast: release + heave.
+  - Inferno Nova impact: detonation + sub boom + roar.
+  - Inferno Nova aftermath: rumble + low-passed fire bed.
+- **Trimmed** to each move's timing and **levelled** by stage: impacts −14 LUFS, casts −15, charges −19, loops and aftermaths −20, fizzle −23. A −1.5 dB peak limiter keeps every file from clipping.
+- **Checked in the game:** every cue played its own file at its beat, and the heaviest moment in the recorded mix peaked at −1.7 dB. The Nova aftermath plays at 70% under the impact to keep that headroom.
+- **Approved** by ear by the owner. Pyre Ring's aftermath was regenerated once (the second option was chosen).
 
 ## Migration plan for the rest
 
