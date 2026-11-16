@@ -42,7 +42,10 @@ public final class NpcService {
 		List<String> available = new ArrayList<>();
 		if (npc.role() == Islander.Role.GUNSMITH) {
 			stock.addAll(GunShop.ids());
-			prices.addAll(GunShop.prices());
+			// An owned item is listed with price -1: the screen shows it as Owned and offers no purchase.
+			for (int i = 0; i < GunShop.STOCK.size(); i++) {
+				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, GunShop.STOCK.get(i)) ? -1L : GunShop.price(i));
+			}
 		}
 		if (npc.role() == Islander.Role.FISHERMAN) {
 			stock.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(com.grandline.registry.ModItems.STARTER_FISHING_ROD).toString());
@@ -50,7 +53,10 @@ public final class NpcService {
 		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
 			stock.addAll(SwordShop.ids());
-			prices.addAll(SwordShop.prices());
+			// An owned item is listed with price -1: the screen shows it as Owned and offers no purchase.
+			for (int i = 0; i < SwordShop.STOCK.size(); i++) {
+				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, SwordShop.STOCK.get(i)) ? -1L : SwordShop.price(i));
+			}
 		}
 		if (npc.role() == Islander.Role.FRUIT_DEALER) {
 			for (Fruits.FruitDef fruit : Fruits.all()) {

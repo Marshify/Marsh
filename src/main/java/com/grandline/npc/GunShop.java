@@ -6,7 +6,6 @@ import com.grandline.player.PlayerProfileService;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,15 +40,16 @@ public final class GunShop {
 		if (index < 0 || index >= STOCK.size()) {
 			return "too_far";
 		}
+		// Equipment is owned once, for good: an owned item cannot be bought again (checked before any money is taken).
+		if (com.grandline.gear.EquipmentOwnership.owns(player, STOCK.get(index))) {
+			return "already_owned";
+		}
 		long price = price(index);
 		if (PlayerProfileService.get(player).currency() < price) {
 			return "gun_money";
 		}
 		PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price));
-		ItemStack stack = new ItemStack(STOCK.get(index));
-		if (!player.getInventory().add(stack)) {
-			player.drop(stack, false);
-		}
+		com.grandline.gear.EquipmentOwnership.grant(player, STOCK.get(index));
 		return "gun_bought";
 	}
 }

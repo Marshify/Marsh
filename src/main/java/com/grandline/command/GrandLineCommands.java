@@ -200,6 +200,42 @@ public final class GrandLineCommands {
 											return result.equals("ship_launched") ? 1 : 0;
 										}))))
 				// Dev tool: save the top block (height + map colour) of every column in an area, for overhead maps and chart art.
+				.then(Commands.literal("equipment").requires(source -> source.hasPermission(2))
+						.then(Commands.literal("list")
+								.then(Commands.argument("player", EntityArgument.player())
+										.executes(context -> {
+											var p = EntityArgument.getPlayer(context, "player");
+											var owned = com.grandline.gear.EquipmentOwnership.owned(p);
+											context.getSource().sendSuccess(() -> Component.literal(p.getGameProfile().getName() + " owns: "
+													+ (owned.isEmpty() ? "nothing" : String.join(", ", owned))), false);
+											return owned.size();
+										})))
+						.then(Commands.literal("grant")
+								.then(Commands.argument("player", EntityArgument.player())
+										.then(Commands.argument("item", ResourceLocationArgument.id())
+												.suggests((c, b) -> SharedSuggestionProvider.suggestResource(com.grandline.gear.Gear.all().stream()
+														.map(net.minecraft.core.registries.BuiltInRegistries.ITEM::getKey), b))
+												.executes(context -> {
+													var p = EntityArgument.getPlayer(context, "player");
+													var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocationArgument.getId(context, "item"));
+													var result = com.grandline.gear.EquipmentOwnership.grant(p, item);
+													context.getSource().sendSuccess(() -> Component.literal("Grant " + ResourceLocationArgument.getId(context, "item")
+															+ " to " + p.getGameProfile().getName() + ": " + result), true);
+													return result == com.grandline.gear.EquipmentOwnership.Grant.GRANTED
+															|| result == com.grandline.gear.EquipmentOwnership.Grant.GRANTED_NO_ROOM ? 1 : 0;
+												}))))
+						.then(Commands.literal("revoke")
+								.then(Commands.argument("player", EntityArgument.player())
+										.then(Commands.argument("item", ResourceLocationArgument.id())
+												.suggests((c, b) -> SharedSuggestionProvider.suggestResource(com.grandline.gear.Gear.all().stream()
+														.map(net.minecraft.core.registries.BuiltInRegistries.ITEM::getKey), b))
+												.executes(context -> {
+													var p = EntityArgument.getPlayer(context, "player");
+													var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocationArgument.getId(context, "item"));
+													boolean done = com.grandline.gear.EquipmentOwnership.revoke(p, item);
+													context.getSource().sendSuccess(() -> Component.literal(done ? "Revoked" : "Not owned"), true);
+													return done ? 1 : 0;
+												})))))
 				.then(Commands.literal("dumpmap").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("x1", IntegerArgumentType.integer())
 								.then(Commands.argument("z1", IntegerArgumentType.integer())

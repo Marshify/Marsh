@@ -31,7 +31,6 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -485,9 +484,8 @@ public class SaberBoss extends GrandLineEnemy {
 	}
 
 	/**
-	 * Exactly one Saber per defeat. It goes to the player who dealt the most damage; if they have fallen (or left), to
-	 * the next living fighter; if no fighter is alive, it is left at the boss's spot for the top fighter alone to pick
-	 * up, and it never despawns.
+	 * At most one Saber per defeat. It goes to the living fighter nearby who dealt the most damage and does not own one
+	 * yet (equipment is owned once, see EquipmentOwnership); if every fighter already owns it, nobody gets a copy.
 	 */
 	private void dropSaber() {
 		List<Map.Entry<UUID, Float>> ranked = new java.util.ArrayList<>(damageBy.entrySet());
@@ -496,25 +494,23 @@ public class SaberBoss extends GrandLineEnemy {
 			return; // not a fight (removed by a command, killed by the world): no reward
 		}
 		ranked.sort(Map.Entry.<UUID, Float>comparingByValue().reversed());
-		ItemStack saber = new ItemStack(Gear.SABER);
+		// The Saber is owned once, for good: it goes to the top fighter nearby who does not own one yet (owners are told,
+		// and keep everything else the fight gave them). It is never dropped loose.
 		for (Map.Entry<UUID, Float> e : ranked) {
 			ServerPlayer p = level().getServer().getPlayerList().getPlayer(e.getKey());
-			if (p != null && p.isAlive() && p.level() == level() && p.distanceTo(this) < 64) {
-				if (!p.getInventory().add(saber)) {
-					ItemEntity item = new ItemEntity(level(), p.getX(), p.getY() + 0.5, p.getZ(), saber);
-					item.setTarget(p.getUUID());
-					item.setNoPickUpDelay();
-					level().addFreshEntity(item);
-				}
-				p.sendSystemMessage(Component.translatable("message.grandline.saber_boss.reward").withStyle(net.minecraft.ChatFormatting.GOLD));
-				level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.9F, 1.0F);
-				return;
+			if (p == null || !p.isAlive() || p.level() != level() || p.distanceTo(this) >= 64) {
+				continue;
 			}
+			com.grandline.gear.EquipmentOwnership.Grant result = com.grandline.gear.EquipmentOwnership.grant(p, Gear.SABER);
+			if (result == com.grandline.gear.EquipmentOwnership.Grant.ALREADY_OWNED) {
+				p.sendSystemMessage(Component.translatable("message.grandline.equipment.already_owned", new ItemStack(Gear.SABER).getHoverName())
+						.withStyle(net.minecraft.ChatFormatting.GRAY));
+				continue;
+			}
+			p.sendSystemMessage(Component.translatable("message.grandline.saber_boss.reward").withStyle(net.minecraft.ChatFormatting.GOLD));
+			level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.9F, 1.0F);
+			return;
 		}
-		ItemEntity item = new ItemEntity(level(), getX(), getY() + 0.5, getZ(), saber);
-		item.setTarget(ranked.get(0).getKey());
-		item.setUnlimitedLifetime();
-		level().addFreshEntity(item);
 	}
 
 	/** Players who fought it (for tests). */

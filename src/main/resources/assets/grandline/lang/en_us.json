@@ -1018,5 +1018,10 @@
   "setting.grandline.movement_sfx": "Movement sounds",
   "setting.grandline.movement_sfx.desc": "Dashes, flash steps and flight.",
   "setting.grandline.environment_sfx": "World sounds",
-  "setting.grandline.environment_sfx.desc": "Volcanoes, islands and other ambience."
+  "setting.grandline.environment_sfx.desc": "Volcanoes, islands and other ambience.",
+  "npc.grandline.shop.owned": "%s — Owned",
+  "npc.grandline.result.already_owned": "You already own that one. Equipment is yours for good, so there's no need to buy it again.",
+  "message.grandline.equipment.no_drop": "Equipment can't be dropped; it stays yours.",
+  "message.grandline.equipment.no_room": "No room for your %s: free a slot and it comes back.",
+  "message.grandline.equipment.already_owned": "You already own the %s."
 }

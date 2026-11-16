@@ -53,6 +53,13 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("equipped_gear"));
 
+	/** Swords, guns and accessories the player owns, for good (persistent, survives death); see EquipmentOwnership. */
+	public static final AttachmentType<com.grandline.gear.OwnedEquipment> OWNED_EQUIPMENT =
+			AttachmentRegistry.<com.grandline.gear.OwnedEquipment>builder()
+					.persistent(com.grandline.gear.OwnedEquipment.CODEC)
+					.copyOnDeath()
+					.buildAndRegister(GrandLineMod.id("owned_equipment"));
+
 	/** Chosen side: "pirates", "marines" or "" (persistent, survives death). */
 	public static final AttachmentType<String> TEAM = AttachmentRegistry.<String>builder()
 			.persistent(com.mojang.serialization.Codec.STRING)

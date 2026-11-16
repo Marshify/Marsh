@@ -17,5 +17,9 @@ public abstract class ItemPickupFilterMixin {
 		if (!self.level().isClientSide && AdventureRules.restricted(player) && !AdventureRules.allowedItem(self.getItem())) {
 			ci.cancel();
 		}
+		// Equipment is never picked up as a loose item: owned equipment is delivered to its owner, never duplicated.
+		if (!self.level().isClientSide && com.grandline.gear.EquipmentOwnership.isEquipment(self.getItem().getItem())) {
+			ci.cancel();
+		}
 	}
 }

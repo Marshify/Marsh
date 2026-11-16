@@ -153,7 +153,8 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		helper.assertTrue(PlayerProfileService.get(p).currency() == 5, "exact price taken: " + PlayerProfileService.get(p).currency());
 		helper.assertTrue(p.getInventory().countItem(Gear.KATANA) == 1 && p.getInventory().countItem(Gear.CUTLASS) == 1, "one of each delivered");
 		helper.assertTrue(SwordShop.buy(p, 2).equals("too_far") && SwordShop.buy(p, -1).equals("too_far"), "no such sword");
-		helper.assertTrue(SwordShop.buy(p, 0).equals("sword_money") && p.getInventory().countItem(Gear.KATANA) == 1, "no free swords");
+		helper.assertTrue(SwordShop.buy(p, 0).equals("already_owned") && p.getInventory().countItem(Gear.KATANA) == 1
+				&& PlayerProfileService.get(p).currency() == 5, "an owned sword cannot be bought again");
 		remove(helper, p);
 		helper.succeed();
 	}

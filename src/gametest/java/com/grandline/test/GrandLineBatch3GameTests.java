@@ -167,8 +167,10 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 	public void deathKeepsEveryItemWithoutDropping(GameTestHelper helper) {
 		ServerLevel level = helper.getLevel();
 		ServerPlayer p = survivor(helper);
-		net.minecraft.world.item.ItemStack sword = new net.minecraft.world.item.ItemStack(com.grandline.gear.Gear.KATANA);
-		sword.setDamageValue(37);
+		// An owned katana (equipment is owned; durability no longer exists, so it carries no damage).
+		com.grandline.gear.EquipmentOwnership.grant(p, com.grandline.gear.Gear.KATANA);
+		int held = p.getInventory().findSlotMatchingItem(new net.minecraft.world.item.ItemStack(com.grandline.gear.Gear.KATANA));
+		net.minecraft.world.item.ItemStack sword = p.getInventory().removeItemNoUpdate(held);
 		sword.setHoverName(net.minecraft.network.chat.Component.literal("Old Faithful"));
 		p.getInventory().setItem(0, sword);
 		p.getInventory().setItem(5, new net.minecraft.world.item.ItemStack(com.grandline.npc.FishingService.SILVERFIN, 12));
@@ -180,8 +182,10 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 			helper.assertTrue(drops.isEmpty(), "nothing drops on death: " + drops.size());
 			ServerPlayer back = level.getServer().getPlayerList().respawn(p, false);
 			var stack = back.getInventory().getItem(0);
-			helper.assertTrue(stack.is(com.grandline.gear.Gear.KATANA) && stack.getDamageValue() == 37
-					&& stack.getHoverName().getString().equals("Old Faithful"), "sword kept with its damage and name");
+			helper.assertTrue(stack.is(com.grandline.gear.Gear.KATANA) && stack.getHoverName().getString().equals("Old Faithful"),
+					"sword kept with its name");
+			helper.assertTrue(back.getInventory().countItem(com.grandline.gear.Gear.KATANA) == 1
+					&& com.grandline.gear.EquipmentOwnership.owns(back, com.grandline.gear.Gear.KATANA), "still owned, one copy");
 			helper.assertTrue(back.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 12, "fish kept");
 			helper.assertTrue(back.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(net.minecraft.world.item.Items.IRON_HELMET), "armour kept");
 			helper.assertTrue(PlayerProfileService.get(back).currency() == 4321, "currency kept");

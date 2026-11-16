@@ -38,9 +38,10 @@ public final class GrandLineGearGameTests implements FabricGameTest {
 		return player;
 	}
 
+	/** Equipment is owned (see EquipmentOwnership): the player owns the item, then equips it. */
 	private static void equip(ServerPlayer player, Item item) {
-		player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(item));
-		GearService.equip(player, InteractionHand.MAIN_HAND);
+		com.grandline.gear.EquipmentOwnership.grant(player, item);
+		com.grandline.gear.EquipmentOwnership.equip(player, item);
 	}
 
 	/** Damage an ability of {@code power} deals to a fresh 100 HP target (golems have no armour). */

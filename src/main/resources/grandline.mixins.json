@@ -13,7 +13,9 @@
     "CraftingDisabledMixin",
     "ItemPickupFilterMixin",
     "VanillaLootMixin",
-    "RaceDamageMixin"
+    "RaceDamageMixin",
+    "ItemStackNoDurabilityMixin",
+    "EquipmentNoDropMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

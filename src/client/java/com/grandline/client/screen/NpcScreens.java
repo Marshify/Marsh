@@ -84,6 +84,12 @@ public final class NpcScreens {
 		for (int i = 0; i < data.stock().size() && i < data.prices().size(); i++) {
 			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
 			int index = i;
+			if (data.prices().get(i) < 0) {
+				// Already owned (the server checks too): shown as Owned, with nothing to buy.
+				options.add(new DialogScreen.Option(Component.translatable("npc.grandline.shop.owned", item.getDescription())
+						.withStyle(net.minecraft.ChatFormatting.DARK_GRAY), () -> { }, true));
+				continue;
+			}
 			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.gunsmith.buy", item.getDescription(),
 					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_GUN + index)));
 		}
@@ -105,6 +111,12 @@ public final class NpcScreens {
 		for (int i = 0; i < data.stock().size() && i < data.prices().size(); i++) {
 			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
 			int index = i;
+			if (data.prices().get(i) < 0) {
+				// Already owned (the server checks too): shown as Owned, with nothing to buy.
+				options.add(new DialogScreen.Option(Component.translatable("npc.grandline.shop.owned", item.getDescription())
+						.withStyle(net.minecraft.ChatFormatting.DARK_GRAY), () -> { }, true));
+				continue;
+			}
 			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.swordsmith.buy", item.getDescription(),
 					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_SWORD + index)));
 		}
