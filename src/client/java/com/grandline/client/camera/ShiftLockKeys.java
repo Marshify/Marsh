@@ -83,14 +83,14 @@ public final class ShiftLockKeys {
 		return mc.player.isPassenger() && held;
 	}
 
-	/** A subtle reticle at the screen centre: a ring with a dot while facing is locked, a faint dot while exploring. */
+	/** A subtle reticle at the screen centre: a ring with a dot while Shift Lock is on, a faint dot otherwise. */
 	private static void reticle(GuiGraphics g, float partial) {
 		Minecraft mc = Minecraft.getInstance();
 		if (!GrandLineCamera.active() || mc.screen != null || mc.options.hideGui) {
 			return;
 		}
 		int cx = g.guiWidth() / 2, cy = g.guiHeight() / 2;
-		if (GrandLineCamera.facingLocked()) {
+		if (GrandLineCamera.shiftLock()) { // the ring follows the Shift Lock toggle only
 			int c = 0xB4FFFFFF, shade = 0x50000000;
 			g.fill(cx, cy, cx + 1, cy + 1, c);
 			for (int[] t : new int[][]{{-5, 0, -3, 1}, {4, 0, 6, 1}, {0, -5, 1, -3}, {0, 4, 1, 6}}) {

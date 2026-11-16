@@ -12,12 +12,14 @@ The action camera is on by default and runs in the third-person back view (F5 st
 | Character | Turns quickly to face where it moves (W away from the camera, S towards it) | Always faces the camera's direction; WASD strafes and walks backwards |
 | Reticle | A faint centre dot | A small ring with a dot |
 
+The ring and the shoulder view follow **only** the Shift Lock toggle: using a move without Shift Lock keeps the dot and the centred view.
+
 ## Aim
 
 **What you aim at always follows the camera.**
-- **Before acting:** before any attack, item use, ability or race ability, the character turns to the camera's direction and that rotation is sent to the server **before** the action's own packet. The reticle, the attack and the server's aim check therefore agree, and server validation is unchanged.
+- **Before acting:** before any attack, item use, ability or race ability, the character turns so its eyes point at exactly what the reticle is on (the first block or entity along the camera's ray, up to 96 blocks), and that rotation is sent to the server **before** the action's own packet. The reticle, the attack and the server's aim check therefore agree, and server validation is unchanged.
 - **Holding the aim:** facing then stays locked to the camera for 1.5 s (and while a move key is held), so multi-hit and charged moves keep their aim.
-- **Targets:** what you hit or interact with is picked along the camera's line of sight, so the reticle is what you target.
+- **Targets:** the block or entity outlined is the one under the reticle: the pick is the camera's own ray through the screen centre, starting at the character (so nothing behind them is picked). Reach is still measured from the character's eyes as in vanilla (blocks: the game mode's reach; entities: 3 blocks, 6 in creative), so the server accepts every use and attack.
 
 ## Following and collision
 

@@ -48,6 +48,9 @@ public final class GrandLineCamera {
 	private static double camY = Double.NaN;   // smoothed pivot height (jump/land lag)
 	private static long lastNanos;
 	private static boolean bossNear;
+	private static double camX, camYPos, camZ;
+	private static boolean hasCam;
+	private static final double AIM_RANGE = 96;
 	private static boolean charging;
 
 	private GrandLineCamera() {
@@ -68,6 +71,49 @@ public final class GrandLineCamera {
 
 	public static boolean shiftLock() {
 		return shiftLock;
+	}
+
+	/** Where the camera was placed last frame (CameraRig). */
+	static void cameraAt(double x, double y, double z) {
+		camX = x;
+		camYPos = y;
+		camZ = z;
+		hasCam = true;
+	}
+
+	public static boolean hasCameraPosition() {
+		return hasCam;
+	}
+
+	public static net.minecraft.world.phys.Vec3 cameraPosition() {
+		return new net.minecraft.world.phys.Vec3(camX, camYPos, camZ);
+	}
+
+	public static net.minecraft.world.phys.Vec3 lookVector() {
+		return net.minecraft.world.phys.Vec3.directionFromRotation(camPitch, camYaw);
+	}
+
+	/**
+	 * The rotation that points the character's eyes at what the reticle is on, so the server (which aims from the eyes)
+	 * hits the same spot the reticle shows, whatever the camera's distance or shoulder offset. {yaw, pitch}.
+	 */
+	static float[] aimRotation(LocalPlayer p) {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.level == null) {
+			return new float[]{camYaw, camPitch};
+		}
+		net.minecraft.world.phys.Vec3 target = CrosshairPick.aimPoint(mc, AIM_RANGE);
+		net.minecraft.world.phys.Vec3 eye = p.getEyePosition();
+		double dx = target.x - eye.x, dy = target.y - eye.y, dz = target.z - eye.z;
+		double flat = Math.sqrt(dx * dx + dz * dz);
+		if (flat < 1.0e-4 && Math.abs(dy) < 1.0e-4) {
+			return new float[]{camYaw, camPitch};
+		}
+		float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+		float pitch = (float) -Math.toDegrees(Math.atan2(dy, flat));
+		// Keep it continuous with the camera's yaw (no 360 jumps) and within the pitch limits.
+		yaw = camYaw + Mth.wrapDegrees(yaw - camYaw);
+		return new float[]{yaw, Mth.clamp(pitch, -90f, 90f)};
 	}
 
 	public static float yaw() {
@@ -137,13 +183,15 @@ public final class GrandLineCamera {
 	public static void turn(LocalPlayer p, double dx, double dy) {
 		ensureInit(p);
 		double s = SENSITIVITY[Mth.clamp(ClientSettings.get().cameraSensitivity, 0, 2)];
+		float oldYaw = camYaw, oldPitch = camPitch;
 		camYaw += (float) (dx * 0.15 * s);
 		camPitch = Mth.clamp(camPitch + (float) (dy * 0.15 * s), -MAX_PITCH, MAX_PITCH);
 		if (facingLocked() && !p.isPassenger()) {
-			// Same as Entity.turn: move the previous rotation too, so the body does not lag a frame behind the camera.
-			float dYaw = Mth.wrapDegrees(camYaw - p.getYRot()), dPitch = camPitch - p.getXRot();
+			// The character follows the camera's turn this frame (Entity.turn style: the previous rotation moves too, so
+			// nothing lags); each tick then re-aims it exactly at the reticle's point.
+			float dYaw = camYaw - oldYaw, dPitch = camPitch - oldPitch;
 			p.setYRot(p.getYRot() + dYaw);
-			p.setXRot(p.getXRot() + dPitch);
+			p.setXRot(Mth.clamp(p.getXRot() + dPitch, -90f, 90f));
 			p.yRotO += dYaw;
 			p.xRotO += dPitch;
 		}
@@ -163,17 +211,15 @@ public final class GrandLineCamera {
 		if (combat) {
 			combatTicks = COMBAT_TICKS;
 		}
-		if (p.getYRot() == camYaw && p.getXRot() == camPitch) {
-			return;
-		}
-		p.setYRot(camYaw);
-		p.setXRot(camPitch);
-		p.yRotO = camYaw;
-		p.xRotO = camPitch;
-		p.setYHeadRot(camYaw);
-		p.yBodyRot = camYaw;
+		float[] aim = aimRotation(p);
+		p.setYRot(aim[0]);
+		p.setXRot(aim[1]);
+		p.yRotO = aim[0];
+		p.xRotO = aim[1];
+		p.setYHeadRot(aim[0]);
+		p.yBodyRot = aim[0];
 		if (p.connection != null) {
-			p.connection.send(new ServerboundMovePlayerPacket.Rot(camYaw, camPitch, p.onGround()));
+			p.connection.send(new ServerboundMovePlayerPacket.Rot(aim[0], aim[1], p.onGround()));
 		}
 	}
 
@@ -234,9 +280,10 @@ public final class GrandLineCamera {
 			combatTicks--;
 		}
 		if (facingLocked() && !p.isPassenger()) {
-			p.setYRot(camYaw);
-			p.setXRot(camPitch);
-			p.yBodyRot = Mth.rotLerp(0.6f, p.yBodyRot, camYaw); // the body turns with the camera, smoothly
+			float[] aim = aimRotation(p);
+			p.setYRot(aim[0]);
+			p.setXRot(aim[1]);
+			p.yBodyRot = Mth.rotLerp(0.6f, p.yBodyRot, aim[0]); // the body turns with the camera, smoothly
 		}
 		boolean reduced = ClientSettings.get().reducedMotion;
 		// Movement responses (distance in blocks, FOV as a multiplier).
@@ -301,7 +348,7 @@ public final class GrandLineCamera {
 	static double frame(double dt) {
 		extra += (extraTarget - extra) * ease(4, dt);
 		fov += (fovTarget - fov) * ease(6, dt);
-		shoulder += ((facingLocked() ? 1 : 0) - shoulder) * ease(8, dt);
+		shoulder += ((shiftLock ? 1 : 0) - shoulder) * ease(8, dt); // only the Shift Lock toggle moves the view
 		return Math.max(2.0, baseDistance() + extra);
 	}
 

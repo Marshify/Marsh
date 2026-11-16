@@ -38,5 +38,7 @@ public final class CameraRig {
 		rig.grandline$setPosition(x - Math.cos(r) * SHOULDER * s, y + SHOULDER_UP * s, z - Math.sin(r) * SHOULDER * s);
 		double distance = GrandLineCamera.settle(rig.grandline$getMaxZoom(want), dt);
 		rig.grandline$move(-distance, 0, 0);
+		net.minecraft.world.phys.Vec3 at = camera.getPosition();
+		GrandLineCamera.cameraAt(at.x, at.y, at.z);
 	}
 }
