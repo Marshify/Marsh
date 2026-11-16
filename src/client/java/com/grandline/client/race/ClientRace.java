@@ -117,6 +117,7 @@ public final class ClientRace {
 	}
 
 	public static void send(int action, int arg) {
+		com.grandline.client.camera.GrandLineCamera.faceCamera(true);
 		if (ClientPlayNetworking.canSend(RaceActionPayload.TYPE)) {
 			ClientPlayNetworking.send(new RaceActionPayload(action, arg));
 		}

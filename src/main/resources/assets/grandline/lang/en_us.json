@@ -1023,5 +1023,21 @@
   "npc.grandline.result.already_owned": "You already own that one. Equipment is yours for good, so there's no need to buy it again.",
   "message.grandline.equipment.no_drop": "Equipment can't be dropped; it stays yours.",
   "message.grandline.equipment.no_room": "No room for your %s: free a slot and it comes back.",
-  "message.grandline.equipment.already_owned": "You already own the %s."
+  "message.grandline.equipment.already_owned": "You already own the %s.",
+  "key.grandline.shift_lock": "Shift Lock",
+  "key.grandline.zoom_in": "Camera zoom in",
+  "key.grandline.zoom_out": "Camera zoom out",
+  "message.grandline.shift_lock.on": "Shift Lock on",
+  "message.grandline.shift_lock.off": "Shift Lock off",
+  "screen.grandline.settings.section.camera": "Camera",
+  "screen.grandline.settings.near": "Near",
+  "screen.grandline.settings.far": "Far",
+  "setting.grandline.custom_camera": "Action camera",
+  "setting.grandline.custom_camera.desc": "Grand Line's third-person camera (free look, Shift Lock). Off: vanilla views.",
+  "setting.grandline.camera_distance": "Camera distance",
+  "setting.grandline.camera_distance.desc": "How far behind you the camera sits. = and - zoom too.",
+  "setting.grandline.camera_sensitivity": "Camera turn speed",
+  "setting.grandline.camera_sensitivity.desc": "On top of Minecraft's mouse sensitivity.",
+  "setting.grandline.reduced_motion": "Reduced camera motion",
+  "setting.grandline.reduced_motion.desc": "No camera distance or FOV changes while moving, dashing or charging."
 }

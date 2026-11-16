@@ -9,7 +9,13 @@
 		"GuiHotbarMixin",
 		"GuiExperienceBarMixin",
     "NavigationGlowMixin",
-    "NavigationGlowColorMixin"
+    "NavigationGlowColorMixin",
+    "CameraAccessor",
+    "CameraMixin",
+    "MouseTurnMixin",
+    "KeyboardInputMixin",
+    "GameRendererCameraMixin",
+    "MinecraftAimMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

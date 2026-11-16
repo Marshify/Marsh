@@ -115,6 +115,7 @@ public final class ClientNetworking {
 
 	/** Tells the server a held move key was released (fires charged moves). */
 	public static void requestAbilityRelease(PowerSource source, int slot) {
+		com.grandline.client.camera.GrandLineCamera.faceCamera(true); // released where the reticle is
 		if (ClientPlayNetworking.canSend(com.grandline.network.payload.AbilityReleasePayload.TYPE)) {
 			ClientPlayNetworking.send(new com.grandline.network.payload.AbilityReleasePayload(source.ordinal(), slot));
 		}
@@ -122,6 +123,7 @@ public final class ClientNetworking {
 
 	/** Sends a move activation intent. The server decides what (if anything) happens. */
 	public static boolean requestAbilityActivation(PowerSource source, int slot) {
+		com.grandline.client.camera.GrandLineCamera.faceCamera(true); // aim and facing to the reticle before the server reads them
 		if (slot < 0 || slot >= AbilityActivationHandler.SLOT_COUNT || !ClientPlayNetworking.canSend(AbilityActivationRequestPayload.TYPE)) {
 			return false;
 		}

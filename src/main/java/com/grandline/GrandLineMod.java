@@ -49,6 +49,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.ship.ShipService.register();
 		com.grandline.world.VanillaSpawns.register();
 		com.grandline.player.rules.CoreRules.register();
+		com.grandline.player.rules.SneakRules.register();
 		com.grandline.world.IslandSpawns.register();
 		com.grandline.world.IslandArrival.register();
 		com.grandline.world.ClearWeather.register();

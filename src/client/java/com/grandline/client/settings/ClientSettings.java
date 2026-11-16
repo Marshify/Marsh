@@ -21,6 +21,16 @@ public final class ClientSettings {
 	public boolean allyVfx = true;
 	/** Move-effect density: 0 low, 1 medium, 2 high. Secondary sparks, embers and smoke scale; core shapes always show. */
 	public int fxDensity = 2;
+	/** Grand Line action camera (third-person back view): on by default. */
+	public boolean customCamera = true;
+	/** Camera distance: 0 near, 1 normal (7.5 blocks), 2 far. */
+	public int cameraDistance = 1;
+	/** Camera turn speed: 0 low, 1 normal, 2 high (on top of Minecraft's mouse sensitivity). */
+	public int cameraSensitivity = 1;
+	/** Turns off the camera's movement responses (distance and FOV changes, jump lag). */
+	public boolean reducedMotion = false;
+	/** Vanilla Sneak has given up Left Shift to Shift Lock (done once). */
+	public boolean sneakKeyFreed = false;
 	/** Grand Line sound volumes per category: 0 off, 1 low, 2 medium, 3 full (on top of Minecraft's sliders). */
 	public int abilitySfx = 3;
 	public int weaponSfx = 3;

@@ -196,6 +196,10 @@ public final class GrandLineKeys {
 			if (!down && moveKeyWasDown[slot] && heldSource[slot] != null && isCharged(heldSource[slot], slot)) {
 				ClientNetworking.requestAbilityRelease(heldSource[slot], slot);
 			}
+			if (down && heldSource[slot] != null) {
+				// Held (a charge or a hold move): keep facing the reticle, with a little more room to see.
+				com.grandline.client.camera.GrandLineCamera.holdCombat(isCharged(heldSource[slot], slot));
+			}
 			if (!down) {
 				heldSource[slot] = null;
 			}

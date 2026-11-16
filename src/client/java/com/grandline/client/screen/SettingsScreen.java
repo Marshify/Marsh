@@ -46,6 +46,11 @@ public final class SettingsScreen extends Screen {
 		rows.add(new Toggle("ally_vfx", () -> s.allyVfx, v -> s.allyVfx = v));
 		rows.add(new Toggle("camera_shake", () -> s.cameraShake, v -> s.cameraShake = v));
 		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v));
+		rows.add("screen.grandline.settings.section.camera");
+		rows.add(new Toggle("custom_camera", () -> s.customCamera, v -> s.customCamera = v));
+		rows.add(new Choice("camera_distance", () -> s.cameraDistance, v -> s.cameraDistance = v, new String[]{"near", "medium", "far"}));
+		rows.add(new Choice("camera_sensitivity", () -> s.cameraSensitivity, v -> s.cameraSensitivity = v));
+		rows.add(new Toggle("reduced_motion", () -> s.reducedMotion, v -> s.reducedMotion = v));
 		rows.add("screen.grandline.settings.section.sound");
 		rows.add(new Choice("ability_sfx", () -> s.abilitySfx, v -> s.abilitySfx = v, VOLUME));
 		rows.add(new Choice("weapon_sfx", () -> s.weaponSfx, v -> s.weaponSfx = v, VOLUME));
