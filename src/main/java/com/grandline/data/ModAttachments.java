@@ -31,6 +31,17 @@ public final class ModAttachments {
 					.initializer(com.grandline.combat.EnergyService.Energy::new)
 					.buildAndRegister(GrandLineMod.id("energy"));
 
+	/**
+	 * Treasure chests this player has opened: chest position (BlockPos.asLong, as text) to the game time it refills
+	 * (persistent, survives death). See TreasureService.
+	 */
+	public static final AttachmentType<java.util.Map<String, Long>> TREASURE_REFILLS =
+			AttachmentRegistry.<java.util.Map<String, Long>>builder()
+					.persistent(com.mojang.serialization.Codec.unboundedMap(com.mojang.serialization.Codec.STRING, com.mojang.serialization.Codec.LONG))
+					.copyOnDeath()
+					.initializer(java.util.Map::of)
+					.buildAndRegister(GrandLineMod.id("treasure_refills"));
+
 	/** Ids of islands this player has discovered (persistent). */
 	public static final AttachmentType<java.util.List<Long>> DISCOVERED_ISLANDS =
 			AttachmentRegistry.<java.util.List<Long>>builder()

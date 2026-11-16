@@ -208,6 +208,14 @@ public final class GrandLineConfig {
 	// ---- Fishing ----
 	/** Starter Fishing Rod price at the Fisherman. */
 	public long fishingRodPrice = 150;
+
+	/**
+	 * Treasure chests: Beli reward as a multiple of the island's quest reward (common, rare, legendary), give or take
+	 * {@code treasureRewardSpread}, and minutes before the same chest can be opened again by the same player.
+	 */
+	public double[] treasureRewardMultipliers = {1.0, 3.0, 8.0};
+	public double treasureRewardSpread = 0.15;
+	public int[] treasureRefillMinutes = {15, 45, 180};
 	/** Seconds before a bite (before mastery shortens it). */
 	public double fishingBiteMinSeconds = 4.0;
 	public double fishingBiteMaxSeconds = 12.0;
@@ -416,6 +424,19 @@ public final class GrandLineConfig {
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);
+		if (treasureRewardMultipliers == null || treasureRewardMultipliers.length != 3) {
+			treasureRewardMultipliers = new double[]{1.0, 3.0, 8.0};
+		}
+		for (int i = 0; i < 3; i++) {
+			treasureRewardMultipliers[i] = clamp(treasureRewardMultipliers[i], 0, 1000);
+		}
+		treasureRewardSpread = clamp(treasureRewardSpread, 0, 0.9);
+		if (treasureRefillMinutes == null || treasureRefillMinutes.length != 3) {
+			treasureRefillMinutes = new int[]{15, 45, 180};
+		}
+		for (int i = 0; i < 3; i++) {
+			treasureRefillMinutes[i] = clamp(treasureRefillMinutes[i], 0, 60 * 24 * 7);
+		}
 		if (raceWeights == null || raceWeights.isEmpty()) {
 			raceWeights = defaults().raceWeights;
 		}

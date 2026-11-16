@@ -79,7 +79,7 @@ public final class EnemyRespawns {
 		data.setDirty();
 	}
 
-	static Island islandAt(ServerLevel level, BlockPos pos) {
+	public static Island islandAt(ServerLevel level, BlockPos pos) {
 		for (Island island : IslandRegistry.nearby(level.getServer(), pos.getX(), pos.getZ(), 260)) {
 			long dx = pos.getX() - island.x(), dz = pos.getZ() - island.z();
 			var plan = com.grandline.world.plan.IslandPlans.get(island);

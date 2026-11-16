@@ -39,6 +39,7 @@ public final class GrandLineMod implements ModInitializer {
 		// Order matters only in that everything must be registered before registries freeze.
 		com.grandline.audio.GrandLineSounds.register();
 		ModItems.register();
+		com.grandline.treasure.TreasureBlocks.register();
 		com.grandline.gear.Gear.register();
 		com.grandline.gear.GearService.register();
 		com.grandline.gear.EquipmentOwnership.register();
@@ -85,6 +86,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.quest.QuestUnlocks.register();
 		com.grandline.quest.QuestNavigation.register();
 		com.grandline.world.AdventureRules.register();
+		com.grandline.treasure.TreasurePlacer.register();
 		com.grandline.npc.EnemyRespawns.register();
 		com.grandline.npc.TempleBosses.register();
 		com.grandline.race.RaceService.register();

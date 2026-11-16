@@ -236,6 +236,43 @@ public final class GrandLineCommands {
 													context.getSource().sendSuccess(() -> Component.literal(done ? "Revoked" : "Not owned"), true);
 													return done ? 1 : 0;
 												})))))
+				// Dev tool: treasure chest spots (scan an island for candidates, list placed chests).
+				.then(Commands.literal("treasure").requires(source -> source.hasPermission(2))
+						.then(Commands.literal("scan").executes(context -> {
+							int n = 0;
+							for (var island : com.grandline.world.IslandRegistry.get(context.getSource().getServer()).all()) {
+								if (com.grandline.world.plan.IslandPlans.get(island) == null) {
+									continue;
+								}
+								try {
+									var file = com.grandline.treasure.TreasureScan.scan(context.getSource().getServer().overworld(), island);
+									context.getSource().sendSuccess(() -> Component.literal("Scanned " + island.name() + " -> " + file), false);
+									n++;
+								} catch (java.io.IOException e) {
+									context.getSource().sendFailure(Component.literal(island.name() + ": " + e.getMessage()));
+								}
+							}
+							return n;
+						}))
+						.then(Commands.literal("clean").executes(context -> {
+							int n = com.grandline.treasure.TreasurePlacer.cleanAll(context.getSource().getServer().overworld());
+							context.getSource().sendSuccess(() -> Component.literal("Removed " + n + " stray treasure chests"), false);
+							return n;
+						}))
+						.then(Commands.literal("place").executes(context -> {
+							int placed = 0;
+							var server = context.getSource().getServer();
+							for (var p : com.grandline.treasure.TreasurePlacer.all(server)) {
+								server.overworld().getChunk(p.pos());
+								if (com.grandline.treasure.TreasurePlacer.place(server.overworld(), p)) {
+									placed++;
+								}
+							}
+							int total = com.grandline.treasure.TreasurePlacer.all(server).size();
+							int ok = placed;
+							context.getSource().sendSuccess(() -> Component.literal(ok + "/" + total + " treasure chests in place"), false);
+							return placed;
+						})))
 				.then(Commands.literal("dumpmap").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("x1", IntegerArgumentType.integer())
 								.then(Commands.argument("z1", IntegerArgumentType.integer())

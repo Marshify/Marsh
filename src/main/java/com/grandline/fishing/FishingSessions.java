@@ -27,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -170,11 +169,14 @@ public final class FishingSessions {
 		if (SESSIONS.isEmpty()) {
 			return;
 		}
-		for (Iterator<Map.Entry<UUID, Session>> it = SESSIONS.entrySet().iterator(); it.hasNext(); ) {
-			Session s = it.next().getValue();
+		// A copy: a step can end its own session (or another), which removes it from the map.
+		for (Session s : java.util.List.copyOf(SESSIONS.values())) {
+			if (SESSIONS.get(s.player) != s) {
+				continue; // already ended this tick
+			}
 			ServerPlayer player = server.getPlayerList().getPlayer(s.player);
 			if (player == null || !player.isAlive() || s.bobber.isRemoved() || !holdingRod(player)) {
-				it.remove();
+				SESSIONS.remove(s.player);
 				finish(server, s, player, false, null);
 				continue;
 			}

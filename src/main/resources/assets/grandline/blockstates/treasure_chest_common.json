@@ -1,0 +1,19 @@
+{
+ "variants": {
+  "facing=north": {
+   "model": "grandline:block/treasure_chest_common"
+  },
+  "facing=east": {
+   "model": "grandline:block/treasure_chest_common",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "grandline:block/treasure_chest_common",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "grandline:block/treasure_chest_common",
+   "y": 270
+  }
+ }
+}

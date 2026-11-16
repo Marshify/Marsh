@@ -44,6 +44,13 @@ public final class IslandPlans {
 		return PLANS.get(islandName);
 	}
 
+	/** Whether this world builds the island from its current plan (not the pre-redesign one). */
+	public static boolean usesCurrentPlan(String islandName) {
+		com.grandline.world.IslandRegistry registry = com.grandline.world.IslandRegistry.current();
+		return PLANS.containsKey(islandName) && (registry == null || registry.layout() >= REDESIGNED_IN.getOrDefault(islandName, 0)
+				|| !LEGACY.containsKey(islandName));
+	}
+
 	/** The pre-redesign plan of an island, if it has one (tests, tools). */
 	public static IslandPlan legacy(String islandName) {
 		return LEGACY.get(islandName);

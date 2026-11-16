@@ -1,0 +1,94 @@
+package com.grandline.treasure;
+
+import net.minecraft.core.Direction;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Where every treasure chest is, island by island (island-local coordinates of the current island plans). Each spot was
+ * picked from the generated island (see docs/TREASURE.md and {@code /grandline treasure scan}) and checked in game.
+ */
+public final class TreasureSpots {
+	private static final Map<String, List<TreasureSpot>> SPOTS = Map.ofEntries(
+			Map.entry("Cloudtop Isles", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -69, 96, -35, Direction.WEST, "dark, covered, walls e"),
+				new TreasureSpot(TreasureTier.RARE, 55, 144, -104, Direction.EAST, "indoors, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 42, 126, -68, Direction.EAST, "walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 6, 123, -37, Direction.SOUTH, "walls nw"))),
+			Map.entry("Crystal Fountain", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -28, 64, 28, Direction.SOUTH, "beach camp shelter, guarded by the west camp"),
+				new TreasureSpot(TreasureTier.RARE, 26, 64, 31, Direction.SOUTH, "beside the east camp on the beach"),
+				new TreasureSpot(TreasureTier.COMMON, -25, 67, -7, Direction.SOUTH, "at the foot of a crystal pillar"),
+				new TreasureSpot(TreasureTier.COMMON, 19, 67, -17, Direction.SOUTH, "at the foot of a crystal pillar"))),
+			Map.entry("Dawnreach Harbor", List.of(
+				new TreasureSpot(TreasureTier.RARE, 24, 68, -12, Direction.SOUTH, "inside a market hall, by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 22, 68, 10, Direction.NORTH, "by crates in a market hall"),
+				new TreasureSpot(TreasureTier.COMMON, -62, 68, 32, Direction.WEST, "by crates near the west harbour"))),
+			Map.entry("Emberfall Isle", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -4, 105, -33, Direction.WEST, "raised 39, walls es"),
+				new TreasureSpot(TreasureTier.RARE, -33, 79, -77, Direction.EAST, "by crates, indoors, raised 13, walls sw"),
+				new TreasureSpot(TreasureTier.COMMON, -25, 67, 59, Direction.WEST, "by crates, walls e"),
+				new TreasureSpot(TreasureTier.COMMON, -6, 65, 96, Direction.SOUTH, "by crates, walls n"))),
+			Map.entry("Frostpeak Isle", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 32, 67, 4, Direction.SOUTH, "dark, covered, walls ne"),
+				new TreasureSpot(TreasureTier.RARE, -17, 66, 7, Direction.NORTH, "by crates, indoors, walls s"),
+				new TreasureSpot(TreasureTier.COMMON, 24, 66, 24, Direction.SOUTH, "walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 2, 63, 23, Direction.NORTH, "walls s"))),
+			Map.entry("Gladiator's Ring", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -39, 88, -25, Direction.EAST, "raised 21, walls w"),
+				new TreasureSpot(TreasureTier.RARE, 40, 66, -45, Direction.EAST, "by crates, indoors, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 23, 67, 55, Direction.EAST, "by crates, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, -62, 68, -22, Direction.WEST, "by crates, walls e"))),
+			Map.entry("Ironhold Bastion", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 19, 66, -24, Direction.NORTH, "back corner of the bastion"),
+				new TreasureSpot(TreasureTier.RARE, -7, 67, -8, Direction.EAST, "indoors in the keep"),
+				new TreasureSpot(TreasureTier.COMMON, -13, 67, 21, Direction.NORTH, "walls s"),
+				new TreasureSpot(TreasureTier.COMMON, -23, 65, -26, Direction.NORTH, "rocky back corner"))),
+			Map.entry("Lotus Palace", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 1, 70, -26, Direction.EAST, "raised garden behind the palace"),
+				new TreasureSpot(TreasureTier.RARE, -33, 64, 24, Direction.SOUTH, "by crates at the west camp, guarded"),
+				new TreasureSpot(TreasureTier.COMMON, -1, 64, 15, Direction.SOUTH, "walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 13, 64, 23, Direction.NORTH, "sheltered corner by the shore"))),
+			Map.entry("Millbrook Village", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 54, 67, 18, Direction.WEST, "at the bandit boss camp, guarded"),
+				new TreasureSpot(TreasureTier.RARE, 17, 67, -20, Direction.EAST, "by crates, indoors, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, -18, 67, 28, Direction.SOUTH, "by crates, walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 6, 67, 26, Direction.SOUTH, "by crates, walls n"))),
+			Map.entry("Redbrick Port", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -16, 76, -23, Direction.SOUTH, "raised 11, walls nw"),
+				new TreasureSpot(TreasureTier.RARE, 24, 65, -25, Direction.NORTH, "under a shelter by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 35, 66, 6, Direction.EAST, "by crates"),
+				new TreasureSpot(TreasureTier.COMMON, -37, 65, -14, Direction.WEST, "by crates under a shelter"))),
+			Map.entry("Saltmarket Docks", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -19, 66, -19, Direction.WEST, "under the warehouse awning, by crates"),
+				new TreasureSpot(TreasureTier.RARE, 19, 66, -19, Direction.EAST, "under the warehouse awning, by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
+				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne"))),
+			Map.entry("Stonewall Prison", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -35, 91, -51, Direction.EAST, "raised 23, walls w"),
+				new TreasureSpot(TreasureTier.RARE, -44, 69, -9, Direction.EAST, "dark, covered, walls sw"),
+				new TreasureSpot(TreasureTier.COMMON, 15, 67, 39, Direction.EAST, "by crates, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 36, 68, 41, Direction.NORTH, "walls s"))),
+			Map.entry("Sunscorch Dunes", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -23, 71, -51, Direction.EAST, "dark, covered, raised 5, walls w"),
+				new TreasureSpot(TreasureTier.RARE, -20, 71, -30, Direction.EAST, "indoors, raised 5, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, -24, 67, 17, Direction.SOUTH, "by crates, walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 9, 67, 26, Direction.SOUTH, "by crates, walls n"))),
+			Map.entry("Verdant Wilds", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -121, 67, -2, Direction.WEST, "by crates, dark, covered, walls e"),
+				new TreasureSpot(TreasureTier.RARE, -109, 67, -18, Direction.WEST, "by crates, dark, covered, walls e"),
+				new TreasureSpot(TreasureTier.COMMON, 14, 69, 14, Direction.SOUTH, "by crates, walls n"),
+				new TreasureSpot(TreasureTier.COMMON, -23, 67, 28, Direction.EAST, "by crates, walls w"))));
+
+	private TreasureSpots() {
+	}
+
+	public static List<TreasureSpot> forIsland(String island) {
+		return SPOTS.getOrDefault(island, List.of());
+	}
+
+	public static Map<String, List<TreasureSpot>> all() {
+		return SPOTS;
+	}
+}

@@ -1,0 +1,506 @@
+{
+ "Cloudtop Isles": [
+  {
+   "tier": "LEGENDARY",
+   "x": -69,
+   "y": 96,
+   "z": -35,
+   "facing": "WEST",
+   "floor": "polished_diorite",
+   "why": "dark, covered, walls e"
+  },
+  {
+   "tier": "RARE",
+   "x": 55,
+   "y": 144,
+   "z": -104,
+   "facing": "EAST",
+   "floor": "stone_bricks",
+   "why": "indoors, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": 42,
+   "y": 126,
+   "z": -68,
+   "facing": "EAST",
+   "floor": "snow_block",
+   "why": "walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": 6,
+   "y": 123,
+   "z": -37,
+   "facing": "SOUTH",
+   "floor": "white_wool",
+   "why": "walls nw"
+  }
+ ],
+ "Crystal Fountain": [
+  {
+   "tier": "LEGENDARY",
+   "x": -28,
+   "y": 64,
+   "z": 28,
+   "facing": "SOUTH",
+   "why": "beach camp shelter, guarded by the west camp"
+  },
+  {
+   "tier": "RARE",
+   "x": 26,
+   "y": 64,
+   "z": 31,
+   "facing": "SOUTH",
+   "why": "beside the east camp on the beach"
+  },
+  {
+   "tier": "COMMON",
+   "x": -25,
+   "y": 67,
+   "z": -7,
+   "facing": "SOUTH",
+   "why": "at the foot of a crystal pillar"
+  },
+  {
+   "tier": "COMMON",
+   "x": 19,
+   "y": 67,
+   "z": -17,
+   "facing": "SOUTH",
+   "why": "at the foot of a crystal pillar"
+  }
+ ],
+ "Dawnreach Harbor": [
+  {
+   "tier": "RARE",
+   "x": 24,
+   "y": 68,
+   "z": -12,
+   "facing": "SOUTH",
+   "why": "inside a market hall, by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 22,
+   "y": 68,
+   "z": 10,
+   "facing": "NORTH",
+   "why": "by crates in a market hall"
+  },
+  {
+   "tier": "COMMON",
+   "x": -62,
+   "y": 68,
+   "z": 32,
+   "facing": "WEST",
+   "why": "by crates near the west harbour"
+  }
+ ],
+ "Emberfall Isle": [
+  {
+   "tier": "LEGENDARY",
+   "x": -4,
+   "y": 105,
+   "z": -33,
+   "facing": "WEST",
+   "floor": "smooth_basalt",
+   "why": "raised 39, walls es"
+  },
+  {
+   "tier": "RARE",
+   "x": -33,
+   "y": 79,
+   "z": -77,
+   "facing": "EAST",
+   "floor": "polished_deepslate",
+   "why": "by crates, indoors, raised 13, walls sw"
+  },
+  {
+   "tier": "COMMON",
+   "x": -25,
+   "y": 67,
+   "z": 59,
+   "facing": "WEST",
+   "floor": "blackstone",
+   "why": "by crates, walls e"
+  },
+  {
+   "tier": "COMMON",
+   "x": -6,
+   "y": 65,
+   "z": 96,
+   "facing": "SOUTH",
+   "floor": "dark_oak_planks",
+   "why": "by crates, walls n"
+  }
+ ],
+ "Frostpeak Isle": [
+  {
+   "tier": "LEGENDARY",
+   "x": 32,
+   "y": 67,
+   "z": 4,
+   "facing": "SOUTH",
+   "floor": "snow_block",
+   "why": "dark, covered, walls ne"
+  },
+  {
+   "tier": "RARE",
+   "x": -17,
+   "y": 66,
+   "z": 7,
+   "facing": "NORTH",
+   "floor": "snow_block",
+   "why": "by crates, indoors, walls s"
+  },
+  {
+   "tier": "COMMON",
+   "x": 24,
+   "y": 66,
+   "z": 24,
+   "facing": "SOUTH",
+   "floor": "snow_block",
+   "why": "walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 2,
+   "y": 63,
+   "z": 23,
+   "facing": "NORTH",
+   "floor": "snow_block",
+   "why": "walls s"
+  }
+ ],
+ "Gladiator's Ring": [
+  {
+   "tier": "LEGENDARY",
+   "x": -39,
+   "y": 88,
+   "z": -25,
+   "facing": "EAST",
+   "floor": "polished_andesite",
+   "why": "raised 21, walls w"
+  },
+  {
+   "tier": "RARE",
+   "x": 40,
+   "y": 66,
+   "z": -45,
+   "facing": "EAST",
+   "floor": "grass_block",
+   "why": "by crates, indoors, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": 23,
+   "y": 67,
+   "z": 55,
+   "facing": "EAST",
+   "floor": "grass_block",
+   "why": "by crates, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": -62,
+   "y": 68,
+   "z": -22,
+   "facing": "WEST",
+   "floor": "grass_block",
+   "why": "by crates, walls e"
+  }
+ ],
+ "Ironhold Bastion": [
+  {
+   "tier": "LEGENDARY",
+   "x": 19,
+   "y": 66,
+   "z": -24,
+   "facing": "NORTH",
+   "why": "back corner of the bastion"
+  },
+  {
+   "tier": "RARE",
+   "x": -7,
+   "y": 67,
+   "z": -8,
+   "facing": "EAST",
+   "why": "indoors in the keep"
+  },
+  {
+   "tier": "COMMON",
+   "x": -13,
+   "y": 67,
+   "z": 21,
+   "facing": "NORTH",
+   "floor": "stone",
+   "why": "walls s"
+  },
+  {
+   "tier": "COMMON",
+   "x": -23,
+   "y": 65,
+   "z": -26,
+   "facing": "NORTH",
+   "why": "rocky back corner"
+  }
+ ],
+ "Lotus Palace": [
+  {
+   "tier": "LEGENDARY",
+   "x": 1,
+   "y": 70,
+   "z": -26,
+   "facing": "EAST",
+   "why": "raised garden behind the palace"
+  },
+  {
+   "tier": "RARE",
+   "x": -33,
+   "y": 64,
+   "z": 24,
+   "facing": "SOUTH",
+   "why": "by crates at the west camp, guarded"
+  },
+  {
+   "tier": "COMMON",
+   "x": -1,
+   "y": 64,
+   "z": 15,
+   "facing": "SOUTH",
+   "floor": "cherry_planks",
+   "why": "walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 13,
+   "y": 64,
+   "z": 23,
+   "facing": "NORTH",
+   "why": "sheltered corner by the shore"
+  }
+ ],
+ "Millbrook Village": [
+  {
+   "tier": "LEGENDARY",
+   "x": 54,
+   "y": 67,
+   "z": 18,
+   "facing": "WEST",
+   "why": "at the bandit boss camp, guarded"
+  },
+  {
+   "tier": "RARE",
+   "x": 17,
+   "y": 67,
+   "z": -20,
+   "facing": "EAST",
+   "floor": "grass_block",
+   "why": "by crates, indoors, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": -18,
+   "y": 67,
+   "z": 28,
+   "facing": "SOUTH",
+   "floor": "grass_block",
+   "why": "by crates, walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 6,
+   "y": 67,
+   "z": 26,
+   "facing": "SOUTH",
+   "floor": "grass_block",
+   "why": "by crates, walls n"
+  }
+ ],
+ "Redbrick Port": [
+  {
+   "tier": "LEGENDARY",
+   "x": -16,
+   "y": 76,
+   "z": -23,
+   "facing": "SOUTH",
+   "floor": "stone",
+   "why": "raised 11, walls nw"
+  },
+  {
+   "tier": "RARE",
+   "x": 24,
+   "y": 65,
+   "z": -25,
+   "facing": "NORTH",
+   "why": "under a shelter by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 35,
+   "y": 66,
+   "z": 6,
+   "facing": "EAST",
+   "why": "by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": -37,
+   "y": 65,
+   "z": -14,
+   "facing": "WEST",
+   "why": "by crates under a shelter"
+  }
+ ],
+ "Saltmarket Docks": [
+  {
+   "tier": "LEGENDARY",
+   "x": -19,
+   "y": 66,
+   "z": -19,
+   "facing": "WEST",
+   "why": "under the warehouse awning, by crates"
+  },
+  {
+   "tier": "RARE",
+   "x": 19,
+   "y": 66,
+   "z": -19,
+   "facing": "EAST",
+   "why": "under the warehouse awning, by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 4,
+   "y": 64,
+   "z": 28,
+   "facing": "WEST",
+   "floor": "spruce_planks",
+   "why": "by crates, walls e"
+  },
+  {
+   "tier": "COMMON",
+   "x": -3,
+   "y": 66,
+   "z": -24,
+   "facing": "SOUTH",
+   "floor": "grass_block",
+   "why": "walls ne"
+  }
+ ],
+ "Stonewall Prison": [
+  {
+   "tier": "LEGENDARY",
+   "x": -35,
+   "y": 91,
+   "z": -51,
+   "facing": "EAST",
+   "floor": "polished_andesite",
+   "why": "raised 23, walls w"
+  },
+  {
+   "tier": "RARE",
+   "x": -44,
+   "y": 69,
+   "z": -9,
+   "facing": "EAST",
+   "floor": "smooth_stone",
+   "why": "dark, covered, walls sw"
+  },
+  {
+   "tier": "COMMON",
+   "x": 15,
+   "y": 67,
+   "z": 39,
+   "facing": "EAST",
+   "floor": "stone",
+   "why": "by crates, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": 36,
+   "y": 68,
+   "z": 41,
+   "facing": "NORTH",
+   "floor": "stone",
+   "why": "walls s"
+  }
+ ],
+ "Sunscorch Dunes": [
+  {
+   "tier": "LEGENDARY",
+   "x": -23,
+   "y": 71,
+   "z": -51,
+   "facing": "EAST",
+   "floor": "smooth_sandstone",
+   "why": "dark, covered, raised 5, walls w"
+  },
+  {
+   "tier": "RARE",
+   "x": -20,
+   "y": 71,
+   "z": -30,
+   "facing": "EAST",
+   "floor": "smooth_sandstone",
+   "why": "indoors, raised 5, walls w"
+  },
+  {
+   "tier": "COMMON",
+   "x": -24,
+   "y": 67,
+   "z": 17,
+   "facing": "SOUTH",
+   "floor": "sandstone",
+   "why": "by crates, walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 9,
+   "y": 67,
+   "z": 26,
+   "facing": "SOUTH",
+   "floor": "sandstone",
+   "why": "by crates, walls n"
+  }
+ ],
+ "Verdant Wilds": [
+  {
+   "tier": "LEGENDARY",
+   "x": -121,
+   "y": 67,
+   "z": -2,
+   "facing": "WEST",
+   "floor": "podzol",
+   "why": "by crates, dark, covered, walls e"
+  },
+  {
+   "tier": "RARE",
+   "x": -109,
+   "y": 67,
+   "z": -18,
+   "facing": "WEST",
+   "floor": "grass_block",
+   "why": "by crates, dark, covered, walls e"
+  },
+  {
+   "tier": "COMMON",
+   "x": 14,
+   "y": 69,
+   "z": 14,
+   "facing": "SOUTH",
+   "floor": "grass_block",
+   "why": "by crates, walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": -23,
+   "y": 67,
+   "z": 28,
+   "facing": "EAST",
+   "floor": "grass_block",
+   "why": "by crates, walls w"
+  }
+ ]
+}

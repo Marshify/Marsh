@@ -28,6 +28,7 @@
       "com.grandline.test.GrandLineEquipmentGameTests",
       "com.grandline.test.GrandLineControlsGameTests",
       "com.grandline.test.GrandLineEnergyGameTests",
+      "com.grandline.test.GrandLineTreasureGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

@@ -1039,5 +1039,10 @@
   "setting.grandline.camera_sensitivity": "Camera turn speed",
   "setting.grandline.camera_sensitivity.desc": "On top of Minecraft's mouse sensitivity.",
   "setting.grandline.reduced_motion": "Reduced camera motion",
-  "setting.grandline.reduced_motion.desc": "No camera distance or FOV changes while moving, dashing or charging."
+  "setting.grandline.reduced_motion.desc": "No camera distance or FOV changes while moving, dashing or charging.",
+  "block.grandline.treasure_chest_common": "Common Chest",
+  "block.grandline.treasure_chest_rare": "Rare Chest",
+  "block.grandline.treasure_chest_legendary": "Legendary Chest",
+  "message.grandline.treasure.opened": "%s: +$%s",
+  "message.grandline.treasure.refilling": "%s already looted. It refills in %s."
 }
