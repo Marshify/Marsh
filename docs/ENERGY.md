@@ -26,7 +26,7 @@ All in `combat/EnergyService`, server-authoritative:
   - Moves that cost nothing still cost nothing.
   - Config `energyCostsScaleWithMax = true` brings back the old rule (cost = fraction of max).
 - **Persistence:** Energy itself isn't saved. You join and respawn full, as before. Melee points are part of the saved profile, so the max is right on every load. Levelling up doesn't touch Energy.
-- **HUD:** the existing Energy bar ("Energy current/max", same style and place) now eases smoothly between the server's updates, at any frame rate.
+- **HUD:** the existing Energy bar ("Energy: current / max", same style and place) now eases smoothly between the server's updates, at any frame rate.
 
 **Existing worlds:** nothing needs migrating. Max Energy is recalculated from the saved Melee points. Players who relied on level-based Energy (100 + 2 per level) now have 100 + 5 per Melee point.
 

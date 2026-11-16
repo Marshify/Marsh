@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/** Settings: On/Off rows for visual and HUD options, plus HUD layout editing. Saved to config/grandline-client.json. */
+/** Settings (a scrolling list when taller than the screen): On/Off rows for visual and HUD options, plus HUD layout editing. Saved to config/grandline-client.json. */
 public final class SettingsScreen extends Screen {
 	private static final int WIDTH = 320;
 	private static final int ROW = 34;
@@ -36,7 +36,12 @@ public final class SettingsScreen extends Screen {
 	private final List<Object> rows = new ArrayList<>(); // section title (String) or Toggle
 	private int left;
 	private int top;
-	private int height;
+	private int panelHeight;
+	/** The scrolling list: everything below the title bar. */
+	private int viewTop, viewBottom, contentHeight, scroll;
+	private boolean draggingBar;
+	private final List<MarshButton> scrolled = new ArrayList<>();
+	private final List<Integer> baseY = new ArrayList<>();
 
 	public SettingsScreen(Screen parent) {
 		super(Component.translatable("screen.grandline.settings.title"));
@@ -65,19 +70,29 @@ public final class SettingsScreen extends Screen {
 
 	@Override
 	protected void init() {
-		int contentHeight = 0;
+		scrolled.clear();
+		baseY.clear();
+		toggleButtons.clear();
+		toggleOf.clear();
+		choiceButtons.clear();
+		choiceOf.clear();
+		contentHeight = 0;
 		for (Object row : rows) {
 			contentHeight += row instanceof String ? 14 : ROW;
 		}
-		height = MarshUi.TITLE_HEIGHT + 8 + contentHeight + ROW + 6;
+		contentHeight += ROW + 4; // the HUD layout buttons
+		// The window fits the screen; the list scrolls when it is taller than that.
+		panelHeight = Math.min(MarshUi.TITLE_HEIGHT + 8 + contentHeight + 4, this.height - 8);
 		left = width / 2 - WIDTH / 2;
-		top = Math.max(4, this.height / 2 - height / 2);
-		int y = top + MarshUi.TITLE_HEIGHT + 6;
+		top = Math.max(4, this.height / 2 - panelHeight / 2);
+		viewTop = top + MarshUi.TITLE_HEIGHT + 4;
+		viewBottom = top + panelHeight - 4;
+		int y = viewTop + 2;
 		for (Object row : rows) {
 			if (row instanceof Toggle toggle) {
-				MarshButton on = addRenderableWidget(new MarshButton(left + WIDTH - 118, y + 7, 52, 20, Component.translatable("screen.grandline.settings.on"),
+				MarshButton on = add(new MarshButton(left + WIDTH - 118, y + 7, 52, 20, Component.translatable("screen.grandline.settings.on"),
 						MarshUi.Color.GRAY, () -> set(toggle, true)));
-				MarshButton off = addRenderableWidget(new MarshButton(left + WIDTH - 62, y + 7, 52, 20, Component.translatable("screen.grandline.settings.off"),
+				MarshButton off = add(new MarshButton(left + WIDTH - 62, y + 7, 52, 20, Component.translatable("screen.grandline.settings.off"),
 						MarshUi.Color.GRAY, () -> set(toggle, false)));
 				toggleButtons.add(new MarshButton[]{on, off});
 				toggleOf.add(toggle);
@@ -87,7 +102,7 @@ public final class SettingsScreen extends Screen {
 				MarshButton[] buttons = new MarshButton[labels.length];
 				for (int i = 0; i < labels.length; i++) {
 					int level = i;
-					buttons[i] = addRenderableWidget(new MarshButton(left + WIDTH - 10 - labels.length * 37 + i * 37, y + 7, 35, 20,
+					buttons[i] = add(new MarshButton(left + WIDTH - 10 - labels.length * 37 + i * 37, y + 7, 35, 20,
 							Component.translatable("screen.grandline.settings." + labels[i]), MarshUi.Color.GRAY, () -> {
 								choice.set().accept(level);
 								ClientSettings.get().save();
@@ -101,14 +116,68 @@ public final class SettingsScreen extends Screen {
 				y += 14;
 			}
 		}
-		addRenderableWidget(new MarshButton(left + 10, y + 6, 140, 20, Component.translatable("screen.grandline.settings.move_hud"),
+		add(new MarshButton(left + 10, y + 6, 140, 20, Component.translatable("screen.grandline.settings.move_hud"),
 				MarshUi.Color.YELLOW, () -> minecraft.setScreen(new HudEditScreen(this))));
-		addRenderableWidget(new MarshButton(left + 158, y + 6, 100, 20, Component.translatable("screen.grandline.settings.reset_hud"),
+		add(new MarshButton(left + 158, y + 6, 100, 20, Component.translatable("screen.grandline.settings.reset_hud"),
 				MarshUi.Color.BLUE, () -> {
 					ClientSettings.get().hudOffsets.clear();
 					ClientSettings.get().save();
 				}));
 		refresh();
+		setScroll(scroll); // keeps the position when the window is resized
+	}
+
+	private MarshButton add(MarshButton button) {
+		scrolled.add(button);
+		baseY.add(button.getY());
+		return addRenderableWidget(button);
+	}
+
+	private int maxScroll() {
+		return Math.max(0, contentHeight + 4 - (viewBottom - viewTop));
+	}
+
+	private void setScroll(int value) {
+		scroll = Math.max(0, Math.min(maxScroll(), value));
+		for (int i = 0; i < scrolled.size(); i++) {
+			MarshButton b = scrolled.get(i);
+			b.setY(baseY.get(i) - scroll);
+			// Only buttons fully inside the list can be seen or clicked.
+			b.visible = b.getY() >= viewTop && b.getY() + b.getHeight() <= viewBottom;
+		}
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+		if (maxScroll() > 0) {
+			setScroll(scroll - (int) Math.round(delta * 20));
+			return true;
+		}
+		return super.mouseScrolled(mouseX, mouseY, delta);
+	}
+
+	private int[] barRect() {
+		int track = viewBottom - viewTop;
+		int thumb = Math.max(20, track * track / (contentHeight + 4));
+		int y = viewTop + (maxScroll() == 0 ? 0 : (track - thumb) * scroll / maxScroll());
+		return new int[]{left + WIDTH - 6, y, 3, thumb};
+	}
+
+	@Override
+	public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+		if (draggingBar && maxScroll() > 0) {
+			int[] bar = barRect();
+			int track = viewBottom - viewTop - bar[3];
+			setScroll((int) Math.round((mouseY - viewTop - bar[3] / 2.0) * maxScroll() / Math.max(1, track)));
+			return true;
+		}
+		return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+	}
+
+	@Override
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		draggingBar = false;
+		return super.mouseReleased(mouseX, mouseY, button);
 	}
 
 	private final List<MarshButton[]> toggleButtons = new ArrayList<>();
@@ -128,7 +197,7 @@ public final class SettingsScreen extends Screen {
 		}
 		for (int i = 0; i < choiceOf.size(); i++) {
 			int v = choiceOf.get(i).get().get();
-			for (int b = 0; b < 3; b++) {
+			for (int b = 0; b < choiceButtons.get(i).length; b++) {
 				choiceButtons.get(i)[b].setColor(b == v ? MarshUi.Color.GREEN : MarshUi.Color.GRAY);
 			}
 		}
@@ -137,10 +206,11 @@ public final class SettingsScreen extends Screen {
 	@Override
 	public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
 		renderBackground(g);
-		MarshUi.window(g, font, left, top, WIDTH, height, title);
+		MarshUi.window(g, font, left, top, WIDTH, panelHeight, title);
 		boolean overClose = closeHit(mouseX, mouseY);
 		MarshUi.closeButton(g, left + WIDTH - 22, top + 3, 18, overClose);
-		int y = top + MarshUi.TITLE_HEIGHT + 6;
+		g.enableScissor(left, viewTop, left + WIDTH, viewBottom);
+		int y = viewTop + 2 - scroll;
 		for (Object row : rows) {
 			if (row instanceof String section) {
 				g.drawString(font, Component.translatable(section), left + 10, y + 3, 0xA9B2C0);
@@ -163,7 +233,13 @@ public final class SettingsScreen extends Screen {
 				y += ROW;
 			}
 		}
+		g.disableScissor();
 		super.render(g, mouseX, mouseY, partialTick);
+		if (maxScroll() > 0) {
+			int[] bar = barRect();
+			g.fill(bar[0], viewTop, bar[0] + bar[2], viewBottom, 0x40000000);
+			g.fill(bar[0], bar[1], bar[0] + bar[2], bar[1] + bar[3], draggingBar ? 0xFFFFFFFF : 0xC0FFFFFF);
+		}
 	}
 
 	private boolean closeHit(double mouseX, double mouseY) {
@@ -174,6 +250,11 @@ public final class SettingsScreen extends Screen {
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (button == 0 && closeHit(mouseX, mouseY)) {
 			onClose();
+			return true;
+		}
+		if (button == 0 && maxScroll() > 0 && mouseX >= left + WIDTH - 9 && mouseX < left + WIDTH - 1 && mouseY >= viewTop && mouseY < viewBottom) {
+			draggingBar = true;
+			mouseDragged(mouseX, mouseY, button, 0, 0);
 			return true;
 		}
 		return super.mouseClicked(mouseX, mouseY, button);

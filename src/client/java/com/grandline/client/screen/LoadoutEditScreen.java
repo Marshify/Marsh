@@ -2,7 +2,6 @@ package com.grandline.client.screen;
 
 import com.grandline.client.GrandLineKeys;
 import com.grandline.client.hud.LoadoutHotbar;
-import com.grandline.client.ui.MarshButton;
 import com.grandline.client.ui.MarshUi;
 import com.grandline.player.loadout.LoadoutOrder;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,15 +15,18 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 
 /**
- * Rearranges the four loadout slots. Drag a slot onto another to swap them; the icon, label and selection move
+ * Rearranges the four loadout slots, in a small translucent popup just above the hotbar. Drag a slot onto another to swap them; the icon, label and selection move
  * together and the hotbar updates live. Only the order changes: nothing in the vanilla inventory moves, nothing is
  * dropped and no move fires. The order is saved to the server when the editor closes (edit key or Escape).
  */
 public final class LoadoutEditScreen extends Screen {
-	private static final int SLOT = 36;
-	private static final int GAP = 10;
-	private static final int WIDTH = 4 * SLOT + 3 * GAP + 40;
-	private static final int HEIGHT = 150;
+	private static final int SLOT = 24;
+	private static final int GAP = 16;
+	private static final int PAD = 8;
+	private static final int WIDTH = 4 * SLOT + 3 * GAP + 2 * PAD;
+	private static final int HEIGHT = 70;
+	/** Gap between the popup and the bottom of the screen: clears the hotbar, hearts and its labels. */
+	private static final int ABOVE_HOTBAR = 46;
 
 	private final List<Integer> opened;
 	private int left;
@@ -43,14 +45,9 @@ public final class LoadoutEditScreen extends Screen {
 	@Override
 	protected void init() {
 		left = width / 2 - WIDTH / 2;
-		top = Math.max(4, height / 2 - HEIGHT / 2 - 20);
-		slotsX = left + (WIDTH - (4 * SLOT + 3 * GAP)) / 2;
-		slotsY = top + MarshUi.TITLE_HEIGHT + 30;
-		addRenderableWidget(new MarshButton(left + WIDTH / 2 - 50, top + HEIGHT - 28, 100, 18,
-				Component.translatable("screen.grandline.loadout_edit.reset"), MarshUi.Color.GRAY, () -> {
-					LoadoutHotbar.setOrder(LoadoutOrder.DEFAULT);
-					dragFrom = -1;
-				}));
+		top = height - ABOVE_HOTBAR - HEIGHT;
+		slotsX = left + PAD;
+		slotsY = top + 17;
 	}
 
 	private int slotAt(double mx, double my) {
@@ -63,14 +60,45 @@ public final class LoadoutEditScreen extends Screen {
 		return -1;
 	}
 
+	/** The small "Reset" link, centred at the bottom: {x, y, w, h}. */
+	private int[] resetBox() {
+		Component reset = Component.translatable("screen.grandline.loadout_edit.reset");
+		int w = (int) Math.ceil(font.width(reset) * 0.75f);
+		return new int[]{left + WIDTH / 2 - w / 2, top + HEIGHT - 10, w, 7};
+	}
+
+	private boolean overReset(double mx, double my) {
+		int[] r = resetBox();
+		return mx >= r[0] - 2 && mx < r[0] + r[2] + 2 && my >= r[1] - 2 && my < r[1] + r[3] + 2;
+	}
+
+	private void small(GuiGraphics g, Component text, int x, int y, int color) {
+		g.pose().pushPose();
+		g.pose().translate(x, y, 200);
+		g.pose().scale(0.75f, 0.75f, 1);
+		g.drawString(font, text, 0, 0, color, true);
+		g.pose().popPose();
+	}
+
+	private void smallCentered(GuiGraphics g, Component text, int cx, int y, int color) {
+		small(g, text, cx - Math.round(font.width(text) * 0.375f), y, color);
+	}
+
+	@Override
+	public void renderBackground(GuiGraphics g) {
+		// Nothing: the world stays fully visible behind the popup.
+	}
+
 	@Override
 	public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-		g.fill(0, 0, width, height, 0x50000000); // keep the world and hotbar visible
-		MarshUi.window(g, font, left, top, WIDTH, HEIGHT, title);
-		Component hint = Component.translatable("screen.grandline.loadout_edit.hint");
-		g.drawCenteredString(font, hint, left + WIDTH / 2, top + MarshUi.TITLE_HEIGHT + 6, 0xA9B2C0);
-		Component close = Component.translatable("screen.grandline.loadout_edit.close", GrandLineKeys.EDIT_LOADOUT.getTranslatedKeyMessage());
-		g.drawCenteredString(font, close, left + WIDTH / 2, top + MarshUi.TITLE_HEIGHT + 16, 0x7E8796);
+		// A low-key translucent strip: soft dark fill with a faint edge, no title bar.
+		g.fill(left + 1, top, left + WIDTH - 1, top + HEIGHT, 0x99101418);
+		g.fill(left, top + 1, left + 1, top + HEIGHT - 1, 0x99101418);
+		g.fill(left + WIDTH - 1, top + 1, left + WIDTH, top + HEIGHT - 1, 0x99101418);
+		g.fill(left + 1, top, left + WIDTH - 1, top + 1, 0x40FFFFFF);
+		Component hint = Component.translatable("screen.grandline.loadout_edit.hint").append(" \u00B7 ")
+				.append(Component.translatable("screen.grandline.loadout_edit.close", GrandLineKeys.EDIT_LOADOUT.getTranslatedKeyMessage()));
+		smallCentered(g, hint, left + WIDTH / 2, top + 4, 0xC8CED8);
 
 		LoadoutHotbar.Loadout active = LoadoutHotbar.active();
 		int hover = dragFrom >= 0 ? slotAt(mouseX, mouseY) : -1;
@@ -87,6 +115,10 @@ public final class LoadoutEditScreen extends Screen {
 			}
 			LoadoutHotbar.keyNumber(g, font, String.valueOf(pos + 1), x + 1, slotsY - 4);
 		}
+		Component reset = Component.translatable("screen.grandline.loadout_edit.reset");
+		int[] r = resetBox();
+		boolean overR = overReset(mouseX, mouseY);
+		small(g, overR ? reset.copy().withStyle(net.minecraft.ChatFormatting.UNDERLINE) : reset, r[0], r[1], overR ? 0xFFD25A : 0x9AA3B0);
 		super.render(g, mouseX, mouseY, partialTick);
 		if (dragFrom >= 0) {
 			LoadoutHotbar.Loadout entry = LoadoutHotbar.at(dragFrom);
@@ -97,27 +129,29 @@ public final class LoadoutEditScreen extends Screen {
 		}
 	}
 
-	/** Icon (2x) and, unless it is the dragged copy, the label under the slot. */
+	/** Icon (1.25x) and, unless it is the dragged copy, a small label under the slot (grey when empty). */
 	private void drawEntry(GuiGraphics g, LoadoutHotbar.Loadout entry, ItemStack icon, int x, int y, boolean active, boolean withLabel) {
 		if (!icon.isEmpty()) {
 			g.pose().pushPose();
 			g.pose().translate(x + 2, y + 2, 0);
-			g.pose().scale(2, 2, 1);
+			g.pose().scale(1.25f, 1.25f, 1);
 			g.renderFakeItem(icon, 0, 0);
 			g.pose().popPose();
 		}
 		if (!withLabel) {
 			return;
 		}
-		Component label = icon.isEmpty() ? Component.translatable("screen.grandline.loadout_edit.empty", entry.displayName()) : entry.displayName();
-		g.pose().pushPose();
-		g.pose().translate(0, 0, 200);
-		g.drawCenteredString(font, label, x + SLOT / 2, y + SLOT + 4, active ? 0xFFD25A : icon.isEmpty() ? 0x7E8796 : 0xFFFFFF);
-		g.pose().popPose();
+		smallCentered(g, entry.displayName(), x + SLOT / 2, y + SLOT + 3, active ? 0xFFD25A : icon.isEmpty() ? 0x7E8796 : 0xFFFFFF);
 	}
 
 	@Override
 	public boolean mouseClicked(double mx, double my, int button) {
+		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && overReset(mx, my)) {
+			LoadoutHotbar.setOrder(LoadoutOrder.DEFAULT);
+			dragFrom = -1;
+			minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.2f));
+			return true;
+		}
 		int pos = slotAt(mx, my);
 		if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && pos >= 0) {
 			dragFrom = pos;
