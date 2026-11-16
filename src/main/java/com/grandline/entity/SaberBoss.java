@@ -210,6 +210,9 @@ public class SaberBoss extends GrandLineEnemy {
 
 	@Override
 	protected void customServerAiStep() {
+		if (tickCount % 5 == 0) {
+			updateBossBarViewers();
+		}
 		super.customServerAiStep();
 		bossBar.setProgress(getHealth() / getMaxHealth());
 		if (home == null) {
@@ -513,6 +516,11 @@ public class SaberBoss extends GrandLineEnemy {
 		}
 	}
 
+	/** Players who currently see the boss bar (for tests). */
+	public java.util.Collection<ServerPlayer> bossBarViewers() {
+		return bossBar.getPlayers();
+	}
+
 	/** Players who fought it (for tests). */
 	public Map<UUID, Float> damageBy() {
 		return damageBy;
@@ -520,10 +528,26 @@ public class SaberBoss extends GrandLineEnemy {
 
 	// ------------------------------------------------------------------------------------------------ boss bar & saving
 
-	@Override
-	public void startSeenByPlayer(ServerPlayer player) {
-		super.startSeenByPlayer(player);
-		bossBar.addPlayer(player);
+	/**
+	 * The whole temple around the boss's spot: the plinth (29 x 25, the hall on top) and the broad front steps down to
+	 * the terrace, from the terrace up to the roof. The boss bar shows only to players inside it.
+	 */
+	public AABB templeBounds() {
+		BlockPos h = home == null ? blockPosition() : home;
+		return new AABB(h.getX() - 14, h.getY() - 7, h.getZ() - 7, h.getX() + 15, h.getY() + 17, h.getZ() + 23);
+	}
+
+	/** Shows the bar to players in the temple (steps included) and hides it from everyone else; checked every 5 ticks. */
+	private void updateBossBarViewers() {
+		AABB temple = templeBounds();
+		for (ServerPlayer p : List.copyOf(bossBar.getPlayers())) {
+			if (p.isRemoved() || p.level() != level() || !temple.contains(p.position())) {
+				bossBar.removePlayer(p);
+			}
+		}
+		for (ServerPlayer p : ((ServerLevel) level()).getEntitiesOfClass(ServerPlayer.class, temple)) {
+			bossBar.addPlayer(p);
+		}
 	}
 
 	@Override

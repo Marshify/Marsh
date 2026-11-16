@@ -286,6 +286,34 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		});
 	}
 
+	@GameTest(template = EMPTY_STRUCTURE, batch = "p2_boss_bar", timeoutTicks = 40)
+	public void saberBossBarShowsOnlyInsideTheTemple(GameTestHelper helper) {
+		ServerLevel level = helper.getLevel();
+		BlockPos home = helper.absolutePos(new BlockPos(1, 8, 1));
+		SaberBoss boss = GrandLineEntities.SABER_BOSS.create(level);
+		boss.moveTo(home.getX() + 0.5, home.getY(), home.getZ() + 0.5, 0, 0);
+		boss.setup(home, 0, 990020, 20);
+		level.addFreshEntity(boss);
+		ServerPlayer onSteps = survivor(helper);
+		ServerPlayer outside = survivor(helper);
+		onSteps.teleportTo(home.getX() + 0.5, home.getY() - 4, home.getZ() + 20.5); // on the front steps
+		outside.teleportTo(home.getX() + 0.5, home.getY() - 5, home.getZ() + 30.5); // on the path below them
+		helper.runAfterDelay(8, () -> {
+			helper.assertTrue(boss.bossBarViewers().contains(onSteps), "the bar shows on the temple steps");
+			helper.assertTrue(!boss.bossBarViewers().contains(outside), "and not outside the temple");
+			outside.teleportTo(home.getX() + 0.5, home.getY(), home.getZ() + 4.5); // into the hall
+		});
+		helper.runAfterDelay(16, () -> {
+			helper.assertTrue(boss.bossBarViewers().contains(outside), "walking in shows it");
+			onSteps.teleportTo(home.getX() + 40.5, home.getY(), home.getZ() + 0.5); // gone
+		});
+		helper.runAfterDelay(24, () -> {
+			helper.assertTrue(!boss.bossBarViewers().contains(onSteps), "leaving hides it");
+			remove(helper, onSteps, outside, boss);
+			helper.succeed();
+		});
+	}
+
 	@GameTest(template = EMPTY_STRUCTURE, batch = "p2_boss_respawn", timeoutTicks = 60)
 	public void templeBossRespawnsAfterCooldownWithoutDuplicates(GameTestHelper helper) {
 		ServerLevel level = helper.getLevel();
