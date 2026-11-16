@@ -1,0 +1,38 @@
+{
+ "Saltmarket Docks": [
+  {
+   "tier": "LEGENDARY",
+   "x": -19,
+   "y": 66,
+   "z": -19,
+   "facing": "WEST",
+   "why": "under the warehouse awning, by crates"
+  },
+  {
+   "tier": "RARE",
+   "x": 19,
+   "y": 66,
+   "z": -19,
+   "facing": "EAST",
+   "why": "under the warehouse awning, by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 4,
+   "y": 64,
+   "z": 28,
+   "facing": "WEST",
+   "floor": "spruce_planks",
+   "why": "by crates, walls e"
+  },
+  {
+   "tier": "COMMON",
+   "x": -3,
+   "y": 66,
+   "z": -24,
+   "facing": "SOUTH",
+   "floor": "grass_block",
+   "why": "walls ne"
+  }
+ ]
+}

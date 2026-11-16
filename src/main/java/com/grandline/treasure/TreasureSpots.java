@@ -61,10 +61,11 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 35, 66, 6, Direction.EAST, "by crates"),
 				new TreasureSpot(TreasureTier.COMMON, -37, 65, -14, Direction.WEST, "by crates under a shelter"))),
 			Map.entry("Saltmarket Docks", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -19, 66, -19, Direction.WEST, "under the warehouse awning, by crates"),
-				new TreasureSpot(TreasureTier.RARE, 19, 66, -19, Direction.EAST, "under the warehouse awning, by crates"),
-				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
-				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, -100, 114, 47, Direction.EAST, "on the lighthouse balcony, at the top of the ladder"),
+				new TreasureSpot(TreasureTier.RARE, 46, 69, -107, Direction.NORTH, "inside the boss ring at the far camp, by crates"),
+				new TreasureSpot(TreasureTier.COMMON, -33, 65, 57, Direction.NORTH, "by cargo on the harbour promenade"),
+				new TreasureSpot(TreasureTier.COMMON, -45, 68, -29, Direction.NORTH, "back alley against the landward wall, by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 59, 66, -137, Direction.WEST, "among the rocks on the east headland"))),
 			Map.entry("Stonewall Prison", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -35, 91, -51, Direction.EAST, "raised 23, walls w"),
 				new TreasureSpot(TreasureTier.RARE, -44, 69, -9, Direction.EAST, "dark, covered, walls sw"),
@@ -81,11 +82,24 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 14, 69, 14, Direction.SOUTH, "by crates, walls n"),
 				new TreasureSpot(TreasureTier.COMMON, -23, 67, 28, Direction.EAST, "by crates, walls w"))));
 
+	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
+	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Saltmarket Docks", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -19, 66, -19, Direction.WEST, "under the warehouse awning, by crates"),
+				new TreasureSpot(TreasureTier.RARE, 19, 66, -19, Direction.EAST, "under the warehouse awning, by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
+				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne")));
+
 	private TreasureSpots() {
 	}
 
 	public static List<TreasureSpot> forIsland(String island) {
 		return SPOTS.getOrDefault(island, List.of());
+	}
+
+	/** The spots of an island's pre-rebuild layout, for older worlds (empty if it has none). */
+	public static List<TreasureSpot> legacy(String island) {
+		return LEGACY.getOrDefault(island, List.of());
 	}
 
 	public static Map<String, List<TreasureSpot>> all() {

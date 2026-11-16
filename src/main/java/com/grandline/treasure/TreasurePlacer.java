@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * Puts each island's treasure chests in place when their chunk loads, in new worlds and in worlds generated before
  * chests existed alike. A chest is only placed where its spot is still open (air or plants, standing on a solid
- * floor), so it never replaces part of a build; islands still on a pre-redesign plan get none (their spots belong to
- * the new layout).
+ * floor), so it never replaces part of a build. Islands an older world still has in their pre-rebuild layout use that
+ * layout's own spots (TreasureSpots.legacy), or none.
  */
 public final class TreasurePlacer {
 	/** A spot in world coordinates. */
@@ -98,10 +98,9 @@ public final class TreasurePlacer {
 		if (byChunk == null) {
 			Map<Long, List<Placed>> map = new HashMap<>();
 			for (Island island : IslandRegistry.get(server).all()) {
-				if (!IslandPlans.usesCurrentPlan(island.name())) {
-					continue;
-				}
-				for (TreasureSpot s : TreasureSpots.forIsland(island.name())) {
+				List<TreasureSpot> spots = IslandPlans.usesCurrentPlan(island.name()) ? TreasureSpots.forIsland(island.name())
+						: TreasureSpots.legacy(island.name());
+				for (TreasureSpot s : spots) {
 					BlockPos pos = new BlockPos(island.x() + s.x(), s.y(), island.z() + s.z());
 					map.computeIfAbsent(new ChunkPos(pos).toLong(), k -> new ArrayList<>()).add(new Placed(island.name(), s, pos));
 				}

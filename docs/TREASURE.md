@@ -1,6 +1,6 @@
 # Treasure chests (0.39.0)
 
-Three kinds of treasure chest are hidden around every First Sea island: 55 in all. Each one is **per player**: opening
+Three kinds of treasure chest are hidden around every First Sea island: 56 in all. Each one is **per player**: opening
 it pays you Beli and starts *your* refill timer for that chest; other players still find it full.
 
 | Chest | Pays (x the island's quest reward, +/-15%) | Refills after |
@@ -28,8 +28,8 @@ island), so a chest stays worth finding all the way up the ladder. All numbers a
 - **Placement** (`TreasurePlacer`): every chest has a fixed spot (`TreasureSpots`). When an island's chunk loads, its
   chests are put in place, in new worlds and existing ones alike. A chest is only placed where the spot is open (air or
   plants on a solid floor), so it never cuts into a build. If a spot is moved in a later version, the old chest is
-  removed when its chunk loads. Islands still on their pre-redesign plan in old worlds get no chests (the spots belong
-  to the new layouts).
+  removed when its chunk loads. Islands an older world still has in their pre-rebuild layout keep that layout's own
+  spots (`TreasureSpots.legacy`), or get none.
 
 ## Choosing the spots
 
@@ -94,10 +94,11 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Redbrick Port | Rare | 24, 65, -25 | north | under a shelter by crates |
 | Redbrick Port | Common | 35, 66, 6 | east | by crates |
 | Redbrick Port | Common | -37, 65, -14 | west | by crates under a shelter |
-| Saltmarket Docks | Legendary | -19, 66, -19 | west | under the warehouse awning, by crates |
-| Saltmarket Docks | Rare | 19, 66, -19 | east | under the warehouse awning, by crates |
-| Saltmarket Docks | Common | 4, 64, 28 | west | by crates, walls e |
-| Saltmarket Docks | Common | -3, 66, -24 | south | walls ne |
+| Saltmarket Docks | Legendary | -100, 114, 47 | east | on the lighthouse balcony, at the top of the ladder |
+| Saltmarket Docks | Rare | 46, 69, -107 | north | inside the boss ring at the far camp, by crates |
+| Saltmarket Docks | Common | -33, 65, 57 | north | by cargo on the harbour promenade |
+| Saltmarket Docks | Common | -45, 68, -29 | north | back alley against the landward wall, by crates |
+| Saltmarket Docks | Common | 59, 66, -137 | west | among the rocks on the east headland |
 | Stonewall Prison | Legendary | -35, 91, -51 | east | raised 23, walls w |
 | Stonewall Prison | Rare | -44, 69, -9 | east | dark, covered, walls sw |
 | Stonewall Prison | Common | 15, 67, 39 | east | by crates, walls w |
@@ -111,9 +112,9 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Verdant Wilds | Common | 14, 69, 14 | south | by crates, walls n |
 | Verdant Wilds | Common | -23, 67, 28 | east | by crates, walls w |
 
-**Known compromises:** Saltmarket Docks, Lotus Palace, Redbrick Port and Crystal Fountain are simpler builds with few
-hidden corners, so some of their chests sit at camps, under awnings or at landmarks rather than in hidden rooms. When
-an island is rebuilt (Saltmarket Docks is next), its chests are re-picked from the new build.
+**Known compromises:** Lotus Palace, Redbrick Port and Crystal Fountain are simpler builds with few
+hidden corners, so some of their chests sit at camps, under awnings or at landmarks rather than in hidden rooms.
+When an island is rebuilt its chests are re-picked from the new build (Saltmarket Docks was, in 0.40.0: all outdoor).
 
 **When an island is rebuilt:** re-pick its chests from the new build with `/grandline treasure scan` and the tools
 above. The owner's preference is **outdoor spots only** (behind buildings, by crates, ledges, rocks, caves), well

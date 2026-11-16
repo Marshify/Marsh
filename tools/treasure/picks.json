@@ -356,37 +356,43 @@
  "Saltmarket Docks": [
   {
    "tier": "LEGENDARY",
-   "x": -19,
-   "y": 66,
-   "z": -19,
-   "facing": "WEST",
-   "why": "under the warehouse awning, by crates"
+   "x": -100,
+   "y": 114,
+   "z": 47,
+   "facing": "EAST",
+   "why": "on the lighthouse balcony, at the top of the ladder"
   },
   {
    "tier": "RARE",
-   "x": 19,
-   "y": 66,
-   "z": -19,
-   "facing": "EAST",
-   "why": "under the warehouse awning, by crates"
+   "x": 46,
+   "y": 69,
+   "z": -107,
+   "facing": "NORTH",
+   "why": "inside the boss ring at the far camp, by crates"
   },
   {
    "tier": "COMMON",
-   "x": 4,
-   "y": 64,
-   "z": 28,
+   "x": -33,
+   "y": 65,
+   "z": 57,
+   "facing": "NORTH",
+   "why": "by cargo on the harbour promenade"
+  },
+  {
+   "tier": "COMMON",
+   "x": -45,
+   "y": 68,
+   "z": -29,
+   "facing": "NORTH",
+   "why": "back alley against the landward wall, by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 59,
+   "y": 66,
+   "z": -137,
    "facing": "WEST",
-   "floor": "spruce_planks",
-   "why": "by crates, walls e"
-  },
-  {
-   "tier": "COMMON",
-   "x": -3,
-   "y": 66,
-   "z": -24,
-   "facing": "SOUTH",
-   "floor": "grass_block",
-   "why": "walls ne"
+   "why": "among the rocks on the east headland"
   }
  ],
  "Stonewall Prison": [

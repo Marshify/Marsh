@@ -1,6 +1,6 @@
 # Pirate harbor rebuild: implementation blueprint (Saltmarket Docks)
 
-Status: **plan only, nothing built yet.** All dimensions are provisional, chosen for proportion; none are measured from a source.
+Status: **built in 0.40.0** (`world/plan/SaltmarketDocks.java`; see docs/SALTMARKET_DOCKS.md for what changed from this plan). All dimensions are provisional, chosen for proportion; none are measured from a source.
 
 ## 1. The island in the codebase
 

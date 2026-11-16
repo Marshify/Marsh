@@ -41,13 +41,13 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy());
 	}
 
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
-				new com.grandline.world.plan.EmberfallIsle(), new SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
+				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
 
 	// ==================================================================================================== Lv 1
@@ -691,9 +691,9 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 375
 
-	/** Trade port: a two-storey trade hall with a clock tower, warehouses, cranes and a broad pier network. */
-	static final class SaltmarketDocks extends BasePlan {
-		SaltmarketDocks() {
+	/** Saltmarket Docks before the 0.40 rebuild (kept for older worlds). Trade port: a two-storey trade hall with a clock tower, warehouses, cranes and a broad pier network. */
+	static final class SaltmarketDocksLegacy extends BasePlan {
+		SaltmarketDocksLegacy() {
 			super("Saltmarket Docks", 0.05);
 			terrain.mass(0, 0, 46, 34, 4, 2.6, Ground.GRASS)
 					.flat(0, 0, 32, 22, 65, 4, s(Blocks.STONE_BRICKS))
