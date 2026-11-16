@@ -21,6 +21,8 @@ public final class ClientNavigation {
 	public static final KeyMapping TOGGLE = new KeyMapping("key.grandline.navigation", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N,
 			"key.categories.grandline");
 	private static NavTargetPayload target;
+	/** The quest giver this player has already clicked: its outline stays off until navigation points somewhere else. */
+	private static int clicked = -1;
 
 	private ClientNavigation() {
 	}
@@ -35,13 +37,34 @@ public final class ClientNavigation {
 
 	/** Whether this entity is the quest giver this player is being guided to (outlined for them alone). */
 	public static boolean highlighted(Entity entity) {
-		return target != null && target.enabled() && target.entityId() >= 0 && entity.getId() == target.entityId();
+		return target != null && target.enabled() && target.entityId() >= 0 && entity.getId() == target.entityId() && entity.getId() != clicked;
 	}
 
 	public static void register() {
 		KeyBindingHelper.registerKeyBinding(TOGGLE);
-		ClientPlayNetworking.registerGlobalReceiver(NavTargetPayload.TYPE, (packet, player, sender) -> target = packet);
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> target = null);
+		ClientPlayNetworking.registerGlobalReceiver(NavTargetPayload.TYPE, (packet, player, sender) -> {
+			if (packet.entityId() != clicked) {
+				clicked = -1; // a new quest giver to find: outline it until it is clicked
+			}
+			target = packet;
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+			target = null;
+			clicked = -1;
+		});
+		// Clicking the outlined quest giver (talking to it, or hitting it) turns its outline off.
+		net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+			if (level.isClientSide() && highlighted(entity)) {
+				clicked = entity.getId();
+			}
+			return net.minecraft.world.InteractionResult.PASS;
+		});
+		net.fabricmc.fabric.api.event.player.AttackEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+			if (level.isClientSide() && highlighted(entity)) {
+				clicked = entity.getId();
+			}
+			return net.minecraft.world.InteractionResult.PASS;
+		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			while (TOGGLE.consumeClick()) {
 				boolean on = !enabled();
