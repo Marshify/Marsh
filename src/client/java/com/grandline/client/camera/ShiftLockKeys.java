@@ -15,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 /**
  * The camera's keys (Shift Lock on Left Shift, zoom on = and -), the reticle, and crouching: there is no player-made
  * crouching in Grand Line play. Vanilla's Sneak key is unbound once (so Left Shift is Shift Lock's, with no conflict in
- * Controls); riding still gets off with the Shift Lock key, and creative and spectator still fly down with it.
+ * Controls); riding still gets off with the Shift Lock key, creative flight and spectator still fly down with it.
  */
 public final class ShiftLockKeys {
 	private static final String CATEGORY = "key.categories.grandline";
@@ -51,12 +51,11 @@ public final class ShiftLockKeys {
 		HudRenderCallback.EVENT.register(ShiftLockKeys::reticle);
 	}
 
-	/** Once: vanilla Sneak gives Left Shift up to Shift Lock (players can still rebind either in Controls). */
+	/** Vanilla Sneak gives Left Shift up to Shift Lock (players can rebind Shift Lock in Controls). */
 	private static void freeLeftShift(Minecraft mc) {
 		ClientSettings s = ClientSettings.get();
-		if (s.sneakKeyFreed) {
-			return;
-		}
+		// Checked on every join: if Sneak shares Shift Lock's key (Controls reset, an old options file), only one of the
+		// two would ever work, so Sneak gives the key up again.
 		if (mc.options.keyShift.same(SHIFT_LOCK)) {
 			mc.options.keyShift.setKey(InputConstants.UNKNOWN);
 			KeyMapping.resetMapping();
@@ -77,8 +76,11 @@ public final class ShiftLockKeys {
 		}
 		boolean held = SHIFT_LOCK.isDown() || mc.options.keyShift.isDown();
 		GameType mode = mc.gameMode.getPlayerMode();
-		if (mode == GameType.CREATIVE || mode == GameType.SPECTATOR) {
+		if (mode == GameType.SPECTATOR) {
 			return held;
+		}
+		if (mode == GameType.CREATIVE) {
+			return held && mc.player.getAbilities().flying; // fly down; on the ground Shift is Shift Lock
 		}
 		return mc.player.isPassenger() && held;
 	}

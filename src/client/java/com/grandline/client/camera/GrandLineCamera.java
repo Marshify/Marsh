@@ -124,8 +124,12 @@ public final class GrandLineCamera {
 		return camPitch;
 	}
 
-	private static boolean survivalLike(LocalPlayer p) {
+	/** Shift Lock works in survival, adventure and creative (not while flying in creative: Shift flies down then). */
+	private static boolean shiftLockAllowed(LocalPlayer p) {
 		var mode = Minecraft.getInstance().gameMode == null ? null : Minecraft.getInstance().gameMode.getPlayerMode();
+		if (mode == GameType.CREATIVE) {
+			return !p.getAbilities().flying;
+		}
 		return mode == GameType.SURVIVAL || mode == GameType.ADVENTURE;
 	}
 
@@ -138,7 +142,7 @@ public final class GrandLineCamera {
 	public static void toggleShiftLock() {
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer p = mc.player;
-		if (p == null || p.isPassenger() || !survivalLike(p)) {
+		if (p == null || p.isPassenger() || !shiftLockAllowed(p)) {
 			return;
 		}
 		shiftLock = !shiftLock;

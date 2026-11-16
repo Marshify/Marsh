@@ -59,7 +59,8 @@ The camera never rotates by itself, and camera shake keeps its own setting. The 
 
 - **Survival and adventure, on foot:** players never crouch. The client never sends it, and the server clears it if anything does.
 - **Riding a ship or boat:** Shift still dismounts.
-- **Creative and spectator:** Shift still flies down.
+- **Creative:** Shift Lock works on the ground; while flying, Shift flies down instead. **Spectator:** Shift flies down.
+- **Key conflict:** if Sneak ends up on the same key as Shift Lock (a Controls reset, an old options file), Sneak is unbound again on the next join, since only one of the two could work.
 - **The Sneak key:** vanilla Sneak is unbound once on first join so Left Shift belongs to Shift Lock without a conflict. Either can be rebound in Controls.
 - **Unchanged:** player size, collision and the vanilla forced crawl or crouch in low spaces.
 
