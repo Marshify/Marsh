@@ -257,6 +257,29 @@ public final class IslandPopulation {
 		}
 	}
 
+	/** A spot at one of the island's camps within 128 blocks of {@code near} (the closest region's), or null. */
+	static BlockPos campSpotNear(ServerLevel level, Island island, RandomSource random, BlockPos near) {
+		java.util.List<com.grandline.world.plan.Anchor> camps = new java.util.ArrayList<>();
+		for (com.grandline.world.plan.Anchor a : com.grandline.world.plan.IslandPlans.anchors(island, com.grandline.world.plan.Anchor.Type.ENEMY_CAMP)) {
+			if (Math.hypot(island.x() + a.x() - near.getX(), island.z() + a.z() - near.getZ()) <= 128) {
+				camps.add(a);
+			}
+		}
+		if (camps.isEmpty()) {
+			return null;
+		}
+		return spotAt(level, island, camps.get(random.nextInt(camps.size())), random);
+	}
+
+	static BlockPos spotAt(ServerLevel level, Island island, com.grandline.world.plan.Anchor camp, RandomSource random) {
+		double angle = random.nextDouble() * Math.PI * 2;
+		double distance = random.nextDouble() * Math.max(1, camp.radius());
+		int x = island.x() + camp.x() + (int) Math.round(Math.cos(angle) * distance);
+		int z = island.z() + camp.z() + (int) Math.round(Math.sin(angle) * distance);
+		int y = camp.y() != com.grandline.world.plan.Anchor.SURFACE ? camp.y() + 1 : level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+		return new BlockPos(x, y, z);
+	}
+
 	static BlockPos campSpot(ServerLevel level, Island island, RandomSource random) {
 		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
 				com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
@@ -289,33 +312,37 @@ public final class IslandPopulation {
 		ServerLevel level = server.overworld();
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
-			for (Island island : IslandRegistry.nearby(server, player.getBlockX(), player.getBlockZ(), 64)) {
+			for (Island island : IslandRegistry.reaching(server, player.getBlockX(), player.getBlockZ(), 0)) {
 				if (island.starter()) {
 					continue; // safe zone
 				}
-				com.grandline.world.plan.IslandPlan islandPlan = com.grandline.world.plan.IslandPlans.get(island);
-				int r = islandPlan != null ? Math.max(island.radius(), islandPlan.extent()) : island.radius();
-				AABB area = new AABB(island.x() - r - 8, level.getMinBuildHeight(), island.z() - r - 8, island.x() + r + 8,
-						level.getMaxBuildHeight(), island.z() + r + 8);
-				if (level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> !(e instanceof com.grandline.entity.IslandBoss)
-						&& !(e instanceof com.grandline.entity.SaberBoss)).size() + EnemyRespawns.pending(level, island.id())
-						>= MAX_ENEMIES_PER_ISLAND) {
-					continue;
-				}
+				boolean nearCentre = Math.hypot(island.x() - player.getX(), island.z() - player.getZ()) <= 64;
 				int x;
 				int z;
 				int y;
-				BlockPos camp = campSpot(level, island, random);
+				BlockPos camp = campSpotNear(level, island, random, player.blockPosition());
+				if (camp == null && nearCentre) {
+					camp = campSpot(level, island, random);
+				}
 				if (camp != null) {
 					x = camp.getX();
 					z = camp.getZ();
 					y = camp.getY();
-				} else {
+				} else if (nearCentre && com.grandline.world.plan.IslandPlans.anchors(island, com.grandline.world.plan.Anchor.Type.ENEMY_CAMP).isEmpty()) {
 					double angle = random.nextDouble() * Math.PI * 2;
 					double distance = random.nextDouble() * island.radius() * 0.7;
 					x = island.x() + (int) Math.round(Math.cos(angle) * distance);
 					z = island.z() + (int) Math.round(Math.sin(angle) * distance);
 					y = Integer.MIN_VALUE;
+				} else {
+					continue; // the player is out on the island, away from any camp
+				}
+				// At most MAX_ENEMIES_PER_ISLAND around this spot (each region of a large island fills on its own).
+				AABB area = new AABB(x - 72, level.getMinBuildHeight(), z - 72, x + 72, level.getMaxBuildHeight(), z + 72);
+				if (level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> !(e instanceof com.grandline.entity.IslandBoss)
+						&& !(e instanceof com.grandline.entity.SaberBoss)).size() + EnemyRespawns.pending(level, island.id())
+						>= MAX_ENEMIES_PER_ISLAND) {
+					continue;
 				}
 				if (!level.hasChunk(x >> 4, z >> 4)) {
 					continue;

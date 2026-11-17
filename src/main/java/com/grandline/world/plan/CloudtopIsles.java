@@ -21,8 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Cloudtop Isles, the sky islands (layout 12): an archipelago of floating islands among big rounded clouds, joined by
- * narrow pale bridges with dark edges, with translucent sky arches hanging in the air.
+ * Cloudtop Isles (layout 13): the sky islands of the lower region and, above them to the north, the Upper Cloudtop Isles.
  * <pre>
  *  piece                    centre (local)   ground y   role
  *  Cloudfoot Cove           (0, 30)          66         arrival, pier and fisherman, the pool under the waterfall
@@ -30,33 +29,40 @@ import net.minecraft.world.level.block.state.BlockState;
  *  Bloomhold                (-44, -40)       100        grassy village: colourful houses, round domed towers, plaza,
  *                                                       lower quest giver and home
  *  Azure Rise               (36, -64)        114        the temple: blue pediment, columns, the curved arched colonnade
- *                                                       behind it; lower camp (stronger), lower boss, the sky arch up
- *  Skyreach Citadel         (-10, -142)      200        the castle: blue dome, wings, spires, entrance; the domed
+ *                                                       behind it; lower camp (stronger), the sky arch up
+ *  Skyreach Citadel         (-150, 15)       124        the castle: blue dome, wings, spires, entrance; the domed
  *                                                       chamber (ring chandelier, chains, banners, ladders, gallery,
- *                                                       the floor mechanism with its gold hub); the whole upper region
+ *                                                       the floor mechanism with its gold hub): the lower boss
+ *  Ancient Tree landmass    (-95, -165)      200        the upper region, see {@link UpperCloudtop}
+ *  Grand Sanctuary          (95, -165)       204        the upper region, see {@link UpperCloudtop}
  * </pre>
- * The lower islands are walked: bridges climb at most one block per block, with cloud platforms between. The citadel
- * is reached through the translucent sky arch on Azure Rise and left through the arch at the courtyard's edge (see
- * {@link com.grandline.world.CloudtopPortals}). Island-local coordinates: +x east, +z south. Built from code, the same
- * in every world. Worlds made before layout 12 keep their island ({@link CloudtopIslesV7}, or the original).
+ * The lower islands are walked: bridges climb at most one block per block, with cloud platforms between. The upper
+ * region is reached through the translucent sky arch on Azure Rise and left through the middle bay of the red arcade on
+ * the Ancient Tree landmass (see {@link com.grandline.world.CloudtopPortals}). No island hangs over another. Island-local
+ * coordinates: +x east, +z south. Built from code, the same in every world. Worlds made before layout 13 keep their
+ * island ({@link CloudtopIslesV12}, {@link CloudtopIslesV7}, or the original).
  */
 final class CloudtopIsles extends BasePlan {
 	static final int SEA_G = 66;
 	static final int WF_X = 28, WF_Z = -4, WF_Y = 98, WF_RX = 13, WF_RZ = 10;
 	static final int V_X = -44, V_Z = -40, V_Y = 100, V_RX = 30, V_RZ = 24;
 	static final int T_X = 36, T_Z = -64, T_Y = 114, T_RX = 23, T_RZ = 23;
-	static final int K_X = -10, K_Z = -142, K_Y = 200, K_RX = 46, K_RZ = 34;
+	/**
+	 * Skyreach Citadel, built in its own coordinates (centre (-10, -142)) and moved by (CIT_DX, CIT_DZ) to its place in the
+	 * lower region, centre (-150, 15), ground y 124.
+	 */
+	static final int K_X = -10, K_Z = -142, K_Y = 124, K_RX = 46, K_RZ = 34, CIT_DX = -140, CIT_DZ = 157;
 	/** The castle's domed chamber: centre and inner radius; the dome springs from {@link #DOME_Y}. */
-	static final int CH_X = -10, CH_Z = -148, CH_R = 12, DOME_Y = 221;
+	static final int CH_X = -10, CH_Z = -148, CH_R = 12, DOME_Y = K_Y + 21;
 	/** The waterfall's falling columns (x = FALL_X - 1 .. FALL_X) and the pool under it. */
 	static final int FALL_X = 28, FALL_Z = 7, POOL_X = 28, POOL_Z = 11;
 	/** Cloud platforms on the walking route: x, z, radius, top. */
-	static final int[][] PADS = {{-30, 11, 4, 79}, {2, -20, 3, 99}, {0, -52, 3, 107}};
+	static final int[][] PADS = {{-30, 11, 4, 79}, {2, -20, 3, 99}, {0, -52, 3, 107}, {-92, -14, 3, 111}};
 
 	/** Portal spots (island-local): the sky arch on Azure Rise and the return arch at the citadel courtyard's edge. */
 	public static final int PORTAL_UP_X = 50, PORTAL_UP_Y = T_Y + 1, PORTAL_UP_Z = -50;
-	public static final int ARRIVE_UP_X = -10, ARRIVE_UP_Y = K_Y + 1, ARRIVE_UP_Z = -120;
-	public static final int PORTAL_DOWN_X = -10, PORTAL_DOWN_Y = K_Y + 1, PORTAL_DOWN_Z = -114;
+	public static final int ARRIVE_UP_X = -135, ARRIVE_UP_Y = UpperCloudtop.T_Y + 1, ARRIVE_UP_Z = -192;
+	public static final int PORTAL_DOWN_X = -135, PORTAL_DOWN_Y = UpperCloudtop.T_Y + 1, PORTAL_DOWN_Z = -202;
 	public static final int ARRIVE_DOWN_X = 45, ARRIVE_DOWN_Y = T_Y + 1, ARRIVE_DOWN_Z = -50;
 
 	/** Bloomhold's houses: corner, size, door side, walls, roof stairs, roof slab. */
@@ -86,7 +92,7 @@ final class CloudtopIsles extends BasePlan {
 				.flat(POOL_X, POOL_Z, 5, 4, 64, 2, s(Blocks.WATER))         // the pool the waterfall falls into
 				.path(s(Blocks.DIRT_PATH), 2.6, 0, 46, 0, 34, -8, 28, -11, 27)
 				.path(s(Blocks.DIRT_PATH), 2.2, 0, 34, 14, 22, POOL_X - 4, POOL_Z + 6)
-				.reach(190);
+				.reach(300);
 		// Lower region (Lv 150-190).
 		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, 36, 0, 180));
 		anchor(Anchor.at(Type.FISHERMAN, 1, 65, 56, 180));
@@ -95,12 +101,12 @@ final class CloudtopIsles extends BasePlan {
 		anchor(Anchor.at(Type.HOME, -49, V_Y + 1, -36, 90));
 		anchor(Anchor.at(Type.ENEMY_CAMP, WF_X - 2, WF_Y, WF_Z - 3));
 		anchor(Anchor.at(Type.ENEMY_CAMP, 20, T_Y, -52));
-		anchor(Anchor.at(Type.BOSS_ARENA, 34, T_Y, -50));
-		// Upper region (Lv 450-625).
-		anchor(Anchor.at(Type.QUEST, -4, K_Y + 1, -122, 90).upper());
-		anchor(Anchor.at(Type.ENEMY_CAMP, -34, K_Y, -124).upper());
-		anchor(Anchor.at(Type.ENEMY_CAMP, 14, K_Y, -124).upper());
-		anchor(Anchor.at(Type.BOSS_ARENA, CH_X, K_Y, CH_Z).upper());
+		anchor(Anchor.at(Type.BOSS_ARENA, CH_X + CIT_DX, K_Y, CH_Z + CIT_DZ)); // in the citadel's domed chamber
+		// Upper region (Lv 450-625): the Upper Cloudtop Isles.
+		anchor(Anchor.at(Type.QUEST, -137, UpperCloudtop.SET_Y + 1, -146, 180).upper());
+		anchor(Anchor.at(Type.ENEMY_CAMP, -70, UpperCloudtop.T_Y, -150).upper());
+		anchor(Anchor.at(Type.ENEMY_CAMP, 62, UpperCloudtop.S_Y, -126).upper());
+		anchor(Anchor.at(Type.BOSS_ARENA, 110, UpperCloudtop.S_Y, -128).upper());
 	}
 
 	// ==================================================================================================== helpers
@@ -531,10 +537,13 @@ final class CloudtopIsles extends BasePlan {
 		skyBridge(c, 4, 100, -18, 17, WF_Y, -6);
 		skyBridge(c, -18, V_Y, -48, -3, 108, -51);
 		skyBridge(c, 3, 108, -53, 17, T_Y, -62);
-		// The citadel and the sky around it.
-		if (c.near(K_X, K_Z, K_RX + 10)) {
-			floating(c, K_X, K_Z, K_RX, K_RZ, (x, z) -> K_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 26, 27);
-			citadel(c);
+		// The way to Skyreach Citadel: Bloomhold -> cloud -> citadel.
+		skyBridge(c, -70, V_Y, -30, -89, 112, -16);
+		skyBridge(c, -95, 112, -12, -115, K_Y, 2);
+		Canvas cc = c.shifted(CIT_DX, CIT_DZ);
+		if (cc.near(K_X, K_Z, K_RX + 10)) {
+			floating(cc, K_X, K_Z, K_RX, K_RZ, (x, z) -> K_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 22, 27);
+			citadel(cc);
 		}
 		// Small islands, grassy and rocky.
 		islet(c, -84, 4, 6, 86, true, 1);
@@ -542,28 +551,21 @@ final class CloudtopIsles extends BasePlan {
 		islet(c, -12, -88, 6, 118, true, 3);
 		islet(c, 72, -92, 4, 128, false, 4);
 		islet(c, -78, -78, 5, 112, true, 5);
-		islet(c, -68, -150, 7, 196, true, 6);
-		islet(c, 48, -160, 6, 206, false, 7);
-		islet(c, 44, -112, 5, 190, true, 8);
-		islet(c, -58, -104, 5, 205, false, 9);
-		// Big rounded clouds, low and high.
-		bigCloud(c, -88, 94, -22, 7);
+		// Big rounded clouds.
 		bigCloud(c, 74, 100, -34, 6);
 		bigCloud(c, -6, 92, 10, 5);
 		bigCloud(c, 62, 84, 22, 6);
 		bigCloud(c, -62, 88, 22, 6);
 		bigCloud(c, 6, 132, -104, 7);
-		bigCloud(c, 78, 142, -108, 6);
-		bigCloud(c, -84, 150, -96, 7);
-		bigCloud(c, -76, 214, -128, 7);
-		bigCloud(c, 52, 220, -136, 6);
-		bigCloud(c, 20, 230, -172, 6);
-		bigCloud(c, 30, 176, -150, 7);
+		bigCloud(c, -84, 150, -78, 7);
+		bigCloud(c, -200, 112, 70, 6);
+		// The Upper Cloudtop Isles.
+		UpperCloudtop.ancientTree(c);
+		UpperCloudtop.rootBridge(c);
+		UpperCloudtop.sanctuary(c);
 		// Translucent arches hanging in the sky.
 		skyArch(c, 66, 76, -6, 15, false);
 		skyArch(c, -86, 108, -50, 12, false);
-		skyArch(c, -10, 186, -96, 13, true);
-		skyArch(c, 54, 198, -140, 10, false);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- cove
@@ -1130,17 +1132,9 @@ final class CloudtopIsles extends BasePlan {
 		}
 		tree(c, -24, y, -117, 6, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES);
 		tree(c, 4, y, -117, 6, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES);
-		for (int[] camp : new int[][]{{-34, -124}, {14, -124}}) {
-			if (c.near(camp[0], camp[1], 6)) {
-				tent(c, camp[0] - 3, camp[1] - 1, y, Blocks.GRAY_WOOL);
-				tent(c, camp[0] + 3, camp[1] - 2, y, Blocks.BLACK_WOOL);
-				c.set(camp[0], y + 1, camp[1] + 1, s(Blocks.SOUL_CAMPFIRE));
-			}
-		}
 		if (c.near(K_X, K_Z, K_RX + 2)) {
 			meadow(c, K_X - K_RX, K_Z - K_RZ, K_X + K_RX, K_Z + K_RZ, y, 13);
 		}
-		portalArch(c, PORTAL_DOWN_X, y, PORTAL_DOWN_Z, true);
 		if (c.near(CH_X, CH_Z - 2, 36)) {
 			wing(c, -38, -24);
 			wing(c, 4, 18);
@@ -1192,6 +1186,7 @@ final class CloudtopIsles extends BasePlan {
 		}
 		int lx = (x1 + x2) / 2;
 		for (int yy = y + 1; yy <= y + 6; yy++) {
+			c.set(lx, yy, z1 + 4, s(Blocks.DARK_OAK_PLANKS)); // the ladder's backing, under the balcony
 			c.set(lx, yy, z1 + 5, Canvas.facing(s(Blocks.LADDER), Direction.SOUTH));
 		}
 		c.set(lx, y + 7, z1 + 5, s(Blocks.AIR));

@@ -75,7 +75,7 @@ public final class KeeperNpcs {
 		}
 		java.util.Set<Long> done = new java.util.HashSet<>();
 		for (ServerPlayer player : level.players()) {
-			for (Island island : IslandRegistry.nearby(server, player.getBlockX(), player.getBlockZ(), NEAR)) {
+			for (Island island : IslandRegistry.reaching(server, player.getBlockX(), player.getBlockZ(), 64)) {
 				if (done.add(island.id())) {
 					ensure(level, island);
 				}

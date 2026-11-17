@@ -1,59 +1,70 @@
-# Cloudtop Isles: the sky islands (0.45.0, layout 12)
+# Cloudtop Isles (0.46.0, layout 13)
 
-The owner's own Sky Island design: an archipelago of floating islands among big rounded clouds, joined by narrow pale
-bridges with dark edges, with translucent sky arches hanging in the air. Two progression regions, as before (lower
-Lv 150-190, upper Lv 450-625; see FIRST_SEA_PROGRESSION.md). Generated from code in `world/plan/CloudtopIsles.java`;
-same island id and position (-1500, -540).
+The lower region (Lv 150-190) is the 0.45.0 sky islands with Skyreach Citadel moved down into it. The upper region
+(Lv 450-625) is the new **Upper Cloudtop Isles**, built to the owner's specification and the approved blueprint
+(docs/UPPER_CLOUDTOP_BLUEPRINT.md). Code: `world/plan/CloudtopIsles.java` (lower islands, citadel) and
+`world/plan/UpperCloudtop.java` (the upper region).
 
-## Layout (island-local; ground level)
+## Lower region
 
-| Piece | Centre, size | y | Contents |
-|---|---|---|---|
-| Cloudfoot Cove | (0, 30), ~60 x 40 | 66 | arrival green, the pier (fisherman, dock), birches, rocks, flowers, lamp posts, the pool the waterfall falls into |
-| Mistfall | (28, -4), 26 x 20 | 98 | the waterfall island: rocks, two oaks, a stone-rimmed spring feeding the spout, the waterfall straight down to the cove's pool; lower camp (basic) |
-| Bloomhold | (-44, -40), 60 x 48 | 100 | the grassy village: plaza with a fountain, benches and lamps; six colourful cottages (coloured walls, coloured stair roofs, birch frames, furnished, doors); three round towers with blue, orange and teal domes, gold finials, a ladder up to a lookout floor; paths to every door; trees, rose bushes, flowers; lower quest giver and home |
-| Azure Rise | (36, -64), 46 x 46 | 114 | the temple: a stepped quartz platform, columns all round, a cella with an altar, a blue frieze, a pale gable roof with **blue pediments** (a pale ring and gold in each), gold at the apex; behind it the **curved arched colonnade** (a half ring of piers and round arches, blue band, cornice, gold-capped ends); in front a pale plaza, the boss ring, the stronger lower camp and the **sky arch up** |
-| Skyreach Citadel | (-10, -142), 92 x 68 | 200 | the castle (the whole upper region): weathered stone (cracked, mossy), a **big blue dome** with light ribs and a gold lantern on top, two wings with blue-green hipped roofs (halls with a balcony and ladder), four corner spires and two entrance spires with tall pointed caps and gold tips, the entrance hall with an arched doorway and spiral banners; the courtyard (trees, lamps, the upper quest giver, two upper camps) and the **return arch** at its edge |
+As in 0.45.0 (see docs/CLOUDTOP_ISLES_V12.md): Cloudfoot Cove, Mistfall, Bloomhold and Azure Rise, joined by the narrow
+pale bridges. In addition:
 
-### The domed chamber
+* **Skyreach Citadel** now floats in the lower region, centre (-150, 15), ground y 124, all of it as before (dome,
+  wings, spires, entrance hall, the domed chamber). A bridge runs from Bloomhold's west edge over a cloud platform to it.
+* The **lower boss** now fights in the citadel's domed chamber (-150, 124, 9).
+* Azure Rise's sky arch now leads up to the Ancient Tree landmass.
 
-Round hall, inner radius 12, floor y 200, walls to 221, the dome above (to about 236). Tall light blue windows every
-30 degrees; doorways south (entrance hall), west and east (the wings). A dark-plank **gallery** at y 210 round the wall,
-railed, reached by **three ladders**. **Spiral banners** (blue, with a curly border, a ring and a whirl) between the
-windows. The **ring chandelier**: a dark ring of radius 6 at y 216, hung from the dome on four **chains**, eight soul
-lanterns (blue light) underneath, chain spokes to a gold hub with a ninth lantern, and a chain up to the crown. The
-**floor mechanism**: an outer copper ring with teeth, an inner ring of dark stone, eight copper spokes, the **gold hub**
-in the middle. The upper boss fights here.
+## Upper Cloudtop Isles
 
-## Getting around
+| Piece | Where (local) | Notes |
+|---|---|---|
+| Ancient Tree landmass | centre (-95, -165), 145 x 125, ground 200 (settlement terrace 202, tree mound to 203) | irregular outline, rocky stretches round the rim, cloud banks hiding the rock, a deep rounded cloud underneath |
+| Giant tree | trunk (-110, -170), 15 across | dark oak bark with log streaks and brown terracotta; eight angular branches; faceted canopy masses (green concrete, green and lime terracotta, a rim of oak and dark oak leaves); top y 289 |
+| Roots | six from the trunk | the east root arches 7 blocks over the combat field (dark oak stairs on its slopes) and becomes the bridge; the others lie half-buried across the grass (paths cut through) |
+| Settlement | round the plaza (-137, -146) | two white buildings, two yellow, a pink house, a small white house, the blue-domed and green-domed towers; narrow windows (black and grey panes, or dark openings with quartz sills), floors with ladders, doors |
+| Combat field | x -97..-43, z -172..-128 | rocks, broken walls, a ruined arch, small trees; the upper basic camp |
+| Classical pavilion | x -72..-48, z -198..-182 | 2-high plinth, columns all round, low grey roof, pink, magenta and red banners |
+| Curved arcades | red (x -150..-121, z -206..-198), blue (x -115..-86, z -115..-107) | arched walls, barrel roofs; the red one's middle bay is the **return arch** |
+| Root bridge | (-38, -165) to (27, -165) | ~60 long, 9 wide, rising 200 to 204, bark sides, no railings |
+| Grand Sanctuary | centre (95, -165), 155 x 135, ground 204 | |
+| Stepped temple | base x 78..142, z -217..-163 | five tiers of 7 with blue inlays (base band, stripe, squares, cyan corners), quartz ledges; top y 239 |
+| Staircase | x 103..117, z -143 to -177 | 15 wide, one up per block, quartz walls with a blue line |
+| Summit pavilion | x 98..122, z -198..-182 | columns, blue band, pediments with a blue tympanum, low grey roof, a hanging golden fixture |
+| Ceremonial courtyard | x 85..135, z -152..-108 | grass in a quartz grid, pale approach and cross path, two rows of striped columns, two platforms; the **upper boss** |
+| Golden bell | (88, -125) | 9 wide, 9 tall: gold rings, yellow concrete and terracotta bands, raw gold lip, light weighted plates, chains, a clapper; quartz frame 14 tall |
+| Archways | (42, -166) and (55, -190) intact; (64, -214) leaning and ruined | |
+| Tall buildings | east side | five white buildings 12-25 tall (blue, orange, flat and andesite roofs; one damaged) |
+| Ruins, combat field | (44, -154), (146, -204); field round (62, -126) | the upper stronger camp |
 
-* The lower islands are walked: cove -> cloud platform -> Bloomhold; Bloomhold -> cloud -> Mistfall; Bloomhold -> cloud
-  -> Azure Rise. Bridges are three blocks wide (quartz and calcite over a dark deepslate edge band), climb at most one
-  block per block (stairs), and have a dark post with a lantern every ten blocks.
-* The **sky arch** on Azure Rise (50, 115, -50) carries a player up to the citadel courtyard (-10, 201, -120); the
-  **return arch** (-10, 201, -114) brings them back (45, 115, -50). Walk through; no keys, works in adventure mode.
+## Gameplay
 
-## Sky
+* Up: the sky arch on Azure Rise (50, 115, -50) lands you at (-135, 201, -192), facing the settlement. Down: the red
+  arcade's middle bay (-135, 201, -202).
+* Upper quest giver: the settlement plaza. Camps: the Ancient Tree field (basic, Lv ~470-510 seen) and the sanctuary
+  field (stronger, Lv ~515-565 seen). Boss: the ceremonial courtyard.
+* **Enemy spawning and keepers now follow large islands** (fixes a gap for every upper region): an island counts as
+  near wherever a player is on its built area, enemies spawn at the camps within 128 blocks of the player, and the cap
+  of four counts per camp area, so the lower region's enemies never block the upper camps.
+* Treasure: legendary on the temple's summit platform, rare by the leaning arch, commons on the Ancient Tree field,
+  Mistfall and Bloomhold.
 
-Five small islands below (grassy with a tree, or bare rock) and four up by the citadel; twelve big rounded clouds
-(clusters of puffs; every block of a puff joins its middle, so nothing floats alone); four translucent arches of
-light blue and white glass. Island undersides are thick clouds with lumpy rims (rim lumps only where they touch the
-cloud next to them).
+## Shadows
 
-## NPCs, enemies, chests
-
-* Lower: arrival (0, 36), fisherman and dock on the pier, quest giver (-40, 101, -34) and home (-49, 101, -36) by the
-  Bloomhold plaza, camps on Mistfall (basic) and Azure Rise (stronger), the boss on Azure Rise's ring.
-* Upper: quest giver (-4, 201, -122) in the courtyard, camps west and east of it, the boss in the domed chamber.
-* Treasure chests (all outdoors, spread out): legendary on the citadel lawn by the west camp, rare between the temple
-  and the colonnade, commons on Mistfall and in Bloomhold.
+Nothing hangs over another island. Since 0.45.1 floating islands cast no shadow anyway (see LIGHTING.md).
 
 ## Existing worlds
 
-Worlds made with layouts 7-11 keep the first rebuild (`CloudtopIslesV7`, docs/CLOUDTOP_ISLES_V7.md) with its portals and
-chests; worlds older than that keep the original. `IslandPlans` now has an "interim" plan for islands rebuilt twice.
+Layout-12 worlds keep the 0.45.0 sky islands, layouts 7-11 the first rebuild, older worlds the original
+(`IslandPlans` keeps any number of in-between plans per island now).
 
 ## Checked
 
-`/grandline audit Cloudtop Isles` on a fresh world: 0 problems. In game: both arches carry a player each way; all four
-chests placed; the views from the cove, the bridges, Bloomhold, Azure Rise, the citadel courtyard and the chamber.
+On a fresh world:
+- The floating-block audit found 0 problems.
+- Both arches carry a player each way, and all five chests are placed.
+- The upper quest giver stands in place, and both upper camps fill with Raiders at their region's levels.
+- Looked over in game: both landmasses from afar, the tree and its roots, the settlement, the pavilion, the root
+  bridge, the temple and staircase, the courtyard and bell, the arches, and the moved citadel.
+
+124 of 124 tests pass.

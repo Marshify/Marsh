@@ -13,9 +13,16 @@ public final class CloudtopAccess {
 		if (plan instanceof CloudtopIsles) {
 			return new int[][]{
 					{CloudtopIsles.PORTAL_UP_X, CloudtopIsles.PORTAL_UP_Y, CloudtopIsles.PORTAL_UP_Z, 0},
-					{CloudtopIsles.ARRIVE_UP_X, CloudtopIsles.ARRIVE_UP_Y, CloudtopIsles.ARRIVE_UP_Z, 180},
+					{CloudtopIsles.ARRIVE_UP_X, CloudtopIsles.ARRIVE_UP_Y, CloudtopIsles.ARRIVE_UP_Z, 0},
 					{CloudtopIsles.PORTAL_DOWN_X, CloudtopIsles.PORTAL_DOWN_Y, CloudtopIsles.PORTAL_DOWN_Z, 0},
 					{CloudtopIsles.ARRIVE_DOWN_X, CloudtopIsles.ARRIVE_DOWN_Y, CloudtopIsles.ARRIVE_DOWN_Z, 0}};
+		}
+		if (plan instanceof CloudtopIslesV12) {
+			return new int[][]{
+					{CloudtopIslesV12.PORTAL_UP_X, CloudtopIslesV12.PORTAL_UP_Y, CloudtopIslesV12.PORTAL_UP_Z, 0},
+					{CloudtopIslesV12.ARRIVE_UP_X, CloudtopIslesV12.ARRIVE_UP_Y, CloudtopIslesV12.ARRIVE_UP_Z, 180},
+					{CloudtopIslesV12.PORTAL_DOWN_X, CloudtopIslesV12.PORTAL_DOWN_Y, CloudtopIslesV12.PORTAL_DOWN_Z, 0},
+					{CloudtopIslesV12.ARRIVE_DOWN_X, CloudtopIslesV12.ARRIVE_DOWN_Y, CloudtopIslesV12.ARRIVE_DOWN_Z, 0}};
 		}
 		if (plan instanceof CloudtopIslesV7) {
 			return new int[][]{

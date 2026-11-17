@@ -20,16 +20,14 @@ public final class IslandPlans {
 			Map.entry("Millbrook Village", 4), Map.entry("Sunscorch Dunes", 5), Map.entry("Gladiator's Ring", 6), Map.entry("Cloudtop Isles", 7),
 			Map.entry("Emberfall Isle", 8), Map.entry("Stonewall Prison", 9), Map.entry("Saltmarket Docks", 10), Map.entry("Frostpeak Isle", 11));
 	/**
-	 * Islands redesigned a second time: worlds made between the first and the second redesign keep the first redesign
-	 * (the "interim" plan), by island name, with the layout version of the second redesign.
+	 * Redesigns in between, for islands rebuilt more than once: by island name, each kept plan with the layout version
+	 * from which worlds no longer use it (e.g. Cloudtop Isles: the layout-7 rebuild until 12, the layout-12 one until 13).
 	 */
-	private static final Map<String, IslandPlan> INTERIM = new HashMap<>();
-	private static final Map<String, Integer> REDESIGNED_AGAIN_IN = Map.of("Cloudtop Isles", 12);
-
+	private static final Map<String, java.util.NavigableMap<Integer, IslandPlan>> INTERIM = new HashMap<>();
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);
 		FirstSeaPlans.legacy().forEach(plan -> LEGACY.put(plan.name(), plan));
-		FirstSeaPlans.interim().forEach(plan -> INTERIM.put(plan.name(), plan));
+		FirstSeaPlans.interim().forEach((plan, until) -> INTERIM.computeIfAbsent(plan.name(), k -> new java.util.TreeMap<>()).put(until, plan));
 	}
 
 	private IslandPlans() {
@@ -50,10 +48,11 @@ public final class IslandPlans {
 				return legacy;
 			}
 		}
-		if (registry != null && registry.layout() < REDESIGNED_AGAIN_IN.getOrDefault(islandName, 0)) {
-			IslandPlan interim = INTERIM.get(islandName);
-			if (interim != null) {
-				return interim;
+		var kept = INTERIM.get(islandName);
+		if (registry != null && kept != null) {
+			var e = kept.higherEntry(registry.layout());
+			if (e != null) {
+				return e.getValue();
 			}
 		}
 		return PLANS.get(islandName);
@@ -67,12 +66,15 @@ public final class IslandPlans {
 
 	/** Whether this world builds the island from its first redesign, kept after a second one (see INTERIM). */
 	public static boolean usesInterimPlan(String islandName) {
-		return INTERIM.containsKey(islandName) && get(islandName) == INTERIM.get(islandName);
+		var kept = INTERIM.get(islandName);
+		return kept != null && kept.containsValue(get(islandName));
 	}
 
-	/** The first redesign of an island redesigned twice, if it has one (tests, tools). */
-	public static IslandPlan interim(String islandName) {
-		return INTERIM.get(islandName);
+	/** The in-between redesign worlds of {@code layout} use, if any (tests, tools). */
+	public static IslandPlan interim(String islandName, int layout) {
+		var kept = INTERIM.get(islandName);
+		var e = kept == null ? null : kept.higherEntry(layout);
+		return e == null ? null : e.getValue();
 	}
 
 	/** The pre-redesign plan of an island, if it has one (tests, tools). */

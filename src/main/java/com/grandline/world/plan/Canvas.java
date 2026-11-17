@@ -29,6 +29,14 @@ public final class Canvas {
 		this.minZ = chunkMinZ;
 	}
 
+	/**
+	 * This canvas with its local origin moved by (dx, dz): a piece written in its own coordinates lands that far away in
+	 * the island's (same chunk, same terrain object; terrain lookups are not shifted).
+	 */
+	public Canvas shifted(int dx, int dz) {
+		return new Canvas(level, terrain, originX + dx, originZ + dz, minX, minZ);
+	}
+
 	public Terrain terrain() {
 		return terrain;
 	}

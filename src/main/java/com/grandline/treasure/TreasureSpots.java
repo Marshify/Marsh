@@ -12,8 +12,9 @@ import java.util.Map;
 public final class TreasureSpots {
 	private static final Map<String, List<TreasureSpot>> SPOTS = Map.ofEntries(
 			Map.entry("Cloudtop Isles", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -44, 201, -128, Direction.EAST, "citadel lawn, west of the courtyard, guarded by the west camp"),
-				new TreasureSpot(TreasureTier.RARE, 50, 115, -71, Direction.WEST, "Azure Rise, between the temple and the colonnade"),
+				new TreasureSpot(TreasureTier.LEGENDARY, 96, 240, -199, Direction.SOUTH, "Grand Sanctuary, on the temple's summit platform beside the pavilion"),
+				new TreasureSpot(TreasureTier.RARE, 58, 205, -208, Direction.EAST, "Grand Sanctuary, by the leaning ruined arch"),
+				new TreasureSpot(TreasureTier.COMMON, -52, 201, -134, Direction.WEST, "Ancient Tree landmass, at the edge of the combat field"),
 				new TreasureSpot(TreasureTier.COMMON, 24, 99, 2, Direction.SOUTH, "Mistfall, on the grass by the trees"),
 				new TreasureSpot(TreasureTier.COMMON, -30, 101, -36, Direction.NORTH, "Bloomhold, between the towers off the east path"))),
 			Map.entry("Crystal Fountain", List.of(
@@ -90,9 +91,14 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
 				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne")));
 
-	/** Spots on islands that worlds made between two rebuilds keep (see IslandPlans.INTERIM). */
+	/** Spots of in-between rebuilds that older worlds keep (see IslandPlans.INTERIM), by plan class name. */
 	private static final Map<String, List<TreasureSpot>> INTERIM = Map.of(
-			"Cloudtop Isles", List.of(
+			"CloudtopIslesV12", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -44, 201, -128, Direction.EAST, "citadel lawn, west of the courtyard, guarded by the west camp"),
+				new TreasureSpot(TreasureTier.RARE, 50, 115, -71, Direction.WEST, "Azure Rise, between the temple and the colonnade"),
+				new TreasureSpot(TreasureTier.COMMON, 24, 99, 2, Direction.SOUTH, "Mistfall, on the grass by the trees"),
+				new TreasureSpot(TreasureTier.COMMON, -30, 101, -36, Direction.NORTH, "Bloomhold, between the towers off the east path")),
+			"CloudtopIslesV7", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -69, 96, -35, Direction.WEST, "dark, covered, walls e"),
 				new TreasureSpot(TreasureTier.RARE, 55, 144, -104, Direction.EAST, "indoors, walls w"),
 				new TreasureSpot(TreasureTier.COMMON, 42, 126, -68, Direction.EAST, "walls w"),
@@ -113,9 +119,9 @@ public final class TreasureSpots {
 		return LEGACY.getOrDefault(island, List.of());
 	}
 
-	/** The spots of an island's first rebuild, for worlds made before its second (empty if it has none). */
-	public static List<TreasureSpot> interim(String island) {
-		return INTERIM.getOrDefault(island, List.of());
+	/** The spots of an in-between rebuild (by its plan), for the worlds that keep it (empty if it has none). */
+	public static List<TreasureSpot> interim(com.grandline.world.plan.IslandPlan plan) {
+		return plan == null ? List.of() : INTERIM.getOrDefault(plan.getClass().getSimpleName(), List.of());
 	}
 
 	public static Map<String, List<TreasureSpot>> all() {

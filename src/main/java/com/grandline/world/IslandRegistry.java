@@ -28,7 +28,7 @@ public final class IslandRegistry extends SavedData {
 	 * Island layout version the world was created with. Worlds saved before versioning load as 1 and keep generating
 	 * the islands they started with (no half-old, half-new islands); new worlds get {@link #CURRENT_LAYOUT}.
 	 */
-	public static final int CURRENT_LAYOUT = 12;
+	public static final int CURRENT_LAYOUT = 13;
 	private int layout = CURRENT_LAYOUT;
 
 	/**
@@ -130,6 +130,25 @@ public final class IslandRegistry extends SavedData {
 	/** The island layout version this world generates (see {@link #CURRENT_LAYOUT}). */
 	public int layout() {
 		return layout;
+	}
+
+	/**
+	 * Islands whose built area comes within {@code range} of (x, z): the island's plan reach (at least its radius) plus
+	 * the range. Large planned islands (the Upper Cloudtop Isles are 140-290 blocks from the island centre) count as near
+	 * wherever a player is on them.
+	 */
+	public static Collection<Island> reaching(MinecraftServer server, int x, int z, int range) {
+		List<Island> result = new ArrayList<>();
+		for (Island island : get(server).all()) {
+			var plan = com.grandline.world.plan.IslandPlans.get(island);
+			long r = Math.max(island.radius(), plan != null ? plan.extent() : 0) + (long) range;
+			long dx = island.x() - x;
+			long dz = island.z() - z;
+			if (dx * dx + dz * dz <= r * r) {
+				result.add(island);
+			}
+		}
+		return result;
 	}
 
 	public static Collection<Island> nearby(MinecraftServer server, int x, int z, int range) {

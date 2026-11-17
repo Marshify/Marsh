@@ -1,6 +1,6 @@
 # Upper Cloudtop Isles: Phase 1 coordinate blueprint (for approval)
 
-Status: **proposed, waiting for the owner's approval.** Nothing below is built yet.
+Status: **approved and built in 0.46.0** (see CLOUDTOP_ISLES.md). Changes from this plan during the build: the castle moved down to the lower region (the owner chose this); the arrival and return moved 5 blocks east with the red arcade; the landmass outlines are squarer with rounded corners so every piece fits inside.
 
 ![top-down](images/upper_cloudtop_topdown.png)
 ![elevation](images/upper_cloudtop_elevation.png)

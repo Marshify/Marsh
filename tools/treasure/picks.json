@@ -436,19 +436,27 @@
  "Cloudtop Isles": [
   {
    "tier": "LEGENDARY",
-   "x": -44,
-   "y": 201,
-   "z": -128,
-   "facing": "EAST",
-   "why": "citadel lawn, west of the courtyard, guarded by the west camp"
+   "x": 96,
+   "y": 240,
+   "z": -199,
+   "facing": "SOUTH",
+   "why": "Grand Sanctuary, on the temple's summit platform beside the pavilion"
   },
   {
    "tier": "RARE",
-   "x": 50,
-   "y": 115,
-   "z": -71,
+   "x": 58,
+   "y": 205,
+   "z": -208,
+   "facing": "EAST",
+   "why": "Grand Sanctuary, by the leaning ruined arch"
+  },
+  {
+   "tier": "COMMON",
+   "x": -52,
+   "y": 201,
+   "z": -134,
    "facing": "WEST",
-   "why": "Azure Rise, between the temple and the colonnade"
+   "why": "Ancient Tree landmass, at the edge of the combat field"
   },
   {
    "tier": "COMMON",
