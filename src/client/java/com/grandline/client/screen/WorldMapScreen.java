@@ -82,7 +82,7 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("Frostpeak Isle", islandArt("frozen_village", 640, 415, 220, 0.55)),
 			Map.entry("Ironhold Bastion", islandArt("marine_fortress", 640, 328, 223, 0.55)),
 			Map.entry("Cloudtop Isles", islandArt("lower_skylands", 640, 331, 212, 0.5)),
-			Map.entry("Stonewall Prison", islandArt("prison", 640, 530, 180, 0.55)),
+			Map.entry("Stonewall Prison", islandArt("prison", 640, 457, 180, 0.57)),
 			Map.entry("Gladiator's Ring", islandArt("colosseum", 640, 434, 200, 0.55)),
 			Map.entry("Emberfall Isle", islandArt("magma_village", 640, 424, 215, 0.6)),
 			Map.entry("Saltmarket Docks", islandArt("marine_starter", 640, 319, 227, 0.5)),
