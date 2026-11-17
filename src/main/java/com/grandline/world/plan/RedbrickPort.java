@@ -150,34 +150,38 @@ public final class RedbrickPort extends BasePlan {
 		}
 	}
 
-	/** A small field cannon at (x, y, z), 3 long, aimed {@code dir}: a sloped rear, the black body, a narrow muzzle. */
-	static void fieldCannon(Canvas c, int x, int y, int z, Direction dir) {
-		c.set(x - dir.getStepX(), y, z - dir.getStepZ(), Kit.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, dir, false));
-		c.set(x, y, z, s(Blocks.BLACK_CONCRETE));
-		c.set(x + dir.getStepX(), y, z + dir.getStepZ(), s(Blocks.POLISHED_BLACKSTONE_WALL));
-	}
-
 	/**
-	 * A large cannon standing on y (its mount at y, the barrel at y + 1), aimed {@code dir}: a heavy rounded rear
-	 * housing, a grey mount, a thick barrel and a narrow muzzle; {@code paired} adds a second barrel alongside.
+	 * The Redbrick cannon (the owner's design), 7 long and 3 wide, aimed {@code dir}; (x, z) is its axle (the fourth
+	 * cell from the back) and y the row it stands in. Along the axis from the back: a spruce slab on the ground, a
+	 * spruce plank leg, the spruce beam (top slabs), the axle with open spruce trapdoor wheels either side, a spruce
+	 * fence leg, and the beam running on past the muzzle; on top a barrel of five blackstone blocks with a blackstone
+	 * button for a fuse near its back.
 	 */
-	static void bigCannon(Canvas c, int x, int y, int z, Direction dir, boolean paired) {
+	static void cannon(Canvas c, int x, int y, int z, Direction dir) {
 		int dx = dir.getStepX(), dz = dir.getStepZ();
-		c.set(x - dx, y, z - dz, s(Blocks.BLACK_CONCRETE));
-		c.set(x - dx, y + 1, z - dz, Kit.stairs(Blocks.POLISHED_BLACKSTONE_STAIRS, dir, false));
-		c.set(x, y, z, s(Blocks.GRAY_CONCRETE));
-		c.set(x, y + 1, z, s(Blocks.BLACK_CONCRETE));
-		c.set(x + dx, y, z + dz, s(Blocks.POLISHED_BLACKSTONE));
-		c.set(x + dx, y + 1, z + dz, s(Blocks.BLACK_CONCRETE));
-		c.set(x + 2 * dx, y + 1, z + 2 * dz, s(Blocks.POLISHED_BLACKSTONE_WALL));
-		if (paired) {
-			Direction side = dir.getClockWise();
-			int sx = side.getStepX(), sz = side.getStepZ();
-			c.set(x + sx, y, z + sz, s(Blocks.GRAY_CONCRETE));
-			c.set(x + sx, y + 1, z + sz, s(Blocks.BLACK_CONCRETE));
-			c.set(x + sx + dx, y + 1, z + sz + dz, s(Blocks.BLACK_CONCRETE));
-			c.set(x + sx + 2 * dx, y + 1, z + sz + 2 * dz, s(Blocks.POLISHED_BLACKSTONE_WALL));
-			c.set(x + sx - dx, y + 1, z + sz - dz, s(Blocks.BLACK_CONCRETE));
+		Direction side = dir.getClockWise();
+		for (int i = 0; i <= 6; i++) {
+			int px = x + (i - 3) * dx, pz = z + (i - 3) * dz;
+			BlockState low = switch (i) {
+				case 0 -> Kit.slab(Blocks.SPRUCE_SLAB, false);
+				case 1 -> s(Blocks.SPRUCE_PLANKS);
+				case 4 -> Kit.connected(Blocks.SPRUCE_FENCE, false).setValue(net.minecraft.world.level.block.FenceBlock.NORTH, false)
+						.setValue(net.minecraft.world.level.block.FenceBlock.SOUTH, false);
+				default -> Kit.slab(Blocks.SPRUCE_SLAB, true);
+			};
+			c.set(px, y, pz, low);
+			c.fill(px, y + 1, pz, px, y + 2, pz, s(Blocks.AIR));
+			if (i >= 1 && i <= 5) {
+				c.set(px, y + 1, pz, s(Blocks.BLACKSTONE));
+			}
+		}
+		c.set(x - dx, y + 2, z - dz, s(Blocks.POLISHED_BLACKSTONE_BUTTON)
+				.setValue(net.minecraft.world.level.block.ButtonBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
+				.setValue(net.minecraft.world.level.block.ButtonBlock.FACING, dir));
+		for (Direction w : new Direction[]{side, side.getOpposite()}) {
+			c.set(x + w.getStepX(), y, z + w.getStepZ(), s(Blocks.SPRUCE_TRAPDOOR)
+					.setValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN, true)
+					.setValue(net.minecraft.world.level.block.TrapDoorBlock.FACING, w));
 		}
 	}
 
@@ -521,15 +525,10 @@ public final class RedbrickPort extends BasePlan {
 			}
 		}
 		c.fill(-6, PLAT, -7, -6, PLAT + 1, -7, Canvas.facing(s(Blocks.LADDER), Direction.SOUTH));
+		// six cannons round the crown, their barrels run out over the rim
 		for (int a : new int[]{0, 45, 135, 180, 225, 315}) {
 			double t = Math.toRadians(a);
-			double ux = Math.cos(t), uz = Math.sin(t);
-			int y = CROWN;
-			BlockState[] parts = {s(Blocks.GRAY_CONCRETE), s(Blocks.BLACK_CONCRETE), s(Blocks.BLACK_CONCRETE), s(Blocks.POLISHED_BLACKSTONE_WALL)};
-			double[] rs = {8.3, 9.3, 10.3, 11.3};
-			for (int i = 0; i < 4; i++) {
-				c.set((int) Math.round(ux * rs[i]), y, (int) Math.round(uz * rs[i]), parts[i]);
-			}
+			cannon(c, (int) Math.round(Math.cos(t) * 11), CROWN, (int) Math.round(Math.sin(t) * 11), cardinal(a));
 		}
 	}
 
@@ -662,11 +661,31 @@ public final class RedbrickPort extends BasePlan {
 		// the gate's arch trim
 		c.set(-1, G + 6, -40, Kit.stairs(Blocks.QUARTZ_STAIRS, Direction.EAST, true));
 		c.set(1, G + 6, -40, Kit.stairs(Blocks.QUARTZ_STAIRS, Direction.WEST, true));
-		// cannons on the walkway, aimed out to sea
+		// cannons aimed out to sea, each on a gun bay built out from the walkway (5 wide, quartz corbel under it,
+		// a navy parapet along its sides)
 		for (int a : new int[]{232, 252, 288, 308}) {
 			double t = Math.toRadians(a);
-			int x = (int) Math.round(Math.cos(t) * 40), z = (int) Math.round(Math.sin(t) * 40);
-			fieldCannon(c, x, WALK + 1, z, cardinal(a));
+			Direction out = cardinal(a), side = out.getClockWise();
+			int x = (int) Math.round(Math.cos(t) * 43), z = (int) Math.round(Math.sin(t) * 43);
+			for (int i = 0; i <= 5; i++) {
+				for (int w = -2; w <= 2; w++) {
+					int bx = x + (i - 3) * out.getStepX() + w * side.getStepX(), bz = z + (i - 3) * out.getStepZ() + w * side.getStepZ();
+					double bd = Math.hypot(bx, bz);
+					if (bd <= WALL_R_IN) {
+						continue;
+					}
+					if (bd > WALL_R_OUT) {
+						c.set(bx, WALK, bz, s(Blocks.BLUE_CONCRETE));
+						c.set(bx, WALK - 1, bz, s(Blocks.SMOOTH_QUARTZ));
+						c.set(bx, WALK - 2, bz, Kit.stairs(Blocks.QUARTZ_STAIRS, out.getOpposite(), true));
+					}
+					c.fill(bx, WALK + 1, bz, bx, WALK + 3, bz, s(Blocks.AIR));
+					if (Math.abs(w) == 2 && bd > WALL_R_OUT) {
+						c.set(bx, WALK + 1, bz, s(Blocks.BLUE_TERRACOTTA));
+					}
+				}
+			}
+			cannon(c, x, WALK + 1, z, out);
 		}
 		// crest banners on the inner face
 		for (int a : new int[]{240, 270, 300}) {
@@ -972,7 +991,7 @@ public final class RedbrickPort extends BasePlan {
 			if (p[2] == 0) {
 				shadeTree(c, p[0], G, p[1], p[0] + p[1]);
 			} else {
-				bigCannon(c, p[0], G + 1, p[1], cardinal(angle(p[0], p[1])), false);
+				cannon(c, p[0], G + 1, p[1], cardinal(angle(p[0], p[1])));
 			}
 		}
 	}
@@ -1029,21 +1048,21 @@ public final class RedbrickPort extends BasePlan {
 	/** The harbour's guns: field cannons along the front, big ones by the doors and on the wing corners, rows by the HQ. */
 	private void artillery(Canvas c) {
 		int y = G + 1;
-		for (int x : new int[]{-7, -4, 4, 7}) {
-			fieldCannon(c, x, y, 35, Direction.SOUTH);
+		for (int x : new int[]{-8, -5, 5, 8}) {
+			cannon(c, x, y, 34, Direction.SOUTH);
 		}
 		for (int x : new int[]{-28, -24, 24, 28}) {
-			fieldCannon(c, x, y, 30, Direction.SOUTH);
+			cannon(c, x, y, 28, Direction.SOUTH);
 		}
 		for (int z : new int[]{-4, 2}) {
-			fieldCannon(c, -15, y, z, Direction.WEST);
-			fieldCannon(c, 15, y, z, Direction.EAST);
+			cannon(c, -15, y, z, Direction.WEST);
+			cannon(c, 15, y, z, Direction.EAST);
 		}
 		for (int side : new int[]{-1, 1}) {
 			plinth(c, side * 8, 15, y);
-			bigCannon(c, side * 8, y + 1, 15, Direction.SOUTH, false);
+			cannon(c, side * 8, y + 1, 15, Direction.SOUTH);
 			plinth(c, side * 39, -13, y);
-			bigCannon(c, side * 39, y + 1, -13, side < 0 ? Direction.WEST : Direction.EAST, true);
+			cannon(c, side * 39, y + 1, -13, side < 0 ? Direction.WEST : Direction.EAST);
 		}
 		c.set(0, y, 22, CloudtopIsles.lantern(Blocks.LANTERN, false));
 	}

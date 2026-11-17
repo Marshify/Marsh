@@ -27,7 +27,7 @@ Plaza surface y 65 (walking height 66); sea 62.
 | Waterfront | 12 buildings on the wings and quays | A red-roof townhouses, B white admin blocks with dark prismarine roofs, C brick/sandstone coastal houses with dormers |
 | Coastal platforms | six, 5 across | four with cannons, two with trees |
 | Guard posts | two inside the wall (flat roofs), two on the north green (spruce lean-tos) | |
-| Artillery | apron, quays, beside the HQ, door plinths, wing corners, platforms, wall | field cannons and large (some paired) cannons |
+| Artillery | apron, quays, beside the HQ, door plinths, wing corners, HQ platform, harbour platforms, wall gun bays | all one design (the owner's): spruce carriage with trapdoor wheels, five-block blackstone barrel, button fuse; aimed away from the HQ |
 | Trees | north green, tower islets | broad dark oak shade trees with spruce flecks |
 | Dock | x −2..2, z 39..46 | dark oak, side sections at the end |
 
