@@ -125,6 +125,8 @@ public final class GrandLineConfig {
 	// ---- Core survival rules ----
 	/** Vanilla experience is disabled for players (no XP bar, no orbs, no XP gain or drops). */
 	public boolean disableVanillaExperience = true;
+	/** Hides the vanilla hearts, hunger and armour rows (air bubbles stay); the status panel shows Health. */
+	public boolean hideVanillaHealthBars = true;
 	/** Hunger and saturation stay full; no exhaustion, starvation or vanilla natural regeneration. */
 	public boolean infiniteHunger = true;
 	/** Passive health regeneration: percent of maximum health per second (replaces vanilla regeneration). */
@@ -157,6 +159,11 @@ public final class GrandLineConfig {
 	// ---- World ----
 	/** Grand Line worlds keep permanently clear weather. */
 	public boolean disableWeather = true;
+	/**
+	 * Islands get fitting biomes (desert, snowy plains, jungle, plains...) over their land as they generate, instead of
+	 * the sea biome. Worlds made before this: run /grandline biomes migrate to update their generated islands.
+	 */
+	public boolean islandBiomes = true;
 
 	// ---- Gunsmith (Dawnreach) ----
 	/** Gun prices at the Gunsmith: Slingshot, Musket. */

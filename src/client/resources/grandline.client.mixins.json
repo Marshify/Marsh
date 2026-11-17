@@ -1,13 +1,13 @@
 {
-	"required": true,
-	"package": "com.grandline.client.mixin",
-	"compatibilityLevel": "JAVA_17",
-	"client": [
-		"WorldCreationUiStateMixin",
-		"HumanoidModelPunchMixin",
-		"GameRendererShakeMixin",
-		"GuiHotbarMixin",
-		"GuiExperienceBarMixin",
+  "required": true,
+  "package": "com.grandline.client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "WorldCreationUiStateMixin",
+    "HumanoidModelPunchMixin",
+    "GameRendererShakeMixin",
+    "GuiHotbarMixin",
+    "GuiExperienceBarMixin",
     "NavigationGlowMixin",
     "NavigationGlowColorMixin",
     "CameraAccessor",
@@ -20,9 +20,10 @@
     "EntityRendererLightMixin",
     "ModelBlockRendererAoMixin",
     "IndigoBlockInfoMixin",
-    "IndigoAoLightMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+    "IndigoAoLightMixin",
+    "GuiHealthBarsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

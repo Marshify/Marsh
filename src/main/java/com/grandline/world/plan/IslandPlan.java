@@ -25,6 +25,11 @@ public interface IslandPlan {
 	default void afterDecoration(Canvas canvas) {
 	}
 
+	/** Whether island-local (lx, lz) gets the island's biome (its land and beach; see IslandBiomes). */
+	default boolean biomeFootprint(int lx, int lz) {
+		return terrain().ground(lx, lz) >= Terrain.WATER_TOP;
+	}
+
 	/** Highest block any structure reaches above the island centre's ground (used only for documentation/tests). */
 	default int extent() {
 		return terrain().extent();

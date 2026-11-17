@@ -78,8 +78,9 @@ public final class ModWorld {
 
 	/** True for worlds created with the Grand Line world type (their ocean is the Grand Line Sea biome). */
 	public static boolean isGrandLineWorld(ServerLevel overworld) {
-		return overworld.getBiome(new BlockPos(0, 62, 0)).unwrapKey()
-				.map(key -> key.location().equals(GrandLineMod.id("grand_line_sea"))).orElse(false);
+		// The generator's biome source, not the biome at a spot: islands now carry their own biomes (IslandBiomes).
+		return overworld.getChunkSource().getGenerator().getBiomeSource().possibleBiomes().stream()
+				.anyMatch(b -> b.unwrapKey().map(key -> key.location().equals(GrandLineMod.id("grand_line_sea"))).orElse(false));
 	}
 
 	/** Adds every designed island of all seas to the registry (they exist from the start, like a real map). */

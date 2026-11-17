@@ -65,6 +65,12 @@ public final class LotusPalace extends BasePlan {
 		anchor(Anchor.at(Type.BOSS_ARENA, 0, FLOOR + 3, PZ - 13));
 	}
 
+	/** The islets only: the palace grounds lie under the open sea, which stays sea (their "land" is only for gameplay). */
+	@Override
+	public boolean biomeFootprint(int lx, int lz) {
+		return lz > -50 && terrain().ground(lx, lz) >= Terrain.WATER_TOP;
+	}
+
 	// ======================================================================================================= helpers
 
 	protected static BlockState s(Block b) {

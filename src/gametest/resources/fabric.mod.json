@@ -34,6 +34,7 @@
       "com.grandline.test.GrandLineCrystalFountainGameTests",
       "com.grandline.test.GrandLineRedbrickGameTests",
       "com.grandline.test.GrandLineLotusGameTests",
+      "com.grandline.test.GrandLineIslandBiomeGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",

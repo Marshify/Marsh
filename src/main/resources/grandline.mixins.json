@@ -19,7 +19,8 @@
     "InventoryPickupSlotMixin",
     "PlayerLavaSafetyMixin",
     "PlayerLavaHurtMixin",
-    "MagmaBlockMixin"
+    "MagmaBlockMixin",
+    "BiomeFreezeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

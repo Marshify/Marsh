@@ -33,6 +33,10 @@ public final class SeaIslandsFeature extends Feature<NoneFeatureConfiguration> {
 				placed = true;
 			}
 		}
+		// Island biomes over each island's footprint (see IslandBiomes).
+		if (com.grandline.GrandLineMod.config().islandBiomes) {
+			IslandBiomes.apply(context.level(), context.level().getChunk(chunk.x, chunk.z));
+		}
 		// Supplied structures (data/<ns>/structure_placements) after the generated islands, so they sit on top.
 		placed |= com.grandline.world.structure.StructurePlacements.placeInChunk(context.level(), chunk);
 		return placed;

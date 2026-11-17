@@ -75,7 +75,9 @@ public final class OceanWeakness {
 	/** Water at {@code feet} belongs to the ocean: an ocean biome, and the water column's surface is at sea level. */
 	public static boolean isOceanWater(ServerLevel level, BlockPos feet) {
 		var biome = level.getBiome(feet);
-		if (!biome.is(SEA_BIOME) && !biome.is(BiomeTags.IS_OCEAN) && !biome.is(BiomeTags.IS_DEEP_OCEAN)) {
+		// In Grand Line worlds the islands' shallows carry island biomes (IslandBiomes): any water at sea level is the sea.
+		if (!biome.is(SEA_BIOME) && !biome.is(BiomeTags.IS_OCEAN) && !biome.is(BiomeTags.IS_DEEP_OCEAN)
+				&& !com.grandline.world.ModWorld.isGrandLineWorld(level.getServer().overworld())) {
 			return false;
 		}
 		BlockPos.MutableBlockPos p = feet.mutable();

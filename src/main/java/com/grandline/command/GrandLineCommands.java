@@ -87,6 +87,22 @@ public final class GrandLineCommands {
 		return n;
 	}
 
+	private static int migrateBiomes(CommandSourceStack source, String island) {
+		var level = source.getServer().overworld();
+		if (!com.grandline.world.ModWorld.isGrandLineWorld(level)) {
+			source.sendFailure(Component.literal("Not a Grand Line world"));
+			return 0;
+		}
+		if (island != null && com.grandline.world.SeaLayout.all().stream().noneMatch(s -> s.name().equalsIgnoreCase(island))) {
+			source.sendFailure(Component.literal("No island " + island));
+			return 0;
+		}
+		int n = com.grandline.world.IslandBiomes.migrate(level, island);
+		source.sendSuccess(() -> Component.literal("Island biomes applied to " + n + " generated chunks"
+				+ (island == null ? "" : " of " + island) + " (the rest get them as they generate)"), true);
+		return n;
+	}
+
 	private static void registerTree(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("grandline")
 				.then(Commands.literal("test").executes(GrandLineCommands::runTest))
@@ -264,6 +280,14 @@ public final class GrandLineCommands {
 									context.getSource().sendSuccess(() -> Component.literal("Tidied " + island.name() + ": " + n + " fixed"), false);
 									return n;
 								})))
+				// Migration: give islands generated before island biomes their biomes.
+				// /grandline biomes migrate (every island) or /grandline biomes migrate <island>
+				.then(Commands.literal("biomes").requires(source -> source.hasPermission(2))
+						.then(Commands.literal("migrate")
+								.executes(context -> migrateBiomes(context.getSource(), null))
+								.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+										.executes(context -> migrateBiomes(context.getSource(),
+												com.mojang.brigadier.arguments.StringArgumentType.getString(context, "island"))))))
 				// Dev tool: list floating or unsupported blocks on an island (writes audit/<island>.txt).
 				.then(Commands.literal("audit").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())

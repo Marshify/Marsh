@@ -186,7 +186,10 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 					"sword kept with its name");
 			helper.assertTrue(back.getInventory().countItem(com.grandline.gear.Gear.KATANA) == 1
 					&& com.grandline.gear.EquipmentOwnership.owns(back, com.grandline.gear.Gear.KATANA), "still owned, one copy");
-			helper.assertTrue(back.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 12, "fish kept");
+			// fish move into the fish bag every few ticks, so they may be in either
+			int fish = back.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) + com.grandline.fishing.FishBag.contents(back)
+					.getOrDefault(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(com.grandline.npc.FishingService.SILVERFIN).toString(), 0);
+			helper.assertTrue(fish == 12, "fish kept: " + fish);
 			helper.assertTrue(back.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(net.minecraft.world.item.Items.IRON_HELMET), "armour kept");
 			helper.assertTrue(PlayerProfileService.get(back).currency() == 4321, "currency kept");
 			helper.assertTrue(p.getInventory().isEmpty(), "the old body holds nothing (no duplicates)");
