@@ -1,46 +1,59 @@
-# Cloudtop Isles rebuild (0.31.0)
+# Cloudtop Isles: the sky islands (0.45.0, layout 12)
 
-A sky archipelago in two progression regions (lower Lv 150-190, upper Lv 450-625; see FIRST_SEA_PROGRESSION.md). Generated from code in `world/plan/CloudtopIsles.java`; same island id and position.
+The owner's own Sky Island design: an archipelago of floating islands among big rounded clouds, joined by narrow pale
+bridges with dark edges, with translucent sky arches hanging in the air. Two progression regions, as before (lower
+Lv 150-190, upper Lv 450-625; see FIRST_SEA_PROGRESSION.md). Generated from code in `world/plan/CloudtopIsles.java`;
+same island id and position (-1500, -540).
 
-## Layout and elevations (island-local; ground / walkway level)
+## Layout (island-local; ground level)
 
-| Section | Centre, size | y | Contents |
+| Piece | Centre, size | y | Contents |
 |---|---|---|---|
-| Crescent Harbor | arc round a south-facing lagoon, ~100 x 60 | 66 | arrival landing and lagoon pier (fisherman, boat), two great grey rocks at the back + four smaller ones, freshwater lake with a wharf (the waterfall lands here), birches, flowers |
-| Cloud Temple island | (-62, -26), 44 x 36 | 92 | pale calcite/smooth stone ground on a thick cloud; temple at the rear: 3-step podium, 9-wide stair, twelve columns, pillared hall with an altar, upper terrace (side stair), raised rooftop platform for a merchant; combat area in front (lower basic camp) and the lower boss spot |
-| Forest island | (-40, -74), 28 x 24 | 106 | six oaks and birches, a flat-sided basalt rock, flowers, open middle (lower stronger camp) |
-| Sky Village | (12, -60), 60 x 48 | 124 / 127 east terrace | six houses (plank or calcite, pitched roofs at varied heights, furnished, doors open), winding path, plaza with a well and benches (quest giver, innkeeper), steps between terraces, lanterns, trees, a rail along the edge by the plaza; the waterfall spills off the south edge into the lake |
-| Sanctuary gate | (60, -100), 28 x 24 | 142 | weathered temple with a broken roof; inside, a quartz-ringed floor of cloud under an open shaft: the portal up |
-| Upper plateau A | (-10, -40), 68 x 56 | 218 | four houses round a green, the upper quest giver's post, the return doorway (quartz arch), birches, the root bridge's west end |
-| Upper plateau B | (88, -50), 100 x 80 | 226 | the great bell (gold and copper, on a 17-tall timber frame over a walled dais), the ancient temple (broad stair, eight tall columns, pillared hall, glowing dais, two side chambers, a spot for an instructor), the walled boss arena (34 x 24, no gaps), two upper camps |
+| Cloudfoot Cove | (0, 30), ~60 x 40 | 66 | arrival green, the pier (fisherman, dock), birches, rocks, flowers, lamp posts, the pool the waterfall falls into |
+| Mistfall | (28, -4), 26 x 20 | 98 | the waterfall island: rocks, two oaks, a stone-rimmed spring feeding the spout, the waterfall straight down to the cove's pool; lower camp (basic) |
+| Bloomhold | (-44, -40), 60 x 48 | 100 | the grassy village: plaza with a fountain, benches and lamps; six colourful cottages (coloured walls, coloured stair roofs, birch frames, furnished, doors); three round towers with blue, orange and teal domes, gold finials, a ladder up to a lookout floor; paths to every door; trees, rose bushes, flowers; lower quest giver and home |
+| Azure Rise | (36, -64), 46 x 46 | 114 | the temple: a stepped quartz platform, columns all round, a cella with an altar, a blue frieze, a pale gable roof with **blue pediments** (a pale ring and gold in each), gold at the apex; behind it the **curved arched colonnade** (a half ring of piers and round arches, blue band, cornice, gold-capped ends); in front a pale plaza, the boss ring, the stronger lower camp and the **sky arch up** |
+| Skyreach Citadel | (-10, -142), 92 x 68 | 200 | the castle (the whole upper region): weathered stone (cracked, mossy), a **big blue dome** with light ribs and a gold lantern on top, two wings with blue-green hipped roofs (halls with a balcony and ladder), four corner spires and two entrance spires with tall pointed caps and gold tips, the entrance hall with an arched doorway and spiral banners; the courtyard (trees, lamps, the upper quest giver, two upper camps) and the **return arch** at its edge |
 
-Everything is below y 260 (the overworld builds to y 319; the vanilla cloud layer is at 192, so the sanctuary sits above it).
+### The domed chamber
 
-## Clouds
+Round hall, inner radius 12, floor y 200, walls to 221, the dome above (to about 236). Tall light blue windows every
+30 degrees; doorways south (entrance hall), west and east (the wings). A dark-plank **gallery** at y 210 round the wall,
+railed, reached by **three ladders**. **Spiral banners** (blue, with a curly border, a ring and a whirl) between the
+windows. The **ring chandelier**: a dark ring of radius 6 at y 216, hung from the dome on four **chains**, eight soul
+lanterns (blue light) underneath, chain spokes to a gold hub with a ninth lantern, and a chain up to the crown. The
+**floor mechanism**: an outer copper ring with teeth, an inner ring of dark stone, eight copper spokes, the **gold hub**
+in the middle. The upper boss fights here.
 
-Every floating landmass rests on a solid cloud: land on top (grass or calcite, soil, stone), then a cloud body that deepens toward the middle (12 to 28 blocks) with lumpy rims bulging past the land's edge; white wool and snow outside, white concrete inside. Invisible light blocks under each cloud keep the undersides bright. Round cloud landings on the bridges and drifting cloud fragments between the layers.
+## Getting around
 
-## Route (no flight needed)
+* The lower islands are walked: cove -> cloud platform -> Bloomhold; Bloomhold -> cloud -> Mistfall; Bloomhold -> cloud
+  -> Azure Rise. Bridges are three blocks wide (quartz and calcite over a dark deepslate edge band), climb at most one
+  block per block (stairs), and have a dark post with a lantern every ten blocks.
+* The **sky arch** on Azure Rise (50, 115, -50) carries a player up to the citadel courtyard (-10, 201, -120); the
+  **return arch** (-10, 201, -114) brings them back (45, 115, -50). Walk through; no keys, works in adventure mode.
 
-Crescent -> landing (y 78) -> Cloud Temple -> Forest -> landing (y 116) -> Sky Village -> Sanctuary gate: six stepped bridges, 3-wide pale stone with wall rails, lanterns and cloud puffs underneath, never more than one block up per block across. Gate -> Upper plateau A: the cloud portal; plateau A -> gate: the return doorway (both work in adventure mode, by walking in). Plateau A -> plateau B: the giant root bridge (dark oak wood, an arching, twisting root four wide on top with moss and rooted dirt, bark ridges as rails, hanging roots).
+## Sky
 
-## Gameplay spots
+Five small islands below (grassy with a tree, or bare rock) and four up by the citadel; twelve big rounded clouds
+(clusters of puffs; every block of a puff joins its middle, so nothing floats alone); four translucent arches of
+light blue and white glass. Island undersides are thick clouds with lumpy rims (rim lumps only where they touch the
+cloud next to them).
 
-- Lower region: quest giver in the village plaza; innkeeper beside it; fisherman on the lagoon pier; boat in the lagoon; arrival on the landing; camps on the temple island (basic) and the forest island (stronger); quest bosses in front of the Cloud Temple.
-- Upper region: quest giver on plateau A (kept in place as a keeper NPC); camps on plateau B (basic west, stronger east); quest bosses in the plateau B arena.
-- No boss existed for Cloudtop besides quest bosses, so none was added; the Cloud Temple's rooftop platform and the ancient temple's instructor spot are left free for a future merchant and instructor.
+## NPCs, enemies, chests
+
+* Lower: arrival (0, 36), fisherman and dock on the pier, quest giver (-40, 101, -34) and home (-49, 101, -36) by the
+  Bloomhold plaza, camps on Mistfall (basic) and Azure Rise (stronger), the boss on Azure Rise's ring.
+* Upper: quest giver (-4, 201, -122) in the courtyard, camps west and east of it, the boss in the domed chamber.
+* Treasure chests (all outdoors, spread out): legendary on the citadel lawn by the west camp, rare between the temple
+  and the colonnade, commons on Mistfall and in Bloomhold.
 
 ## Existing worlds
 
-World layout 7. Older worlds keep the original Cloudtop (`FirstSeaPlans.CloudtopIslesLegacy`), which already has the upper region since 0.30.0 (west islet camp, summit quest giver and boss). Portals exist only on the rebuilt island.
+Worlds made with layouts 7-11 keep the first rebuild (`CloudtopIslesV7`, docs/CLOUDTOP_ISLES_V7.md) with its portals and
+chests; worlds older than that keep the original. `IslandPlans` now has an "interim" plan for islands rebuilt twice.
 
-## Tests
+## Checked
 
-- In the generated world: all 117 walkway cells of the six bridges are solid with two blocks of headroom; the portal up lands on plateau A at its arrival point and the return doorway lands at the gate; quest givers (both regions), innkeeper and fisherman stand on the ground; enemies present on the forest island and plateau B.
-- `GrandLineCloudtopGameTests`: older worlds keep the original island (with its upper region); both regions have a quest giver, two camps and a boss arena; the upper quest giver is far above the lower; every spot is within the build height; the portals connect the gate and the sanctuary.
-- Full suite: 108 / 108 pass.
-
-## Known issues
-
-- Enemies share one island limit across both regions, so at any moment a region may have only a few; they respawn every 10 seconds.
-- Some cloud edges still show a soft shadow at the rim.
+`/grandline audit Cloudtop Isles` on a fresh world: 0 problems. In game: both arches carry a player each way; all four
+chests placed; the views from the cove, the bridges, Bloomhold, Azure Rise, the citadel courtyard and the chamber.

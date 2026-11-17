@@ -19,10 +19,17 @@ public final class IslandPlans {
 	private static final Map<String, Integer> REDESIGNED_IN = Map.ofEntries(Map.entry("Verdant Wilds", 2), Map.entry("Dawnreach Harbor", 3),
 			Map.entry("Millbrook Village", 4), Map.entry("Sunscorch Dunes", 5), Map.entry("Gladiator's Ring", 6), Map.entry("Cloudtop Isles", 7),
 			Map.entry("Emberfall Isle", 8), Map.entry("Stonewall Prison", 9), Map.entry("Saltmarket Docks", 10), Map.entry("Frostpeak Isle", 11));
+	/**
+	 * Islands redesigned a second time: worlds made between the first and the second redesign keep the first redesign
+	 * (the "interim" plan), by island name, with the layout version of the second redesign.
+	 */
+	private static final Map<String, IslandPlan> INTERIM = new HashMap<>();
+	private static final Map<String, Integer> REDESIGNED_AGAIN_IN = Map.of("Cloudtop Isles", 12);
 
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);
 		FirstSeaPlans.legacy().forEach(plan -> LEGACY.put(plan.name(), plan));
+		FirstSeaPlans.interim().forEach(plan -> INTERIM.put(plan.name(), plan));
 	}
 
 	private IslandPlans() {
@@ -43,14 +50,29 @@ public final class IslandPlans {
 				return legacy;
 			}
 		}
+		if (registry != null && registry.layout() < REDESIGNED_AGAIN_IN.getOrDefault(islandName, 0)) {
+			IslandPlan interim = INTERIM.get(islandName);
+			if (interim != null) {
+				return interim;
+			}
+		}
 		return PLANS.get(islandName);
 	}
 
 	/** Whether this world builds the island from its current plan (not the pre-redesign one). */
 	public static boolean usesCurrentPlan(String islandName) {
 		com.grandline.world.IslandRegistry registry = com.grandline.world.IslandRegistry.current();
-		return PLANS.containsKey(islandName) && (registry == null || registry.layout() >= REDESIGNED_IN.getOrDefault(islandName, 0)
-				|| !LEGACY.containsKey(islandName));
+		return get(islandName) == PLANS.get(islandName) && PLANS.containsKey(islandName);
+	}
+
+	/** Whether this world builds the island from its first redesign, kept after a second one (see INTERIM). */
+	public static boolean usesInterimPlan(String islandName) {
+		return INTERIM.containsKey(islandName) && get(islandName) == INTERIM.get(islandName);
+	}
+
+	/** The first redesign of an island redesigned twice, if it has one (tests, tools). */
+	public static IslandPlan interim(String islandName) {
+		return INTERIM.get(islandName);
 	}
 
 	/** The pre-redesign plan of an island, if it has one (tests, tools). */

@@ -1,42 +1,4 @@
 {
- "Cloudtop Isles": [
-  {
-   "tier": "LEGENDARY",
-   "x": -69,
-   "y": 96,
-   "z": -35,
-   "facing": "WEST",
-   "floor": "polished_diorite",
-   "why": "dark, covered, walls e"
-  },
-  {
-   "tier": "RARE",
-   "x": 55,
-   "y": 144,
-   "z": -104,
-   "facing": "EAST",
-   "floor": "stone_bricks",
-   "why": "indoors, walls w"
-  },
-  {
-   "tier": "COMMON",
-   "x": 42,
-   "y": 126,
-   "z": -68,
-   "facing": "EAST",
-   "floor": "snow_block",
-   "why": "walls w"
-  },
-  {
-   "tier": "COMMON",
-   "x": 6,
-   "y": 123,
-   "z": -37,
-   "facing": "SOUTH",
-   "floor": "white_wool",
-   "why": "walls nw"
-  }
- ],
  "Crystal Fountain": [
   {
    "tier": "LEGENDARY",
@@ -469,6 +431,40 @@
    "facing": "EAST",
    "floor": "grass_block",
    "why": "by crates, walls w"
+  }
+ ],
+ "Cloudtop Isles": [
+  {
+   "tier": "LEGENDARY",
+   "x": -44,
+   "y": 201,
+   "z": -128,
+   "facing": "EAST",
+   "why": "citadel lawn, west of the courtyard, guarded by the west camp"
+  },
+  {
+   "tier": "RARE",
+   "x": 50,
+   "y": 115,
+   "z": -71,
+   "facing": "WEST",
+   "why": "Azure Rise, between the temple and the colonnade"
+  },
+  {
+   "tier": "COMMON",
+   "x": 24,
+   "y": 99,
+   "z": 2,
+   "facing": "SOUTH",
+   "why": "Mistfall, on the grass by the trees"
+  },
+  {
+   "tier": "COMMON",
+   "x": -30,
+   "y": 101,
+   "z": -36,
+   "facing": "NORTH",
+   "why": "Bloomhold, between the towers off the east path"
   }
  ]
 }

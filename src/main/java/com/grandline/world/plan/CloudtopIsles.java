@@ -3,151 +3,238 @@ package com.grandline.world.plan;
 import com.grandline.world.plan.Anchor.Type;
 import com.grandline.world.plan.Terrain.Ground;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.WallBannerBlock;
+import net.minecraft.world.level.block.entity.BannerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BedPart;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoorHingeSide;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 /**
- * Cloudtop Isles, rebuilt: a sky archipelago climbing from the sea into the clouds, in two progression regions.
+ * Cloudtop Isles, the sky islands (layout 12): an archipelago of floating islands among big rounded clouds, joined by
+ * narrow pale bridges with dark edges, with translucent sky arches hanging in the air.
  * <pre>
- *  section               centre (local)   ground y   role
- *  Crescent Harbor       arc round (0, 30)   66      arrival (lagoon pier), fisherman, two tall rocks, lake + wharf
- *  Cloud Temple island   (-62, -26)          92      big temple; lower camp (basic) and lower boss spot in front
- *  Forest island         (-40, -74)          106     six trees, a flat-sided rock; lower camp (stronger)
- *  Sky Village           (12, -60)           124/127 six houses, plaza, lower quest giver, innkeeper; waterfall to the lake
- *  Sanctuary entrance    (60, -100)          142     weathered temple with the cloud portal up to the sanctuary
- *  Upper plateau A       (-10, -40)          218     settlement, upper quest giver, return doorway, the root bridge
- *  Upper plateau B       (88, -50)           226     the great bell, the ancient temple, the upper boss arena, upper camps
+ *  piece                    centre (local)   ground y   role
+ *  Cloudfoot Cove           (0, 30)          66         arrival, pier and fisherman, the pool under the waterfall
+ *  Mistfall island          (28, -4)         98         the waterfall island; lower camp (basic)
+ *  Bloomhold                (-44, -40)       100        grassy village: colourful houses, round domed towers, plaza,
+ *                                                       lower quest giver and home
+ *  Azure Rise               (36, -64)        114        the temple: blue pediment, columns, the curved arched colonnade
+ *                                                       behind it; lower camp (stronger), lower boss, the sky arch up
+ *  Skyreach Citadel         (-10, -142)      200        the castle: blue dome, wings, spires, entrance; the domed
+ *                                                       chamber (ring chandelier, chains, banners, ladders, gallery,
+ *                                                       the floor mechanism with its gold hub); the whole upper region
  * </pre>
- * Every floating landmass sits on a thick, rounded cloud base. The lower chain is walkable: stepped bridges (one block
- * up per block) with cloud landings. The sanctuary is reached through the entrance temple's cloud portal and left through
- * the return doorway (see {@link com.grandline.world.CloudtopPortals}). Island-local coordinates: +x east, +z south.
- * Built from code, identical in every world; older worlds keep the original Cloudtop ({@link FirstSeaPlans} legacy).
+ * The lower islands are walked: bridges climb at most one block per block, with cloud platforms between. The citadel
+ * is reached through the translucent sky arch on Azure Rise and left through the arch at the courtyard's edge (see
+ * {@link com.grandline.world.CloudtopPortals}). Island-local coordinates: +x east, +z south. Built from code, the same
+ * in every world. Worlds made before layout 12 keep their island ({@link CloudtopIslesV7}, or the original).
  */
 final class CloudtopIsles extends BasePlan {
 	static final int SEA_G = 66;
-	// Lower chain.
-	static final int TEMPLE_X = -62, TEMPLE_Z = -26, TEMPLE_Y = 92, TEMPLE_RX = 22, TEMPLE_RZ = 18;
-	static final int FOREST_X = -40, FOREST_Z = -74, FOREST_Y = 106, FOREST_RX = 14, FOREST_RZ = 12;
-	static final int VILLAGE_X = 12, VILLAGE_Z = -60, VILLAGE_Y = 124, VILLAGE_RX = 30, VILLAGE_RZ = 24;
-	static final int GATE_X = 60, GATE_Z = -100, GATE_Y = 142, GATE_RX = 14, GATE_RZ = 12;
-	// Upper sanctuary.
-	static final int PA_X = -10, PA_Z = -40, PA_Y = 218, PA_RX = 34, PA_RZ = 28;
-	static final int PB_X = 88, PB_Z = -50, PB_Y = 226, PB_RX = 50, PB_RZ = 40;
-	static final int LAKE_X = 16, LAKE_Z = -31;
-	/** The waterfall falls from the village's south edge at this column into the lake. */
-	static final int FALL_X = 16, FALL_Z = -36;
+	static final int WF_X = 28, WF_Z = -4, WF_Y = 98, WF_RX = 13, WF_RZ = 10;
+	static final int V_X = -44, V_Z = -40, V_Y = 100, V_RX = 30, V_RZ = 24;
+	static final int T_X = 36, T_Z = -64, T_Y = 114, T_RX = 23, T_RZ = 23;
+	static final int K_X = -10, K_Z = -142, K_Y = 200, K_RX = 46, K_RZ = 34;
+	/** The castle's domed chamber: centre and inner radius; the dome springs from {@link #DOME_Y}. */
+	static final int CH_X = -10, CH_Z = -148, CH_R = 12, DOME_Y = 221;
+	/** The waterfall's falling columns (x = FALL_X - 1 .. FALL_X) and the pool under it. */
+	static final int FALL_X = 28, FALL_Z = 7, POOL_X = 28, POOL_Z = 11;
+	/** Cloud platforms on the walking route: x, z, radius, top. */
+	static final int[][] PADS = {{-30, 11, 4, 79}, {2, -20, 3, 99}, {0, -52, 3, 107}};
 
-	/** Portal spots (island-local): the entrance temple's cloud shaft and the sanctuary's return doorway. */
-	public static final int PORTAL_UP_X = GATE_X, PORTAL_UP_Y = GATE_Y + 1, PORTAL_UP_Z = GATE_Z - 3;
-	public static final int ARRIVE_UP_X = PA_X - 14, ARRIVE_UP_Y = PA_Y + 1, ARRIVE_UP_Z = PA_Z + 6;
-	public static final int PORTAL_DOWN_X = PA_X - 20, PORTAL_DOWN_Y = PA_Y + 1, PORTAL_DOWN_Z = PA_Z + 6;
-	public static final int ARRIVE_DOWN_X = GATE_X, ARRIVE_DOWN_Y = GATE_Y + 1, ARRIVE_DOWN_Z = GATE_Z + 7;
+	/** Portal spots (island-local): the sky arch on Azure Rise and the return arch at the citadel courtyard's edge. */
+	public static final int PORTAL_UP_X = 50, PORTAL_UP_Y = T_Y + 1, PORTAL_UP_Z = -50;
+	public static final int ARRIVE_UP_X = -10, ARRIVE_UP_Y = K_Y + 1, ARRIVE_UP_Z = -120;
+	public static final int PORTAL_DOWN_X = -10, PORTAL_DOWN_Y = K_Y + 1, PORTAL_DOWN_Z = -114;
+	public static final int ARRIVE_DOWN_X = 45, ARRIVE_DOWN_Y = T_Y + 1, ARRIVE_DOWN_Z = -50;
 
-	/** Village houses: corner, size, floors, door side, roof block, wall block. */
-	record House(int x, int z, int w, int d, Direction front, Block roof, Block wall, int kind) {
+	/** Bloomhold's houses: corner, size, door side, walls, roof stairs, roof slab. */
+	record Cottage(int x, int z, int w, int d, Direction front, Block wall, Block roof, Block roofSlab) {
 	}
 
-	static final House[] HOUSES = {
-			new House(-6, -76, 7, 6, Direction.SOUTH, Blocks.SPRUCE_STAIRS, Blocks.SPRUCE_PLANKS, 0),
-			new House(4, -80, 6, 6, Direction.SOUTH, Blocks.DARK_OAK_STAIRS, Blocks.CALCITE, 1),
-			new House(24, -78, 8, 6, Direction.SOUTH, Blocks.SPRUCE_STAIRS, Blocks.BIRCH_PLANKS, 2),
-			new House(-12, -56, 6, 7, Direction.EAST, Blocks.DARK_OAK_STAIRS, Blocks.CALCITE, 3),
-			new House(30, -58, 7, 7, Direction.WEST, Blocks.SPRUCE_STAIRS, Blocks.SPRUCE_PLANKS, 4),
-			new House(22, -46, 6, 5, Direction.NORTH, Blocks.DARK_OAK_STAIRS, Blocks.CALCITE, 5)};
+	static final Cottage[] COTTAGES = {
+			new Cottage(-62, -46, 7, 6, Direction.EAST, Blocks.YELLOW_TERRACOTTA, Blocks.RED_NETHER_BRICK_STAIRS, Blocks.RED_NETHER_BRICK_SLAB),
+			new Cottage(-54, -58, 7, 6, Direction.SOUTH, Blocks.LIGHT_BLUE_CONCRETE, Blocks.WAXED_CUT_COPPER_STAIRS, Blocks.WAXED_CUT_COPPER_SLAB),
+			new Cottage(-40, -57, 6, 6, Direction.SOUTH, Blocks.PINK_TERRACOTTA, Blocks.DARK_PRISMARINE_STAIRS, Blocks.DARK_PRISMARINE_SLAB),
+			new Cottage(-30, -52, 7, 6, Direction.WEST, Blocks.WHITE_CONCRETE, Blocks.CRIMSON_STAIRS, Blocks.CRIMSON_SLAB),
+			new Cottage(-62, -34, 6, 7, Direction.EAST, Blocks.WHITE_TERRACOTTA, Blocks.WARPED_STAIRS, Blocks.WARPED_SLAB),
+			new Cottage(-54, -28, 6, 6, Direction.NORTH, Blocks.ORANGE_TERRACOTTA, Blocks.PRISMARINE_BRICK_STAIRS, Blocks.PRISMARINE_BRICK_SLAB)};
+
+	/** Bloomhold's round domed towers: centre, dome colour. */
+	static final int[][] TOWERS = {{-44, -56}, {-24, -40}, {-32, -28}};
+	static final Block[] TOWER_DOMES = {Blocks.BLUE_CONCRETE, Blocks.ORANGE_CONCRETE, Blocks.CYAN_CONCRETE};
 
 	CloudtopIsles() {
 		super("Cloudtop Isles", 0.05);
-		// Crescent Harbor: overlapping hills along an arc open to the south, enclosing a sheltered lagoon.
-		double[][] arc = {{-37, 23}, {-31, 8}, {-19, -3}, {-3, -8}, {13, -6}, {27, 3}, {36, 17}};
-		for (double[] p : arc) {
-			terrain.mass(p[0], p[1], 15, 12, 4.0, 3.0, Ground.GRASS);
-		}
-		terrain.mass(LAKE_X, LAKE_Z + 2, 14, 11, 4.2, 3.0, Ground.GRASS)       // the north lobe holding the lake
-				.flat(LAKE_X, LAKE_Z, 6, 4, 64, 2, s(Blocks.WATER))           // the freshwater lake (fed by the waterfall)
-				.flat(0, 4, 6, 3, SEA_G, 3, null)                             // the arrival landing
-				.path(s(Blocks.DIRT_PATH), 3, 0, 4, -12, 6, -24, 10, -32, 14)
-				.path(s(Blocks.DIRT_PATH), 2.4, 0, 4, 8, -6, LAKE_X, LAKE_Z + 6)
-				.reach(175);
+		// Cloudfoot Cove: a low green cove at sea level, the pool under the waterfall on its north-east side.
+		terrain.mass(0, 30, 26, 18, 4.0, 3.0, Ground.GRASS)
+				.mass(24, 14, 14, 11, 3.5, 3.0, Ground.GRASS)
+				.mass(-16, 24, 10, 8, 3.0, 3.0, Ground.GRASS)
+				.flat(0, 36, 7, 5, SEA_G, 3, null)                          // the arrival green
+				.flat(-14, 25, 4, 3, SEA_G, 2, null)                        // the foot of the first bridge
+				.flat(POOL_X, POOL_Z, 5, 4, 64, 2, s(Blocks.WATER))         // the pool the waterfall falls into
+				.path(s(Blocks.DIRT_PATH), 2.6, 0, 46, 0, 34, -8, 28, -11, 27)
+				.path(s(Blocks.DIRT_PATH), 2.2, 0, 34, 14, 22, POOL_X - 4, POOL_Z + 6)
+				.reach(190);
 		// Lower region (Lv 150-190).
-		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, 3, 0, 180));
-		anchor(Anchor.at(Type.FISHERMAN, 1, 65, 18, 180));
-		anchor(Anchor.at(Type.DOCK, 5, 63, 17));
-		anchor(Anchor.at(Type.QUEST, 10, VILLAGE_Y + 1, -60, 90));
-		anchor(Anchor.at(Type.HOME, 6, VILLAGE_Y + 1, -64, 270));
-		anchor(Anchor.at(Type.ENEMY_CAMP, TEMPLE_X, TEMPLE_Y, TEMPLE_Z + 5));
-		anchor(Anchor.at(Type.ENEMY_CAMP, FOREST_X, FOREST_Y, FOREST_Z));
-		anchor(Anchor.at(Type.BOSS_ARENA, TEMPLE_X, TEMPLE_Y, TEMPLE_Z + 2));
+		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, 36, 0, 180));
+		anchor(Anchor.at(Type.FISHERMAN, 1, 65, 56, 180));
+		anchor(Anchor.at(Type.DOCK, 5, 63, 58));
+		anchor(Anchor.at(Type.QUEST, -40, V_Y + 1, -34, 180));
+		anchor(Anchor.at(Type.HOME, -49, V_Y + 1, -36, 90));
+		anchor(Anchor.at(Type.ENEMY_CAMP, WF_X - 2, WF_Y, WF_Z - 3));
+		anchor(Anchor.at(Type.ENEMY_CAMP, 20, T_Y, -52));
+		anchor(Anchor.at(Type.BOSS_ARENA, 34, T_Y, -50));
 		// Upper region (Lv 450-625).
-		anchor(Anchor.at(Type.QUEST, PA_X + 4, PA_Y + 1, PA_Z + 4, 90).upper());
-		anchor(Anchor.at(Type.ENEMY_CAMP, PB_X - 24, PB_Y, PB_Z + 18).upper());
-		anchor(Anchor.at(Type.ENEMY_CAMP, PB_X + 14, PB_Y, PB_Z + 22).upper());
-		anchor(Anchor.at(Type.BOSS_ARENA, PB_X, PB_Y, PB_Z - 28).upper());
-		anchor(Anchor.of(Type.TREASURE, -38, 30));
+		anchor(Anchor.at(Type.QUEST, -4, K_Y + 1, -122, 90).upper());
+		anchor(Anchor.at(Type.ENEMY_CAMP, -34, K_Y, -124).upper());
+		anchor(Anchor.at(Type.ENEMY_CAMP, 14, K_Y, -124).upper());
+		anchor(Anchor.at(Type.BOSS_ARENA, CH_X, K_Y, CH_Z).upper());
 	}
 
 	// ==================================================================================================== helpers
 
-	static long hash(int x, int z) {
-		long h = x * 0x9E3779B97F4A7C15L ^ z * 0xC2B2AE3D27D4EB4FL;
-		h ^= h >>> 29;
-		h *= 0xBF58476D1CE4E5B9L;
-		return h ^ (h >>> 32);
-	}
-
 	static double unit(int x, int z, int salt) {
-		return ((hash(x * 31 + salt, z * 17 - salt) >>> 11) & 0xFFFF) / 65536.0;
+		return CloudtopIslesV7.unit(x, z, salt);
 	}
 
 	static BlockState stair(Block b, Direction facing, boolean top) {
 		return Kit.stairs(b, facing, top);
 	}
 
-	static BlockState lantern(boolean hanging) {
-		return s(Blocks.LANTERN).setValue(LanternBlock.HANGING, hanging);
+	static BlockState lantern(Block b, boolean hanging) {
+		return s(b).setValue(LanternBlock.HANGING, hanging);
 	}
 
+	/** Weathered castle stone: stone bricks with cracked and mossy ones mixed in. */
 	static BlockState aged(int x, int y, int z) {
-		double u = unit(x * 5 + y, z, 9);
-		return u < 0.14 ? s(Blocks.CRACKED_STONE_BRICKS) : u < 0.26 ? s(Blocks.MOSSY_STONE_BRICKS) : s(Blocks.STONE_BRICKS);
+		double u = unit(x * 5 + y, z, 19);
+		return u < 0.16 ? s(Blocks.CRACKED_STONE_BRICKS) : u < 0.30 ? s(Blocks.MOSSY_STONE_BRICKS) : u < 0.36 ? s(Blocks.ANDESITE)
+				: s(Blocks.STONE_BRICKS);
 	}
 
-	/** 0 at the centre, 1 at the (gently wobbling) edge of an elliptical landmass. */
-	static double edge(int x, int z, int cx, int cz, int rx, int rz, int seed) {
-		double dx = (x - cx) / (double) rx, dz = (z - cz) / (double) rz;
-		double ang = Math.atan2(dz, dx);
-		double wob = 1 + 0.07 * Math.sin(ang * 3 + seed) + 0.05 * Math.sin(ang * 5 + seed * 2.3);
-		return Math.sqrt(dx * dx + dz * dz) / wob;
+	/** Direction from (dx, dz) toward the centre, along the dominant axis. */
+	static Direction inward(int dx, int dz) {
+		return Math.abs(dx) >= Math.abs(dz) ? (dx > 0 ? Direction.WEST : Direction.EAST) : (dz > 0 ? Direction.NORTH : Direction.SOUTH);
 	}
 
-	/** Surface height of a floating landmass at (x, z); the village has a raised east terrace. */
-	interface Height {
-		int at(int x, int z);
+	/** A soft, rounded cloud: an ellipsoid of wool and snow with a lumpy surface (never walked on, only looked at). */
+	static void puff(Canvas c, int cx, int cy, int cz, double rx, double ry, double rz) {
+		if (!c.near(cx, cz, (int) Math.ceil(Math.max(rx, rz)) + 1)) {
+			return;
+		}
+		for (int x = (int) (cx - rx - 1); x <= cx + rx + 1; x++) {
+			for (int z = (int) (cz - rz - 1); z <= cz + rz + 1; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				for (int y = (int) (cy - ry - 1); y <= cy + ry + 1; y++) {
+					if (puffInside(x, y, z, cx, cy, cz, rx, ry, rz) && puffConnected(x, y, z, cx, cy, cz, rx, ry, rz)) {
+						double dx = (x - cx) / rx, dy = (y - cy) / ry, dz = (z - cz) / rz;
+						double d = dx * dx + dy * dy + dz * dz;
+						boolean shell = d > 0.88 * 0.55;
+						c.set(x, y, z, shell ? (unit(x, z + y, 62) < 0.5 ? s(Blocks.WHITE_WOOL) : s(Blocks.SNOW_BLOCK)) : s(Blocks.WHITE_CONCRETE));
+					}
+				}
+			}
+		}
+	}
+
+	static boolean puffInside(int x, int y, int z, int cx, int cy, int cz, double rx, double ry, double rz) {
+		double dx = (x - cx) / rx, dy = (y - cy) / ry, dz = (z - cz) / rz;
+		return dx * dx + dy * dy + dz * dz <= 0.88 + unit(x / 2, z / 2 + y, 61) * 0.22;
+	}
+
+	/** Whether every block on the step-by-step walk from (x, y, z) to the centre is inside, so no lump floats alone. */
+	static boolean puffConnected(int x, int y, int z, int cx, int cy, int cz, double rx, double ry, double rz) {
+		while (x != cx || y != cy || z != cz) {
+			if (!puffInside(x, y, z, cx, cy, cz, rx, ry, rz)) {
+				return false;
+			}
+			double ax = Math.abs(x - cx) / rx, ay = Math.abs(y - cy) / ry, az = Math.abs(z - cz) / rz;
+			if (ax >= ay && ax >= az) {
+				x -= Integer.signum(x - cx);
+			} else if (ay >= az) {
+				y -= Integer.signum(y - cy);
+			} else {
+				z -= Integer.signum(z - cz);
+			}
+		}
+		return true;
+	}
+
+	/** A big rounded cloud: a cluster of overlapping puffs, broad and flat-bottomed. */
+	static void bigCloud(Canvas c, int cx, int cy, int cz, int size) {
+		if (!c.near(cx, cz, size * 3)) {
+			return;
+		}
+		puff(c, cx, cy, cz, size * 1.4, size * 0.75, size);
+		puff(c, cx - size, cy - 1, cz + 1, size * 0.9, size * 0.55, size * 0.8);
+		puff(c, cx + size + 1, cy - 1, cz - 1, size * 0.9, size * 0.5, size * 0.75);
+		puff(c, cx + 1, cy + size / 2, cz, size * 0.8, size * 0.6, size * 0.7);
+		puff(c, cx - 2, cy, cz - size + 1, size * 0.8, size * 0.5, size * 0.6);
 	}
 
 	/**
-	 * A floating landmass on a cloud: the land (top block, two of soil, then stone), resting on a thick rounded cloud whose
-	 * depth swells toward the middle and whose rim bulges out past the land in soft lumps. White wool and snow on the
-	 * outside, white concrete inside, light grey wool along the underside shadow. Solid all the way through.
+	 * A narrow sky bridge (y = the walkway): three blocks of pale quartz and calcite over a dark deepslate edge band, stairs
+	 * where it climbs (at most one block up per block across), a thin dark post with a lantern every ten blocks.
 	 */
-	static void floating(Canvas c, int cx, int cz, int rx, int rz, Height height, Block top, Block soil, int cloudDepth, int seed) {
+	static void skyBridge(Canvas c, int x1, int y1, int z1, int x2, int y2, int z2) {
+		int n = Math.max(Math.abs(x2 - x1), Math.abs(z2 - z1));
+		if (n == 0 || !c.near((x1 + x2) / 2, (z1 + z2) / 2, n / 2 + 4)) {
+			return;
+		}
+		double ux = (x2 - x1) / (double) n, uz = (z2 - z1) / (double) n;
+		Direction along = Math.abs(ux) >= Math.abs(uz) ? (ux > 0 ? Direction.EAST : Direction.WEST) : (uz > 0 ? Direction.SOUTH : Direction.NORTH);
+		Direction side = along.getClockWise();
+		int prevY = y1;
+		for (int i = 0; i <= n; i++) {
+			int x = (int) Math.round(x1 + ux * i), z = (int) Math.round(z1 + uz * i);
+			int y = y1 + (int) Math.round((y2 - y1) * (i / (double) n));
+			boolean climb = y > prevY, drop = y < prevY;
+			for (int w = -1; w <= 1; w++) {
+				int bx = x + side.getStepX() * w, bz = z + side.getStepZ() * w;
+				Block flat = w == 0 ? Blocks.SMOOTH_QUARTZ : Blocks.CALCITE;
+				Block steps = w == 0 ? Blocks.SMOOTH_QUARTZ_STAIRS : Blocks.QUARTZ_STAIRS;
+				c.set(bx, y, bz, climb ? stair(steps, along, false) : drop ? stair(steps, along.getOpposite(), false) : s(flat));
+				c.set(bx, y - 1, bz, w == 0 ? s(Blocks.SMOOTH_QUARTZ) : s(Blocks.POLISHED_DEEPSLATE));
+				c.fill(bx, y + 1, bz, bx, y + 3, bz, s(Blocks.AIR));
+			}
+			if (i % 10 == 5 && i > 2 && i < n - 2 && !climb && !drop) {
+				int sw = (i / 10) % 2 == 0 ? 1 : -1;
+				int px = x + side.getStepX() * sw, pz = z + side.getStepZ() * sw;
+				c.set(px, y + 1, pz, s(Blocks.POLISHED_BLACKSTONE_WALL));
+				c.set(px, y + 2, pz, lantern(Blocks.LANTERN, false));
+			}
+			prevY = y;
+		}
+	}
+
+	/**
+	 * A floating landmass on a cloud (as in {@link CloudtopIslesV7#floating}), except that a rim lump is only placed
+	 * where it touches the land or the lump next to it toward the middle, so no piece of cloud hangs alone.
+	 */
+	static void floating(Canvas c, int cx, int cz, int rx, int rz, CloudtopIslesV7.Height height, Block top, Block soil, int cloudDepth, int seed) {
 		for (int x = cx - rx - 5; x <= cx + rx + 5; x++) {
 			for (int z = cz - rz - 5; z <= cz + rz + 5; z++) {
 				if (!c.inChunk(x, z)) {
 					continue;
 				}
-				double e = edge(x, z, cx, cz, rx, rz, seed);
+				double e = CloudtopIslesV7.edge(x, z, cx, cz, rx, rz, seed);
 				int y = height.at(x, z);
-				double lump = unit(x / 3, z / 3, seed) * 0.6 + unit(x, z, seed + 1) * 0.4;
 				if (e <= 1.0) {
+					double lump = unit(x / 3, z / 3, seed) * 0.6 + unit(x, z, seed + 1) * 0.4;
 					c.set(x, y, z, s(top));
 					c.set(x, y - 1, z, s(soil));
 					c.set(x, y - 2, z, s(soil));
@@ -158,18 +245,13 @@ final class CloudtopIsles extends BasePlan {
 						BlockState b = shell ? (unit(x, z + k, seed + 2) < 0.5 ? s(Blocks.WHITE_WOOL) : s(Blocks.SNOW_BLOCK)) : s(Blocks.WHITE_CONCRETE);
 						c.set(x, y - k, z, b);
 					}
-					// Invisible light under the cloud, so the underside reads as bright cloud rather than a black shadow.
 					if (Math.floorMod(x, 4) == 0 && Math.floorMod(z, 4) == 0) {
 						c.set(x, y - 4 - depth, z, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13));
 					}
-				} else if (e <= 1.22) {
-					// The rim: rounded cloud lumps poking out under the land's edge.
-					double t = (e - 1.0) / 0.22;
-					if (lump > 0.25 + t * 0.6) {
-						int base = height.at(x, z);
-						int rimTop = base - 2 - (int) Math.round(t * 2);
-						int rimBot = base - 4 - (int) Math.round((1 - t) * 4 * lump);
-						for (int yy = rimBot; yy <= rimTop; yy++) {
+				} else {
+					int[] rim = rim(x, z, cx, cz, rx, rz, height, seed);
+					if (rim != null) {
+						for (int yy = rim[0]; yy <= rim[1]; yy++) {
 							c.set(x, yy, z, unit(x, yy, seed + 3) < 0.6 ? s(Blocks.WHITE_WOOL) : s(Blocks.SNOW_BLOCK));
 						}
 					}
@@ -178,99 +260,246 @@ final class CloudtopIsles extends BasePlan {
 		}
 	}
 
-	/** A small round cloud pad (a bridge landing or a drifting fragment), {@code top} the walkable surface. */
-	static void cloudPad(Canvas c, int cx, int cz, int r, int top, boolean walkable) {
-		for (int x = cx - r - 1; x <= cx + r + 1; x++) {
-			for (int z = cz - r - 1; z <= cz + r + 1; z++) {
-				double d = Math.hypot(x - cx, z - cz) / (r + 0.4);
-				if (d > 1 || !c.inChunk(x, z)) {
+	/** The rim lump's y range at a column outside the land, or null: it must overlap the column toward the middle. */
+	static int[] rim(int x, int z, int cx, int cz, int rx, int rz, CloudtopIslesV7.Height height, int seed) {
+		int[] r = rimRaw(x, z, cx, cz, rx, rz, height, seed);
+		int guard = 0;
+		int px = x, pz = z;
+		int[] cur = r;
+		while (cur != null && guard++ < 12) {
+			int sx = Integer.signum(cx - px), sz = Integer.signum(cz - pz);
+			double fx = Math.abs(px - cx) / (double) rx, fz = Math.abs(pz - cz) / (double) rz;
+			if (fx >= fz) {
+				px += sx;
+			} else {
+				pz += sz;
+			}
+			if (CloudtopIslesV7.edge(px, pz, cx, cz, rx, rz, seed) <= 1.0) {
+				return r; // reached the land, which spans every rim height below its top
+			}
+			int[] in = rimRaw(px, pz, cx, cz, rx, rz, height, seed);
+			if (in == null || in[1] < cur[0] || in[0] > cur[1]) {
+				return null;
+			}
+			cur = in;
+		}
+		return null;
+	}
+
+	static int[] rimRaw(int x, int z, int cx, int cz, int rx, int rz, CloudtopIslesV7.Height height, int seed) {
+		double e = CloudtopIslesV7.edge(x, z, cx, cz, rx, rz, seed);
+		if (e <= 1.0 || e > 1.22) {
+			return null;
+		}
+		double lump = unit(x / 3, z / 3, seed) * 0.6 + unit(x, z, seed + 1) * 0.4;
+		double t = (e - 1.0) / 0.22;
+		if (lump <= 0.25 + t * 0.6) {
+			return null;
+		}
+		int base = height.at(x, z);
+		int rimTop = base - 2 - (int) Math.round(t * 2);
+		int rimBot = base - 4 - (int) Math.round((1 - t) * 4 * lump);
+		return new int[]{rimBot, rimTop};
+	}
+
+	/** A walkable cloud platform: a round pad with a flat snow top and a deep rounded underside. */
+	static void pad(Canvas c, int[] p) {
+		if (!c.near(p[0], p[1], p[2] + 6)) {
+			return;
+		}
+		CloudtopIslesV7.cloudPad(c, p[0], p[1], p[2], p[3], true);
+		puff(c, p[0] + 2, p[3] - 3, p[1] + 1, p[2] + 2.5, 2.5, p[2] + 1.5);
+		CloudtopIslesV7.cloudPad(c, p[0], p[1], p[2], p[3], true); // the walking top stays flat over the puff
+		c.fill(p[0] - p[2], p[3] + 1, p[1] - p[2], p[0] + p[2], p[3] + 3, p[1] + p[2], s(Blocks.AIR));
+	}
+
+	/**
+	 * A translucent arch standing in the air: a half ring of light blue glass edged with white glass, in the vertical
+	 * plane through (cx, cz) along x ({@code alongX}) or along z, two blocks deep.
+	 */
+	static void skyArch(Canvas c, int cx, int baseY, int cz, int radius, boolean alongX) {
+		if (!c.near(cx, cz, radius + 3)) {
+			return;
+		}
+		for (int t = -radius - 2; t <= radius + 2; t++) {
+			for (int dy = 0; dy <= radius + 2; dy++) {
+				double d = Math.hypot(t, dy);
+				if (d < radius - 0.5 || d > radius + 2.2) {
 					continue;
 				}
-				int depth = 1 + (int) Math.round((1 - d * d) * (r * 0.9)) + (int) (unit(x, z, 77) * 2);
-				for (int k = 0; k <= depth; k++) {
-					BlockState b = unit(x, z + k, 78) < 0.55 ? s(Blocks.WHITE_WOOL) : s(Blocks.SNOW_BLOCK);
-					c.set(x, top - k, z, b);
-				}
-				if (walkable && d < 0.8) {
-					c.set(x, top, z, s(Blocks.SNOW_BLOCK));
+				BlockState b = d > radius + 1.3 || d < radius + 0.2 ? s(Blocks.WHITE_STAINED_GLASS) : s(Blocks.LIGHT_BLUE_STAINED_GLASS);
+				for (int k = 0; k <= 1; k++) {
+					if (alongX) {
+						c.set(cx + t, baseY + dy, cz + k, b);
+					} else {
+						c.set(cx + k, baseY + dy, cz + t, b);
+					}
 				}
 			}
 		}
 	}
 
 	/**
-	 * A stepped sky bridge between two points (y = the walkway block): 3 wide pale stone with stone brick wall rails,
-	 * stairs where it climbs (at most one block up per block across), lanterns on posts every eight blocks, and small
-	 * cloud puffs hanging under it.
+	 * A walk-through sky arch (a portal): pale quartz piers and a glass arch over a five-wide, six-high opening, in the
+	 * plane along x ({@code alongX}) or along z, the opening centred on (x, z) above the floor y.
 	 */
-	static void skyBridge(Canvas c, int x1, int y1, int z1, int x2, int y2, int z2) {
-		int n = Math.max(Math.abs(x2 - x1), Math.abs(z2 - z1));
-		if (n == 0) {
+	static void portalArch(Canvas c, int x, int y, int z, boolean alongX) {
+		if (!c.near(x, z, 8)) {
 			return;
 		}
-		double ux = (x2 - x1) / (double) n, uz = (z2 - z1) / (double) n;
-		Direction along = Math.abs(ux) >= Math.abs(uz) ? (ux > 0 ? Direction.EAST : Direction.WEST) : (uz > 0 ? Direction.SOUTH : Direction.NORTH);
-		Direction side = along.getClockWise();
-		// Pass 1: rails, lanterns and hanging cloud puffs. Pass 2: the walkway and its headroom, laid over anything from
-		// pass 1 (on a diagonal bridge a rail from one row can fall on the walkway of a row further along).
-		for (int i = 0; i <= n; i++) {
-			int x = (int) Math.round(x1 + ux * i), z = (int) Math.round(z1 + uz * i);
-			int y = y1 + (int) Math.round((y2 - y1) * (i / (double) n));
-			for (int w : new int[]{-2, 2}) {
-				if (i < 2 || i > n - 2) {
-					continue; // the ends meet land or a landing (and must not cut into a neighbouring bridge's walkway)
+		for (int t = -5; t <= 5; t++) {
+			for (int dy = 0; dy <= 10; dy++) {
+				int at = Math.abs(t);
+				BlockState b = null;
+				if (dy <= 5) {
+					if (at >= 3 && at <= 4) {
+						b = dy == 0 ? s(Blocks.CHISELED_QUARTZ_BLOCK) : s(Blocks.QUARTZ_PILLAR);
+					}
+				} else {
+					double d = Math.hypot(t, dy - 5);
+					if (d >= 3 && d <= 4.6) {
+						b = d > 4 ? s(Blocks.WHITE_STAINED_GLASS) : s(Blocks.LIGHT_BLUE_STAINED_GLASS);
+					}
 				}
-				int rx = x + side.getStepX() * w, rz = z + side.getStepZ() * w;
-				c.set(rx, y - 1, rz, s(Blocks.SMOOTH_STONE));
-				c.set(rx, y, rz, s(Blocks.STONE_BRICKS));
-				c.set(rx, y + 1, rz, s(Blocks.STONE_BRICK_WALL));
-				if (i % 8 == 4) {
-					c.set(rx, y + 2, rz, lantern(false));
+				if (b == null && at <= 2 && dy >= 1 && dy <= 7) {
+					b = s(Blocks.AIR);
 				}
-			}
-			if (i % 6 == 3) {
-				for (int k = 2; k <= 4; k++) {
-					for (int w = -1; w <= 1; w++) {
-						if (k == 4 && w != 0) {
-							continue;
-						}
-						c.set(x + side.getStepX() * w, y - k, z + side.getStepZ() * w, s(Blocks.WHITE_WOOL));
+				if (b != null) {
+					if (alongX) {
+						c.set(x + t, y + dy, z, b);
+					} else {
+						c.set(x, y + dy, z + t, b);
 					}
 				}
 			}
 		}
-		int prevY = y1;
-		for (int i = 0; i <= n; i++) {
-			int x = (int) Math.round(x1 + ux * i), z = (int) Math.round(z1 + uz * i);
-			int y = y1 + (int) Math.round((y2 - y1) * (i / (double) n));
-			boolean climb = y > prevY, drop = y < prevY;
-			for (int w = -1; w <= 1; w++) {
-				int bx = x + side.getStepX() * w, bz = z + side.getStepZ() * w;
-				BlockState deck = climb ? stair(Blocks.POLISHED_DIORITE_STAIRS, along, false)
-						: drop ? stair(Blocks.POLISHED_DIORITE_STAIRS, along.getOpposite(), false) : s(Blocks.POLISHED_DIORITE);
-				c.set(bx, y, bz, deck);
-				c.set(bx, y - 1, bz, s(Blocks.SMOOTH_STONE));
-				c.fill(bx, y + 1, bz, bx, y + 3, bz, s(Blocks.AIR));
+		// A pale step under the opening, a lantern on each pier.
+		for (int t = -4; t <= 4; t++) {
+			for (int k = -1; k <= 1; k++) {
+				if (alongX) {
+					c.set(x + t, y, z + k, s(Blocks.SMOOTH_QUARTZ));
+				} else {
+					c.set(x + k, y, z + t, s(Blocks.SMOOTH_QUARTZ));
+				}
 			}
-			prevY = y;
+		}
+		for (int t : new int[]{-4, 4}) {
+			if (alongX) {
+				c.set(x + t, y + 6, z, lantern(Blocks.SOUL_LANTERN, false));
+			} else {
+				c.set(x, y + 6, z + t, lantern(Blocks.SOUL_LANTERN, false));
+			}
 		}
 	}
 
-	/** A round broad-leaf tree standing on {@code y} (the ground block): a sturdy trunk and a layered canopy. */
+	/** A round broad-leaf tree standing on ground y. */
 	static void tree(Canvas c, int x, int y, int z, int h, Block log, Block leaves) {
-		c.fill(x, y + 1, z, x, y + h, z, s(log));
-		BlockState leaf = Kit.leaves(leaves);
-		for (int dy = h - 2; dy <= h + 2; dy++) {
-			int r = dy >= h + 2 ? 1 : dy == h - 2 ? 2 : 3;
-			for (int dx = -r; dx <= r; dx++) {
-				for (int dz = -r; dz <= r; dz++) {
-					if (dx * dx + dz * dz <= r * r + 1 && (dx != 0 || dz != 0 || dy > h)) {
-						if (unit(x + dx, z + dz, dy) > 0.12 || Math.abs(dx) + Math.abs(dz) < r) {
-							c.set(x + dx, y + dy, z + dz, leaf);
+		if (c.near(x, z, 5)) {
+			CloudtopIslesV7.tree(c, x, y, z, h, log, leaves);
+		}
+	}
+
+	/** Grass tufts and flowers over grass blocks in a box at ground y. */
+	static void meadow(Canvas c, int x1, int z1, int x2, int z2, int y, int salt) {
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				if (!c.inChunk(x, z) || c.level().getBlockState(c.world(x, y, z)).getBlock() != Blocks.GRASS_BLOCK
+						|| !c.level().getBlockState(c.world(x, y + 1, z)).isAir()) {
+					continue;
+				}
+				double r = unit(x, z, salt);
+				if (r < 0.05) {
+					c.set(x, y + 1, z, s(r < 0.015 ? Blocks.CORNFLOWER : r < 0.03 ? Blocks.OXEYE_DAISY : r < 0.04 ? Blocks.ALLIUM : Blocks.DANDELION));
+				} else if (r > 0.86) {
+					c.set(x, y + 1, z, s(Blocks.GRASS));
+				}
+			}
+		}
+	}
+
+	/** Pale paving along a line (top block at y), {@code width} wide. */
+	static void pave(Canvas c, int y, double width, int... pts) {
+		for (int i = 0; i + 3 < pts.length; i += 2) {
+			int x1 = pts[i], z1 = pts[i + 1], x2 = pts[i + 2], z2 = pts[i + 3];
+			int n = Math.max(Math.abs(x2 - x1), Math.abs(z2 - z1));
+			if (!c.near((x1 + x2) / 2, (z1 + z2) / 2, n / 2 + 4)) {
+				continue;
+			}
+			for (int k = 0; k <= n; k++) {
+				double px = x1 + (x2 - x1) * (k / (double) Math.max(1, n)), pz = z1 + (z2 - z1) * (k / (double) Math.max(1, n));
+				for (int x = (int) Math.floor(px - width); x <= Math.ceil(px + width); x++) {
+					for (int z = (int) Math.floor(pz - width); z <= Math.ceil(pz + width); z++) {
+						if (Math.hypot(x - px, z - pz) <= width / 2 + 0.3) {
+							double u = unit(x, z, 23);
+							c.set(x, y, z, u < 0.55 ? s(Blocks.SMOOTH_STONE) : u < 0.85 ? s(Blocks.CALCITE) : s(Blocks.POLISHED_DIORITE));
+							c.fill(x, y + 1, z, x, y + 2, z, s(Blocks.AIR));
 						}
 					}
 				}
 			}
+		}
+	}
+
+	/** A lamp post on ground y: a dark post and a lantern on top. */
+	static void lampPost(Canvas c, int x, int y, int z) {
+		c.set(x, y + 1, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+		c.set(x, y + 2, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+		c.set(x, y + 3, z, lantern(Blocks.LANTERN, false));
+	}
+
+	/** A small grey rock outcrop on ground y. */
+	static void rock(Canvas c, int x, int y, int z, int h, int r) {
+		if (!c.near(x, z, r + 2)) {
+			return;
+		}
+		for (int k = 1; k <= h; k++) {
+			double rr = r * (1.0 - (k / (double) (h + 1)) * 0.75) + 0.4;
+			for (int dx = -r - 1; dx <= r + 1; dx++) {
+				for (int dz = -r - 1; dz <= r + 1; dz++) {
+					if (Math.hypot(dx, dz * 1.15) + unit(x + dx, z + dz + k, 41) * 0.8 <= rr) {
+						double u = unit(x + dx, k, z + dz);
+						c.set(x + dx, y + k, z + dz, u < 0.45 ? s(Blocks.ANDESITE) : u < 0.8 ? s(Blocks.STONE) : s(Blocks.TUFF));
+					}
+				}
+			}
+		}
+	}
+
+	/** A small floating islet (grassy with a tree, or bare rock), on its own cloud. */
+	static void islet(Canvas c, int cx, int cz, int r, int y, boolean grassy, int seed) {
+		if (!c.near(cx, cz, r + 6)) {
+			return;
+		}
+		floating(c, cx, cz, r, r, (x, z) -> y, grassy ? Blocks.GRASS_BLOCK : Blocks.STONE, grassy ? Blocks.DIRT : Blocks.ANDESITE,
+				Math.max(4, r + 2), seed);
+		if (grassy) {
+			tree(c, cx, y, cz, 4 + seed % 2, Blocks.OAK_LOG, Blocks.OAK_LEAVES);
+			meadow(c, cx - r, cz - r, cx + r, cz + r, y, seed);
+		} else {
+			rock(c, cx - 1, y, cz + 1, 3 + seed % 3, 2);
+		}
+	}
+
+	/** A wall banner, blue with a spiral rosette (curly border, a ring and a whirl), facing {@code facing}. */
+	static void spiralBanner(Canvas c, int x, int y, int z, Direction facing) {
+		if (!c.inChunk(x, z)) {
+			return;
+		}
+		c.set(x, y, z, s(Blocks.BLUE_WALL_BANNER).setValue(WallBannerBlock.FACING, facing));
+		if (c.level().getBlockEntity(c.world(x, y, z)) instanceof BannerBlockEntity banner) {
+			ListTag patterns = new ListTag();
+			for (Object[] p : new Object[][]{{"cbo", DyeColor.LIGHT_BLUE}, {"mc", DyeColor.YELLOW}, {"flo", DyeColor.BLUE}, {"cs", DyeColor.LIGHT_BLUE}}) {
+				CompoundTag t = new CompoundTag();
+				t.putString("Pattern", (String) p[0]);
+				t.putInt("Color", ((DyeColor) p[1]).getId());
+				patterns.add(t);
+			}
+			CompoundTag tag = new CompoundTag();
+			tag.put("Patterns", patterns);
+			ItemStack stack = new ItemStack(Items.BLUE_BANNER);
+			BlockItem.setBlockEntityData(stack, BlockEntityType.BANNER, tag);
+			banner.fromItem(stack, DyeColor.BLUE);
+			banner.setChanged();
 		}
 	}
 
@@ -278,117 +507,95 @@ final class CloudtopIsles extends BasePlan {
 
 	@Override
 	public void build(Canvas c) {
-		crescent(c);
-		if (c.near(TEMPLE_X, TEMPLE_Z, TEMPLE_RX + 8)) {
-			floating(c, TEMPLE_X, TEMPLE_Z, TEMPLE_RX, TEMPLE_RZ, (x, z) -> TEMPLE_Y, Blocks.CALCITE, Blocks.CALCITE, 16, 3);
-			paleGround(c, TEMPLE_X, TEMPLE_Z, TEMPLE_RX, TEMPLE_RZ, TEMPLE_Y);
-			cloudTemple(c);
-		}
-		if (c.near(FOREST_X, FOREST_Z, FOREST_RX + 8)) {
-			floating(c, FOREST_X, FOREST_Z, FOREST_RX, FOREST_RZ, (x, z) -> FOREST_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 11, 5);
-			forest(c);
-		}
-		if (c.near(VILLAGE_X, VILLAGE_Z, VILLAGE_RX + 8)) {
-			floating(c, VILLAGE_X, VILLAGE_Z, VILLAGE_RX, VILLAGE_RZ, CloudtopIsles::villageHeight, Blocks.GRASS_BLOCK, Blocks.DIRT, 20, 7);
-			village(c);
+		cove(c);
+		if (c.near(WF_X, WF_Z, WF_RX + 8)) {
+			floating(c, WF_X, WF_Z, WF_RX, WF_RZ, (x, z) -> WF_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 14, 21);
+			mistfall(c);
 		}
 		waterfall(c);
-		if (c.near(GATE_X, GATE_Z, GATE_RX + 8)) {
-			floating(c, GATE_X, GATE_Z, GATE_RX, GATE_RZ, (x, z) -> GATE_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 12, 11);
-			sanctuaryGate(c);
+		if (c.near(V_X, V_Z, V_RX + 8)) {
+			floating(c, V_X, V_Z, V_RX, V_RZ, (x, z) -> V_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 20, 23);
+			village(c);
 		}
-		// The climbing route: crescent -> landing -> temple -> forest -> landing -> village -> sanctuary entrance.
-		cloudPad(c, -49, 7, 3, 77, true);
-		cloudPad(c, -19, -93, 3, 115, true);
-		skyBridge(c, -34, SEA_G + 1, 14, -48, 78, 8);
-		skyBridge(c, -49, 78, 5, -55, TEMPLE_Y, -10);
-		skyBridge(c, -50, TEMPLE_Y, -38, -44, FOREST_Y, -62);
-		skyBridge(c, -27, FOREST_Y, -76, -20, 116, -92);
-		skyBridge(c, -18, 116, -92, -8, VILLAGE_Y, -74);
-		skyBridge(c, 40, VILLAGE_Y + 3, -70, 50, GATE_Y, -94);
-		// Upper sanctuary.
-		if (c.near(PA_X, PA_Z, PA_RX + 8)) {
-			floating(c, PA_X, PA_Z, PA_RX, PA_RZ, (x, z) -> PA_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 22, 13);
-			plateauA(c);
+		if (c.near(T_X, T_Z, T_RX + 8)) {
+			floating(c, T_X, T_Z, T_RX, T_RZ, (x, z) -> T_Y, Blocks.CALCITE, Blocks.CALCITE, 18, 25);
+			temple(c);
 		}
-		if (c.near(PB_X, PB_Z, PB_RX + 8)) {
-			floating(c, PB_X, PB_Z, PB_RX, PB_RZ, (x, z) -> PB_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 28, 17);
-			plateauB(c);
+		// The walking route: cove -> cloud -> Bloomhold; Bloomhold -> cloud -> Mistfall; Bloomhold -> cloud -> Azure Rise.
+		for (int[] p : PADS) {
+			pad(c, p);
 		}
-		rootBridge(c);
-		// Drifting cloud fragments between the layers.
-		for (int[] f : new int[][]{{-20, -30, 104}, {44, -40, 112}, {-70, -60, 120}, {30, 10, 96}, {70, -70, 160}, {-40, -10, 196},
-				{30, -100, 190}, {120, -10, 205}, {-60, -90, 175}}) {
-			if (c.near(f[0], f[1], 6)) {
-				cloudPad(c, f[0], f[1], 3 + (int) (unit(f[0], f[1], 81) * 2), f[2], false);
-			}
+		skyBridge(c, -14, SEA_G + 1, 25, -27, 80, 13);
+		skyBridge(c, -31, 80, 8, -40, V_Y, -18);
+		skyBridge(c, -20, V_Y, -28, -1, 100, -21);
+		skyBridge(c, 4, 100, -18, 17, WF_Y, -6);
+		skyBridge(c, -18, V_Y, -48, -3, 108, -51);
+		skyBridge(c, 3, 108, -53, 17, T_Y, -62);
+		// The citadel and the sky around it.
+		if (c.near(K_X, K_Z, K_RX + 10)) {
+			floating(c, K_X, K_Z, K_RX, K_RZ, (x, z) -> K_Y, Blocks.GRASS_BLOCK, Blocks.DIRT, 26, 27);
+			citadel(c);
 		}
-		treasure(c);
+		// Small islands, grassy and rocky.
+		islet(c, -84, 4, 6, 86, true, 1);
+		islet(c, 62, -22, 5, 104, false, 2);
+		islet(c, -12, -88, 6, 118, true, 3);
+		islet(c, 72, -92, 4, 128, false, 4);
+		islet(c, -78, -78, 5, 112, true, 5);
+		islet(c, -68, -150, 7, 196, true, 6);
+		islet(c, 48, -160, 6, 206, false, 7);
+		islet(c, 44, -112, 5, 190, true, 8);
+		islet(c, -58, -104, 5, 205, false, 9);
+		// Big rounded clouds, low and high.
+		bigCloud(c, -88, 94, -22, 7);
+		bigCloud(c, 74, 100, -34, 6);
+		bigCloud(c, -6, 92, 10, 5);
+		bigCloud(c, 62, 84, 22, 6);
+		bigCloud(c, -62, 88, 22, 6);
+		bigCloud(c, 6, 132, -104, 7);
+		bigCloud(c, 78, 142, -108, 6);
+		bigCloud(c, -84, 150, -96, 7);
+		bigCloud(c, -76, 214, -128, 7);
+		bigCloud(c, 52, 220, -136, 6);
+		bigCloud(c, 20, 230, -172, 6);
+		bigCloud(c, 30, 176, -150, 7);
+		// Translucent arches hanging in the sky.
+		skyArch(c, 66, 76, -6, 15, false);
+		skyArch(c, -86, 108, -50, 12, false);
+		skyArch(c, -10, 186, -96, 13, true);
+		skyArch(c, 54, 198, -140, 10, false);
 	}
 
-	// ---------------------------------------------------------------------------------------------------- crescent
+	// ---------------------------------------------------------------------------------------------------- cove
 
-	/**
-	 * The crescent harbor: grass with flowers, two tall grey rocks at the back and four smaller formations, the lake with
-	 * its wharf, the arrival landing and the pier into the lagoon, a few birches.
-	 */
-	private void crescent(Canvas c) {
-		for (int x = -60; x <= 60; x++) {
-			for (int z = -50; z <= 45; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
-				}
-				int g = c.ground(x, z);
-				if (g <= Terrain.WATER_TOP + 1 || c.terrain().paving(x, z) != null || c.terrain().top(x, z).getBlock() != Blocks.GRASS_BLOCK) {
-					continue;
-				}
-				double r = unit(x, z, 31);
-				double patch = (Math.sin(x * 0.2) + Math.sin(z * 0.17 + 1) + Math.sin((x + z) * 0.1)) / 3;
-				if (patch > 0.4 && r < 0.14) {
-					c.set(x, g + 1, z, s(r < 0.05 ? Blocks.CORNFLOWER : r < 0.09 ? Blocks.OXEYE_DAISY : Blocks.ALLIUM));
-				} else if (r > 0.88) {
-					c.set(x, g + 1, z, s(Blocks.GRASS));
-				}
-			}
+	/** Cloudfoot Cove: the pier, the arrival green, birches and rocks, flowers, lamp posts. */
+	private void cove(Canvas c) {
+		if (!c.near(4, 26, 40)) {
+			return;
 		}
-		rock(c, -30, 4, 18, 4);   // the two great rocks at the back
-		rock(c, 30, 2, 15, 4);
-		rock(c, -40, 20, 6, 2);
-		rock(c, 38, 16, 5, 2);
-		rock(c, -12, -6, 4, 2);
-		rock(c, 4, -12, 5, 2);
-		for (int[] t : new int[][]{{-22, 12}, {-36, 10}, {24, 10}, {12, -2}, {-6, 2}}) {
-			if (c.near(t[0], t[1], 4)) {
+		for (int[] t : new int[][]{{-10, 36}, {12, 32}, {-20, 30}, {18, 24}}) {
+			if (c.near(t[0], t[1], 5)) {
 				tree(c, t[0], c.ground(t[0], t[1]), t[1], 5, Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES);
 			}
 		}
-		// Lake wharf: a short jetty from the south shore.
-		if (c.near(LAKE_X, LAKE_Z, 10)) {
-			for (int z = LAKE_Z + 5; z >= LAKE_Z + 1; z--) {
-				for (int x = LAKE_X - 1; x <= LAKE_X; x++) {
-					c.set(x, 65, z, s(Blocks.SPRUCE_PLANKS));
-					c.fill(x, 66, z, x, 68, z, s(Blocks.AIR));
-				}
-				if (z == LAKE_Z + 1) {
-					c.set(LAKE_X - 1, 66, z, s(Blocks.SPRUCE_FENCE));
-					c.set(LAKE_X - 1, 67, z, lantern(false));
-				}
+		for (int[] r : new int[][]{{-22, 22, 5, 2}, {14, 40, 3, 2}, {36, 18, 4, 2}}) {
+			if (c.near(r[0], r[1], 4)) {
+				rock(c, r[0], c.ground(r[0], r[1]), r[1], r[2], r[3]);
 			}
-			c.fill(LAKE_X - 1, 61, LAKE_Z + 1, LAKE_X - 1, 64, LAKE_Z + 1, s(Blocks.SPRUCE_LOG));
 		}
-		// The lagoon pier (arrival): from the landing south into the sheltered water.
-		if (c.near(0, 12, 12)) {
-			for (int z = 6; z <= 20; z++) {
+		// The pier: south from the green into the sea.
+		if (c.near(0, 52, 12)) {
+			for (int z = 44; z <= 60; z++) {
 				for (int x = -1; x <= 1; x++) {
 					c.set(x, 64, z, x == 0 ? s(Blocks.STRIPPED_SPRUCE_LOG).setValue(RotatedPillarBlock.AXIS, Direction.Axis.Z) : s(Blocks.SPRUCE_PLANKS));
 					c.fill(x, 65, z, x, 67, z, s(Blocks.AIR));
 				}
 				for (int x : new int[]{-2, 2}) {
-					if (z % 4 == 0 || z == 20) {
+					if (z % 4 == 0 || z == 60) {
 						c.fill(x, Math.min(c.ground(x, z), 61), z, x, 64, z, s(Blocks.SPRUCE_LOG));
 						c.set(x, 65, z, s(Blocks.SPRUCE_FENCE));
 						if (z % 8 == 4) {
-							c.set(x, 66, z, lantern(false));
+							c.set(x, 66, z, lantern(Blocks.LANTERN, false));
 						}
 					} else {
 						c.set(x, 64, z, s(Blocks.SPRUCE_PLANKS));
@@ -396,703 +603,913 @@ final class CloudtopIsles extends BasePlan {
 					}
 				}
 			}
-			c.set(-1, 65, 19, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-			// Signpost toward the bridges.
-			int g = c.ground(-6, 4);
-			c.fill(-6, g + 1, 4, -6, g + 2, 4, s(Blocks.SPRUCE_FENCE));
-			c.set(-6, g + 3, 4, lantern(false));
+			c.set(-1, 65, 59, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		}
-	}
-
-	/** A grey rock formation: stacked andesite, stone and tuff in irregular tiers. */
-	private static void rock(Canvas c, int x, int z, int h, int r) {
-		if (!c.near(x, z, r + 2)) {
-			return;
-		}
-		int g = c.ground(x, z);
-		for (int y = 1; y <= h; y++) {
-			double rr = r * (1.0 - (y / (double) (h + 1)) * 0.7) + 0.4;
-			for (int dx = -r - 1; dx <= r + 1; dx++) {
-				for (int dz = -r - 1; dz <= r + 1; dz++) {
-					double d = Math.hypot(dx, dz * 1.2) + unit(x + dx, z + dz + y, 41) * 0.8;
-					if (d <= rr) {
-						double u = unit(x + dx, y, z + dz);
-						c.set(x + dx, g + y, z + dz, u < 0.45 ? s(Blocks.ANDESITE) : u < 0.75 ? s(Blocks.STONE) : u < 0.9 ? s(Blocks.TUFF) : s(Blocks.COBBLESTONE));
-					}
+		for (int x = -30; x <= 42; x++) {
+			for (int z = 0; z <= 50; z++) {
+				if (c.inChunk(x, z) && c.ground(x, z) > Terrain.WATER_TOP + 1) {
+					meadow(c, x, z, x, z, c.ground(x, z), 31);
 				}
+			}
+		}
+		// Lamp posts on the green and at the foot of the first bridge.
+		for (int[] l : new int[][]{{4, 38}, {-4, 38}, {-11, 23}, {POOL_X - 7, POOL_Z + 3}}) {
+			if (c.near(l[0], l[1], 2)) {
+				lampPost(c, l[0], c.ground(l[0], l[1]), l[1]);
 			}
 		}
 	}
 
-	// ---------------------------------------------------------------------------------------------------- temple island
+	// ---------------------------------------------------------------------------------------------------- Mistfall
 
-	/** Pale, bare ground: calcite with smooth stone, diorite and gravel patches. */
-	private static void paleGround(Canvas c, int cx, int cz, int rx, int rz, int y) {
-		for (int x = cx - rx; x <= cx + rx; x++) {
-			for (int z = cz - rz; z <= cz + rz; z++) {
-				if (!c.inChunk(x, z) || edge(x, z, cx, cz, rx, rz, 3) > 1.0) {
-					continue;
-				}
-				double p = (Math.sin(x * 0.3) + Math.sin(z * 0.27 + 2)) / 2;
-				double u = unit(x, z, 51);
-				c.set(x, y, z, p > 0.5 ? s(Blocks.SMOOTH_STONE) : u < 0.1 ? s(Blocks.DIORITE) : u < 0.16 ? s(Blocks.GRAVEL) : s(Blocks.CALCITE));
+	/** Mistfall: rocks, two trees, the spring that feeds the waterfall, the lower camp (tents and a campfire). */
+	private void mistfall(Canvas c) {
+		int y = WF_Y;
+		rock(c, WF_X + 7, y, WF_Z - 4, 6, 3);
+		rock(c, WF_X - 8, y, WF_Z - 5, 4, 2);
+		rock(c, WF_X + 2, y, WF_Z - 8, 3, 2);
+		tree(c, WF_X + 6, y, WF_Z + 3, 5, Blocks.OAK_LOG, Blocks.OAK_LEAVES);
+		tree(c, WF_X - 9, y, WF_Z + 2, 4, Blocks.OAK_LOG, Blocks.OAK_LEAVES);
+		// The spring: a stone-rimmed pool that runs south into the spout.
+		for (int x = FALL_X - 3; x <= FALL_X + 2; x++) {
+			for (int z = FALL_Z - 6; z <= FALL_Z - 4; z++) {
+				boolean rim = x == FALL_X - 3 || x == FALL_X + 2 || z == FALL_Z - 6;
+				c.set(x, y, z, rim ? s(Blocks.MOSSY_COBBLESTONE) : s(Blocks.WATER));
+				c.set(x, y - 1, z, s(Blocks.STONE));
+				c.set(x, y + 1, z, s(Blocks.AIR));
 			}
 		}
+		// The camp: two tents, a campfire, crates.
+		int cx = WF_X - 2, cz = WF_Z - 3;
+		tent(c, cx - 4, cz - 1, y, Blocks.BROWN_WOOL);
+		tent(c, cx + 3, cz - 2, y, Blocks.GREEN_WOOL);
+		c.set(cx, y + 1, cz + 1, s(Blocks.CAMPFIRE));
+		c.set(cx - 5, y + 1, cz + 3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(cx - 4, y + 1, cz + 3, s(Blocks.SPRUCE_PLANKS));
+		meadow(c, WF_X - WF_RX, WF_Z - WF_RZ, WF_X + WF_RX, WF_Z + WF_RZ, y, 7);
 	}
 
-	/**
-	 * The Cloud Temple at the island's rear: a three-step podium with a broad 9-wide stair, a colonnade of twelve stone
-	 * columns round a pillared hall (an altar, lanterns, a carved frieze), an upper terrace on the hall's roof reached by
-	 * side stairs, and a raised rooftop platform kept free for a merchant.
-	 */
-	private void cloudTemple(Canvas c) {
-		int cx = TEMPLE_X, z0 = TEMPLE_Z - 16, z1 = TEMPLE_Z - 2, x0 = cx - 10, x1 = cx + 10, y = TEMPLE_Y;
-		// Podium (3 high) and stair.
-		for (int k = 0; k < 3; k++) {
-			c.fill(x0 - 2 + k, y + 1 + k, z0 - 2 + k, x1 + 2 - k, y + 1 + k, z1 + 2 - k, aged(cx, y + k, z0));
+	/** A small A-frame tent (three long, opening south) on ground y. */
+	static void tent(Canvas c, int x, int z, int y, Block wool) {
+		for (int dz = -1; dz <= 1; dz++) {
+			c.set(x - 1, y + 1, z + dz, s(wool));
+			c.set(x + 1, y + 1, z + dz, s(wool));
+			c.set(x, y + 2, z + dz, s(wool));
+			c.set(x, y + 1, z + dz, s(Blocks.AIR));
 		}
-		for (int k = 0; k < 3; k++) {
-			for (int x = cx - 4; x <= cx + 4; x++) {
-				c.set(x, y + 1 + k, z1 + 3 - k, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-			}
-		}
-		int fy = y + 3; // hall floor
-		c.fill(x0 + 1, fy, z0 + 1, x1 - 1, fy, z1 - 1, s(Blocks.POLISHED_DIORITE));
-		// Colonnade.
-		for (int x = x0; x <= x1; x += 4) {
-			for (int z : new int[]{z0, z1}) {
-				column(c, x, fy + 1, z, 8);
-			}
-		}
-		for (int z = z0 + 4; z <= z1 - 4; z += 5) {
-			column(c, x0, fy + 1, z, 8);
-			column(c, x1, fy + 1, z, 8);
-		}
-		// Hall (cella) walls with the entrance on the south.
-		int hx0 = cx - 6, hx1 = cx + 6, hz0 = z0 + 2, hz1 = z1 - 3;
-		for (int x = hx0; x <= hx1; x++) {
-			for (int z = hz0; z <= hz1; z++) {
-				boolean wall = x == hx0 || x == hx1 || z == hz0 || z == hz1;
-				for (int yy = fy + 1; yy <= fy + 7; yy++) {
-					boolean door = z == hz1 && Math.abs(x - cx) <= 2 && yy <= fy + 5;
-					c.set(x, yy, z, wall && !door ? (yy == fy + 6 ? s(Blocks.CHISELED_STONE_BRICKS) : aged(x, yy, z)) : s(Blocks.AIR));
-				}
-				c.set(x, fy + 8, z, s(Blocks.SMOOTH_STONE));
-			}
-		}
-		for (int x = cx - 3; x <= cx + 3; x += 3) {
-			c.fill(x, fy + 1, hz0 + 3, x, fy + 7, hz0 + 3, s(Blocks.QUARTZ_PILLAR));
-		}
-		c.fill(cx - 1, fy + 1, hz0 + 1, cx + 1, fy + 1, hz0 + 1, s(Blocks.CHISELED_QUARTZ_BLOCK));
-		c.set(cx, fy + 2, hz0 + 1, s(Blocks.SEA_LANTERN));
-		c.set(cx - 4, fy + 7, hz0 + 5, lantern(true));
-		c.set(cx + 4, fy + 7, hz0 + 5, lantern(true));
-		c.set(cx, fy + 7, hz1 - 2, lantern(true));
-		// Entablature over the colonnade, the upper terrace (walkable roof) and its parapet.
-		c.fill(x0, fy + 9, z0, x1, fy + 9, z1, s(Blocks.SMOOTH_STONE));
-		for (int x = x0; x <= x1; x++) {
-			for (int z = z0; z <= z1; z++) {
-				boolean rim = x == x0 || x == x1 || z == z0 || z == z1;
-				if (rim) {
-					c.set(x, fy + 10, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICK_WALL) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-				}
-			}
-		}
-		// Side stairs from the podium to the terrace (west side).
-		for (int k = 0; k < 9; k++) {
-			c.set(x0 - 1, fy + 1 + k, z1 - 1 - k, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-			c.fill(x0 - 1, fy, z1 - 1 - k, x0 - 1, fy + k, z1 - 1 - k, s(Blocks.STONE_BRICKS));
-		}
-		c.set(x0, fy + 10, z1 - 9, s(Blocks.AIR));
-		c.set(x0, fy + 10, z1 - 10, s(Blocks.AIR));
-		// The rooftop platform (raised, for a merchant or special NPC).
-		c.fill(cx - 3, fy + 10, z0 + 4, cx + 3, fy + 10, z0 + 8, s(Blocks.POLISHED_DIORITE));
-		for (int x = cx - 3; x <= cx + 3; x += 6) {
-			c.fill(x, fy + 11, z0 + 4, x, fy + 13, z0 + 4, s(Blocks.QUARTZ_PILLAR));
-			c.fill(x, fy + 11, z0 + 8, x, fy + 13, z0 + 8, s(Blocks.QUARTZ_PILLAR));
-		}
-		c.fill(cx - 3, fy + 14, z0 + 4, cx + 3, fy + 14, z0 + 8, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
-		// Weathered stones in front: broken column drums lying in the courtyard edges (clear of the fight).
-		for (int[] p : new int[][]{{cx - 14, TEMPLE_Z + 8}, {cx + 15, TEMPLE_Z + 6}}) {
-			c.set(p[0], y + 1, p[1], s(Blocks.QUARTZ_PILLAR).setValue(RotatedPillarBlock.AXIS, Direction.Axis.X));
-			c.set(p[0] + 1, y + 1, p[1], s(Blocks.QUARTZ_PILLAR).setValue(RotatedPillarBlock.AXIS, Direction.Axis.X));
-		}
+		c.set(x, y + 1, z - 1, s(Blocks.SPRUCE_PLANKS));
+		c.set(x - 1, y, z + 2, s(Blocks.COARSE_DIRT));
+		c.set(x + 1, y, z + 2, s(Blocks.COARSE_DIRT));
 	}
 
-	/** A stone column: a chiseled base, quartz shaft, a chiseled capital. */
-	private static void column(Canvas c, int x, int y, int z, int h) {
-		c.set(x, y, z, s(Blocks.CHISELED_STONE_BRICKS));
-		c.fill(x, y + 1, z, x, y + h - 2, z, s(Blocks.QUARTZ_PILLAR));
-		c.set(x, y + h - 1, z, s(Blocks.CHISELED_STONE_BRICKS));
-	}
-
-	// ---------------------------------------------------------------------------------------------------- forest island
-
-	/** Six trees round an open middle, a tall flat-sided rock at the north-east edge, grass and flowers. */
-	private void forest(Canvas c) {
-		int y = FOREST_Y;
-		int[][] trees = {{-10, -5, 6, 0}, {-8, 6, 5, 1}, {0, -9, 7, 0}, {9, -6, 5, 1}, {10, 5, 6, 0}, {-2, 9, 5, 0}};
-		for (int[] t : trees) {
-			tree(c, FOREST_X + t[0], y, FOREST_Z + t[1], t[2], t[3] == 0 ? Blocks.OAK_LOG : Blocks.BIRCH_LOG,
-					t[3] == 0 ? Blocks.OAK_LEAVES : Blocks.BIRCH_LEAVES);
-		}
-		int rx = FOREST_X + 9, rz = FOREST_Z - 1;
-		for (int dx = 0; dx <= 2; dx++) {
-			for (int dz = 0; dz <= 4; dz++) {
-				int h = 7 - dz + (dx == 1 ? 1 : 0);
-				c.fill(rx + dx, y + 1, rz + dz, rx + dx, y + h, rz + dz, dx == 1 ? s(Blocks.SMOOTH_BASALT) : s(Blocks.POLISHED_BASALT));
-			}
-		}
-		for (int x = FOREST_X - FOREST_RX; x <= FOREST_X + FOREST_RX; x++) {
-			for (int z = FOREST_Z - FOREST_RZ; z <= FOREST_Z + FOREST_RZ; z++) {
-				if (!c.inChunk(x, z) || edge(x, z, FOREST_X, FOREST_Z, FOREST_RX, FOREST_RZ, 5) > 0.92) {
-					continue;
-				}
-				double r = unit(x, z, 61);
-				if (Math.hypot(x - FOREST_X, z - FOREST_Z) < 5) {
-					continue; // the open middle
-				}
-				if (r < 0.06) {
-					c.set(x, y + 1, z, s(r < 0.03 ? Blocks.POPPY : Blocks.DANDELION));
-				} else if (r > 0.85) {
-					c.set(x, y + 1, z, s(Blocks.GRASS));
-				}
-			}
-		}
-	}
-
-	// ---------------------------------------------------------------------------------------------------- village
-
-	/** The village's ground: 124, with a raised east terrace at 127 (stone steps between them). */
-	static int villageHeight(int x, int z) {
-		return x >= VILLAGE_X + 14 ? VILLAGE_Y + 3 : x >= VILLAGE_X + 11 ? VILLAGE_Y + (x - VILLAGE_X - 10) : VILLAGE_Y;
-	}
-
-	/**
-	 * The Sky Village: a winding path from the west bridge through the plaza (a well and benches, the quest giver and the
-	 * innkeeper), past six houses to the east terrace and the bridge up to the sanctuary; flowers, trees and lanterns; the
-	 * waterfall pouring off the south edge.
-	 */
-	private void village(Canvas c) {
-		double[] path = {-8, -74, -2, -68, 4, -62, 10, -60, 18, -62, 24, -66, 30, -68, 38, -70};
-		for (int x = VILLAGE_X - VILLAGE_RX; x <= VILLAGE_X + VILLAGE_RX; x++) {
-			for (int z = VILLAGE_Z - VILLAGE_RZ; z <= VILLAGE_Z + VILLAGE_RZ; z++) {
-				if (!c.inChunk(x, z) || edge(x, z, VILLAGE_X, VILLAGE_Z, VILLAGE_RX, VILLAGE_RZ, 7) > 0.98) {
-					continue;
-				}
-				int y = villageHeight(x, z);
-				boolean onPath = false;
-				for (int i = 0; i + 3 < path.length; i += 2) {
-					if (distSeg(x, z, path[i], path[i + 1], path[i + 2], path[i + 3]) <= 1.3) {
-						onPath = true;
-					}
-				}
-				boolean plaza = Math.hypot(x - 8, z - 60 - 0) < 5.5 && z <= -55 && z >= -66;
-				if (plaza) {
-					c.set(x, y, z, unit(x, z, 71) < 0.3 ? s(Blocks.CALCITE) : s(Blocks.POLISHED_DIORITE));
-				} else if (onPath) {
-					c.set(x, y, z, x >= VILLAGE_X + 11 && x <= VILLAGE_X + 13 ? stair(Blocks.STONE_BRICK_STAIRS, Direction.EAST, false)
-							: unit(x, z, 72) < 0.25 ? s(Blocks.COBBLESTONE) : s(Blocks.DIRT_PATH));
-				} else {
-					double r = unit(x, z, 73);
-					if (r < 0.05) {
-						c.set(x, y + 1, z, s(r < 0.02 ? Blocks.AZURE_BLUET : r < 0.035 ? Blocks.LILY_OF_THE_VALLEY : Blocks.PINK_TULIP));
-					} else if (r > 0.86) {
-						c.set(x, y + 1, z, s(Blocks.GRASS));
-					}
-				}
-			}
-		}
-		// Plaza: the well and benches.
-		int py = VILLAGE_Y;
-		c.fill(7, py + 1, -61, 9, py + 1, -59, s(Blocks.STONE_BRICKS));
-		c.set(8, py + 1, -60, s(Blocks.WATER));
-		for (int[] p : new int[][]{{7, -61}, {9, -61}, {7, -59}, {9, -59}}) {
-			c.fill(p[0], py + 2, p[1], p[0], py + 3, p[1], s(Blocks.SPRUCE_FENCE));
-		}
-		c.fill(7, py + 4, -61, 9, py + 4, -59, Kit.slab(Blocks.SPRUCE_SLAB, false));
-		c.set(8, py + 3, -60, lantern(true));
-		c.set(5, py + 1, -57, stair(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
-		c.set(11, py + 1, -57, stair(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
-		for (House h : HOUSES) {
-			house(c, h);
-		}
-		for (int[] t : new int[][]{{-12, -66, 5}, {-4, -46, 6}, {36, -50, 5}, {18, -80, 6}, {34, -76, 5}}) {
-			tree(c, t[0], villageHeight(t[0], t[1]), t[1], t[2], Blocks.OAK_LOG, Blocks.OAK_LEAVES);
-		}
-		for (int[] l : new int[][]{{0, -70}, {14, -64}, {26, -64}, {36, -68}, {2, -56}}) {
-			int y = villageHeight(l[0], l[1]);
-			c.fill(l[0], y + 1, l[1], l[0], y + 2, l[1], s(Blocks.SPRUCE_FENCE));
-			c.set(l[0], y + 3, l[1], lantern(false));
-		}
-		// A rail along the south edge by the plaza (fall protection near the NPCs).
-		for (int x = -2; x <= 14; x++) {
-			int z = -40 + (int) Math.round(Math.abs(x - 6) * 0.15);
-			if (x == FALL_X || x == FALL_X - 1) {
-				continue;
-			}
-			c.set(x, VILLAGE_Y + 1, z, Kit.connected(Blocks.SPRUCE_FENCE, true));
-		}
-	}
-
-	static double distSeg(double px, double pz, double ax, double az, double bx, double bz) {
-		double dx = bx - ax, dz = bz - az, len = dx * dx + dz * dz;
-		double t = len == 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / len));
-		return Math.hypot(px - (ax + t * dx), pz - (az + t * dz));
-	}
-
-	/** A small house: pale stone base, plank or calcite walls, a pitched roof, a door standing open, a furnished room. */
-	private static void house(Canvas c, House h) {
-		int y = villageHeight(h.x() + h.w() / 2, h.z() + h.d() / 2);
-		int x1 = h.x(), z1 = h.z(), x2 = h.x() + h.w() - 1, z2 = h.z() + h.d() - 1;
-		for (int x = x1; x <= x2; x++) {
-			for (int z = z1; z <= z2; z++) {
-				boolean wall = x == x1 || x == x2 || z == z1 || z == z2;
-				boolean corner = (x == x1 || x == x2) && (z == z1 || z == z2);
-				c.set(x, y, z, s(Blocks.STONE_BRICKS));
-				c.set(x, y + 1, z, wall ? s(Blocks.STONE_BRICKS) : s(Blocks.SPRUCE_PLANKS));
-				for (int yy = y + 2; yy <= y + 4; yy++) {
-					c.set(x, yy, z, wall ? (corner ? s(Blocks.STRIPPED_SPRUCE_LOG) : s(h.wall())) : s(Blocks.AIR));
-				}
-				c.set(x, y + 1, z, wall ? s(Blocks.STONE_BRICKS) : s(Blocks.SPRUCE_PLANKS));
-			}
-		}
-		// Windows.
-		for (int x = x1 + 2; x < x2; x += 3) {
-			c.set(x, y + 3, z1, Kit.connected(Blocks.GLASS_PANE, true));
-			c.set(x, y + 3, z2, Kit.connected(Blocks.GLASS_PANE, true));
-		}
-		for (int z = z1 + 2; z < z2; z += 3) {
-			c.set(x1, y + 3, z, Kit.connected(Blocks.GLASS_PANE, false));
-			c.set(x2, y + 3, z, Kit.connected(Blocks.GLASS_PANE, false));
-		}
-		// Door.
-		Direction f = h.front();
-		int dx = f == Direction.EAST ? x2 : f == Direction.WEST ? x1 : (x1 + x2) / 2;
-		int dz = f == Direction.SOUTH ? z2 : f == Direction.NORTH ? z1 : (z1 + z2) / 2;
-		BlockState door = s(Blocks.SPRUCE_DOOR).setValue(BlockStateProperties.HORIZONTAL_FACING, f).setValue(BlockStateProperties.OPEN, true)
-				.setValue(BlockStateProperties.DOOR_HINGE, DoorHingeSide.LEFT);
-		c.set(dx, y + 2, dz, door.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER));
-		c.set(dx, y + 3, dz, door.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER));
-		c.set(dx + f.getStepX(), y + 1, dz + f.getStepZ(), stair(Blocks.STONE_BRICK_STAIRS, f.getOpposite(), false));
-		c.set(dx + f.getStepX() + f.getClockWise().getStepX(), y + 4, dz + f.getStepZ() + f.getClockWise().getStepZ(), lantern(true));
-		// Pitched roof along the longer side, with overhang; heights vary with the house.
-		boolean alongX = h.w() >= h.d();
-		int lo = (alongX ? z1 : x1) - 1, hi = (alongX ? z2 : x2) + 1, a1 = (alongX ? x1 : z1) - 1, a2 = (alongX ? x2 : z2) + 1;
-		int base = y + 5 + (h.kind() % 2);
-		for (int i = 0; lo + i <= hi - i; i++) {
-			for (int t = a1; t <= a2; t++) {
-				int p = lo + i, q = hi - i;
-				if (p == q) {
-					put(c, alongX, t, base + i, p, Kit.slab(h.roof() == Blocks.SPRUCE_STAIRS ? Blocks.SPRUCE_SLAB : Blocks.DARK_OAK_SLAB, false));
-				} else {
-					put(c, alongX, t, base + i, p, stair(h.roof(), alongX ? Direction.SOUTH : Direction.EAST, false));
-					put(c, alongX, t, base + i, q, stair(h.roof(), alongX ? Direction.NORTH : Direction.WEST, false));
-				}
-				if ((t == a1 + 1 || t == a2 - 1) && i > 0) {
-					for (int m = p + 1; m < q; m++) {
-						put(c, alongX, t, base + i, m, s(h.wall()));
-					}
-				}
-			}
-		}
-		// Raise the walls to meet a higher roof base.
-		if (base > y + 5) {
-			for (int x = x1; x <= x2; x++) {
-				for (int z = z1; z <= z2; z++) {
-					if (x == x1 || x == x2 || z == z1 || z == z2) {
-						c.set(x, y + 5, z, s(h.wall()));
-					}
-				}
-			}
-		}
-		// Furniture.
-		int ix = x1 + 1, iz = z1 + 1;
-		c.set(ix, y + 2, iz, s(Blocks.RED_BED).setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.HEAD));
-		c.set(ix, y + 2, iz + 1, s(Blocks.RED_BED).setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.FOOT));
-		c.set(x2 - 1, y + 2, iz, h.kind() % 3 == 0 ? s(Blocks.CRAFTING_TABLE) : h.kind() % 3 == 1 ? s(Blocks.LOOM) : s(Blocks.BOOKSHELF));
-		c.set(x2 - 1, y + 2, z2 - 1, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set(ix + 1, y + 2, iz, s(Blocks.FLOWER_POT));
-		c.set((x1 + x2) / 2, y + 4, (z1 + z2) / 2, lantern(true));
-	}
-
-	private static void put(Canvas c, boolean alongX, int t, int y, int m, BlockState state) {
-		if (alongX) {
-			c.set(t, y, m, state);
-		} else {
-			c.set(m, y, t, state);
-		}
-	}
-
-	/**
-	 * The waterfall: a source in a stone spout on the village's south edge and a falling column straight down into the
-	 * crescent's lake. Placed as falling water so it looks right at once and never spreads sideways.
-	 */
+	/** The waterfall: from the spout on Mistfall's south edge straight down into the cove's pool. */
 	private void waterfall(Canvas c) {
-		if (!c.near(FALL_X, FALL_Z, 3)) {
+		if (!c.near(FALL_X, FALL_Z, 4)) {
 			return;
 		}
-		int top = VILLAGE_Y;
 		for (int x = FALL_X - 1; x <= FALL_X; x++) {
-			// The spout: a short stone channel cut into the edge.
-			c.set(x, top, FALL_Z - 2, s(Blocks.WATER));
-			c.set(x, top, FALL_Z - 1, s(Blocks.WATER));
-			c.set(x, top - 1, FALL_Z - 2, s(Blocks.STONE_BRICKS));
-			c.set(x, top - 1, FALL_Z - 1, s(Blocks.STONE_BRICKS));
+			for (int z = FALL_Z - 3; z <= FALL_Z - 1; z++) {
+				c.set(x, WF_Y, z, s(Blocks.WATER));
+				c.set(x, WF_Y - 1, z, s(Blocks.STONE_BRICKS));
+				c.set(x, WF_Y + 1, z, s(Blocks.AIR));
+			}
+			for (int z = FALL_Z - 3; z <= FALL_Z; z++) {
+				for (int rx : new int[]{FALL_X - 2, FALL_X + 1}) {
+					c.set(rx, WF_Y, z, s(Blocks.MOSSY_STONE_BRICKS));
+					c.set(rx, WF_Y + 1, z, s(Blocks.AIR));
+				}
+			}
 			BlockState falling = s(Blocks.WATER).setValue(LiquidBlock.LEVEL, 8);
-			for (int y = top; y >= 65; y--) {
+			for (int y = WF_Y; y >= 65; y--) {
 				c.set(x, y, FALL_Z, falling);
 			}
-			c.tickFluid(x, top, FALL_Z);
+			c.tickFluid(x, WF_Y, FALL_Z);
 		}
-		for (int y = top - 6; y >= 70; y -= 6) {
+		for (int y = WF_Y - 6; y >= 70; y -= 6) {
 			c.set(FALL_X + 1, y, FALL_Z + 1, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 12));
 		}
-		c.set(FALL_X - 2, top, FALL_Z - 2, s(Blocks.STONE_BRICKS));
-		c.set(FALL_X + 1, top, FALL_Z - 2, s(Blocks.STONE_BRICKS));
-		c.set(FALL_X - 2, top, FALL_Z - 1, s(Blocks.STONE_BRICKS));
-		c.set(FALL_X + 1, top, FALL_Z - 1, s(Blocks.STONE_BRICKS));
 	}
 
-	// ---------------------------------------------------------------------------------------------------- sanctuary entrance
+	// ---------------------------------------------------------------------------------------------------- Bloomhold
 
-	/**
-	 * The sanctuary gate: a weathered temple (a stepped base, four corner piers, a carved lintel band, a cracked stone
-	 * roof) whose chamber holds a shaft of cloud rising from a ringed floor: stepping into the cloud carries a player up to
-	 * the Upper Sanctuary. Grass and two trees round it, a broad stair from the village bridge.
-	 */
-	private void sanctuaryGate(Canvas c) {
-		int cx = GATE_X, cz = GATE_Z - 3, y = GATE_Y;
-		int x0 = cx - 6, x1 = cx + 6, z0 = cz - 6, z1 = cz + 6;
-		for (int x = x0 - 1; x <= x1 + 1; x++) {
-			for (int z = z0 - 1; z <= z1 + 1; z++) {
-				c.set(x, y + 1, z, aged(x, y + 1, z));
-			}
-		}
-		for (int x = x0; x <= x1; x++) {
-			for (int z = z0; z <= z1; z++) {
-				boolean wall = x == x0 || x == x1 || z == z0 || z == z1;
-				boolean pier = (x == x0 || x == x1) && (z == z0 || z == z1);
-				for (int yy = y + 2; yy <= y + 10; yy++) {
-					boolean door = z == z1 && Math.abs(x - cx) <= 2 && yy <= y + 7;
-					BlockState b = pier ? s(Blocks.POLISHED_ANDESITE) : yy == y + 8 ? s(Blocks.CHISELED_STONE_BRICKS) : aged(x, yy, z);
-					c.set(x, yy, z, wall && !door ? b : s(Blocks.AIR));
-				}
-				c.set(x, y + 11, z, unit(x, z, 91) < 0.15 ? s(Blocks.AIR) : s(Blocks.CRACKED_STONE_BRICKS)); // a broken roof
-			}
-		}
-		c.fill(cx - 3, y + 8, z1, cx + 3, y + 8, z1, s(Blocks.CHISELED_STONE_BRICKS));
-		// The cloud shaft: a ring of quartz round a 3 x 3 floor of cloud, cloud columns rising to the roof's hole.
-		for (int dx = -2; dx <= 2; dx++) {
-			for (int dz = -2; dz <= 2; dz++) {
-				boolean ring = Math.abs(dx) == 2 || Math.abs(dz) == 2;
-				c.set(cx + dx, y + 1, cz + dz, ring ? s(Blocks.CHISELED_QUARTZ_BLOCK) : s(Blocks.SNOW_BLOCK));
-			}
-		}
-		for (int[] p : new int[][]{{-2, -2}, {2, -2}, {-2, 2}, {2, 2}}) {
-			c.fill(cx + p[0], y + 2, cz + p[1], cx + p[0], y + 9, cz + p[1], s(Blocks.QUARTZ_PILLAR));
-			c.set(cx + p[0], y + 10, cz + p[1], s(Blocks.SEA_LANTERN));
-		}
-		c.fill(cx - 1, y + 11, cz - 1, cx + 1, y + 11, cz + 1, s(Blocks.AIR)); // open to the sky above the shaft
-		// Stair and steps from the bridge landing.
-		for (int x = cx - 2; x <= cx + 2; x++) {
-			c.set(x, y + 1, z1 + 1, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-		}
-		tree(c, cx - 10, y, GATE_Z + 4, 5, Blocks.OAK_LOG, Blocks.OAK_LEAVES);
-		tree(c, cx + 10, y, GATE_Z + 6, 5, Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES);
-	}
-
-	// ---------------------------------------------------------------------------------------------------- upper sanctuary
-
-	/** Plateau A: four houses round a green, the upper quest giver's post, the glowing return doorway, trees. */
-	private void plateauA(Canvas c) {
-		int y = PA_Y;
-		House[] hs = {new House(PA_X - 2, PA_Z - 20, 7, 6, Direction.SOUTH, Blocks.DARK_OAK_STAIRS, Blocks.CALCITE, 1),
-				new House(PA_X + 10, PA_Z - 18, 6, 6, Direction.SOUTH, Blocks.SPRUCE_STAIRS, Blocks.SPRUCE_PLANKS, 2),
-				new House(PA_X + 14, PA_Z + 6, 6, 7, Direction.WEST, Blocks.DARK_OAK_STAIRS, Blocks.CALCITE, 3),
-				new House(PA_X - 4, PA_Z + 14, 7, 6, Direction.NORTH, Blocks.SPRUCE_STAIRS, Blocks.BIRCH_PLANKS, 4)};
-		for (House h : hs) {
-			houseAt(c, h, y);
-		}
-		// The green: a path ring and a stone circle.
-		for (int x = PA_X - 26; x <= PA_X + 26; x++) {
-			for (int z = PA_Z - 22; z <= PA_Z + 22; z++) {
-				if (!c.inChunk(x, z) || edge(x, z, PA_X, PA_Z, PA_RX, PA_RZ, 13) > 0.95) {
-					continue;
-				}
-				double d = Math.hypot(x - PA_X, z - PA_Z);
-				if (Math.abs(d - 8) < 1.1 || (Math.abs(z - (PA_Z - 2)) <= 1 && x > PA_X + 8)) {
-					c.set(x, y, z, unit(x, z, 101) < 0.3 ? s(Blocks.COBBLESTONE) : s(Blocks.DIRT_PATH));
-				} else if (unit(x, z, 102) < 0.04) {
-					c.set(x, y + 1, z, s(Blocks.LILY_OF_THE_VALLEY));
-				}
-			}
-		}
-		// The return doorway: a quartz arch filled with a sheet of cloud light.
-		int dx = PORTAL_DOWN_X, dz = PORTAL_DOWN_Z;
-		for (int k = -2; k <= 2; k++) {
-			for (int yy = y + 1; yy <= y + 6; yy++) {
-				boolean side = Math.abs(k) == 2;
-				boolean topRow = yy == y + 6;
-				c.set(dx, yy, dz + k, side || topRow ? s(Blocks.CHISELED_QUARTZ_BLOCK) : s(Blocks.AIR));
-			}
-		}
-		c.set(dx, y + 7, dz, s(Blocks.SEA_LANTERN));
-		c.fill(dx, y, dz - 1, dx, y, dz + 1, s(Blocks.SNOW_BLOCK));
-		// Quest giver's post (a lectern under a small canopy).
-		int qx = PA_X + 6, qz = PA_Z + 4;
-		c.fill(qx, y + 1, qz - 1, qx, y + 3, qz - 1, s(Blocks.SPRUCE_FENCE));
-		c.fill(qx, y + 1, qz + 1, qx, y + 3, qz + 1, s(Blocks.SPRUCE_FENCE));
-		c.fill(qx - 1, y + 4, qz - 1, qx, y + 4, qz + 1, s(Blocks.LIGHT_BLUE_WOOL));
-		c.set(qx, y + 1, qz, s(Blocks.LECTERN));
-		for (int[] t : new int[][]{{PA_X - 18, PA_Z - 10, 6}, {PA_X + 22, PA_Z - 8, 6}, {PA_X - 14, PA_Z + 18, 5}, {PA_X + 4, PA_Z + 24, 5}}) {
-			tree(c, t[0], y, t[1], t[2], Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES);
-		}
-	}
-
-	/** A house standing on a fixed level {@code y} (for the plateaus). */
-	private static void houseAt(Canvas c, House h, int y) {
-		House shifted = h;
-		// Reuse the village builder by temporarily treating y as the village height: build directly here instead.
-		int x1 = h.x(), z1 = h.z(), x2 = h.x() + h.w() - 1, z2 = h.z() + h.d() - 1;
-		for (int x = x1; x <= x2; x++) {
-			for (int z = z1; z <= z2; z++) {
-				boolean wall = x == x1 || x == x2 || z == z1 || z == z2;
-				boolean corner = (x == x1 || x == x2) && (z == z1 || z == z2);
-				c.set(x, y, z, s(Blocks.STONE_BRICKS));
-				c.set(x, y + 1, z, wall ? s(Blocks.STONE_BRICKS) : s(Blocks.SPRUCE_PLANKS));
-				for (int yy = y + 2; yy <= y + 4; yy++) {
-					c.set(x, yy, z, wall ? (corner ? s(Blocks.STRIPPED_DARK_OAK_LOG) : s(h.wall())) : s(Blocks.AIR));
-				}
-			}
-		}
-		Direction f = shifted.front();
-		int dx = f == Direction.EAST ? x2 : f == Direction.WEST ? x1 : (x1 + x2) / 2;
-		int dz = f == Direction.SOUTH ? z2 : f == Direction.NORTH ? z1 : (z1 + z2) / 2;
-		BlockState door = s(Blocks.DARK_OAK_DOOR).setValue(BlockStateProperties.HORIZONTAL_FACING, f).setValue(BlockStateProperties.OPEN, true)
-				.setValue(BlockStateProperties.DOOR_HINGE, DoorHingeSide.LEFT);
-		c.set(dx, y + 2, dz, door.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER));
-		c.set(dx, y + 3, dz, door.setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER));
-		c.set(dx + f.getStepX(), y + 1, dz + f.getStepZ(), stair(Blocks.STONE_BRICK_STAIRS, f.getOpposite(), false));
-		for (int x = x1 + 2; x < x2; x += 3) {
-			c.set(x, y + 3, z1, Kit.connected(Blocks.GLASS_PANE, true));
-			c.set(x, y + 3, z2, Kit.connected(Blocks.GLASS_PANE, true));
-		}
-		boolean alongX = h.w() >= h.d();
-		int lo = (alongX ? z1 : x1) - 1, hi = (alongX ? z2 : x2) + 1, a1 = (alongX ? x1 : z1) - 1, a2 = (alongX ? x2 : z2) + 1;
-		int base = y + 5;
-		for (int i = 0; lo + i <= hi - i; i++) {
-			for (int t = a1; t <= a2; t++) {
-				int p = lo + i, q = hi - i;
-				if (p == q) {
-					put(c, alongX, t, base + i, p, Kit.slab(Blocks.DARK_OAK_SLAB, false));
-				} else {
-					put(c, alongX, t, base + i, p, stair(h.roof(), alongX ? Direction.SOUTH : Direction.EAST, false));
-					put(c, alongX, t, base + i, q, stair(h.roof(), alongX ? Direction.NORTH : Direction.WEST, false));
-				}
-				if ((t == a1 + 1 || t == a2 - 1) && i > 0) {
-					for (int m = p + 1; m < q; m++) {
-						put(c, alongX, t, base + i, m, s(h.wall()));
+	/** Bloomhold: the plaza and fountain, six colourful cottages, three round domed towers, paths, trees, lamps. */
+	private void village(Canvas c) {
+		int y = V_Y;
+		// Paths: from the south bridge, the two east bridges and between the houses, all to the plaza.
+		pave(c, y, 3, -40, -18, -42, -34);
+		pave(c, y, 3, -20, -28, -38, -38);
+		pave(c, y, 3, -18, -48, -38, -42);
+		pave(c, y, 2, -50, -40, -55, -43);
+		pave(c, y, 2, -50, -40, -56, -36, -56, -31);
+		pave(c, y, 2, -46, -46, -51, -52);
+		pave(c, y, 2, -42, -46, -37, -51);
+		pave(c, y, 2, -38, -44, -33, -49, -31, -49);
+		pave(c, y, 2, -46, -34, -51, -29);
+		pave(c, y, 2, -44, -47, -44, -52);
+		pave(c, y, 2, -38, -38, -28, -40);
+		pave(c, y, 2, -40, -30, -36, -28);
+		// The plaza and its fountain.
+		if (c.near(V_X, V_Z, 9)) {
+			for (int dx = -7; dx <= 7; dx++) {
+				for (int dz = -7; dz <= 7; dz++) {
+					double d = Math.hypot(dx, dz);
+					if (d <= 7.3) {
+						int x = V_X + dx, z = V_Z + dz;
+						c.set(x, y, z, d > 6.3 ? s(Blocks.POLISHED_DIORITE) : (Math.floorMod(dx + dz, 2) == 0 ? s(Blocks.CALCITE) : s(Blocks.SMOOTH_STONE)));
+						c.fill(x, y + 1, z, x, y + 3, z, s(Blocks.AIR));
 					}
 				}
 			}
-		}
-		c.set(x1 + 1, y + 2, z1 + 1, s(Blocks.WHITE_BED).setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.HEAD));
-		c.set(x1 + 1, y + 2, z1 + 2, s(Blocks.WHITE_BED).setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.FOOT));
-		c.set(x2 - 1, y + 2, z1 + 1, s(Blocks.BOOKSHELF));
-		c.set(x2 - 1, y + 2, z2 - 1, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set((x1 + x2) / 2, y + 4, (z1 + z2) / 2, lantern(true));
-	}
-
-	/**
-	 * Plateau B: the great bell on a timber-and-stone frame over a raised round dais, stone paths, the ancient temple at the
-	 * east end (a broad stair, tall columns, a pillared hall with side chambers and a spot for an instructor), and the boss
-	 * arena on the north side (a 34 x 24 stone floor inside a wall, no gaps).
-	 */
-	private void plateauB(Canvas c) {
-		int y = PB_Y;
-		// Paths: from the root bridge east to the temple, a branch north to the arena.
-		for (int x = PB_X - PB_RX; x <= PB_X + PB_RX; x++) {
-			for (int z = PB_Z - PB_RZ; z <= PB_Z + PB_RZ; z++) {
-				if (!c.inChunk(x, z) || edge(x, z, PB_X, PB_Z, PB_RX, PB_RZ, 17) > 0.96) {
-					continue;
-				}
-				boolean main = Math.abs(z - PB_Z) <= 1 && x < PB_X + 30;
-				boolean branch = Math.abs(x - PB_X) <= 1 && z < PB_Z && z > PB_Z - 16;
-				if (main || branch) {
-					c.set(x, y, z, unit(x, z, 111) < 0.3 ? s(Blocks.MOSSY_COBBLESTONE) : s(Blocks.STONE_BRICKS));
-				} else if (unit(x, z, 112) > 0.9) {
-					c.set(x, y + 1, z, s(Blocks.GRASS));
-				}
-			}
-		}
-		bell(c, PB_X - 8, y, PB_Z);
-		ancientTemple(c, PB_X + 36, y, PB_Z);
-		bossArena(c, PB_X, y, PB_Z - 28);
-		for (int[] t : new int[][]{{PB_X - 36, PB_Z - 20, 7}, {PB_X - 30, PB_Z + 26, 6}, {PB_X + 20, PB_Z + 30, 6}, {PB_X - 10, PB_Z + 34, 5}}) {
-			tree(c, t[0], y, t[1], t[2], Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES);
-		}
-	}
-
-	/** The great bell: a round dais, two massive posts with braces, a beam, and a bell of gold and copper hanging free. */
-	private static void bell(Canvas c, int cx, int y, int cz) {
-		for (int dx = -7; dx <= 7; dx++) {
-			for (int dz = -7; dz <= 7; dz++) {
-				double d = Math.hypot(dx, dz);
-				if (d <= 7.2) {
-					c.set(cx + dx, y + 1, cz + dz, d > 6.2 ? s(Blocks.STONE_BRICKS) : s(Blocks.POLISHED_DIORITE));
-				}
-				if (d <= 6.2 && d > 5.2) {
-					c.set(cx + dx, y + 2, cz + dz, s(Blocks.STONE_BRICK_WALL));
-				}
-			}
-		}
-		for (int dz : new int[]{-1, 1}) {
-			c.set(cx, y + 2, cz + dz * 6, s(Blocks.AIR)); // openings in the low wall
-		}
-		for (int dx : new int[]{-5, 5}) {
-			c.fill(cx + dx, y + 2, cz - 1, cx + dx, y + 16, cz + 1, s(Blocks.DARK_OAK_LOG));
-			c.set(cx + dx, y + 2, cz, s(Blocks.CHISELED_STONE_BRICKS));
-			c.set(cx + dx + (dx > 0 ? -1 : 1), y + 15, cz, stair(Blocks.DARK_OAK_STAIRS, dx > 0 ? Direction.EAST : Direction.WEST, true));
-		}
-		c.fill(cx - 6, y + 17, cz - 1, cx + 6, y + 17, cz + 1, s(Blocks.STRIPPED_DARK_OAK_LOG).setValue(RotatedPillarBlock.AXIS, Direction.Axis.X));
-		c.fill(cx - 6, y + 18, cz, cx + 6, y + 18, cz, Kit.slab(Blocks.DARK_OAK_SLAB, false));
-		// The bell: chains, a crown, and a flaring body (radius 1 -> 3) of gold with a copper lip.
-		c.fill(cx, y + 15, cz, cx, y + 16, cz, s(Blocks.CHAIN));
-		for (int k = 0; k <= 6; k++) {
-			int yy = y + 14 - k;
-			double r = k == 0 ? 1 : 1.2 + k * 0.35;
 			for (int dx = -3; dx <= 3; dx++) {
 				for (int dz = -3; dz <= 3; dz++) {
 					double d = Math.hypot(dx, dz);
-					if (d <= r && (d > r - 1.2 || k == 0)) {
-						c.set(cx + dx, yy, cz + dz, k == 6 ? s(Blocks.CUT_COPPER) : s(Blocks.GOLD_BLOCK));
+					if (d <= 3.4) {
+						int x = V_X + dx, z = V_Z + dz;
+						c.set(x, y, z, s(Blocks.QUARTZ_BRICKS));
+						c.set(x, y + 1, z, d > 2.5 ? s(Blocks.QUARTZ_BRICKS) : s(Blocks.WATER));
 					}
 				}
 			}
-		}
-		c.set(cx, y + 9, cz, s(Blocks.CHAIN));
-		c.set(cx, y + 8, cz, s(Blocks.COPPER_BLOCK)); // the clapper
-	}
-
-	/**
-	 * The ancient temple at the plateau's east end, facing west: a broad stair, eight tall columns along the front, a
-	 * pillared hall with a glowing dais, two side chambers, decorative bands, and a roof parapet.
-	 */
-	private static void ancientTemple(Canvas c, int cx, int y, int cz) {
-		int x0 = cx - 8, x1 = cx + 8, z0 = cz - 12, z1 = cz + 12;
-		c.fill(x0 - 2, y + 1, z0 - 2, x1 + 2, y + 2, z1 + 2, s(Blocks.STONE_BRICKS));
-		for (int k = 0; k < 2; k++) {
-			for (int z = cz - 6; z <= cz + 6; z++) {
-				c.set(x0 - 3 - k, y + 1 + (1 - k), z, stair(Blocks.STONE_BRICK_STAIRS, Direction.EAST, false));
+			c.set(V_X, y + 1, V_Z, s(Blocks.QUARTZ_PILLAR));
+			c.set(V_X, y + 2, V_Z, s(Blocks.QUARTZ_PILLAR));
+			c.set(V_X, y + 3, V_Z, s(Blocks.WATER));
+			c.tickFluid(V_X, y + 3, V_Z);
+			for (int[] l : new int[][]{{-6, -2}, {6, 2}, {-2, 6}, {2, -6}}) {
+				lampPost(c, V_X + l[0], y, V_Z + l[1]);
+			}
+			// Benches facing the fountain.
+			for (int dz = -1; dz <= 1; dz++) {
+				c.set(V_X - 5, y + 1, V_Z + dz, stair(Blocks.SPRUCE_STAIRS, Direction.WEST, false));
+				c.set(V_X + 5, y + 1, V_Z + dz, stair(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
 			}
 		}
-		int fy = y + 3;
-		for (int z = z0; z <= z1; z += 3) {
-			c.set(x0 - 1, fy, z, s(Blocks.CHISELED_STONE_BRICKS));
-			c.fill(x0 - 1, fy + 1, z, x0 - 1, fy + 11, z, s(Blocks.QUARTZ_PILLAR));
-			c.set(x0 - 1, fy + 12, z, s(Blocks.CHISELED_STONE_BRICKS));
+		for (Cottage h : COTTAGES) {
+			if (c.near(h.x() + h.w() / 2, h.z() + h.d() / 2, 12)) {
+				cottage(c, h, y);
+			}
 		}
-		for (int x = x0; x <= x1; x++) {
-			for (int z = z0; z <= z1; z++) {
-				boolean wall = x == x0 || x == x1 || z == z0 || z == z1;
-				boolean partition = (z == cz - 6 || z == cz + 6) && x > x0 + 2;
-				for (int yy = fy; yy <= fy + 12; yy++) {
-					boolean door = x == x0 && Math.abs(z - cz) <= 2 && yy <= fy + 6 && yy > fy;
-					boolean sideDoor = partition && x >= cx - 1 && x <= cx + 1 && yy > fy && yy <= fy + 3;
-					BlockState b = yy == fy ? s(Blocks.POLISHED_DIORITE) : yy == fy + 8 ? s(Blocks.CHISELED_STONE_BRICKS) : aged(x, yy, z);
-					if (yy == fy) {
-						c.set(x, yy, z, b);
+		for (int i = 0; i < TOWERS.length; i++) {
+			if (c.near(TOWERS[i][0], TOWERS[i][1], 8)) {
+				domedTower(c, TOWERS[i][0], TOWERS[i][1], y, 3, 11, TOWER_DOMES[i]);
+			}
+		}
+		for (int[] t : new int[][]{{-67, -38}, {-59, -52}, {-45, -21}, {-20, -33}, {-52, -48}}) {
+			tree(c, t[0], y, t[1], 5, t[0] % 2 == 0 ? Blocks.OAK_LOG : Blocks.BIRCH_LOG, t[0] % 2 == 0 ? Blocks.OAK_LEAVES : Blocks.BIRCH_LEAVES);
+		}
+		// Flower beds by the cottages, then the meadow everywhere else.
+		for (int[] b : new int[][]{{-56, -39}, {-47, -52}, {-34, -54}, {-47, -27}}) {
+			if (c.near(b[0], b[1], 3)) {
+				c.set(b[0], y + 1, b[1], s(Blocks.ROSE_BUSH));
+				c.set(b[0], y + 2, b[1], s(Blocks.ROSE_BUSH).setValue(net.minecraft.world.level.block.DoublePlantBlock.HALF,
+						net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+			}
+		}
+		if (c.near(V_X, V_Z, V_RX + 2)) {
+			meadow(c, V_X - V_RX, V_Z - V_RZ, V_X + V_RX, V_Z + V_RZ, y, 11);
+		}
+		// A notice board by the quest giver.
+		if (c.near(-37, -34, 2)) {
+			c.set(-37, y + 1, -33, s(Blocks.SPRUCE_FENCE));
+			c.set(-37, y + 2, -33, Canvas.facing(s(Blocks.SPRUCE_WALL_SIGN), Direction.SOUTH));
+			c.set(-37, y + 2, -34, s(Blocks.SPRUCE_PLANKS));
+			c.set(-37, y + 1, -34, s(Blocks.SPRUCE_FENCE));
+		}
+	}
+
+	/** A colourful cottage on ground y: framed walls, windows, a door with a lantern, a stair roof, a furnished room. */
+	private static void cottage(Canvas c, Cottage h, int y) {
+		int minX = h.x(), minZ = h.z(), maxX = h.x() + h.w() - 1, maxZ = h.z() + h.d() - 1;
+		Kit.Palette p = new Kit.Palette(h.wall(), Blocks.STRIPPED_BIRCH_LOG, Blocks.BIRCH_PLANKS, h.roof(), h.roofSlab(), Blocks.BIRCH_DOOR, Blocks.GLASS_PANE);
+		c.fill(minX, y, minZ, maxX, y, maxZ, s(Blocks.BIRCH_PLANKS));
+		for (int x = minX; x <= maxX; x++) {
+			for (int z = minZ; z <= maxZ; z++) {
+				boolean edgeX = x == minX || x == maxX, edgeZ = z == minZ || z == maxZ;
+				if (!edgeX && !edgeZ) {
+					c.fill(x, y + 1, z, x, y + 4, z, s(Blocks.AIR));
+					continue;
+				}
+				boolean corner = edgeX && edgeZ;
+				for (int dy = 1; dy <= 3; dy++) {
+					BlockState b = corner ? s(Blocks.STRIPPED_BIRCH_LOG) : s(h.wall());
+					if (dy == 2 && !corner && Math.floorMod(edgeX ? z : x, 2) == 0) {
+						b = Kit.connected(Blocks.GLASS_PANE, !edgeX);
+					}
+					c.set(x, y + dy, z, b);
+				}
+				c.set(x, y + 4, z, s(Blocks.STRIPPED_BIRCH_LOG).setValue(RotatedPillarBlock.AXIS, corner ? Direction.Axis.Y : edgeX ? Direction.Axis.Z : Direction.Axis.X));
+			}
+		}
+		Direction front = h.front();
+		int dx = front == Direction.EAST ? maxX : front == Direction.WEST ? minX : (minX + maxX) / 2;
+		int dz = front == Direction.SOUTH ? maxZ : front == Direction.NORTH ? minZ : (minZ + maxZ) / 2;
+		Kit.door(c, dx, y + 1, dz, Blocks.BIRCH_DOOR, front.getOpposite());
+		c.set(dx + front.getStepX(), y, dz + front.getStepZ(), s(Blocks.POLISHED_DIORITE));
+		c.fill(dx + front.getStepX(), y + 1, dz + front.getStepZ(), dx + front.getStepX(), y + 2, dz + front.getStepZ(), s(Blocks.AIR));
+		// A lantern on a short post beside the door, a flowering bush on the other side.
+		Direction side = front.getClockWise();
+		int px = dx + side.getStepX() * 2 + front.getStepX(), pz = dz + side.getStepZ() * 2 + front.getStepZ();
+		c.set(px, y + 1, pz, s(Blocks.BIRCH_FENCE));
+		c.set(px, y + 2, pz, lantern(Blocks.LANTERN, false));
+		int bx = dx - side.getStepX() * 2 + front.getStepX(), bz = dz - side.getStepZ() * 2 + front.getStepZ();
+		c.set(bx, y + 1, bz, s(Blocks.FLOWERING_AZALEA_LEAVES).setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true));
+		Kit.gableRoof(c, minX - 1, minZ - 1, maxX + 1, maxZ + 1, y + 4, p, maxX - minX >= maxZ - minZ);
+		Kit.furnish(c, minX + 1, minZ + 1, maxX - 1, maxZ - 1, y, Kit.Interior.HOME, front);
+		c.set(maxX - 1, y + 2, minZ + 1, lantern(Blocks.LANTERN, false)); // on the crafting table
+	}
+
+	/** A round tower on ground y with a coloured dome: white walls, a coloured band, windows, a door toward the plaza. */
+	private static void domedTower(Canvas c, int cx, int cz, int y, int r, int h, Block dome) {
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d > r + 0.4) {
+					continue;
+				}
+				boolean shell = d > r - 0.8;
+				c.set(cx + dx, y, cz + dz, s(Blocks.POLISHED_DIORITE));
+				for (int yy = y + 1; yy <= y + h; yy++) {
+					int k = yy - y;
+					BlockState b;
+					if (!shell) {
+						b = s(Blocks.AIR);
+					} else if (k == h - 1) {
+						b = s(dome == Blocks.ORANGE_CONCRETE ? Blocks.ORANGE_TERRACOTTA : Blocks.LIGHT_BLUE_TERRACOTTA);
+					} else if ((k == 3 || k == 7) && (dx == 0 || dz == 0)) {
+						b = s(Blocks.GLASS);
 					} else {
-						c.set(x, yy, z, (wall || partition) && !door && !sideDoor ? b : s(Blocks.AIR));
+						b = s(Blocks.WHITE_CONCRETE);
+					}
+					c.set(cx + dx, yy, cz + dz, b);
+				}
+			}
+		}
+		// The dome: a half sphere a block wider than the walls, with a gold finial.
+		int R = r + 1;
+		for (int dx = -R; dx <= R; dx++) {
+			for (int dz = -R; dz <= R; dz++) {
+				for (int dy = 0; dy <= R; dy++) {
+					double d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+					if (d <= R + 0.45 && d > R - 0.75) {
+						c.set(cx + dx, y + h + 1 + dy, cz + dz, s(dome));
+					} else if (d <= R - 0.75 && dy == 0) {
+						c.set(cx + dx, y + h + 1, cz + dz, s(Blocks.BIRCH_PLANKS));
 					}
 				}
-				c.set(x, fy + 13, z, s(Blocks.SMOOTH_STONE));
-				if (wall) {
-					c.set(x, fy + 14, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICK_WALL) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+			}
+		}
+		c.set(cx, y + h + R + 2, cz, s(Blocks.GOLD_BLOCK));
+		c.set(cx, y + h + R + 3, cz, s(Blocks.LIGHTNING_ROD));
+		c.set(cx, y + h, cz, lantern(Blocks.LANTERN, true));
+		// The door faces the plaza.
+		Direction toPlaza = inward(cx - V_X, cz - V_Z);
+		Kit.door(c, cx + toPlaza.getStepX() * r, y + 1, cz + toPlaza.getStepZ() * r, Blocks.BIRCH_DOOR, toPlaza.getOpposite());
+		c.set(cx + toPlaza.getStepX() * (r + 1), y, cz + toPlaza.getStepZ() * (r + 1), s(Blocks.POLISHED_DIORITE));
+		c.fill(cx + toPlaza.getStepX() * (r + 1), y + 1, cz + toPlaza.getStepZ() * (r + 1), cx + toPlaza.getStepX() * (r + 1), y + 2,
+				cz + toPlaza.getStepZ() * (r + 1), s(Blocks.AIR));
+		// A ladder up the back wall to a lookout floor under the dome.
+		Direction back = toPlaza.getOpposite();
+		int lx = cx + back.getStepX() * (r - 1), lz = cz + back.getStepZ() * (r - 1);
+		for (int yy = y + 1; yy <= y + h; yy++) {
+			c.set(lx, yy, lz, Canvas.facing(s(Blocks.LADDER), toPlaza));
+		}
+		for (int dx = -r + 1; dx <= r - 1; dx++) {
+			for (int dz = -r + 1; dz <= r - 1; dz++) {
+				if (Math.hypot(dx, dz) <= r - 0.8 && (cx + dx != lx || cz + dz != lz)) {
+					c.set(cx + dx, y + 8, cz + dz, s(Blocks.BIRCH_PLANKS));
 				}
 			}
 		}
-		for (int z : new int[]{cz - 3, cz + 3}) {
-			for (int x : new int[]{cx - 3, cx + 3}) {
-				c.fill(x, fy + 1, z, x, fy + 12, z, s(Blocks.QUARTZ_PILLAR));
-			}
-		}
-		c.fill(cx + 4, fy + 1, cz - 1, cx + 6, fy + 1, cz + 1, s(Blocks.CHISELED_QUARTZ_BLOCK));
-		c.set(cx + 5, fy + 2, cz, s(Blocks.SEA_LANTERN));
-		c.set(cx, fy + 11, cz, lantern(true));
-		c.set(cx, fy + 3, cz - 9, lantern(true));
-		c.set(cx, fy + 3, cz + 9, lantern(true));
-		c.set(cx + 6, fy + 1, cz - 9, s(Blocks.BOOKSHELF));
-		c.set(cx + 6, fy + 1, cz + 9, s(Blocks.LECTERN));
+		c.set(cx, y + 8, cz, s(Blocks.BIRCH_PLANKS));
+		c.set(cx - back.getStepX(), y + 7, cz - back.getStepZ(), lantern(Blocks.LANTERN, true));
 	}
 
-	/** The boss arena: a wide stone floor (34 x 24) with a solid wall and torches, two gates facing the bell. */
-	private static void bossArena(Canvas c, int cx, int y, int cz) {
-		int x0 = cx - 17, x1 = cx + 17, z0 = cz - 12, z1 = cz + 12;
-		for (int x = x0; x <= x1; x++) {
-			for (int z = z0; z <= z1; z++) {
-				boolean wall = x == x0 || x == x1 || z == z0 || z == z1;
-				c.fill(x, y - 3, z, x, y - 1, z, s(Blocks.STONE));
-				c.set(x, y, z, wall ? s(Blocks.STONE_BRICKS) : (Math.abs(x - cx) + Math.abs(z - cz)) % 7 == 0 ? s(Blocks.CHISELED_STONE_BRICKS)
-						: unit(x, z, 121) < 0.2 ? s(Blocks.CRACKED_STONE_BRICKS) : s(Blocks.STONE_BRICKS));
-				c.fill(x, y + 1, z, x, y + 6, z, s(Blocks.AIR));
-				if (wall) {
-					boolean gate = z == z1 && Math.abs(x - cx) <= 2;
-					if (!gate) {
-						c.fill(x, y + 1, z, x, y + 3, z, aged(x, y + 2, z));
-						c.set(x, y + 4, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICK_WALL) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-						if ((x - x0) % 8 == 0 && (z == z0 || z == z1)) {
-							c.set(x, y + 5, z, s(Blocks.TORCH));
-						}
+	// ---------------------------------------------------------------------------------------------------- Azure Rise
+
+	/** The temple platform's extent, its top (y), and the colonnade's centre and radius. */
+	static final int TP_X1 = 26, TP_X2 = 46, TP_Z1 = -78, TP_Z2 = -61, TP_Y = T_Y + 2;
+	static final int COL_X = 36, COL_Z = -66, COL_R = 18;
+
+	/**
+	 * Azure Rise: a pale plaza, the temple (stepped platform, columns all round, a cella with an altar, a blue frieze and
+	 * blue pediments under a pale roof), the curved arched colonnade behind it, the arena in front, the sky arch.
+	 */
+	private void temple(Canvas c) {
+		int y = T_Y;
+		// The plaza in front, the path from the bridge, the boss arena ring.
+		pave(c, y, 3, 17, -62, 22, -56, 30, -56);
+		pave(c, y, 5, 26, -58, 46, -58);
+		pave(c, y, 3, 40, -54, 46, -50);
+		if (c.near(34, -50, 9)) {
+			for (int dx = -7; dx <= 7; dx++) {
+				for (int dz = -7; dz <= 7; dz++) {
+					double d = Math.hypot(dx, dz);
+					if (d <= 7.2 && d > 6.2) {
+						c.set(34 + dx, y, -50 + dz, s(Blocks.POLISHED_DIORITE));
+					} else if (d <= 6.2) {
+						c.set(34 + dx, y, -50 + dz, Math.floorMod(dx * 3 + dz, 5) == 0 ? s(Blocks.LIGHT_BLUE_CONCRETE) : s(Blocks.SMOOTH_QUARTZ));
 					}
 				}
 			}
+		}
+		colonnade(c);
+		if (c.near(36, -70, 16)) {
+			templeBuilding(c);
+		}
+		portalArch(c, PORTAL_UP_X, y, PORTAL_UP_Z, false);
+		// Planters and lamps on the plaza.
+		for (int[] l : new int[][]{{24, -58}, {48, -58}, {20, -62}}) {
+			if (c.near(l[0], l[1], 2)) {
+				lampPost(c, l[0], y, l[1]);
+			}
+		}
+		for (int[] b : new int[][]{{22, -66}, {50, -66}, {22, -74}, {50, -74}}) {
+			if (c.near(b[0], b[1], 2)) {
+				c.set(b[0], y + 1, b[1], s(Blocks.AZALEA_LEAVES).setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true));
+			}
+		}
+		// The stronger lower camp, west of the plaza.
+		if (c.near(20, -52, 6)) {
+			tent(c, 17, -51, y, Blocks.LIGHT_GRAY_WOOL);
+			tent(c, 23, -49, y, Blocks.BLUE_WOOL);
+			c.set(20, y + 1, -54, s(Blocks.CAMPFIRE));
+			c.set(16, y + 1, -55, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		}
+	}
+
+	/** The temple on its stepped platform. */
+	private static void templeBuilding(Canvas c) {
+		int y = T_Y;
+		// The platform (two steps), with stairs up the front.
+		for (int x = TP_X1; x <= TP_X2; x++) {
+			for (int z = TP_Z1; z <= TP_Z2; z++) {
+				c.set(x, y + 1, z, s(Blocks.SMOOTH_QUARTZ));
+				c.set(x, y + 2, z, (x + z) % 2 == 0 ? s(Blocks.QUARTZ_BRICKS) : s(Blocks.SMOOTH_QUARTZ));
+				c.fill(x, y + 3, z, x, y + 12, z, s(Blocks.AIR));
+			}
+		}
+		for (int x = TP_X1 - 1; x <= TP_X2 + 1; x++) {
+			c.set(x, y + 1, TP_Z2 + 1, stair(Blocks.QUARTZ_STAIRS, Direction.NORTH, false));
+			c.set(x, y + 1, TP_Z1 - 1, stair(Blocks.QUARTZ_STAIRS, Direction.SOUTH, false));
+		}
+		for (int z = TP_Z1; z <= TP_Z2; z++) {
+			c.set(TP_X1 - 1, y + 1, z, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, false));
+			c.set(TP_X2 + 1, y + 1, z, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, false));
+		}
+		for (int x = 33; x <= 39; x++) {
+			c.set(x, y + 2, TP_Z2 + 1, stair(Blocks.QUARTZ_STAIRS, Direction.NORTH, false));
+			c.set(x, y + 1, TP_Z2 + 2, stair(Blocks.QUARTZ_STAIRS, Direction.NORTH, false));
+			c.set(x, y + 1, TP_Z2 + 1, s(Blocks.SMOOTH_QUARTZ));
+		}
+		int fy = TP_Y; // floor
+		// Columns: six along the front (a wide gap at the door), five down each side, four along the back.
+		int[] front = {27, 30, 33, 39, 42, 45};
+		java.util.List<int[]> cols = new java.util.ArrayList<>();
+		for (int x : front) {
+			cols.add(new int[]{x, -62});
+			cols.add(new int[]{x, -77});
+		}
+		for (int z = -65; z >= -74; z -= 3) {
+			cols.add(new int[]{27, z});
+			cols.add(new int[]{45, z});
+		}
+		for (int[] col : cols) {
+			c.set(col[0], fy + 1, col[1], s(Blocks.CHISELED_QUARTZ_BLOCK));
+			c.fill(col[0], fy + 2, col[1], col[0], fy + 8, col[1], s(Blocks.QUARTZ_PILLAR));
+			c.set(col[0], fy + 9, col[1], s(Blocks.CHISELED_QUARTZ_BLOCK));
+		}
+		// The cella: walls inside the columns, a door in front, windows, a blue carpet to the altar.
+		for (int x = 29; x <= 43; x++) {
+			for (int z = -75; z <= -64; z++) {
+				boolean wall = x == 29 || x == 43 || z == -75 || z == -64;
+				if (!wall) {
+					continue;
+				}
+				for (int k = 1; k <= 9; k++) {
+					boolean window = (k == 4 || k == 5) && ((x == 29 || x == 43) && Math.floorMod(z, 3) == 0);
+					c.set(x, fy + k, z, window ? s(Blocks.LIGHT_BLUE_STAINED_GLASS) : k == 9 ? s(Blocks.CHISELED_QUARTZ_BLOCK) : s(Blocks.QUARTZ_BRICKS));
+				}
+			}
+		}
+		for (int x = 35; x <= 37; x++) {
+			for (int k = 1; k <= 5; k++) {
+				if (k == 5 && x != 36) {
+					c.set(x, fy + k, -64, stair(Blocks.QUARTZ_STAIRS, x == 35 ? Direction.EAST : Direction.WEST, true));
+				} else {
+					c.set(x, fy + k, -64, s(Blocks.AIR));
+				}
+			}
+		}
+		for (int z = -73; z <= -65; z++) {
+			c.set(36, fy + 1, z, s(Blocks.BLUE_CARPET));
+		}
+		c.fill(34, fy + 1, -74, 38, fy + 1, -74, s(Blocks.QUARTZ_BRICKS));
+		c.set(34, fy + 1, -74, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, false));
+		c.set(38, fy + 1, -74, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, false));
+		c.set(36, fy + 2, -74, s(Blocks.LAPIS_BLOCK));
+		c.set(36, fy + 3, -74, lantern(Blocks.SOUL_LANTERN, false));
+		c.set(32, fy + 8, -70, lantern(Blocks.LANTERN, true));
+		c.set(40, fy + 8, -70, lantern(Blocks.LANTERN, true));
+		c.fill(30, fy + 9, -74, 42, fy + 9, -65, s(Blocks.SMOOTH_QUARTZ));
+		c.set(32, fy + 9, -70, s(Blocks.SMOOTH_QUARTZ));
+		// Entablature over the columns: a pale beam and the blue frieze, a pale cornice.
+		for (int x = TP_X1; x <= TP_X2; x++) {
+			for (int z = TP_Z1; z <= TP_Z2 - 1; z++) {
+				boolean rim = x == TP_X1 || x == TP_X2 || z == TP_Z1 || z == TP_Z2 - 1;
+				c.set(x, fy + 10, z, rim ? s(Blocks.SMOOTH_QUARTZ) : s(Blocks.QUARTZ_BRICKS));
+				c.set(x, fy + 11, z, rim ? s(Blocks.BLUE_CONCRETE) : s(Blocks.QUARTZ_BRICKS));
+			}
+		}
+		// The roof: a pale gable along z, with blue pediments at both ends and gold at the apex and corners.
+		int ry = fy + 12, half = (TP_X2 - TP_X1) / 2 + 1;
+		for (int i = 0; i <= half; i++) {
+			int xa = TP_X1 - 1 + i, xb = TP_X2 + 1 - i, yy = ry + i;
+			for (int z = TP_Z1 - 1; z <= TP_Z2; z++) {
+				if (xa == xb) {
+					c.set(xa, yy, z, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
+					continue;
+				}
+				if (xa > xb) {
+					continue;
+				}
+				c.set(xa, yy, z, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, false));
+				c.set(xb, yy, z, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, false));
+				boolean end = z == TP_Z1 - 1 || z == TP_Z2;
+				for (int x = xa + 1; x <= xb - 1; x++) {
+					c.set(x, yy, z, end ? (x == xa + 1 || x == xb - 1 ? s(Blocks.SMOOTH_QUARTZ) : s(Blocks.BLUE_CONCRETE)) : s(Blocks.QUARTZ_BRICKS));
+				}
+			}
+		}
+		// A pale ring motif in each pediment, gold at the top.
+		for (int z : new int[]{TP_Z1 - 1, TP_Z2}) {
+			for (int dx = -2; dx <= 2; dx++) {
+				for (int dy = -2; dy <= 2; dy++) {
+					double d = Math.hypot(dx, dy);
+					if (d > 1.4 && d < 2.6) {
+						c.set(36 + dx, ry + 4 + dy, z, s(Blocks.SMOOTH_QUARTZ));
+					}
+				}
+			}
+			c.set(36, ry + 4, z, s(Blocks.GOLD_BLOCK));
+			c.set(36, ry + half + 1, z, s(Blocks.GOLD_BLOCK));
 		}
 	}
 
 	/**
-	 * The giant root bridge from plateau A to plateau B: a thick, twisting root (dark oak wood) arching between the
-	 * plateaus, flat-topped and four wide to walk on, with mossy patches, side tendrils and roots hanging beneath.
+	 * The curved arched colonnade behind the temple: a half ring of pale piers and round arches with a blue band and a
+	 * cornice, standing on a pale footing.
 	 */
-	private void rootBridge(Canvas c) {
-		int ax = PA_X + PA_RX - 4, ay = PA_Y, az = PA_Z;
-		int bx = PB_X - PB_RX + 4, by = PB_Y, bz = PB_Z;
-		if (!c.near((ax + bx) / 2, (az + bz) / 2, 30)) {
+	private static void colonnade(Canvas c) {
+		if (!c.near(COL_X, COL_Z - 8, COL_R + 4)) {
 			return;
 		}
-		int n = Math.max(Math.abs(bx - ax), Math.abs(bz - az));
-		for (int i = 0; i <= n; i++) {
-			double t = i / (double) n;
-			double x = ax + (bx - ax) * t;
-			double z = az + (bz - az) * t + Math.sin(t * Math.PI) * 6; // a sideways twist
-			int top = (int) Math.round(ay + (by - ay) * t + Math.sin(t * Math.PI) * 4); // an arch
-			int r = 3 + (int) Math.round(Math.sin(t * Math.PI * 3) * 0.6);
-			for (int dx = -r - 1; dx <= r + 1; dx++) {
-				for (int dz = -r - 1; dz <= r + 1; dz++) {
-					for (int dy = -r - 2; dy <= 0; dy++) {
-						double d = Math.sqrt(dx * dx + dz * dz + (dy + r * 0.6) * (dy + r * 0.6) * 0.8);
-						if (d <= r + 0.5) {
-							int bxp = (int) Math.round(x) + dx, bzp = (int) Math.round(z) + dz;
-							boolean surface = dy == 0 && Math.abs(dz) <= 2;
-							c.set(bxp, top + dy, bzp, surface ? (unit(bxp, bzp, 131) < 0.25 ? s(Blocks.MOSS_BLOCK) : s(Blocks.ROOTED_DIRT))
-									: s(Blocks.DARK_OAK_WOOD));
-							if (surface) {
-								c.fill(bxp, top + 1, bzp, bxp, top + 3, bzp, s(Blocks.AIR));
-							}
+		int y = T_Y;
+		for (int dx = -COL_R - 1; dx <= COL_R + 1; dx++) {
+			for (int dz = -COL_R - 1; dz <= 0; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d < COL_R - 0.5 || d > COL_R + 0.5) {
+					continue;
+				}
+				int x = COL_X + dx, z = COL_Z + dz;
+				double theta = Math.atan2(-dz, dx); // 0 (east) .. pi (west), through north
+				double s = theta * COL_R;
+				double m = s % 6.0;
+				c.set(x, y, z, s(Blocks.SMOOTH_QUARTZ));
+				for (int k = 1; k <= 10; k++) {
+					BlockState b;
+					boolean pier = m < 1.6 || s < 1.2 || s > Math.PI * COL_R - 1.2;
+					int open = 5 + (int) Math.round(1.8 * Math.sin(Math.PI * Math.max(0, Math.min(1, (m - 1.6) / 4.4))));
+					if (k == 9) {
+						b = s(Blocks.BLUE_CONCRETE);
+					} else if (k == 10) {
+						b = s(Blocks.SMOOTH_QUARTZ);
+					} else if (!pier && k <= open) {
+						b = s(Blocks.AIR);
+					} else if (pier && k == 1) {
+						b = s(Blocks.CHISELED_QUARTZ_BLOCK);
+					} else {
+						b = pier ? s(Blocks.QUARTZ_PILLAR) : s(Blocks.QUARTZ_BRICKS);
+					}
+					c.set(x, y + k, z, b);
+				}
+				c.set(x, y + 11, z, Kit.slab(Blocks.SMOOTH_QUARTZ_SLAB, false));
+			}
+		}
+		// The two ends: a taller pier with a gold cap.
+		for (int sgn : new int[]{-1, 1}) {
+			int x = COL_X + sgn * COL_R;
+			c.fill(x, y + 1, COL_Z, x, y + 11, COL_Z, s(Blocks.QUARTZ_PILLAR));
+			c.set(x, y + 12, COL_Z, s(Blocks.GOLD_BLOCK));
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------- Skyreach Citadel
+
+	/**
+	 * Skyreach Citadel: courtyard, the wings and corner spires, the entrance hall with its spires, the domed chamber and
+	 * everything in it, the return arch.
+	 */
+	private void citadel(Canvas c) {
+		int y = K_Y;
+		// The courtyard: paving from the return arch to the doors, lamps, trees, the camps.
+		pave(c, y, 4, -10, -112, -10, -126);
+		pave(c, y, 3, -10, -120, -30, -124);
+		pave(c, y, 3, -10, -120, 10, -124);
+		if (c.near(-10, -120, 8)) {
+			for (int dx = -5; dx <= 5; dx++) {
+				for (int dz = -4; dz <= 4; dz++) {
+					if (Math.hypot(dx, dz * 1.2) <= 5.2) {
+						c.set(-10 + dx, y, -120 + dz, Math.floorMod(dx + dz, 3) == 0 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS));
+					}
+				}
+			}
+		}
+		for (int[] l : new int[][]{{-14, -116}, {-6, -116}, {-14, -125}, {-6, -125}}) {
+			if (c.near(l[0], l[1], 2)) {
+				lampPost(c, l[0], y, l[1]);
+			}
+		}
+		tree(c, -24, y, -117, 6, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES);
+		tree(c, 4, y, -117, 6, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES);
+		for (int[] camp : new int[][]{{-34, -124}, {14, -124}}) {
+			if (c.near(camp[0], camp[1], 6)) {
+				tent(c, camp[0] - 3, camp[1] - 1, y, Blocks.GRAY_WOOL);
+				tent(c, camp[0] + 3, camp[1] - 2, y, Blocks.BLACK_WOOL);
+				c.set(camp[0], y + 1, camp[1] + 1, s(Blocks.SOUL_CAMPFIRE));
+			}
+		}
+		if (c.near(K_X, K_Z, K_RX + 2)) {
+			meadow(c, K_X - K_RX, K_Z - K_RZ, K_X + K_RX, K_Z + K_RZ, y, 13);
+		}
+		portalArch(c, PORTAL_DOWN_X, y, PORTAL_DOWN_Z, true);
+		if (c.near(CH_X, CH_Z - 2, 36)) {
+			wing(c, -38, -24);
+			wing(c, 4, 18);
+			for (int[] t : new int[][]{{-39, -157}, {-39, -139}, {19, -157}, {19, -139}}) {
+				spire(c, t[0], t[1], y, 3, 24);
+			}
+			entrance(c);
+			chamber(c);
+		}
+	}
+
+	/** A castle wing (x1..x2, z -156..-140): weathered walls, windows, a blue-green hipped roof, a hall inside. */
+	private static void wing(Canvas c, int x1, int x2) {
+		int y = K_Y, z1 = -156, z2 = -140, top = y + 12;
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				boolean edge = x == x1 || x == x2 || z == z1 || z == z2;
+				c.set(x, y, z, edge ? aged(x, y, z) : s(Blocks.DARK_OAK_PLANKS));
+				for (int yy = y + 1; yy <= top; yy++) {
+					if (!edge) {
+						c.set(x, yy, z, s(Blocks.AIR));
+						continue;
+					}
+					boolean corner = (x == x1 || x == x2) && (z == z1 || z == z2);
+					int k = yy - y;
+					boolean window = !corner && (k >= 3 && k <= 5 || k >= 8 && k <= 10) && Math.floorMod(x == x1 || x == x2 ? z : x, 3) == 1;
+					c.set(x, yy, z, corner ? s(Blocks.POLISHED_ANDESITE) : window ? s(Blocks.GLASS_PANE) : k == 7 || k == 12 ? s(Blocks.POLISHED_DIORITE) : aged(x, yy, z));
+				}
+			}
+		}
+		// Glass panes join along their wall.
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				boolean edgeX = x == x1 || x == x2, edgeZ = z == z1 || z == z2;
+				if ((edgeX || edgeZ) && !(edgeX && edgeZ)) {
+					for (int yy = y + 1; yy <= top; yy++) {
+						int k = yy - y;
+						if ((k >= 3 && k <= 5 || k >= 8 && k <= 10) && Math.floorMod(edgeX ? z : x, 3) == 1) {
+							c.set(x, yy, z, Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, !edgeX));
 						}
 					}
 				}
 			}
-			// Bark ridges along the edges as a natural rail, and hanging roots below.
-			int rx = (int) Math.round(x), rz = (int) Math.round(z);
-			c.set(rx, top + 1, rz - 3, s(Blocks.DARK_OAK_WOOD));
-			c.set(rx, top + 1, rz + 3, s(Blocks.DARK_OAK_WOOD));
-			if (i % 5 == 2) {
-				for (int k = r + 2; k < r + 6; k++) {
-					c.set(rx, top - k, rz, s(Blocks.HANGING_ROOTS));
+		}
+		// An upper floor (a balcony along the back) and lanterns.
+		c.fill(x1 + 1, y + 6, z1 + 1, x2 - 1, y + 6, z1 + 4, s(Blocks.DARK_OAK_PLANKS));
+		for (int x = x1 + 1; x <= x2 - 1; x++) {
+			c.set(x, y + 7, z1 + 5, Kit.connected(Blocks.DARK_OAK_FENCE, true));
+		}
+		int lx = (x1 + x2) / 2;
+		for (int yy = y + 1; yy <= y + 6; yy++) {
+			c.set(lx, yy, z1 + 5, Canvas.facing(s(Blocks.LADDER), Direction.SOUTH));
+		}
+		c.set(lx, y + 7, z1 + 5, s(Blocks.AIR));
+		c.set(lx, y + 6, z1 + 5, Canvas.facing(s(Blocks.LADDER), Direction.SOUTH));
+		c.set(lx, y + 6, z1 + 4, s(Blocks.DARK_OAK_PLANKS));
+		for (int x = x1 + 3; x <= x2 - 3; x += 5) {
+			c.set(x, top, (z1 + z2) / 2 + 2, lantern(Blocks.LANTERN, true));
+			spiralBanner(c, x, y + 7, z2 - 1, Direction.NORTH);
+		}
+		c.set(x1 + 2, y + 1, z2 - 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(x2 - 2, y + 1, z2 - 2, s(Blocks.BOOKSHELF));
+		c.set(x2 - 2, y + 2, z2 - 2, s(Blocks.BOOKSHELF));
+		Kit.hipRoof(c, x1 - 1, z1 - 1, x2 + 1, z2 + 1, top + 1, Blocks.DARK_PRISMARINE_STAIRS, Blocks.DARK_PRISMARINE_SLAB, Blocks.DARK_PRISMARINE);
+	}
+
+	/** A round corner spire: weathered walls, slit windows, a tall pointed blue-green cap with a gold tip. */
+	private static void spire(Canvas c, int cx, int cz, int y, int r, int h) {
+		if (!c.near(cx, cz, r + 3)) {
+			return;
+		}
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (d > r + 0.4) {
+					continue;
+				}
+				boolean shell = d > r - 0.8;
+				c.set(cx + dx, y, cz + dz, aged(cx + dx, y, cz + dz));
+				for (int yy = y + 1; yy <= y + h; yy++) {
+					int k = yy - y;
+					boolean slit = shell && (dx == 0 || dz == 0) && k % 7 == 4;
+					c.set(cx + dx, yy, cz + dz, !shell ? s(Blocks.AIR) : slit ? s(Blocks.LIGHT_BLUE_STAINED_GLASS) : k == h ? s(Blocks.POLISHED_DIORITE) : aged(cx + dx, yy, cz + dz));
 				}
 			}
 		}
+		// The cap: a steep cone, two layers per step.
+		int R = r + 1, cy = y + h + 1;
+		for (int i = 0; i <= R * 2; i++) {
+			double rr = R - i / 2.0;
+			for (int dx = -R; dx <= R; dx++) {
+				for (int dz = -R; dz <= R; dz++) {
+					double d = Math.hypot(dx, dz);
+					if (d <= rr + 0.4 && d > rr - 1.0) {
+						c.set(cx + dx, cy + i, cz + dz, rr < 0.6 ? s(Blocks.DARK_PRISMARINE) : stair(Blocks.DARK_PRISMARINE_STAIRS, inward(dx, dz), false));
+					} else if (d <= rr - 1.0) {
+						c.set(cx + dx, cy + i, cz + dz, s(Blocks.DARK_PRISMARINE));
+					}
+				}
+			}
+		}
+		c.set(cx, cy + R * 2 + 1, cz, s(Blocks.GOLD_BLOCK));
+		c.set(cx, cy + R * 2 + 2, cz, s(Blocks.LIGHTNING_ROD));
+	}
+
+	/** The entrance hall in front of the chamber: an arched doorway, two slender spires, battlements, a blue band. */
+	private static void entrance(Canvas c) {
+		int y = K_Y, x1 = -16, x2 = -4, z1 = -137, z2 = -126, top = y + 11;
+		for (int x = x1; x <= x2; x++) {
+			for (int z = z1; z <= z2; z++) {
+				boolean edge = x == x1 || x == x2 || z <= z1 + 3 || z == z2;
+				c.set(x, y, z, edge ? aged(x, y, z) : s(Blocks.POLISHED_ANDESITE));
+				for (int yy = y + 1; yy <= top; yy++) {
+					c.set(x, yy, z, !edge ? s(Blocks.AIR) : yy - y == 9 ? s(Blocks.BLUE_CONCRETE) : aged(x, yy, z));
+				}
+				c.set(x, top + 1, z, edge ? aged(x, top + 1, z) : s(Blocks.STONE_BRICK_SLAB));
+				boolean rim = x == x1 || x == x2 || z == z1 || z == z2;
+				if (rim && Math.floorMod(x + z, 2) == 0) {
+					c.set(x, top + 2, z, aged(x, top + 2, z));
+				}
+			}
+		}
+		// The doorway arch, cut through the front and (later, after the chamber wall) through the back.
+		doorway(c, z2, z2);
+		for (int x = x1 + 2; x <= x2 - 2; x += 4) {
+			c.set(x, top, (z1 + z2) / 2 + 2, lantern(Blocks.LANTERN, true));
+		}
+		spiralBanner(c, x1 + 1, y + 5, -130, Direction.EAST);
+		spiralBanner(c, x2 - 1, y + 5, -130, Direction.WEST);
+		spiralBanner(c, -13, y + 7, z2 + 1, Direction.SOUTH);
+		spiralBanner(c, -7, y + 7, z2 + 1, Direction.SOUTH);
+		// The steps down to the courtyard.
+		for (int x = -12; x <= -8; x++) {
+			c.set(x, y, z2 + 1, s(Blocks.POLISHED_ANDESITE));
+		}
+		spire(c, -18, -127, y, 2, 16);
+		spire(c, -2, -127, y, 2, 16);
+	}
+
+	/** The arched doorway (five wide, seven high) from z1 to z2 through whatever stands there. */
+	private static void doorway(Canvas c, int z1, int z2) {
+		for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
+			for (int x = -12; x <= -8; x++) {
+				int ax = Math.abs(x + 10);
+				int h = ax <= 0 ? 7 : ax == 1 ? 7 : 6;
+				c.fill(x, K_Y + 1, z, x, K_Y + h - (ax == 2 ? 1 : 0), z, s(Blocks.AIR));
+			}
+		}
+	}
+
+	/**
+	 * The domed chamber: a round hall (inner radius CH_R) of weathered stone with tall windows, a gallery ring reached by
+	 * ladders, spiral banners round the wall, the floor mechanism (rings, spokes and teeth round a gold hub), the ring
+	 * chandelier of soul lanterns hung on chains, and the great blue dome with ribs and a gold lantern on top.
+	 */
+	private static void chamber(Canvas c) {
+		int y = K_Y, wallTop = DOME_Y;
+		for (int dx = -CH_R - 3; dx <= CH_R + 3; dx++) {
+			for (int dz = -CH_R - 3; dz <= CH_R + 3; dz++) {
+				double d = Math.hypot(dx, dz);
+				int x = CH_X + dx, z = CH_Z + dz;
+				if (d > CH_R + 2.0 || !c.inChunk(x, z)) {
+					continue;
+				}
+				double ang = Math.toDegrees(Math.atan2(dz, dx));
+				if (d <= CH_R + 0.5) {
+					c.fill(x, y + 1, z, x, wallTop, z, s(Blocks.AIR));
+					c.set(x, y, z, floor(dx, dz, d, ang));
+				} else {
+					c.set(x, y, z, aged(x, y, z));
+					for (int yy = y + 1; yy <= wallTop; yy++) {
+						int k = yy - y;
+						boolean window = k >= 3 && k <= 8 && isWindow(ang);
+						BlockState b = window ? s(Blocks.LIGHT_BLUE_STAINED_GLASS) : k == 9 || k == 21 ? s(Blocks.POLISHED_DIORITE) : aged(x, yy, z);
+						c.set(x, yy, z, b);
+					}
+				}
+			}
+		}
+		// The dome: a shell of blue with light ribs, from the wall top up, overhanging the wall a little.
+		int R = CH_R + 2;
+		for (int dx = -R - 1; dx <= R + 1; dx++) {
+			for (int dz = -R - 1; dz <= R + 1; dz++) {
+				int x = CH_X + dx, z = CH_Z + dz;
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double ang = Math.toDegrees(Math.atan2(dz, dx));
+				boolean rib = Math.abs(((ang % 45) + 45) % 45 - 22.5) > 20.5;
+				for (int dy = 1; dy <= R + 1; dy++) {
+					double d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+					if (d <= R + 0.5 && d > R - 0.9) {
+						c.set(x, wallTop + dy, z, dy <= 1 ? s(Blocks.POLISHED_DIORITE) : rib ? s(Blocks.LIGHT_BLUE_TERRACOTTA) : s(Blocks.BLUE_CONCRETE));
+					} else if (d <= R - 0.9) {
+						c.set(x, wallTop + dy, z, s(Blocks.AIR));
+					}
+				}
+			}
+		}
+		// The lantern on top of the dome.
+		int apex = wallTop + R + 1;
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				c.set(CH_X + dx, apex, CH_Z + dz, s(Blocks.GOLD_BLOCK));
+				if (dx != 0 && dz != 0) {
+					c.fill(CH_X + dx, apex + 1, CH_Z + dz, CH_X + dx, apex + 2, CH_Z + dz, s(Blocks.POLISHED_DIORITE));
+				}
+			}
+		}
+		c.set(CH_X, apex + 1, CH_Z, s(Blocks.SEA_LANTERN));
+		c.fill(CH_X - 1, apex + 3, CH_Z - 1, CH_X + 1, apex + 3, CH_Z + 1, s(Blocks.BLUE_CONCRETE));
+		c.set(CH_X, apex + 4, CH_Z, s(Blocks.GOLD_BLOCK));
+		c.set(CH_X, apex + 5, CH_Z, s(Blocks.LIGHTNING_ROD));
+		// Doorways: south into the entrance hall, west and east into the wings.
+		doorway(c, -137, -133);
+		for (int sgn : new int[]{-1, 1}) {
+			int xa = CH_X + sgn * (CH_R - 1), xb = CH_X + sgn * (CH_R + 4);
+			for (int z = CH_Z - 1; z <= CH_Z + 1; z++) {
+				c.fill(Math.min(xa, xb), y + 1, z, Math.max(xa, xb), y + 4, z, s(Blocks.AIR));
+			}
+			c.fill(Math.min(xa, xb), y, CH_Z - 1, Math.max(xa, xb), y, CH_Z + 1, s(Blocks.POLISHED_ANDESITE));
+		}
+		gallery(c);
+		chandelier(c, apex);
+		// Spiral banners between the windows, facing in, each on a wall block.
+		for (int a = 15; a < 360; a += 30) {
+			double rad = Math.toRadians(a);
+			for (double r = CH_R; r >= CH_R - 1.5; r -= 0.5) {
+				int bx = (int) Math.round(CH_X + Math.cos(rad) * r), bz = (int) Math.round(CH_Z + Math.sin(rad) * r);
+				Direction in = inward(bx - CH_X, bz - CH_Z);
+				int wx = bx - in.getStepX(), wz = bz - in.getStepZ();
+				if (Math.hypot(bx - CH_X, bz - CH_Z) <= CH_R + 0.5 && Math.hypot(wx - CH_X, wz - CH_Z) > CH_R + 0.5) {
+					spiralBanner(c, bx, y + 6, bz, in);
+					break;
+				}
+			}
+		}
+		// Hidden light under the gallery and round the dome's spring, so the hall is lit but still moody.
+		for (int a = 0; a < 360; a += 30) {
+			double rad = Math.toRadians(a + 15);
+			int lx = (int) Math.round(CH_X + Math.cos(rad) * (CH_R - 1)), lz = (int) Math.round(CH_Z + Math.sin(rad) * (CH_R - 1));
+			c.set(lx, y + 9, lz, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 11));
+			c.set(lx, DOME_Y + 1, lz, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 10));
+		}
+		// Soul lanterns on posts round the mechanism.
+		for (int a = 45; a < 360; a += 90) {
+			double rad = Math.toRadians(a);
+			int lx = (int) Math.round(CH_X + Math.cos(rad) * 8.5), lz = (int) Math.round(CH_Z + Math.sin(rad) * 8.5);
+			c.set(lx, y + 1, lz, s(Blocks.POLISHED_BLACKSTONE_WALL));
+			c.set(lx, y + 2, lz, lantern(Blocks.SOUL_LANTERN, false));
+		}
+	}
+
+	/** Tall windows round the chamber, every 30 degrees, skipping the doorways (east 0, south 90, west 180). */
+	private static boolean isWindow(double ang) {
+		double a = ((ang % 360) + 360) % 360;
+		for (int w = 30; w < 360; w += 30) {
+			if (w == 90 || w == 180 || w == 0) {
+				continue;
+			}
+			if (Math.abs(a - w) < 2.6) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * The chamber floor: weathered stone, with the mechanism set in the middle: an outer copper ring with teeth, an inner
+	 * ring of dark stone, eight copper spokes, and the gold hub.
+	 */
+	private static BlockState floor(int dx, int dz, double d, double ang) {
+		double a = ((ang % 360) + 360) % 360;
+		if (d <= 1.5) {
+			return s(Blocks.GOLD_BLOCK);
+		}
+		if (d <= 2.5) {
+			return s(Blocks.POLISHED_BLACKSTONE);
+		}
+		boolean spoke = false;
+		for (int k = 0; k < 8; k++) {
+			double r = Math.toRadians(k * 45);
+			double along = dx * Math.cos(r) + dz * Math.sin(r), across = -dx * Math.sin(r) + dz * Math.cos(r);
+			spoke |= along > 0 && Math.abs(across) < 0.6;
+		}
+		if (d <= 5.5 && d > 4.5) {
+			return s(Blocks.POLISHED_DEEPSLATE);
+		}
+		if (d <= 9.5 && d > 8.4) {
+			return s(Blocks.WAXED_CUT_COPPER);
+		}
+		if (d <= 10.5 && d > 9.5 && Math.floorMod((int) Math.round(a / 7.5), 2) == 0) {
+			return s(Blocks.WAXED_COPPER_BLOCK);
+		}
+		if (d <= 8.4 && spoke) {
+			return s(Blocks.WAXED_CUT_COPPER);
+		}
+		if (d <= 8.4) {
+			return s(Blocks.POLISHED_ANDESITE);
+		}
+		return Math.floorMod(dx + dz, 2) == 0 ? s(Blocks.STONE_BRICKS) : s(Blocks.POLISHED_ANDESITE);
+	}
+
+	/** The gallery: a ring of dark planks round the wall at the window tops, railed, with three ladders up. */
+	private static void gallery(Canvas c) {
+		int gy = K_Y + 10;
+		int[][] ladders = {{CH_X, CH_Z - CH_R}, {CH_X - CH_R + 1, CH_Z - 5}, {CH_X + CH_R - 1, CH_Z - 5}};
+		for (int dx = -CH_R; dx <= CH_R; dx++) {
+			for (int dz = -CH_R; dz <= CH_R; dz++) {
+				double d = Math.hypot(dx, dz);
+				int x = CH_X + dx, z = CH_Z + dz;
+				if (d <= CH_R + 0.5 && d > CH_R - 2.5) {
+					c.set(x, gy, z, s(Blocks.DARK_OAK_PLANKS));
+				} else if (d <= CH_R - 2.5 && d > CH_R - 3.5) {
+					c.set(x, gy, z, s(Blocks.DARK_OAK_SLAB).setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+							net.minecraft.world.level.block.state.properties.SlabType.TOP));
+					c.set(x, gy + 1, z, s(Blocks.DARK_OAK_FENCE));
+				}
+			}
+		}
+		for (int[] l : ladders) {
+			int dx = l[0] - CH_X, dz = l[1] - CH_Z;
+			Direction in = inward(dx, dz);
+			for (int yy = K_Y + 1; yy <= gy + 1; yy++) {
+				c.set(l[0], yy, l[1], Canvas.facing(s(Blocks.LADDER), in));
+			}
+			c.set(l[0], gy + 2, l[1], s(Blocks.AIR));
+		}
+		for (int a = 0; a < 360; a += 60) {
+			double rad = Math.toRadians(a);
+			int lx = (int) Math.round(CH_X + Math.cos(rad) * (CH_R - 1)), lz = (int) Math.round(CH_Z + Math.sin(rad) * (CH_R - 1));
+			c.set(lx, gy + 1, lz, lantern(Blocks.LANTERN, false));
+		}
+	}
+
+	/**
+	 * The ring chandelier: a dark ring hung from the dome on four chains, with eight soul lanterns underneath, chain
+	 * spokes to a hub that carries a ninth lantern, and a chain from the hub up to the dome's crown.
+	 */
+	private static void chandelier(Canvas c, int apex) {
+		int ry = K_Y + 16;
+		double rr = 6;
+		for (int dx = -7; dx <= 7; dx++) {
+			for (int dz = -7; dz <= 7; dz++) {
+				double d = Math.hypot(dx, dz);
+				if (Math.abs(d - rr) <= 0.5) {
+					c.set(CH_X + dx, ry, CH_Z + dz, s(Blocks.POLISHED_BLACKSTONE));
+				}
+			}
+		}
+		for (int a = 0; a < 360; a += 45) {
+			double rad = Math.toRadians(a);
+			int lx = (int) Math.round(CH_X + Math.cos(rad) * rr), lz = (int) Math.round(CH_Z + Math.sin(rad) * rr);
+			c.set(lx, ry, lz, s(Blocks.POLISHED_BLACKSTONE));
+			c.set(lx, ry - 1, lz, lantern(Blocks.SOUL_LANTERN, true));
+		}
+		int R = CH_R + 2;
+		for (int[] p : new int[][]{{6, 0}, {-6, 0}, {0, 6}, {0, -6}}) {
+			int top = DOME_Y + (int) Math.floor(Math.sqrt(Math.max(0, (R - 1) * (R - 1) - 36)));
+			c.fill(CH_X + p[0], ry + 1, CH_Z + p[1], CH_X + p[0], top, CH_Z + p[1], s(Blocks.CHAIN));
+		}
+		for (int k = 1; k <= 5; k++) {
+			c.set(CH_X + k, ry, CH_Z, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, Direction.Axis.X));
+			c.set(CH_X - k, ry, CH_Z, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, Direction.Axis.X));
+			c.set(CH_X, ry, CH_Z + k, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, Direction.Axis.Z));
+			c.set(CH_X, ry, CH_Z - k, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, Direction.Axis.Z));
+		}
+		c.set(CH_X, ry, CH_Z, s(Blocks.GOLD_BLOCK));
+		c.set(CH_X, ry - 1, CH_Z, lantern(Blocks.SOUL_LANTERN, true));
+		c.fill(CH_X, ry + 1, CH_Z, CH_X, apex - 2, CH_Z, s(Blocks.CHAIN));
 	}
 }

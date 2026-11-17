@@ -12,10 +12,10 @@ import java.util.Map;
 public final class TreasureSpots {
 	private static final Map<String, List<TreasureSpot>> SPOTS = Map.ofEntries(
 			Map.entry("Cloudtop Isles", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -69, 96, -35, Direction.WEST, "dark, covered, walls e"),
-				new TreasureSpot(TreasureTier.RARE, 55, 144, -104, Direction.EAST, "indoors, walls w"),
-				new TreasureSpot(TreasureTier.COMMON, 42, 126, -68, Direction.EAST, "walls w"),
-				new TreasureSpot(TreasureTier.COMMON, 6, 123, -37, Direction.SOUTH, "walls nw"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, -44, 201, -128, Direction.EAST, "citadel lawn, west of the courtyard, guarded by the west camp"),
+				new TreasureSpot(TreasureTier.RARE, 50, 115, -71, Direction.WEST, "Azure Rise, between the temple and the colonnade"),
+				new TreasureSpot(TreasureTier.COMMON, 24, 99, 2, Direction.SOUTH, "Mistfall, on the grass by the trees"),
+				new TreasureSpot(TreasureTier.COMMON, -30, 101, -36, Direction.NORTH, "Bloomhold, between the towers off the east path"))),
 			Map.entry("Crystal Fountain", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -28, 64, 28, Direction.SOUTH, "beach camp shelter, guarded by the west camp"),
 				new TreasureSpot(TreasureTier.RARE, 26, 64, 31, Direction.SOUTH, "beside the east camp on the beach"),
@@ -90,6 +90,14 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
 				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne")));
 
+	/** Spots on islands that worlds made between two rebuilds keep (see IslandPlans.INTERIM). */
+	private static final Map<String, List<TreasureSpot>> INTERIM = Map.of(
+			"Cloudtop Isles", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -69, 96, -35, Direction.WEST, "dark, covered, walls e"),
+				new TreasureSpot(TreasureTier.RARE, 55, 144, -104, Direction.EAST, "indoors, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 42, 126, -68, Direction.EAST, "walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 6, 123, -37, Direction.SOUTH, "walls nw")));
+
 	/** Islands that, by their owner's design, have no treasure chests. */
 	public static final java.util.Set<String> NONE_BY_DESIGN = java.util.Set.of("Frostpeak Isle");
 
@@ -103,6 +111,11 @@ public final class TreasureSpots {
 	/** The spots of an island's pre-rebuild layout, for older worlds (empty if it has none). */
 	public static List<TreasureSpot> legacy(String island) {
 		return LEGACY.getOrDefault(island, List.of());
+	}
+
+	/** The spots of an island's first rebuild, for worlds made before its second (empty if it has none). */
+	public static List<TreasureSpot> interim(String island) {
+		return INTERIM.getOrDefault(island, List.of());
 	}
 
 	public static Map<String, List<TreasureSpot>> all() {

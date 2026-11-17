@@ -38,11 +38,7 @@ public final class CloudtopPortals {
 
 	/** Island-local portal data from the rebuilt plan, or null when this world uses the original island. */
 	static int[][] spots(Island island) {
-		var plan = IslandPlans.get(island);
-		if (plan == null || !plan.getClass().getSimpleName().equals("CloudtopIsles")) {
-			return null;
-		}
-		return com.grandline.world.plan.CloudtopAccess.portals();
+		return com.grandline.world.plan.CloudtopAccess.portals(IslandPlans.get(island));
 	}
 
 	private static void tick(MinecraftServer server) {

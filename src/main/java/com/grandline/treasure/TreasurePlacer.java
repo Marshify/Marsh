@@ -99,7 +99,7 @@ public final class TreasurePlacer {
 			Map<Long, List<Placed>> map = new HashMap<>();
 			for (Island island : IslandRegistry.get(server).all()) {
 				List<TreasureSpot> spots = IslandPlans.usesCurrentPlan(island.name()) ? TreasureSpots.forIsland(island.name())
-						: TreasureSpots.legacy(island.name());
+						: IslandPlans.usesInterimPlan(island.name()) ? TreasureSpots.interim(island.name()) : TreasureSpots.legacy(island.name());
 				for (TreasureSpot s : spots) {
 					BlockPos pos = new BlockPos(island.x() + s.x(), s.y(), island.z() + s.z());
 					map.computeIfAbsent(new ChunkPos(pos).toLong(), k -> new ArrayList<>()).add(new Placed(island.name(), s, pos));

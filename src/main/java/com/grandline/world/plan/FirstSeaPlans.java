@@ -44,6 +44,11 @@ public final class FirstSeaPlans {
 		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy());
 	}
 
+	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
+	public static List<IslandPlan> interim() {
+		return List.of(new CloudtopIslesV7());
+	}
+
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),

@@ -55,10 +55,10 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 
 | Island | Chest | Position | Faces | Where |
 |---|---|---|---|---|
-| Cloudtop Isles | Legendary | -69, 96, -35 | west | dark, covered, walls e |
-| Cloudtop Isles | Rare | 55, 144, -104 | east | indoors, walls w |
-| Cloudtop Isles | Common | 42, 126, -68 | east | walls w |
-| Cloudtop Isles | Common | 6, 123, -37 | south | walls nw |
+| Cloudtop Isles | Legendary | -44, 201, -128 | east | citadel lawn, by the west camp (re-picked for the sky islands, 0.45.0; layout 7-11 worlds keep the old spots) |
+| Cloudtop Isles | Rare | 50, 115, -71 | west | Azure Rise, between the temple and the colonnade |
+| Cloudtop Isles | Common | 24, 99, 2 | south | Mistfall, on the grass |
+| Cloudtop Isles | Common | -30, 101, -36 | north | Bloomhold, between the towers |
 | Crystal Fountain | Legendary | -28, 64, 28 | south | beach camp shelter, guarded by the west camp |
 | Crystal Fountain | Rare | 26, 64, 31 | south | beside the east camp on the beach |
 | Crystal Fountain | Common | -25, 67, -7 | south | at the foot of a crystal pillar |
