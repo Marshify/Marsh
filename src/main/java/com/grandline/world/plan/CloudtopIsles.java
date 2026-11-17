@@ -214,7 +214,12 @@ final class CloudtopIsles extends BasePlan {
 				Block flat = w == 0 ? Blocks.SMOOTH_QUARTZ : Blocks.CALCITE;
 				Block steps = w == 0 ? Blocks.SMOOTH_QUARTZ_STAIRS : Blocks.QUARTZ_STAIRS;
 				c.set(bx, y, bz, climb ? stair(steps, along, false) : drop ? stair(steps, along.getOpposite(), false) : s(flat));
-				c.set(bx, y - 1, bz, w == 0 ? s(Blocks.SMOOTH_QUARTZ) : s(Blocks.POLISHED_DEEPSLATE));
+				if (climb || drop) {
+					// An upside-down stair under each step, so the underside is one smooth slope instead of a saw edge.
+					c.set(bx, y - 1, bz, stair(steps, climb ? along.getOpposite() : along, true));
+				} else {
+					c.set(bx, y - 1, bz, w == 0 ? s(Blocks.SMOOTH_QUARTZ) : s(Blocks.CALCITE));
+				}
 				c.fill(bx, y + 1, bz, bx, y + 3, bz, s(Blocks.AIR));
 			}
 			if (i % 10 == 5 && i > 2 && i < n - 2 && !climb && !drop) {

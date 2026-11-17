@@ -406,7 +406,9 @@ final class UpperCloudtop {
 						if (d > w || !c.inChunk(x, z)) {
 							continue;
 						}
-						double v = hh * Math.sqrt(1 - (d / w) * (d / w));
+						// A walkable root (stairs) has a flat deck across the middle 60% of its width; only the sides round off.
+						double v = !stairs ? hh * Math.sqrt(1 - (d / w) * (d / w))
+								: d <= 0.6 * w ? hh : hh * Math.sqrt(Math.max(0, 1 - Math.pow((d - 0.6 * w) / (0.4 * w), 2)));
 						int yTop = (int) Math.round(py + v), yBot = (int) Math.round(py - v);
 						for (int y = yBot; y <= yTop; y++) {
 							c.set(x, y, z, bark(x, y, z));
@@ -436,7 +438,7 @@ final class UpperCloudtop {
 			}
 			Direction d = q[0] != p[0] ? (q[0] > p[0] ? Direction.EAST : Direction.WEST) : (q[1] > p[1] ? Direction.SOUTH : Direction.NORTH);
 			Direction side = d.getClockWise();
-			for (int k = -1; k <= 1; k++) {
+			for (int k = -2; k <= 2; k++) {
 				int x = q[0] + side.getStepX() * k, z = q[1] + side.getStepZ() * k;
 				Integer t = tops.get(((long) x << 32) ^ (z & 0xffffffffL));
 				if (t != null && t.equals(tq)) {
@@ -604,11 +606,11 @@ final class UpperCloudtop {
 		Direction back = front.getOpposite();
 		int lx, lz;
 		if (front.getAxis() == Direction.Axis.Z) {
-			lx = x1 + 1;
+			lx = x1 + 2; // along the wall at an even step: the odd ones are windows, which would leave the ladder hanging
 			lz = back == Direction.NORTH ? z1 + 1 : z2 - 1;
 		} else {
 			lx = back == Direction.WEST ? x1 + 1 : x2 - 1;
-			lz = z1 + 1;
+			lz = z1 + 2;
 		}
 		for (int k = 1; k < h; k++) {
 			c.set(lx, y + k, lz, Canvas.facing(s(Blocks.LADDER), front));
@@ -700,7 +702,8 @@ final class UpperCloudtop {
 						b = s(Blocks.SMOOTH_QUARTZ);
 					} else if (k == h - 2) {
 						b = s(band);
-					} else if ((dx == 0 || dz == 0) && k % 5 >= 2 && k % 5 <= 3) {
+					} else if ((dx == 0 || dz == 0) && k % 5 >= 2 && k % 5 <= 3
+							&& !(Integer.signum(dx) == -door.getStepX() && Integer.signum(dz) == -door.getStepZ())) { // no window behind the ladder
 						b = Kit.connected(Blocks.BLACK_STAINED_GLASS_PANE, dz == 0 ? false : true);
 					} else {
 						b = s(Blocks.WHITE_CONCRETE);
@@ -765,7 +768,7 @@ final class UpperCloudtop {
 		// Paths (after the roots, so they cut a way through where they cross one).
 		dirtPath(c, h, 3, -135, -192, -136, -172, -137, -152);
 		dirtPath(c, h, 3, -130, -146, -118, -147, -98, -150);
-		dirtPath(c, h, 3, -60, -172, -60, -180);
+		dirtPath(c, h, 3, -60, -172, -60, -179); // stops short of the pavilion steps (it clears above itself)
 		dirtPath(c, h, 2.5, -137, -140, -122, -126, -100, -116);
 		dirtPath(c, h, 3, -45, -160, -38, -165);
 		for (int[] t : new int[][]{{-90, -133, 5}, {-50, -170, 6}, {-56, -131, 5}, {-82, -201, 6}, {-40, -190, 5}, {-120, -128, 5}, {-160, -152, 4}}) {
@@ -1138,7 +1141,7 @@ final class UpperCloudtop {
 					c.set(x, yStep, z, s(Blocks.SMOOTH_QUARTZ));
 					c.set(x, yStep + 1, z, x == ST_X1 - 1 || x == ST_X2 + 1 ? Kit.slab(Blocks.QUARTZ_SLAB, false) : s(Blocks.AIR));
 				} else {
-					c.set(x, yStep, z, (i + 1) % 6 == 0 ? s(Blocks.SMOOTH_QUARTZ) : Kit.stairs(Blocks.QUARTZ_STAIRS, Direction.NORTH, false));
+					c.set(x, yStep, z, Kit.stairs(Blocks.QUARTZ_STAIRS, Direction.NORTH, false));
 					c.fill(x, yStep + 1, z, x, yStep + 4, z, s(Blocks.AIR));
 				}
 			}

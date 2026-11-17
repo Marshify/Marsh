@@ -153,5 +153,6 @@ public final class IslandPlans {
 			}
 		}
 		plan.build(canvas);
+		SupportFix.run(level, chunkMinX, chunkMinZ, Terrain.FLOOR, Math.min(level.getMaxBuildHeight() - 1, 330));
 	}
 }

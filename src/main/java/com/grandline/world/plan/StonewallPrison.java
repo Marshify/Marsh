@@ -873,8 +873,7 @@ final class StonewallPrison extends BasePlan {
 						if (!shell) {
 							b = s(Blocks.AIR);
 						} else if (win && k >= 1 && k <= 5) {
-							b = k == 5 ? Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7)
-									: Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, Math.abs(Math.sin(Math.toRadians(a))) > 0.7);
+							b = s(Blocks.LIGHT_BLUE_STAINED_GLASS); // full blocks: panes leave gaps on a curved wall
 						} else if (frame && k <= 5) {
 							b = s(Blocks.POLISHED_ANDESITE);
 						} else if (Math.floorMod((int) Math.round(a), 60) == 0 && k == 3) {
@@ -1049,14 +1048,7 @@ final class StonewallPrison extends BasePlan {
 		}
 		// The spiral staircase down to the chamber, round a central pillar, with a stone rail round the opening.
 		spiral(c, G, CH_FLOOR, true);
-		for (int x = -4; x <= 4; x++) {
-			for (int z = -4; z <= 4; z++) {
-				double d = Math.hypot(x, z);
-				if (d > 3.6 && d <= 4.5 && c.inChunk(x, z) && !(x >= 0 && x <= 4 && z >= -1 && z <= 0)) {
-					c.set(x, G + 1, z, s(Blocks.STONE_BRICK_WALL));
-				}
-			}
-		}
+		spiralRail(c, G + 1, CH_FLOOR, G, Blocks.POLISHED_ANDESITE);
 	}
 
 	/**
@@ -1091,36 +1083,147 @@ final class StonewallPrison extends BasePlan {
 		}
 	}
 
+	/** One cell of the square spiral: x, z, y, and the stair's facing (-1 for a flat landing). */
+	record Step(int x, int z, int y, int facing) {
+	}
+
 	/**
-	 * A spiral staircase from {@code yTop} down to {@code yBottom} round a central pillar (steps at radius 2-3), the shaft
-	 * cleared round it; {@code pillar} also raises the central stone pillar.
+	 * The square spiral staircase from {@code yBottom} (a floor) up to {@code yTop} (the floor above): a 7 x 7 shaft
+	 * round a 3 x 3 pillar, a two-wide stair climbing three steps along each side with a flat 2 x 2 landing at each
+	 * corner (12 up per turn, so there is always headroom). The last step is level with the upper floor.
+	 */
+	static java.util.List<Step> spiralSteps(int yBottom, int yTop) {
+		java.util.List<Step> out = new java.util.ArrayList<>();
+		// Sides in climbing order: east (going south), south (west), west (north), north (east); then the next corner.
+		int[][] sideRows = {{-1, 0, 1}, {1, 0, -1}, {1, 0, -1}, {-1, 0, 1}};
+		Direction[] travel = {Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST};
+		int y = yBottom;
+		for (int side = 0; y < yTop; side = (side + 1) % 4) {
+			for (int row : sideRows[side]) {
+				y++;
+				boolean last = y >= yTop;
+				for (int across : new int[]{2, 3}) {
+					int x, z;
+					switch (side) {
+						case 0 -> { x = across; z = row; }
+						case 1 -> { x = row; z = across; }
+						case 2 -> { x = -across; z = row; }
+						default -> { x = row; z = -across; }
+					}
+					out.add(new Step(x, z, y, last ? -1 : travel[side].ordinal()));
+				}
+				if (last) {
+					return out;
+				}
+			}
+			// The corner landing after this side (level with its last step).
+			int[] sx = side == 0 ? new int[]{2, 3} : side == 1 ? new int[]{-3, -2} : side == 2 ? new int[]{-3, -2} : new int[]{2, 3};
+			int[] sz = side == 0 ? new int[]{2, 3} : side == 1 ? new int[]{2, 3} : side == 2 ? new int[]{-3, -2} : new int[]{-3, -2};
+			for (int x : sx) {
+				for (int z : sz) {
+					out.add(new Step(x, z, y, -1));
+				}
+			}
+		}
+		return out;
+	}
+
+	/** The way off the top of the spiral: the floor cells just outside its last step (for leaving a gap in the rail). */
+	static java.util.Set<Long> spiralExit(int yBottom, int yTop) {
+		java.util.Set<Long> exit = new java.util.HashSet<>();
+		for (Step st : spiralSteps(yBottom, yTop)) {
+			if (st.y() == yTop) {
+				for (Direction d : Direction.Plane.HORIZONTAL) {
+					int x = st.x() + d.getStepX(), z = st.z() + d.getStepZ();
+					if (Math.max(Math.abs(x), Math.abs(z)) == 4) {
+						exit.add(((long) x << 32) ^ (z & 0xffffffffL));
+					}
+				}
+			}
+		}
+		return exit;
+	}
+
+	/**
+	 * Builds the square spiral from {@code yTop} down to {@code yBottom} at the centre: the shaft cleared (the upper
+	 * floor opened), the pillar, the steps and landings in spruce on a stone brick underside.
 	 */
 	private static void spiral(Canvas c, int yTop, int yBottom, boolean pillar) {
-		if (!c.near(0, 0, 4)) {
+		if (!c.near(0, 0, 5)) {
 			return;
 		}
 		for (int x = -3; x <= 3; x++) {
 			for (int z = -3; z <= 3; z++) {
-				double d = Math.hypot(x, z);
-				if (d <= 3.5 && c.inChunk(x, z)) {
-					c.fill(x, yBottom + 1, z, x, yTop, z, d <= 1.0 && pillar ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR));
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				boolean core = Math.abs(x) <= 1 && Math.abs(z) <= 1;
+				c.fill(x, yBottom + 1, z, x, yTop, z, core && pillar ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR));
+				if (core && pillar) {
+					c.set(x, yTop, z, s(Blocks.POLISHED_ANDESITE));
 				}
 			}
 		}
-		int n = yTop - yBottom;
-		for (int i = 0; i < n; i++) {
-			double a = 0 + i * 24.0; // clockwise going down
-			int y = yTop - i;
-			for (double r = 1.6; r <= 3.2; r += 0.5) {
-				double t = Math.toRadians(a);
-				int x = (int) Math.round(Math.cos(t) * r), z = (int) Math.round(Math.sin(t) * r);
-				if (!c.inChunk(x, z) || Math.hypot(x, z) <= 1.0) {
-					continue;
-				}
-				c.set(x, y, z, Kit.stairs(Blocks.SPRUCE_STAIRS, tangent(a - 180), false));
+		for (Step st : spiralSteps(yBottom, yTop)) {
+			if (!c.inChunk(st.x(), st.z())) {
+				continue;
+			}
+			c.set(st.x(), st.y(), st.z(), st.facing() < 0 ? s(Blocks.SPRUCE_PLANKS)
+					: Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.values()[st.facing()], false));
+			if (st.y() - 1 > yBottom) {
+				c.set(st.x(), st.y() - 1, st.z(), s(Blocks.STONE_BRICKS));
 			}
 		}
 	}
+
+	/** Whether the shaft column (x, z) has to stay open at the top floor (a step below it needs the headroom). */
+	static boolean spiralHole(java.util.List<Step> steps, int x, int z, int yTop) {
+		for (Step st : steps) {
+			if (st.x() == x && st.z() == z && st.y() >= yTop - 3 && st.y() < yTop) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Floors over the top of the spiral (only the stairwell over its last steps stays open), the last step level with
+	 * the floor, and a low rail round the stairwell (not across the way off the stair).
+	 */
+	private static void spiralRail(Canvas c, int y, int yBottom, int yTop, Block border) {
+		java.util.List<Step> steps = spiralSteps(yBottom, yTop);
+		java.util.Set<Long> top = new java.util.HashSet<>();
+		for (Step st : steps) {
+			if (st.y() == yTop) {
+				top.add(((long) st.x() << 32) ^ (st.z() & 0xffffffffL));
+			}
+		}
+		for (int x = -4; x <= 4; x++) {
+			for (int z = -4; z <= 4; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				boolean inShaft = Math.max(Math.abs(x), Math.abs(z)) <= 3;
+				boolean hole = inShaft && spiralHole(steps, x, z, yTop);
+				long key = ((long) x << 32) ^ (z & 0xffffffffL);
+				if (inShaft && !hole && !top.contains(key)) {
+					c.set(x, yTop, z, s(border));
+				}
+				if (hole || top.contains(key)) {
+					continue;
+				}
+				boolean edge = false;
+				for (Direction d : Direction.Plane.HORIZONTAL) {
+					int nx = x + d.getStepX(), nz = z + d.getStepZ();
+					edge |= Math.max(Math.abs(nx), Math.abs(nz)) <= 3 && spiralHole(steps, nx, nz, yTop);
+				}
+				if (edge) {
+					c.set(x, y, z, s(Blocks.STONE_BRICK_WALL));
+				}
+			}
+		}
+	}
+
 
 	// ---------------------------------------------------------------------------------------------------- upper rooms
 
@@ -1136,30 +1239,17 @@ final class StonewallPrison extends BasePlan {
 		}
 		// Middle floor: a spiral up to the upper room in the middle, barrels and a table.
 		spiral(c, UP_FLOOR, MID_FLOOR, true);
-		for (int x = -3; x <= 3; x++) {
-			for (int z = -3; z <= 3; z++) {
-				double d = Math.hypot(x, z);
-				if (d > 3.5 && d <= 4.5 && c.inChunk(x, z)) {
-					c.set(x, MID_FLOOR, z, s(Blocks.POLISHED_ANDESITE));
-				}
-			}
-		}
 		c.set(6, MID_FLOOR + 1, -5, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		c.set(7, MID_FLOOR + 1, -4, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set(-6, MID_FLOOR + 1, 5, s(Blocks.DARK_OAK_FENCE));
-		c.set(-6, MID_FLOOR + 2, 5, s(Blocks.DARK_OAK_PRESSURE_PLATE));
-		c.set(-5, MID_FLOOR + 1, 5, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.WEST, false));
+		// A table (two upper spruce slabs) with a chair on each long side, both facing it.
+		c.set(-6, MID_FLOOR + 1, 4, Kit.slab(Blocks.SPRUCE_SLAB, true));
+		c.set(-6, MID_FLOOR + 1, 5, Kit.slab(Blocks.SPRUCE_SLAB, true));
+		c.set(-5, MID_FLOOR + 1, 4, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
+		c.set(-5, MID_FLOOR + 1, 5, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
 		c.set(0, UP_FLOOR - 1, 6, lantern(true));
 		c.set(0, UP_FLOOR - 1, -6, lantern(true));
-		// The upper room: the stair opening with a pale border.
-		for (int x = -4; x <= 4; x++) {
-			for (int z = -4; z <= 4; z++) {
-				double d = Math.hypot(x, z);
-				if (d > 3.5 && d <= 4.4 && c.inChunk(x, z)) {
-					c.set(x, UP_FLOOR, z, s(Blocks.SMOOTH_QUARTZ));
-				}
-			}
-		}
+		// The upper room: the stair opening with a pale border and a low rail.
+		spiralRail(c, UP_FLOOR + 1, MID_FLOOR, UP_FLOOR, Blocks.SMOOTH_QUARTZ);
 		// Chandelier: chains from the ceiling, a gold hub with arms, end rods and sea lanterns.
 		int cy = ROOF - 1;
 		c.fill(0, cy - 1, 0, 0, cy, 0, s(Blocks.CHAIN));
@@ -1191,13 +1281,12 @@ final class StonewallPrison extends BasePlan {
 			c.set(bx, UP_FLOOR + 1, z, s(Blocks.BOOKSHELF));
 			c.set(bx, UP_FLOOR + 2, z, s(Blocks.BOOKSHELF));
 		}
+		// The desk: a row of upper spruce slabs at table height, a lantern on it, a chair facing it.
 		for (int x = 2; x <= 4; x++) {
-			c.set(x, UP_FLOOR + 1, -5, s(Blocks.SPRUCE_TRAPDOOR).setValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN, true)
-					.setValue(net.minecraft.world.level.block.TrapDoorBlock.FACING, Direction.SOUTH));
-			c.set(x, UP_FLOOR + 2, -5, Kit.slab(Blocks.SPRUCE_SLAB, false));
+			c.set(x, UP_FLOOR + 1, -5, Kit.slab(Blocks.SPRUCE_SLAB, true));
 		}
-		c.set(3, UP_FLOOR + 1, -4, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.NORTH, false));
-		c.set(2, UP_FLOOR + 2, -5, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(2, UP_FLOOR + 2, -5, lantern(false));
+		c.set(3, UP_FLOOR + 1, -4, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
 		// White curtains beside the windows (banners on the wall, facing in).
 		for (int k = 0; k < 6; k++) {
 			for (int side : new int[]{-1, 1}) {
@@ -1248,8 +1337,9 @@ final class StonewallPrison extends BasePlan {
 				}
 			}
 		}
-		// The spiral staircase's column passes through the middle (built by the atrium); keep it.
+		// The spiral staircase passes through the middle (the carving above cleared it): rebuild it and its top floor.
 		spiral(c, G, CH_FLOOR, true);
+		spiralRail(c, G + 1, CH_FLOOR, G, Blocks.POLISHED_ANDESITE);
 		int[] towers = {30, 102, 174, 246, 318};
 		int[][] tops = new int[towers.length][];
 		for (int i = 0; i < towers.length; i++) {

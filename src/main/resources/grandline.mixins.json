@@ -16,7 +16,10 @@
     "RaceDamageMixin",
     "ItemStackNoDurabilityMixin",
     "EquipmentNoDropMixin",
-    "InventoryPickupSlotMixin"
+    "InventoryPickupSlotMixin",
+    "PlayerLavaSafetyMixin",
+    "PlayerLavaHurtMixin",
+    "MagmaBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -525,12 +525,17 @@ public final class CrystalFountain extends BasePlan {
 				for (int k = -3; k <= 3; k++) {
 					int x = g[0] != 0 ? g[0] * along : k, z = g[1] != 0 ? g[1] * along : k;
 					int top = Math.abs(k) == 3 ? 7 : 8;
-					int floor = along >= R_ENCL ? G_IN : along >= R_ENCL - 1 ? G_IN + 1 : G_CT;
-					c.set(x, floor, z, s(Blocks.SMOOTH_STONE));
+					// Two real steps up from the road (surface G_IN) to the courtyard (surface G_CT): a stair at G_IN + 1, then
+					// one at G_CT, each on solid stone, so it is a walk up rather than a hop over full blocks.
+					int floor = along > R_ENCL ? G_IN : G_CT;
+					c.fill(x, G_IN - 1, z, x, floor, z, s(Blocks.SMOOTH_STONE));
 					c.fill(x, floor + 1, z, x, G_CT + top, z, s(Blocks.AIR));
-					if (along == R_ENCL - 1 || along == R_ENCL) {
-						Direction up = g[0] > 0 ? Direction.WEST : g[0] < 0 ? Direction.EAST : Direction.SOUTH;
-						c.set(x, floor, z, along == R_ENCL ? Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false) : s(Blocks.SMOOTH_STONE));
+					Direction up = g[0] > 0 ? Direction.WEST : g[0] < 0 ? Direction.EAST : Direction.SOUTH;
+					if (along == R_ENCL) {
+						c.set(x, G_IN + 1, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false));
+						c.set(x, G_CT, z, s(Blocks.AIR));
+					} else if (along == R_ENCL - 1) {
+						c.set(x, G_CT, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, up, false));
 					}
 				}
 				for (int k : new int[]{-4, 4}) {
@@ -701,7 +706,9 @@ public final class CrystalFountain extends BasePlan {
 				if (o <= rs + 0.4) {
 					boolean shell = o > rs - 1.6;
 					for (int y = baseTop + 1; y <= shaftTop; y++) {
-						c.set(x, y, z, shell ? wallBlock(x, y, z, o, rs, ang, baseTop + 8, baseTop + 40) : s(Blocks.AIR));
+						// The hall keeps its ceiling (the shaft's hollow above it is closed off, not a dark tube to look up).
+						c.set(x, y, z, shell ? wallBlock(x, y, z, o, rs, ang, baseTop + 8, baseTop + 40)
+								: y == baseTop + 1 ? floorBlock(x, z) : s(Blocks.AIR));
 					}
 				}
 				// Lantern room.
@@ -883,8 +890,9 @@ public final class CrystalFountain extends BasePlan {
 					}
 				}
 			}
-			// Spillways: a notch in the middle of each face; a curtain of water down the face to the pool below.
-			for (int f = 0; f < 8; f++) {
+			// Spillways on the four straight (north, south, east, west) faces: a notch and a clean three-wide curtain down
+			// to the pool below. (The diagonal faces get none: rounded onto the grid they broke into loose water cubes.)
+			for (int f = 0; f < 8; f += 2) {
 				double t = Math.toRadians(f * 45);
 				double ux = Math.cos(t), uz = Math.sin(t);
 				for (int w = -1; w <= 1; w++) {
@@ -1287,7 +1295,8 @@ public final class CrystalFountain extends BasePlan {
 				boolean ex = x == x1 || x == x2, ez = z == z1 || z == z2;
 				for (int yy = y + 1; yy <= shaftTop; yy++) {
 					if (!ex && !ez) {
-						c.set(x, yy, z, s(Blocks.AIR));
+						// Real floors every six blocks (between the window rows), not one empty 20-block tube.
+						c.set(x, yy, z, (yy - y) % 6 == 0 ? s(Blocks.SPRUCE_PLANKS) : s(Blocks.AIR));
 						continue;
 					}
 					int along = ex ? z - z1 : x - x1;
@@ -1356,6 +1365,9 @@ public final class CrystalFountain extends BasePlan {
 			c.set(cxm, yy, z1 + 1, Canvas.facing(s(Blocks.LADDER), Direction.SOUTH));
 		}
 		c.set(cxm + 2, shaftTop + 2, czm, CloudtopIsles.lantern(Blocks.LANTERN, false));
+		for (int f = 6; f <= shaftTop - y; f += 6) {
+			c.set(cxm, y + f - 1, czm + 2, CloudtopIsles.lantern(Blocks.LANTERN, true));
+		}
 	}
 
 	/**
@@ -1623,6 +1635,8 @@ public final class CrystalFountain extends BasePlan {
 					c.set(px, py, pz, bs);
 				}
 			}
+		}	if (flat) {
+			c.set(x, y, z, s(Blocks.POLISHED_DEEPSLATE)); // the axle: no one-block pit in the middle of a gear lying flat
 		}
 	}
 

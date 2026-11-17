@@ -891,7 +891,7 @@ final class GladiatorsRing extends BasePlan {
 					set(c, alongX, t, yy, p, stair(Blocks.BRICK_STAIRS, alongX ? Direction.SOUTH : Direction.EAST, false));
 					set(c, alongX, t, yy, q, stair(Blocks.BRICK_STAIRS, alongX ? Direction.NORTH : Direction.WEST, false));
 				}
-				if (gable && i > 0) {
+				if (gable) { // every row, the bottom one too (it closes the slot between the wall top and the roof)
 					for (int m = p + 1; m < q; m++) {
 						set(c, alongX, t, yy, m, s(Blocks.WHITE_TERRACOTTA));
 					}

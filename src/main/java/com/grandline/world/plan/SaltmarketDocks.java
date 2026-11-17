@@ -275,19 +275,20 @@ public final class SaltmarketDocks extends BasePlan {
 				c.set(ax + dx, y0 - 1, z, s(Blocks.SMOOTH_SANDSTONE));
 			}
 		}
-		// a pale stone border that follows the curve: jambs, curved shoulders (stairs) and a keystone
+		// a pale stone border that follows the curve: jambs, curved shoulders (upside-down stairs whose lower half sits on the
+		// outer, lower side, so each step rounds the corner instead of notching it) and a keystone
 		for (int y = y0; y <= y0 + 5; y++) {
 			c.set(ax - 3, y, HZ2, s(Blocks.SMOOTH_QUARTZ));
 			c.set(ax + 3, y, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		}
 		c.set(ax - 3, y0 + 6, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		c.set(ax + 3, y0 + 6, HZ2, s(Blocks.SMOOTH_QUARTZ));
-		c.set(ax - 2, y0 + 6, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, true));
-		c.set(ax + 2, y0 + 6, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, true));
+		c.set(ax - 2, y0 + 6, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, true));
+		c.set(ax + 2, y0 + 6, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, true));
 		c.set(ax - 2, y0 + 7, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		c.set(ax + 2, y0 + 7, HZ2, s(Blocks.SMOOTH_QUARTZ));
-		c.set(ax - 1, y0 + 8, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, true));
-		c.set(ax + 1, y0 + 8, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, true));
+		c.set(ax - 1, y0 + 8, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.WEST, true));
+		c.set(ax + 1, y0 + 8, HZ2, stair(Blocks.QUARTZ_STAIRS, Direction.EAST, true));
 		c.set(ax - 1, y0 + 9, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		c.set(ax + 1, y0 + 9, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		c.set(ax, y0 + 9, HZ2, s(Blocks.CHISELED_QUARTZ_BLOCK));

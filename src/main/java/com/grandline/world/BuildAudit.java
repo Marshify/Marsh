@@ -47,8 +47,20 @@ public final class BuildAudit {
 				if (!level.hasChunk(x >> 4, z >> 4)) {
 					continue;
 				}
-				for (int y = 50; y < 200; y++) {
+				for (int y = 50; y < 320; y++) {
 					BlockState s = level.getBlockState(m.set(x, y, z));
+					if (s.isAir() && level.getBlockState(m.above()).isAir() && level.canSeeSky(m)) {
+						// A one-block pit in an open floor: walled on all four sides and floored, nothing above.
+						BlockPos p = m.immutable();
+						boolean pit = fullTop(level, p.below());
+						for (Direction d : Direction.Plane.HORIZONTAL) {
+							pit &= fullTop(level, p.relative(d)) && level.getBlockState(p.relative(d).above()).isAir();
+						}
+						if (pit) {
+							out.add(new Finding(p, "air", "one-block hole in the floor (in " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(p.north()).getBlock()).getPath()
+								+ ", over " + BuiltInRegistries.BLOCK.getKey(level.getBlockState(p.below()).getBlock()).getPath() + ")"));
+						}
+					}
 					if (s.isAir() || !s.getFluidState().isEmpty() && s.getBlock() == Blocks.WATER) {
 						continue;
 					}
@@ -58,6 +70,14 @@ public final class BuildAudit {
 					if (!s.canSurvive(level, p)) {
 						out.add(new Finding(p, id, "cannot survive here (pops off when updated)"));
 						continue;
+					}
+					if (b == Blocks.LADDER && !level.getBlockState(p.below()).is(Blocks.LADDER)) {
+						// The bottom of a ladder must be reachable: standing on the block under it, or one up from it.
+						BlockPos b1 = p.below(), b2 = p.below(2);
+						if (level.getBlockState(b1).getCollisionShape(level, b1).isEmpty()
+								&& level.getBlockState(b2).getCollisionShape(level, b2).isEmpty()) {
+							out.add(new Finding(p, id, "ladder starts out of reach (nothing to stand on under it)"));
+						}
 					}
 					if (b instanceof LanternBlock) {
 						boolean hanging = s.getValue(LanternBlock.HANGING);
