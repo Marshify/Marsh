@@ -26,9 +26,10 @@ import net.minecraft.world.item.Items;
 import java.util.List;
 
 /**
- * The Grand Line hotbar: the vanilla 9 slots drawn with the Marsh UI slot sprites, plus the combat bar: one tile per
- * equipped loadout entry (Fighting Style, Fruit, Sword, Gun) in the player's saved order, packed with no gaps; entries
- * that are not equipped are not drawn at all. Number keys 1-4 select the loadout entry in that
+ * The Grand Line hotbar, one bar numbered 1-9 in place of the vanilla one: keys 1-4 are the loadout entries (Fighting
+ * Style, Fruit, Sword, Gun in the player's saved order), keys 5-9 the hotbar slots 5-9. Only tiles with something in
+ * them are drawn (an unequipped entry, an empty slot: nothing), packed together with no gaps. The server keeps hotbar
+ * slots 1-4 for the sword and gun (HotbarLayout), so every item has a tile. Number keys 1-4 select the loadout entry in that
  * position: Style/Fruit switch the move keys and select a hand without a weapon; Sword/Gun select that weapon's
  * hotbar slot. Keys 5-9 and scrolling keep their vanilla behaviour. The order is edited in {@code LoadoutEditScreen}.
  */
@@ -95,6 +96,16 @@ public final class LoadoutHotbar {
 			}
 		}
 		return GrandLineKeys.activeSource() == PowerSource.FRUIT && equipped(Loadout.FRUIT) ? Loadout.FRUIT : Loadout.STYLE;
+	}
+
+	/** Whether the selection is a loadout entry (keys 1-4) rather than an item in slots 5-9. */
+	public static boolean loadoutSelected() {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return true;
+		}
+		var held = mc.player.getMainHandItem().getItem();
+		return mc.player.getInventory().selected < LoadoutOrder.SIZE || held instanceof GearSwordItem || held instanceof GunItem;
 	}
 
 	/** If the selected entry is no longer equipped (fruit removed), switch to an equipped one. Runs every tick. */
@@ -223,13 +234,23 @@ public final class LoadoutHotbar {
 				GrandLineKeys.choose(loadout == Loadout.FRUIT ? PowerSource.FRUIT : PowerSource.STYLE);
 				// A held weapon would override the move keys: switch to a hotbar slot without one.
 				var held = player.getMainHandItem().getItem();
-				if (held instanceof GearSwordItem || held instanceof GunItem) {
-					for (int i = 0; i < 9; i++) {
+				int sel = player.getInventory().selected;
+				if (held instanceof GearSwordItem || held instanceof GunItem || sel >= LoadoutOrder.SIZE) {
+					// An empty hand among slots 1-4 (kept for weapons), else any slot without a weapon.
+					int pick = -1;
+					for (int i = 0; i < 9 && pick < 0; i++) {
+						if (i < LoadoutOrder.SIZE && player.getInventory().getItem(i).isEmpty()) {
+							pick = i;
+						}
+					}
+					for (int i = 0; i < 9 && pick < 0; i++) {
 						var item = player.getInventory().getItem(i).getItem();
 						if (!(item instanceof GearSwordItem) && !(item instanceof GunItem)) {
-							selectSlot(i);
-							break;
+							pick = i;
 						}
+					}
+					if (pick >= 0) {
+						selectSlot(pick);
 					}
 				}
 				return true;
@@ -247,62 +268,70 @@ public final class LoadoutHotbar {
 
 	// ------------------------------------------------------------------------------------------------ drawing
 
+	/**
+	 * One bar in place of the vanilla hotbar: tiles 1-4 are the equipped loadout entries (Fighting Style, Fruit, Sword,
+	 * Gun in the saved order), tiles 5-9 the hotbar slots 5-9. Only tiles with something in them are drawn, packed
+	 * together and centred; each keeps its own key number. The offhand sits to the left, as in vanilla.
+	 */
 	public static void render(GuiGraphics g, float partialTick) {
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
 		Font font = mc.font;
-		int width = 9 * SLOT + 8 * GAP;
-		int x0 = g.guiWidth() / 2 - width / 2;
-		int y = g.guiHeight() - SLOT - 2;
 		Inventory inv = player.getInventory();
-		for (int i = 0; i < 9; i++) {
-			int x = x0 + i * (SLOT + GAP);
-			MarshUi.abilitySlot(g, x, y, SLOT, i == inv.selected ? 1 : 0);
-			ItemStack stack = inv.getItem(i);
-			if (!stack.isEmpty()) {
-				g.renderItem(player, stack, x + 2, y + 2, i + 1);
-				g.renderItemDecorations(font, stack, x + 2, y + 2);
-			}
-			if (i >= LoadoutOrder.SIZE) { // 1-4 belong to the loadout panel
-				keyNumber(g, font, String.valueOf(i + 1), x + 1, y - 3);
+		List<Integer> loadout = visiblePositions();
+		List<Integer> items = new java.util.ArrayList<>();
+		for (int i = LoadoutOrder.SIZE; i < 9; i++) {
+			if (!inv.getItem(i).isEmpty()) {
+				items.add(i);
 			}
 		}
-		// Offhand slot, on the side vanilla uses.
-		ItemStack offhand = player.getOffhandItem();
-		int left = x0 - 4;
-		if (!offhand.isEmpty()) {
-			left -= SLOT;
-			MarshUi.abilitySlot(g, left, y, SLOT, 0);
-			g.renderItem(player, offhand, left + 2, y + 2, 10);
-			g.renderItemDecorations(font, offhand, left + 2, y + 2);
-			left -= 4;
-		}
-		// Combat bar: only equipped entries, in the saved order, packed together; each keeps its own key (1-4).
-		List<Integer> shown = visiblePositions();
-		if (shown.isEmpty()) {
+		int count = loadout.size() + items.size();
+		if (count == 0) {
 			return;
 		}
+		int width = count * SLOT + (count - 1) * GAP;
+		int x0 = g.guiWidth() / 2 - width / 2;
+		int y = g.guiHeight() - SLOT - 2;
+		boolean onLoadout = loadoutSelected();
 		Loadout active = active();
-		int lx = left - shown.size() * (SLOT + GAP) - 2;
-		for (int k = 0; k < shown.size(); k++) {
-			int pos = shown.get(k);
+		int k = 0;
+		for (int pos : loadout) {
 			Loadout l = at(pos);
-			int x = lx + k * (SLOT + GAP);
+			int x = x0 + k++ * (SLOT + GAP);
+			boolean sel = onLoadout && l == active;
+			MarshUi.abilitySlot(g, x, y, SLOT, sel ? 1 : 0);
 			ItemStack icon = icon(l);
-			MarshUi.abilitySlot(g, x, y, SLOT, l == active ? 1 : 0);
 			if (!icon.isEmpty()) {
 				g.renderFakeItem(icon, x + 2, y + 2);
 			}
 			keyNumber(g, font, String.valueOf(pos + 1), x + 1, y - 3);
-			if (l == active) {
-				Component label = l.displayName();
-				g.pose().pushPose();
-				g.pose().translate(x + SLOT / 2f - font.width(label) * 0.35f, y - 10, 0);
-				g.pose().scale(0.7f, 0.7f, 1);
-				g.drawString(font, label, 0, 0, 0xFFD25A, true);
-				g.pose().popPose();
+			if (sel) {
+				label(g, font, l.displayName(), x, y);
 			}
 		}
+		for (int i : items) {
+			int x = x0 + k++ * (SLOT + GAP);
+			MarshUi.abilitySlot(g, x, y, SLOT, !onLoadout && i == inv.selected ? 1 : 0);
+			ItemStack stack = inv.getItem(i);
+			g.renderItem(player, stack, x + 2, y + 2, i + 1);
+			g.renderItemDecorations(font, stack, x + 2, y + 2);
+			keyNumber(g, font, String.valueOf(i + 1), x + 1, y - 3);
+		}
+		ItemStack offhand = player.getOffhandItem();
+		if (!offhand.isEmpty()) {
+			int left = x0 - 4 - SLOT;
+			MarshUi.abilitySlot(g, left, y, SLOT, 0);
+			g.renderItem(player, offhand, left + 2, y + 2, 10);
+			g.renderItemDecorations(font, offhand, left + 2, y + 2);
+		}
+	}
+
+	private static void label(GuiGraphics g, Font font, Component label, int x, int y) {
+		g.pose().pushPose();
+		g.pose().translate(x + SLOT / 2f - font.width(label) * 0.35f, y - 10, 0);
+		g.pose().scale(0.7f, 0.7f, 1);
+		g.drawString(font, label, 0, 0, 0xFFD25A, true);
+		g.pose().popPose();
 	}
 
 	public static void keyNumber(GuiGraphics g, Font font, String text, int x, int y) {
