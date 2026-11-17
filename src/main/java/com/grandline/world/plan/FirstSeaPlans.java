@@ -384,7 +384,7 @@ public final class FirstSeaPlans {
 				}
 			}
 			Kit.house(c, -28, 8, -14, 18, 65, 2, Palette.SNOW_LODGE, Direction.SOUTH, Interior.HALL);
-			c.fill(-21, 66, 12, -21, 67, 12, s(Blocks.CAMPFIRE));
+			c.set(-21, 66, 12, s(Blocks.CAMPFIRE)); // one campfire (a second on top of it floated)
 			for (int[] ig : new int[][]{{22, 20}, {30, 6}}) {
 				igloo(c, ig[0], ig[1], c.ground(ig[0], ig[1]));
 			}

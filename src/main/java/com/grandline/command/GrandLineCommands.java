@@ -236,6 +236,34 @@ public final class GrandLineCommands {
 													context.getSource().sendSuccess(() -> Component.literal(done ? "Revoked" : "Not owned"), true);
 													return done ? 1 : 0;
 												})))))
+				// Tidy an island now (normally automatic as its chunks load): fixes unsupported decorations.
+				.then(Commands.literal("tidy").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+								.executes(context -> {
+									String name = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "island");
+									var server = context.getSource().getServer();
+									var island = com.grandline.world.IslandRegistry.get(server).all().stream()
+											.filter(i -> i.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+									var plan = island == null ? null : com.grandline.world.plan.IslandPlans.get(island);
+									if (plan == null) {
+										context.getSource().sendFailure(Component.literal("No planned island " + name));
+										return 0;
+									}
+									int r = plan.extent() + 12, fixed = 0;
+									for (int cx = (island.x() - r) >> 4; cx <= (island.x() + r) >> 4; cx++) {
+										for (int cz = (island.z() - r) >> 4; cz <= (island.z() + r) >> 4; cz++) {
+											server.overworld().getChunk(cx, cz);
+										}
+									}
+									for (int cx = (island.x() - r) >> 4; cx <= (island.x() + r) >> 4; cx++) {
+										for (int cz = (island.z() - r) >> 4; cz <= (island.z() + r) >> 4; cz++) {
+											fixed += com.grandline.world.IslandTidy.tidy(server.overworld(), new net.minecraft.world.level.ChunkPos(cx, cz));
+										}
+									}
+									int n = fixed;
+									context.getSource().sendSuccess(() -> Component.literal("Tidied " + island.name() + ": " + n + " fixed"), false);
+									return n;
+								})))
 				// Dev tool: list floating or unsupported blocks on an island (writes audit/<island>.txt).
 				.then(Commands.literal("audit").requires(source -> source.hasPermission(2))
 						.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())

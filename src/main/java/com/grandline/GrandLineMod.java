@@ -89,6 +89,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.quest.QuestNavigation.register();
 		com.grandline.world.AdventureRules.register();
 		com.grandline.treasure.TreasurePlacer.register();
+		com.grandline.world.IslandTidy.register();
 		com.grandline.npc.EnemyRespawns.register();
 		com.grandline.npc.TempleBosses.register();
 		com.grandline.race.RaceService.register();
