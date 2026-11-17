@@ -15,7 +15,9 @@
     "MouseTurnMixin",
     "KeyboardInputMixin",
     "GameRendererCameraMixin",
-    "MinecraftAimMixin"
+    "MinecraftAimMixin",
+    "LevelRendererLightMixin",
+    "EntityRendererLightMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

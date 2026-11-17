@@ -38,6 +38,8 @@ public final class ClientSettings {
 	public int environmentSfx = 3;
 	/** Shake the camera on nearby move impacts. */
 	public boolean cameraShake = true;
+	/** Stylized world lighting: no black shadows under floating islands (see StylizedLighting). */
+	public boolean stylizedLighting = true;
 	/** Show the move list (bottom right). */
 	public boolean showMoveList = true;
 	/** Show the active quest tracker. */

@@ -1044,5 +1044,7 @@
   "block.grandline.treasure_chest_rare": "Rare Chest",
   "block.grandline.treasure_chest_legendary": "Legendary Chest",
   "message.grandline.treasure.opened": "%s: +$%s",
-  "message.grandline.treasure.refilling": "%s already looted. It refills in %s."
+  "message.grandline.treasure.refilling": "%s already looted. It refills in %s.",
+  "setting.grandline.stylized_lighting": "Bright skies",
+  "setting.grandline.stylized_lighting.desc": "No black shadows under floating islands. Rooms and caves keep normal light."
 }

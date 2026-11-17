@@ -50,6 +50,12 @@ public final class SettingsScreen extends Screen {
 		rows.add("screen.grandline.settings.section.visuals");
 		rows.add(new Toggle("ally_vfx", () -> s.allyVfx, v -> s.allyVfx = v));
 		rows.add(new Toggle("camera_shake", () -> s.cameraShake, v -> s.cameraShake = v));
+		rows.add(new Toggle("stylized_lighting", () -> s.stylizedLighting, v -> {
+			s.stylizedLighting = v;
+			if (net.minecraft.client.Minecraft.getInstance().levelRenderer != null) {
+				net.minecraft.client.Minecraft.getInstance().levelRenderer.allChanged(); // re-light every chunk
+			}
+		}));
 		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v));
 		rows.add("screen.grandline.settings.section.camera");
 		rows.add(new Toggle("custom_camera", () -> s.customCamera, v -> s.customCamera = v));
