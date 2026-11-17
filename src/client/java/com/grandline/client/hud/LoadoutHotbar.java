@@ -26,8 +26,9 @@ import net.minecraft.world.item.Items;
 import java.util.List;
 
 /**
- * The Grand Line hotbar: the vanilla 9 slots drawn with the Marsh UI slot sprites, plus a four-slot loadout panel
- * (Fighting Style, Fruit, Sword, Gun) in the player's saved order. Number keys 1-4 select the loadout entry in that
+ * The Grand Line hotbar: the vanilla 9 slots drawn with the Marsh UI slot sprites, plus the combat bar: one tile per
+ * equipped loadout entry (Fighting Style, Fruit, Sword, Gun) in the player's saved order, packed with no gaps; entries
+ * that are not equipped are not drawn at all. Number keys 1-4 select the loadout entry in that
  * position: Style/Fruit switch the move keys and select a hand without a weapon; Sword/Gun select that weapon's
  * hotbar slot. Keys 5-9 and scrolling keep their vanilla behaviour. The order is edited in {@code LoadoutEditScreen}.
  */
@@ -60,6 +61,27 @@ public final class LoadoutHotbar {
 		return ClientSettings.get().customHotbar && mc.player != null && !mc.player.isSpectator() && ClientProfileCache.view() != null;
 	}
 
+	/**
+	 * Whether a loadout entry is equipped: the fighting style always (once the profile is known), the fruit when one has
+	 * been eaten, a sword or gun when it is in the hotbar (equipping puts it there). A fruit item, or a weapon carried in
+	 * the main inventory, does not count.
+	 */
+	public static boolean equipped(Loadout loadout) {
+		if (loadout == Loadout.STYLE) {
+			return ClientProfileCache.profile() != null;
+		}
+		return !icon(loadout).isEmpty();
+	}
+
+	/** The positions of equipped entries, in the saved order (what the combat bar draws). */
+	public static List<Integer> visiblePositions() {
+		boolean[] eq = new boolean[LoadoutOrder.SIZE];
+		for (Loadout l : Loadout.values()) {
+			eq[l.ordinal()] = equipped(l);
+		}
+		return LoadoutOrder.visiblePositions(order, eq);
+	}
+
 	/** Which loadout entry currently powers the move keys. */
 	public static Loadout active() {
 		Minecraft mc = Minecraft.getInstance();
@@ -72,7 +94,14 @@ public final class LoadoutHotbar {
 				return Loadout.GUN;
 			}
 		}
-		return GrandLineKeys.activeSource() == PowerSource.FRUIT ? Loadout.FRUIT : Loadout.STYLE;
+		return GrandLineKeys.activeSource() == PowerSource.FRUIT && equipped(Loadout.FRUIT) ? Loadout.FRUIT : Loadout.STYLE;
+	}
+
+	/** If the selected entry is no longer equipped (fruit removed), switch to an equipped one. Runs every tick. */
+	private static void keepSelectionEquipped() {
+		if (GrandLineKeys.activeSource() == PowerSource.FRUIT && !equipped(Loadout.FRUIT)) {
+			GrandLineKeys.choose(PowerSource.STYLE);
+		}
 	}
 
 	/** Item shown for a loadout entry (empty if the player has none). */
@@ -150,7 +179,11 @@ public final class LoadoutHotbar {
 	 */
 	public static void register() {
 		ClientTickEvents.START_CLIENT_TICK.register(client -> {
-			if (client.player == null || client.screen != null || !replacesVanilla()) {
+			if (client.player == null || !replacesVanilla()) {
+				return;
+			}
+			keepSelectionEquipped();
+			if (client.screen != null) {
 				return;
 			}
 			// Creative "save/load toolbar" (activator + number) keeps working.
@@ -244,14 +277,19 @@ public final class LoadoutHotbar {
 			g.renderItemDecorations(font, offhand, left + 2, y + 2);
 			left -= 4;
 		}
-		// Loadout panel in the saved order; number keys 1-4.
+		// Combat bar: only equipped entries, in the saved order, packed together; each keeps its own key (1-4).
+		List<Integer> shown = visiblePositions();
+		if (shown.isEmpty()) {
+			return;
+		}
 		Loadout active = active();
-		int lx = left - 4 * (SLOT + GAP) - 2;
-		for (int pos = 0; pos < LoadoutOrder.SIZE; pos++) {
+		int lx = left - shown.size() * (SLOT + GAP) - 2;
+		for (int k = 0; k < shown.size(); k++) {
+			int pos = shown.get(k);
 			Loadout l = at(pos);
-			int x = lx + pos * (SLOT + GAP);
+			int x = lx + k * (SLOT + GAP);
 			ItemStack icon = icon(l);
-			MarshUi.abilitySlot(g, x, y, SLOT, l == active ? 1 : icon.isEmpty() ? 2 : 0);
+			MarshUi.abilitySlot(g, x, y, SLOT, l == active ? 1 : 0);
 			if (!icon.isEmpty()) {
 				g.renderFakeItem(icon, x + 2, y + 2);
 			}

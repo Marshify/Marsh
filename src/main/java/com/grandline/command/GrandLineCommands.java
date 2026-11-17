@@ -353,6 +353,14 @@ public final class GrandLineCommands {
 										.then(Commands.argument("amount", LongArgumentType.longArg(0))
 												.executes(context -> modify(context, "addxp",
 														(player, ctx) -> PlayerProfileService.addExperience(player, LongArgumentType.getLong(ctx, "amount")))))))
+						// Sets or clears a player's eaten fruit (testing): /grandline admin fruit <players> <fruit id | none>
+						.then(Commands.literal("fruit")
+								.then(Commands.argument("players", EntityArgument.players())
+										.then(Commands.argument("fruit", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+												.executes(context -> modify(context, "fruit", (player, ctx) -> {
+													String f = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "fruit");
+													return PlayerProfileService.update(player, pr -> pr.withPowers(pr.powers().withFruit("none".equals(f) ? "" : f)));
+												})))))
 						.then(Commands.literal("addcurrency")
 								.then(Commands.argument("players", EntityArgument.players())
 										.then(Commands.argument("amount", LongArgumentType.longArg())

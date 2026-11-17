@@ -43,4 +43,20 @@ public final class GrandLineLoadoutGameTests implements FabricGameTest {
 		}
 		helper.succeed();
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "loadout")
+	public void combatBarShowsOnlyEquippedEntriesKeepingTheirKeys(GameTestHelper helper) {
+		var order = com.grandline.player.loadout.LoadoutOrder.DEFAULT; // Style, Fruit, Sword, Gun
+		java.util.function.Function<boolean[], java.util.List<Integer>> vis = eq -> com.grandline.player.loadout.LoadoutOrder.visiblePositions(order, eq);
+		helper.assertTrue(vis.apply(new boolean[]{true, false, false, false}).equals(java.util.List.of(0)), "style only: one tile");
+		helper.assertTrue(vis.apply(new boolean[]{true, true, false, false}).equals(java.util.List.of(0, 1)), "style + fruit");
+		helper.assertTrue(vis.apply(new boolean[]{true, false, false, true}).equals(java.util.List.of(0, 3)),
+				"style + gun: two tiles, the gun keeps position 3 (key 4)");
+		helper.assertTrue(vis.apply(new boolean[]{true, true, true, true}).equals(java.util.List.of(0, 1, 2, 3)), "everything");
+		helper.assertTrue(vis.apply(new boolean[]{false, false, false, false}).isEmpty(), "nothing equipped: no bar");
+		var custom = java.util.List.of(3, 0, 2, 1); // Gun, Style, Sword, Fruit
+		helper.assertTrue(com.grandline.player.loadout.LoadoutOrder.visiblePositions(custom, new boolean[]{true, false, true, false})
+				.equals(java.util.List.of(1, 2)), "a custom order is kept: style (key 2) then sword (key 3)");
+		helper.succeed();
+	}
 }

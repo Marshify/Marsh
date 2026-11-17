@@ -38,6 +38,22 @@ public final class LoadoutOrder {
 		return isValid(order) ? List.copyOf(order) : DEFAULT;
 	}
 
+	/**
+	 * The positions to draw on the combat bar, in order, skipping entries that are not equipped ({@code equipped} is
+	 * indexed by entry id). Each kept position keeps its own key (position + 1) even when drawn further left.
+	 */
+	public static List<Integer> visiblePositions(List<Integer> order, boolean[] equipped) {
+		List<Integer> out = new ArrayList<>();
+		List<Integer> o = sanitize(order);
+		for (int pos = 0; pos < SIZE; pos++) {
+			int id = o.get(pos);
+			if (id < equipped.length && equipped[id]) {
+				out.add(pos);
+			}
+		}
+		return List.copyOf(out);
+	}
+
 	/** The order with positions {@code a} and {@code b} swapped. */
 	public static List<Integer> swap(List<Integer> order, int a, int b) {
 		List<Integer> copy = new ArrayList<>(sanitize(order));
