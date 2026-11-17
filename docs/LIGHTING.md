@@ -52,3 +52,17 @@ would stay dark with Sodium until a Sodium-specific hook is added. There is no U
 
 **Tested:** the cloud sides up close and from the side (noon and night), the Sky Village grass, the ocean below, and the
 Saltmarket tavern and a house (unchanged). All of it is behind the same "Bright skies" setting.
+
+## 0.45.1: no shadows at all under floating islands
+
+The owner asked that sky islands cast no shadow on other islands or the water.
+- Spots under a floating island now get **full** sky light (15), not the soft shade of 13.
+- A spot also counts as open sky when the first thing above it is the **underside of a floating cloud**: white wool,
+  snow block or white concrete, at least 4 blocks deep, at y 70 or higher. That holds however close the island floats,
+  so cloud platforms and low islands cast no shadow either. Roofs and ceilings are never thick white cloud, so rooms stay
+  dark.
+- The **sea floor** under an island is lit as if under open water (full sky light, less one per block of water), as
+  long as the column above it is only water up to an open surface. Caves are under stone and keep vanilla light.
+
+Tested in game on the 0.45.0 sky islands: looking up from the water under Bloomhold, under the first cloud platform,
+under Mistfall by the waterfall, and down from above the first bridge. No shadow on the water or the sea bed.
