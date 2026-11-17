@@ -31,12 +31,31 @@ public final class StylizedLighting {
 	private StylizedLighting() {
 	}
 
+	/** Height from which cloud blocks are treated as floating-island cloud (no ambient occlusion). */
+	public static final int CLOUD_MIN_Y = 75;
+
+	/**
+	 * Whether this block is part of a floating island's cloud base (white wool or snow block, high above the sea), drawn
+	 * with flat lighting instead of ambient occlusion. Checked in game: with ambient occlusion the stepped cloud sides went
+	 * grey-black even at full light; without it they read as soft bright cloud.
+	 */
+	public static boolean flatCloud(net.minecraft.world.level.block.state.BlockState state, BlockPos pos) {
+		return pos.getY() >= CLOUD_MIN_Y && enabled()
+				&& (state.is(net.minecraft.world.level.block.Blocks.WHITE_WOOL) || state.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK));
+	}
+
 	public static boolean enabled() {
 		return ClientSettings.get().stylizedLighting;
 	}
 
 	/** Sky light at {@code pos} as it should be rendered (the vanilla value, raised under floating islands). */
+	/** Dev: GRANDLINE_LIGHT_DEBUG=full renders every spot above MIN_Y with full sky light (to tell light from shading). */
+	private static final boolean DEBUG_FULL = "full".equals(System.getenv("GRANDLINE_LIGHT_DEBUG"));
+
 	public static int skyLight(BlockAndTintGetter level, BlockPos pos, int vanillaSky) {
+		if (DEBUG_FULL && pos.getY() >= MIN_Y) {
+			return 15;
+		}
 		if (vanillaSky >= DIFFUSE || !enabled() || pos.getY() < MIN_Y || !(openAbove(level, pos) || openBelow(level, pos))) {
 			return vanillaSky;
 		}
@@ -46,7 +65,7 @@ public final class StylizedLighting {
 	/** A packed light value (as LevelRenderer.getLightColor returns) with its sky part adjusted. */
 	public static int adjustPacked(BlockAndTintGetter level, BlockPos pos, int packed) {
 		int sky = LightTexture.sky(packed);
-		if (sky >= DIFFUSE || !enabled()) {
+		if (!DEBUG_FULL && (sky >= DIFFUSE || !enabled())) {
 			return packed;
 		}
 		int adjusted = skyLight(level, pos, sky);
@@ -59,27 +78,33 @@ public final class StylizedLighting {
 	 */
 	static boolean openBelow(BlockAndTintGetter level, BlockPos pos) {
 		BlockPos.MutableBlockPos m = pos.mutable();
-		if (!level.getBlockState(m).isAir()) {
+		if (!passable(level, m)) {
 			return false;
 		}
 		for (int i = 1; i <= GAP; i++) {
 			m.setY(pos.getY() - i);
-			if (!level.getBlockState(m).isAir()) {
+			if (!passable(level, m)) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	/** Open space for light: air, water, and plants or other non-solid blocks (grass, flowers, torches). Not leaves. */
+	static boolean passable(BlockAndTintGetter level, BlockPos p) {
+		var state = level.getBlockState(p);
+		return state.isAir() || !state.canOcclude() && state.getCollisionShape(level, p).isEmpty();
+	}
+
 	/** Whether the spot itself is open and the {@link #GAP} blocks above it are all air (stops at the first block). */
 	static boolean openAbove(BlockAndTintGetter level, BlockPos pos) {
 		BlockPos.MutableBlockPos m = pos.mutable();
-		if (!level.getBlockState(m).isAir() && level.getFluidState(m).isEmpty()) {
+		if (!passable(level, m)) {
 			return false;
 		}
 		for (int i = 1; i <= GAP; i++) {
 			m.setY(pos.getY() + i);
-			if (!level.getBlockState(m).isAir()) {
+			if (!passable(level, m)) {
 				return false;
 			}
 		}

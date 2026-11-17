@@ -1,4 +1,4 @@
-# Stylized world lighting (0.41.0)
+# Stylized world lighting (0.41.0, 0.41.1)
 
 **Problem:** huge, nearly black regions on the ocean and terrain under floating islands (Cloudtop Isles, the upper
 Skylands), and dark grey island undersides.
@@ -31,3 +31,24 @@ lighthouse shaft (not glowing).
 **Not tested / limits:** with shader packs (Iris) or Sodium, which are not in the dev setup. Iris on vanilla rendering
 uses the same light values, so it should follow. Sodium replaces the chunk-lighting code, so the ground under islands
 would stay dark with Sodium until a Sodium-specific hook is added. There is no Underwater City in the game yet.
+
+## 0.41.1: the islands themselves
+
+**Problem:** the cloud sides of the floating islands rendered grey-black, and the Sky Village grass sat in a dark patch.
+
+**Causes (checked by switching each off in turn):**
+- The dark cloud sides came from **ambient occlusion**. Forcing full light changed nothing, but turning smooth lighting
+  off fixed them. The stepped cloud surface is nearly all inner corners, and every vertex got darkened.
+- The village patch was sky light again: the upper plateaus cast it. It was missed because the openness check treated
+  short grass and flowers as solid.
+- Fabric's **Indigo** renderer (the one that draws terrain with Fabric API) has its own AO switch and its own light
+  lookup, so the vanilla hooks alone did not reach smooth-lit blocks.
+
+**Fix:**
+- Floating-island cloud (white wool and snow blocks above y 75) is drawn with flat lighting instead of AO. This is in
+  both vanilla's `ModelBlockRenderer` and Indigo's `BlockRenderInfo`.
+- The stylized sky light also applies in Indigo's `AoCalculator.getLightmapCoordinates`.
+- Plants, torches and other non-solid blocks count as open space; leaves do not.
+
+**Tested:** the cloud sides up close and from the side (noon and night), the Sky Village grass, the ocean below, and the
+Saltmarket tavern and a house (unchanged). All of it is behind the same "Bright skies" setting.
