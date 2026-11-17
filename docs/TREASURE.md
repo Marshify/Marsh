@@ -83,10 +83,10 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Ironhold Bastion | Rare | -7, 67, -8 | east | indoors in the keep |
 | Ironhold Bastion | Common | -13, 67, 21 | north | walls s |
 | Ironhold Bastion | Common | -23, 65, -26 | north | rocky back corner |
-| Lotus Palace | Legendary | 1, 70, -26 | east | raised garden behind the palace |
-| Lotus Palace | Rare | -33, 64, 24 | south | by crates at the west camp, guarded |
-| Lotus Palace | Common | -1, 64, 15 | south | walls n |
-| Lotus Palace | Common | 13, 64, 23 | north | sheltered corner by the shore |
+| Lotus Palace | Legendary | 22, 12, -134 | west | in the sunken palace hall, north-east (0.51.0; older worlds keep the old spots) |
+| Lotus Palace | Rare | -31, 12, -58 | east | inside the tall shell house by the south-west path |
+| Lotus Palace | Common | 4, 66, -24 | south | on the north islet, by the landing |
+| Lotus Palace | Common | 30, 66, 22 | north | on the south-east islet, among the palms |
 | Millbrook Village | Legendary | 54, 67, 18 | west | at the bandit boss camp, guarded |
 | Millbrook Village | Rare | 17, 67, -20 | east | by crates, indoors, walls w |
 | Millbrook Village | Common | -18, 67, 28 | south | by crates, walls n |

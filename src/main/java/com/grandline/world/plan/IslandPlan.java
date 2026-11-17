@@ -18,6 +18,13 @@ public interface IslandPlan {
 
 	List<Anchor> anchors();
 
+	/**
+	 * A last pass over the chunk after the world's own decoration (ocean plants and the like) has run: lets a plan undo
+	 * what that put where it must not be. Called once per chunk the island touches; writes are clipped.
+	 */
+	default void afterDecoration(Canvas canvas) {
+	}
+
 	/** Highest block any structure reaches above the island centre's ground (used only for documentation/tests). */
 	default int extent() {
 		return terrain().extent();

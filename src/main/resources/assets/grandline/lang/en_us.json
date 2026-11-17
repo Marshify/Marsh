@@ -1006,6 +1006,8 @@
   "item.grandline.machine_core": "Machine Core",
   "item.grandline.blood_vial": "Blood Vial",
   "item.grandline.awakening_key": "Awakening Key",
+  "message.grandline.lotus.down": "The whirlpool pulls you down to Lotus Palace.",
+  "message.grandline.lotus.up": "The whirlpool carries you back up to the surface.",
   "message.grandline.cloudtop.up": "The clouds carry you up to the Upper Sanctuary (Lv 450-625).",
   "message.grandline.cloudtop.down": "The doorway returns you to the sanctuary gate.",
   "screen.grandline.settings.section.sound": "Sound",

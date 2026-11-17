@@ -139,36 +139,35 @@
  "Lotus Palace": [
   {
    "tier": "LEGENDARY",
-   "x": 1,
-   "y": 70,
-   "z": -26,
-   "facing": "EAST",
-   "why": "raised garden behind the palace"
+   "x": 22,
+   "y": 12,
+   "z": -134,
+   "facing": "WEST",
+   "why": "in the palace hall, north-east, behind the column rows"
   },
   {
    "tier": "RARE",
-   "x": -33,
-   "y": 64,
-   "z": 24,
-   "facing": "SOUTH",
-   "why": "by crates at the west camp, guarded"
+   "x": -31,
+   "y": 12,
+   "z": -58,
+   "facing": "EAST",
+   "why": "inside the tall shell house by the south-west path"
   },
   {
    "tier": "COMMON",
-   "x": -1,
-   "y": 64,
-   "z": 15,
+   "x": 4,
+   "y": 66,
+   "z": -24,
    "facing": "SOUTH",
-   "floor": "cherry_planks",
-   "why": "walls n"
+   "why": "on the north islet, by the landing"
   },
   {
    "tier": "COMMON",
-   "x": 13,
-   "y": 64,
-   "z": 23,
+   "x": 30,
+   "y": 66,
+   "z": 22,
    "facing": "NORTH",
-   "why": "sheltered corner by the shore"
+   "why": "on the south-east islet, among the palms"
   }
  ],
  "Millbrook Village": [

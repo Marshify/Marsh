@@ -107,5 +107,40 @@
    "facing": "WEST",
    "why": "by crates under a shelter"
   }
+ ],
+ "Lotus Palace": [
+  {
+   "tier": "LEGENDARY",
+   "x": 1,
+   "y": 70,
+   "z": -26,
+   "facing": "EAST",
+   "why": "raised garden behind the palace"
+  },
+  {
+   "tier": "RARE",
+   "x": -33,
+   "y": 64,
+   "z": 24,
+   "facing": "SOUTH",
+   "why": "by crates at the west camp, guarded"
+  },
+  {
+   "tier": "COMMON",
+   "x": -1,
+   "y": 64,
+   "z": 15,
+   "facing": "SOUTH",
+   "floor": "cherry_planks",
+   "why": "walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 13,
+   "y": 64,
+   "z": 23,
+   "facing": "NORTH",
+   "why": "sheltered corner by the shore"
+  }
  ]
 }

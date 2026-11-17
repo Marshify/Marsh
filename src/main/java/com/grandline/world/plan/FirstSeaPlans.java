@@ -41,7 +41,7 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy(), new RedbrickPortLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy(), new RedbrickPortLegacy(), new LotusPalaceLegacy());
 	}
 
 	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
@@ -52,7 +52,7 @@ public final class FirstSeaPlans {
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new com.grandline.world.plan.RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
-				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new com.grandline.world.plan.CrystalFountain());
+				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new com.grandline.world.plan.LotusPalace(), new com.grandline.world.plan.CrystalFountain());
 	}
 
 	// ==================================================================================================== Lv 1
@@ -748,9 +748,9 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 450
 
-	/** Palace: a four-tier pagoda on a raised purple stone plinth, a lotus pond with a bridge, cherry trees. */
-	static final class LotusPalace extends BasePlan {
-		LotusPalace() {
+	/** The original Lotus Palace (a four-tier pagoda, a lotus pond with a bridge, cherry trees). Kept for worlds made before layout 17. */
+	static final class LotusPalaceLegacy extends BasePlan {
+		LotusPalaceLegacy() {
 			super("Lotus Palace", 0.07);
 			terrain.mass(0, 0, 44, 40, 5, 2.2, Ground.GRASS)
 					.flat(0, -8, 20, 18, 69, 3, s(Blocks.PURPUR_BLOCK))

@@ -68,7 +68,8 @@
       "minecraft:sea_pickle"
     ],
     [
-      "minecraft:freeze_top_layer"
+      "minecraft:freeze_top_layer",
+      "grandline:sea_islands_late"
     ]
   ],
   "has_precipitation": true,

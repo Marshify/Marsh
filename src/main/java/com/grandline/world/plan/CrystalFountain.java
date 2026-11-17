@@ -707,9 +707,16 @@ public final class CrystalFountain extends BasePlan {
 					boolean shell = o > rs - 1.6;
 					for (int y = baseTop + 1; y <= shaftTop; y++) {
 						// The hall keeps its ceiling (the shaft's hollow above it is closed off, not a dark tube to look up).
+						// inside: floors every 26 (the hall's ceiling the first), each lit in the middle, so the windows show
+						// rooms instead of a 130-block tube
+						int k = (y - baseTop - 1) % 26;
 						c.set(x, y, z, shell ? wallBlock(x, y, z, o, rs, ang, baseTop + 8, baseTop + 40)
-								: y == baseTop + 1 ? floorBlock(x, z) : s(Blocks.AIR));
+								: k == 0 ? (o <= 1.5 && y > baseTop + 1 ? s(Blocks.SEA_LANTERN) : floorBlock(x, z)) : s(Blocks.AIR));
 					}
+				}
+				// The shaft's top is closed all the way across (the lantern room only covers its middle).
+				if (o <= rs + 0.4) {
+					c.set(x, shaftTop + 1, z, s(Blocks.SMOOTH_QUARTZ));
 				}
 				// Lantern room.
 				double rr = 13;
@@ -1229,8 +1236,8 @@ public final class CrystalFountain extends BasePlan {
 		pier(c, -5, 10, 55);
 		pier(c, -34, 8, 48);
 		pier(c, 27, 8, 48);
-		harbourTower(c, -58);
-		harbourTower(c, 47);
+		harbourTower(c, -57); // flush with the plaza's edges (x -45..45): no strip of water between
+		harbourTower(c, 46);
 	}
 
 	static Direction inward(int dx, int dz) {

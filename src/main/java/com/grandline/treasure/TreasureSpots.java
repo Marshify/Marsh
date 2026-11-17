@@ -42,10 +42,10 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, -13, 67, 21, Direction.NORTH, "walls s"),
 				new TreasureSpot(TreasureTier.COMMON, -23, 65, -26, Direction.NORTH, "rocky back corner"))),
 			Map.entry("Lotus Palace", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, 1, 70, -26, Direction.EAST, "raised garden behind the palace"),
-				new TreasureSpot(TreasureTier.RARE, -33, 64, 24, Direction.SOUTH, "by crates at the west camp, guarded"),
-				new TreasureSpot(TreasureTier.COMMON, -1, 64, 15, Direction.SOUTH, "walls n"),
-				new TreasureSpot(TreasureTier.COMMON, 13, 64, 23, Direction.NORTH, "sheltered corner by the shore"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, 22, 12, -134, Direction.WEST, "in the palace hall, north-east, behind the column rows"),
+				new TreasureSpot(TreasureTier.RARE, -31, 12, -58, Direction.EAST, "inside the tall shell house by the south-west path"),
+				new TreasureSpot(TreasureTier.COMMON, 4, 66, -24, Direction.SOUTH, "on the north islet, by the landing"),
+				new TreasureSpot(TreasureTier.COMMON, 30, 66, 22, Direction.NORTH, "on the south-east islet, among the palms"))),
 			Map.entry("Millbrook Village", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, 54, 67, 18, Direction.WEST, "at the bandit boss camp, guarded"),
 				new TreasureSpot(TreasureTier.RARE, 17, 67, -20, Direction.EAST, "by crates, indoors, walls w"),
@@ -80,6 +80,11 @@ public final class TreasureSpots {
 
 	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
 	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Lotus Palace", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 1, 70, -26, Direction.EAST, "raised garden behind the palace"),
+				new TreasureSpot(TreasureTier.RARE, -33, 64, 24, Direction.SOUTH, "by crates at the west camp, guarded"),
+				new TreasureSpot(TreasureTier.COMMON, -1, 64, 15, Direction.SOUTH, "walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 13, 64, 23, Direction.NORTH, "sheltered corner by the shore")),
 			"Redbrick Port", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -16, 76, -23, Direction.SOUTH, "raised 11, walls nw"),
 				new TreasureSpot(TreasureTier.RARE, 24, 65, -25, Direction.NORTH, "under a shelter by crates"),

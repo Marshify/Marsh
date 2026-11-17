@@ -47,7 +47,7 @@ public final class BuildAudit {
 				if (!level.hasChunk(x >> 4, z >> 4)) {
 					continue;
 				}
-				for (int y = 50; y < 320; y++) {
+				for (int y = 0; y < 320; y++) {
 					BlockState s = level.getBlockState(m.set(x, y, z));
 					if (s.isAir() && level.getBlockState(m.above()).isAir() && level.canSeeSky(m)) {
 						// A one-block pit in an open floor: walled on all four sides and floored, nothing above.
