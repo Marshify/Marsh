@@ -794,6 +794,13 @@ public final class CrystalFountain extends BasePlan {
 			}
 			c.set(x, baseTop - 1, R_LANDMARK, s(Blocks.SMOOTH_QUARTZ));
 		}
+		// The falls drop straight into the head of the water channel (see channel()): the foundation filled over it,
+		// so the water landed on a solid floor and spread across the paving.
+		for (int x = -1; x <= 1; x++) {
+			c.set(x, y0 - 2, R_LANDMARK, s(Blocks.LIGHT_BLUE_STAINED_GLASS));
+			c.set(x, y0 - 1, R_LANDMARK, s(Blocks.WATER));
+			c.set(x, y0, R_LANDMARK, s(Blocks.WATER).setValue(LiquidBlock.LEVEL, 8));
+		}
 	}
 
 	static BlockState floorBlock(int x, int z) {
