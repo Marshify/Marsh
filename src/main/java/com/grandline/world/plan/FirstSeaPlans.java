@@ -41,7 +41,7 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy(), new RedbrickPortLegacy());
 	}
 
 	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
@@ -50,7 +50,7 @@ public final class FirstSeaPlans {
 	}
 
 	public static List<IslandPlan> all() {
-		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
+		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new com.grandline.world.plan.RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
 				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new com.grandline.world.plan.CrystalFountain());
 	}
@@ -245,8 +245,9 @@ public final class FirstSeaPlans {
 	// ==================================================================================================== Lv 60
 
 	/** Hillside port: three brick terraces joined by a stone stair street, a keep on top and a harbour below. */
-	static final class RedbrickPort extends BasePlan {
-		RedbrickPort() {
+	/** The original Redbrick Port (a brick harbour town and a stone keep). Kept for worlds made before layout 16. */
+	static final class RedbrickPortLegacy extends BasePlan {
+		RedbrickPortLegacy() {
 			super("Redbrick Port", 0.08);
 			terrain.mass(0, 0, 46, 40, 5, 2.2, Ground.GRASS)
 					.mass(-6, -14, 28, 20, 15, 1.5, Ground.STONE)

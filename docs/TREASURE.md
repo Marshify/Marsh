@@ -91,10 +91,10 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Millbrook Village | Rare | 17, 67, -20 | east | by crates, indoors, walls w |
 | Millbrook Village | Common | -18, 67, 28 | south | by crates, walls n |
 | Millbrook Village | Common | 6, 67, 26 | south | by crates, walls n |
-| Redbrick Port | Legendary | -16, 76, -23 | south | raised 11, walls nw |
-| Redbrick Port | Rare | 24, 65, -25 | north | under a shelter by crates |
-| Redbrick Port | Common | 35, 66, 6 | east | by crates |
-| Redbrick Port | Common | -37, 65, -14 | west | by crates under a shelter |
+| Redbrick Port | Legendary | 3, 79, 2 | west | the headquarters' crown room (0.50.0; older worlds keep the old spots) |
+| Redbrick Port | Rare | 35, 83, -22 | west | the north-east watchtower's chamber |
+| Redbrick Port | Common | -22, 66, 25 | west | the south-west quay, behind the field cannons |
+| Redbrick Port | Common | 13, 66, -52 | east | the green behind the wall, by the east guard post |
 | Saltmarket Docks | Legendary | -100, 114, 47 | east | on the lighthouse balcony, at the top of the ladder |
 | Saltmarket Docks | Rare | 46, 69, -107 | north | inside the boss ring at the far camp, by crates |
 | Saltmarket Docks | Common | -33, 65, 57 | north | by cargo on the harbour promenade |

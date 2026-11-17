@@ -52,10 +52,10 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, -18, 67, 28, Direction.SOUTH, "by crates, walls n"),
 				new TreasureSpot(TreasureTier.COMMON, 6, 67, 26, Direction.SOUTH, "by crates, walls n"))),
 			Map.entry("Redbrick Port", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -16, 76, -23, Direction.SOUTH, "raised 11, walls nw"),
-				new TreasureSpot(TreasureTier.RARE, 24, 65, -25, Direction.NORTH, "under a shelter by crates"),
-				new TreasureSpot(TreasureTier.COMMON, 35, 66, 6, Direction.EAST, "by crates"),
-				new TreasureSpot(TreasureTier.COMMON, -37, 65, -14, Direction.WEST, "by crates under a shelter"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, 3, 79, 2, Direction.WEST, "in the headquarters' crown room, up the hall ladder and across the artillery platform"),
+				new TreasureSpot(TreasureTier.RARE, 35, 83, -22, Direction.WEST, "in the north-east watchtower's chamber, at the top of its ladder"),
+				new TreasureSpot(TreasureTier.COMMON, -22, 66, 25, Direction.WEST, "on the south-west quay, behind the field cannons"),
+				new TreasureSpot(TreasureTier.COMMON, 13, 66, -52, Direction.EAST, "on the green behind the wall, beside the east guard post"))),
 			Map.entry("Saltmarket Docks", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -100, 114, 47, Direction.EAST, "on the lighthouse balcony, at the top of the ladder"),
 				new TreasureSpot(TreasureTier.RARE, 46, 69, -107, Direction.NORTH, "inside the boss ring at the far camp, by crates"),
@@ -80,6 +80,11 @@ public final class TreasureSpots {
 
 	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
 	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Redbrick Port", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -16, 76, -23, Direction.SOUTH, "raised 11, walls nw"),
+				new TreasureSpot(TreasureTier.RARE, 24, 65, -25, Direction.NORTH, "under a shelter by crates"),
+				new TreasureSpot(TreasureTier.COMMON, 35, 66, 6, Direction.EAST, "by crates"),
+				new TreasureSpot(TreasureTier.COMMON, -37, 65, -14, Direction.WEST, "by crates under a shelter")),
 			"Crystal Fountain", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -28, 64, 28, Direction.SOUTH, "beach camp shelter, guarded by the west camp"),
 				new TreasureSpot(TreasureTier.RARE, 26, 64, 31, Direction.SOUTH, "beside the east camp on the beach"),

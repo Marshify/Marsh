@@ -211,36 +211,35 @@
  "Redbrick Port": [
   {
    "tier": "LEGENDARY",
-   "x": -16,
-   "y": 76,
-   "z": -23,
-   "facing": "SOUTH",
-   "floor": "stone",
-   "why": "raised 11, walls nw"
+   "x": 3,
+   "y": 79,
+   "z": 2,
+   "facing": "WEST",
+   "why": "in the headquarters' crown room, up the hall ladder and across the artillery platform"
   },
   {
    "tier": "RARE",
-   "x": 24,
-   "y": 65,
-   "z": -25,
-   "facing": "NORTH",
-   "why": "under a shelter by crates"
-  },
-  {
-   "tier": "COMMON",
    "x": 35,
-   "y": 66,
-   "z": 6,
-   "facing": "EAST",
-   "why": "by crates"
+   "y": 83,
+   "z": -22,
+   "facing": "WEST",
+   "why": "in the north-east watchtower's chamber, at the top of its ladder"
   },
   {
    "tier": "COMMON",
-   "x": -37,
-   "y": 65,
-   "z": -14,
+   "x": -22,
+   "y": 66,
+   "z": 25,
    "facing": "WEST",
-   "why": "by crates under a shelter"
+   "why": "on the south-west quay, behind the field cannons"
+  },
+  {
+   "tier": "COMMON",
+   "x": 13,
+   "y": 66,
+   "z": -52,
+   "facing": "EAST",
+   "why": "on the green behind the wall, beside the east guard post"
   }
  ],
  "Saltmarket Docks": [

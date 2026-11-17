@@ -72,5 +72,40 @@
    "floor": "snow_block",
    "why": "walls s"
   }
+ ],
+ "Redbrick Port": [
+  {
+   "tier": "LEGENDARY",
+   "x": -16,
+   "y": 76,
+   "z": -23,
+   "facing": "SOUTH",
+   "floor": "stone",
+   "why": "raised 11, walls nw"
+  },
+  {
+   "tier": "RARE",
+   "x": 24,
+   "y": 65,
+   "z": -25,
+   "facing": "NORTH",
+   "why": "under a shelter by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": 35,
+   "y": 66,
+   "z": 6,
+   "facing": "EAST",
+   "why": "by crates"
+  },
+  {
+   "tier": "COMMON",
+   "x": -37,
+   "y": 65,
+   "z": -14,
+   "facing": "WEST",
+   "why": "by crates under a shelter"
+  }
  ]
 }

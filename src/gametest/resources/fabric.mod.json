@@ -32,6 +32,7 @@
       "com.grandline.test.GrandLineHarbourGameTests",
       "com.grandline.test.GrandLineFrostpeakGameTests",
       "com.grandline.test.GrandLineCrystalFountainGameTests",
+      "com.grandline.test.GrandLineRedbrickGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",
       "com.grandline.test.GrandLineFruitGameTests",
