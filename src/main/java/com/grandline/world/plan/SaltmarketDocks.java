@@ -247,13 +247,13 @@ public final class SaltmarketDocks extends BasePlan {
 			// a cannon on the wall walk above each arch, aimed out to sea
 			cannon(c, ax + 3, HZ2 - 1, Direction.SOUTH);
 		}
-		// Ladders up from the promenade to the wall walk at both ends.
+		// Ladders up the sea face of the wall at both ends (on the bricks), through a gap in the battlements.
 		for (int lx : new int[]{WX1 + 6, WX2 - 6}) {
-			for (int y = PROM + 1; y <= WALK + 1; y++) {
-				c.set(lx, y, HZ2, s(Blocks.AIR));
+			for (int y = PROM + 1; y <= WALK; y++) {
 				c.set(lx, y, HZ2 + 1, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH));
 			}
-			c.set(lx, WALK, HZ2, s(Blocks.AIR));
+			c.fill(lx, WALK + 1, HZ2, lx, WALK + 3, HZ2, s(Blocks.AIR));
+			c.set(lx, WALK, HZ2, s(Blocks.SMOOTH_STONE));
 		}
 	}
 
@@ -304,8 +304,9 @@ public final class SaltmarketDocks extends BasePlan {
 					c.set(ax + dx, y, HZ1, s(Blocks.AIR));
 				}
 			}
-			c.set(ax - 2, y0 + 3, HZ1 + 1, lantern(false));
-			c.set(ax + 2, y0 + 3, HZ1 + 1, lantern(false));
+			// torches on the passage walls
+			c.set(ax - 2, y0 + 5, HZ1 + 1, s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, Direction.EAST));
+			c.set(ax + 2, y0 + 5, HZ1 + 1, s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, Direction.WEST));
 		} else {
 			// cargo in the alcove
 			c.set(ax - 1, y0, HZ2 - 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
@@ -435,7 +436,7 @@ public final class SaltmarketDocks extends BasePlan {
 					if (Math.floorMod(x + z, 2) == 0) {
 						c.set(x, top + 2, z, s(Blocks.STONE_BRICKS));
 					}
-					if ((x == cx || z == cz) && (top - 4) > TOWN) {
+					if ((z == cz || x == cx && z == cz + 3) && (top - 4) > TOWN) {   // not on the north face (the ladder's wall)
 						c.set(x, top - 4, z, s(Blocks.BLUE_STAINED_GLASS_PANE));
 					}
 				}
@@ -448,7 +449,7 @@ public final class SaltmarketDocks extends BasePlan {
 			c.set(cx, y, cz - 2, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH));
 		}
 		c.set(cx, top, cz - 2, s(Blocks.AIR));
-		c.set(cx + 1, TOWN + 3, cz, lantern(false));
+		c.set(cx + 1, TOWN + 1, cz, lantern(false));
 		// open onto the landward wall walk
 		for (int t = 0; t < 4; t++) {
 			int side = cx < 0 ? cx + 3 : cx - 3;
@@ -653,7 +654,9 @@ public final class SaltmarketDocks extends BasePlan {
 				if (zb - za > 1) {
 					c.fill(minX + 1, yy, za + 1, minX + 1, yy, zb - 1, gable);
 					c.fill(maxX - 1, yy, za + 1, maxX - 1, yy, zb - 1, gable);
-					c.fill(minX + 2, yy, za + 1, maxX - 2, yy, zb - 1, s(Blocks.AIR));
+					if (i > 0) {
+						c.fill(minX + 2, yy, za + 1, maxX - 2, yy, zb - 1, s(Blocks.AIR)); // the attic (the top ceiling stays)
+					}
 				}
 			} else {
 				int xa = minX + i, xb = maxX - i;
@@ -666,7 +669,9 @@ public final class SaltmarketDocks extends BasePlan {
 				if (xb - xa > 1) {
 					c.fill(xa + 1, yy, minZ + 1, xb - 1, yy, minZ + 1, gable);
 					c.fill(xa + 1, yy, maxZ - 1, xb - 1, yy, maxZ - 1, gable);
-					c.fill(xa + 1, yy, minZ + 2, xb - 1, yy, maxZ - 2, s(Blocks.AIR));
+					if (i > 0) {
+						c.fill(xa + 1, yy, minZ + 2, xb - 1, yy, maxZ - 2, s(Blocks.AIR)); // the attic (the top ceiling stays)
+					}
 				}
 			}
 		}
@@ -733,7 +738,8 @@ public final class SaltmarketDocks extends BasePlan {
 			c.set(dx, y, dz, s(Blocks.DARK_OAK_PLANKS));
 			c.set(dx + out.getStepX(), y, dz + out.getStepZ(), stair(Blocks.STONE_BRICK_STAIRS, out.getOpposite(), false));
 		}
-		c.set(x + out.getStepX(), y + 4, z + out.getStepZ(), lantern(false));
+		// a torch on the wall above the doorway
+		c.set(x + out.getStepX(), y + 4, z + out.getStepZ(), s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, out));
 	}
 
 	// ==================================================================================================== landmarks
@@ -799,7 +805,7 @@ public final class SaltmarketDocks extends BasePlan {
 		// door toward the causeway (east), and the ladder inside
 		c.fill(cx + 6, base, cz, cx + 6, base + 2, cz, s(Blocks.AIR));
 		c.fill(cx + 5, base, cz, cx + 5, base + 2, cz, s(Blocks.AIR));
-		c.set(cx + 7, base + 3, cz, lantern(false));
+		c.set(cx + 7, base + 3, cz, s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, Direction.EAST));
 		for (int y = base; y < balcony; y++) {
 			c.set(cx - 3, y, cz, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.EAST));
 			c.set(cx - 4, y, cz, y < shaft ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.CALCITE));
@@ -960,7 +966,12 @@ public final class SaltmarketDocks extends BasePlan {
 		c.set(12, TOWN + 33, -14, s(Blocks.LANTERN));
 		// main doorway (3 wide) onto the veranda, and a side door east
 		doorway(c, -1, TOWN, z2, Direction.SOUTH, 3);
-		doorway(c, x2, TOWN, -12, Direction.EAST, 1);
+		// side door east: an open door in a timber frame, a step and a torch
+		c.fill(x2, TOWN + 1, -12, x2, TOWN + 2, -12, s(Blocks.AIR));
+		StonewallPrison.door(c, x2, TOWN + 1, -12, Blocks.DARK_OAK_DOOR, Direction.EAST);
+		c.set(x2, TOWN + 3, -12, log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.Z));
+		c.set(x2 + 1, TOWN, -12, stair(Blocks.STONE_BRICK_STAIRS, Direction.WEST, false));
+		c.set(x2 + 1, TOWN + 3, -12, s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, Direction.EAST));
 		// veranda: dark oak deck on the plaza side, posts, a sloped acacia roof
 		for (int x = x1; x <= x2; x++) {
 			for (int z = z2 + 1; z <= z2 + 5; z++) {
@@ -974,7 +985,7 @@ public final class SaltmarketDocks extends BasePlan {
 			c.set(x, TOWN + 4, z2 + 5, stair(Blocks.ACACIA_STAIRS, Direction.NORTH, false));
 			if ((x - x1) % 4 == 0) {
 				c.fill(x, TOWN + 1, z2 + 5, x, TOWN + 3, z2 + 5, log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.Y));
-				c.set(x, TOWN + 3, z2 + 4, lantern(true).setValue(LanternBlock.HANGING, false));
+				c.set(x, TOWN + 3, z2 + 4, lantern(true));            // hanging from the veranda roof
 			} else if (Math.abs(x) > 2) {
 				c.set(x, TOWN + 1, z2 + 5, Kit.connected(Blocks.DARK_OAK_FENCE, true));
 			}
@@ -1262,24 +1273,19 @@ public final class SaltmarketDocks extends BasePlan {
 			c.fill(l[0], up - 3, l[1], l[0], up - 1, l[1], s(Blocks.CHAIN));
 			c.set(l[0], up - 4, l[1], lantern(true));
 		}
-		for (int z = -22; z <= -6; z += 4) {
+		for (int z : new int[]{-22, -18, -6}) {                          // clear of the side door at z -12
 			c.set(13, y + 1, z, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 			c.set(13, y + 2, z, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		}
-		// ladder up to the kitchen
+		// ladder up to the kitchen: against the north wall, through a one-block hatch with a rail either side
 		for (int yy = y + 2; yy <= up; yy++) {
-			c.set(-11, yy, -22, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH));
-		}
-		c.fill(-12, up, -22, -10, up, -21, s(Blocks.AIR));
-		c.set(-11, up, -22, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH));
-		for (int x = -12; x <= -10; x++) {
-			c.set(x, up + 1, -20, s(Blocks.DARK_OAK_FENCE));
+			c.set(-11, yy, -23, s(Blocks.LADDER).setValue(LadderBlock.FACING, Direction.SOUTH));
 		}
 		// the kitchen: a central island, a brick oven, cupboards, shelves, utensils, banners
 		for (int x = -3; x <= 3; x++) {
 			for (int z = -16; z <= -12; z++) {
 				c.set(x, up + 1, z, s(Blocks.BRICKS));
-				c.set(x, up + 2, z, Kit.slab(Blocks.DARK_OAK_SLAB, false));
+				c.set(x, up + 2, z, s(Blocks.DARK_OAK_PLANKS)); // a full top, so things stand on it
 			}
 		}
 		c.set(-2, up + 3, -14, s(Blocks.DECORATED_POT));
@@ -1294,16 +1300,20 @@ public final class SaltmarketDocks extends BasePlan {
 		c.set(10, up + 1, -20, Canvas.facing(s(Blocks.FURNACE), Direction.SOUTH));
 		c.set(10, up + 2, -20, Canvas.facing(s(Blocks.SMOKER), Direction.SOUTH));
 		c.set(10, up + 1, -22, s(Blocks.CAMPFIRE));
-		for (int x = -12; x <= 6; x++) {
+		c.set(-12, up + 1, -23, Kit.connected(Blocks.DARK_OAK_FENCE, false));
+		c.set(-10, up + 1, -23, Kit.connected(Blocks.DARK_OAK_FENCE, false));
+		for (int x = -8; x <= 6; x++) {
 			c.set(x, up + 1, -23, x % 3 == 0 ? Canvas.facing(s(Blocks.BARREL), Direction.SOUTH) : s(Blocks.DARK_OAK_PLANKS));
 			c.set(x, up + 2, -23, Kit.slab(Blocks.POLISHED_ANDESITE_SLAB, false));
-			c.set(x, up + 4, -23, x % 2 == 0 ? s(Blocks.DARK_OAK_TRAPDOOR) : s(Blocks.CHAIN));
+			if (x % 2 == 0) {
+				c.set(x, up + 4, -23, s(Blocks.DARK_OAK_TRAPDOOR)); // shelves on the wall
+			}
 		}
 		for (int z = -19; z <= -6; z += 4) {
-			banner(c, 13 - 1, up + 4, z, Direction.WEST, Blocks.BLUE_WALL_BANNER);
+			banner(c, 13, up + 4, z, Direction.WEST, Blocks.BLUE_WALL_BANNER); // against the east wall (x 14)
 		}
 		c.set(0, up + 6, -14, lantern(true));
-		c.set(0, up + 7, -14, s(Blocks.CHAIN));
+		c.set(0, up + 7, -14, s(Blocks.CHAIN));                         // from the kitchen ceiling (y up + 8)
 	}
 
 	// ==================================================================================================== wilderness
@@ -1397,9 +1407,12 @@ public final class SaltmarketDocks extends BasePlan {
 				int sg = c.ground(x, z);
 				c.fill(x, sg + 1, z, x, sg + 2 + (k % 2), z, rock(x, sg, z));
 			}
-			c.fill(bx, bg + 1, bz - 8, bx, bg + 7, bz - 8, s(Blocks.DARK_OAK_FENCE));
-			c.fill(bx + 1, bg + 4, bz - 8, bx + 3, bg + 7, bz - 8, s(Blocks.BLACK_WOOL));
-			c.set(bx + 2, bg + 6, bz - 8, s(Blocks.WHITE_WOOL));
+			// the boss's flag: a dark pole with black banners hanging from its top
+			c.fill(bx, bg + 1, bz - 8, bx, bg + 9, bz - 8, log(Blocks.DARK_OAK_LOG, Direction.Axis.Y));
+			c.set(bx, bg + 10, bz - 8, s(Blocks.DARK_OAK_FENCE));
+			banner(c, bx + 1, bg + 8, bz - 8, Direction.EAST, Blocks.BLACK_WALL_BANNER);
+			banner(c, bx - 1, bg + 8, bz - 8, Direction.WEST, Blocks.BLACK_WALL_BANNER);
+			banner(c, bx, bg + 8, bz - 7, Direction.SOUTH, Blocks.BLACK_WALL_BANNER);
 		}
 	}
 

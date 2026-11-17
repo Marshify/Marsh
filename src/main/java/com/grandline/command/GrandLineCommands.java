@@ -236,6 +236,41 @@ public final class GrandLineCommands {
 													context.getSource().sendSuccess(() -> Component.literal(done ? "Revoked" : "Not owned"), true);
 													return done ? 1 : 0;
 												})))))
+				// Dev tool: list floating or unsupported blocks on an island (writes audit/<island>.txt).
+				.then(Commands.literal("audit").requires(source -> source.hasPermission(2))
+						.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+								.executes(context -> {
+									String name = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "island");
+									var server = context.getSource().getServer();
+									var island = com.grandline.world.IslandRegistry.get(server).all().stream()
+											.filter(i -> i.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+									if (island == null) {
+										context.getSource().sendFailure(Component.literal("No island " + name));
+										return 0;
+									}
+									var plan = com.grandline.world.plan.IslandPlans.get(island);
+									int r = plan != null ? plan.extent() : island.radius();
+									for (int cx = (island.x() - r) >> 4; cx <= (island.x() + r) >> 4; cx++) {
+										for (int cz = (island.z() - r) >> 4; cz <= (island.z() + r) >> 4; cz++) {
+											server.overworld().getChunk(cx, cz);
+										}
+									}
+									var found = com.grandline.world.BuildAudit.audit(server.overworld(), island);
+									StringBuilder sb = new StringBuilder();
+									for (var f : found) {
+										sb.append(f.pos().getX() - island.x()).append(' ').append(f.pos().getY()).append(' ').append(f.pos().getZ() - island.z())
+												.append(' ').append(f.block()).append(": ").append(f.problem()).append('\n');
+									}
+									try {
+										var dir = server.getServerDirectory().toPath().resolve("audit");
+										java.nio.file.Files.createDirectories(dir);
+										java.nio.file.Files.writeString(dir.resolve(island.name().replaceAll("[^A-Za-z0-9]+", "_") + ".txt"), sb.toString());
+									} catch (java.io.IOException e) {
+										context.getSource().sendFailure(Component.literal(e.getMessage()));
+									}
+									context.getSource().sendSuccess(() -> Component.literal(found.size() + " problems on " + island.name()), false);
+									return found.size();
+								})))
 				// Dev tool: treasure chest spots (scan an island for candidates, list placed chests).
 				.then(Commands.literal("treasure").requires(source -> source.hasPermission(2))
 						.then(Commands.literal("scan").executes(context -> {
