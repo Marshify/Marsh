@@ -72,6 +72,9 @@ public final class GrandLineTreasureGameTests implements FabricGameTest {
 			if (!islands.contains(plan.name()) || SeaLayout.all().stream().noneMatch(s -> s.name().equals(plan.name()) && s.sea() == 1)) {
 				continue;
 			}
+			if (TreasureSpots.NONE_BY_DESIGN.contains(plan.name())) {
+				continue;
+			}
 			List<TreasureSpot> spots = TreasureSpots.forIsland(plan.name());
 			helper.assertTrue(spots.size() >= 3, plan.name() + " has treasure chests: " + spots.size());
 			helper.assertTrue(spots.stream().filter(s -> s.tier() == TreasureTier.LEGENDARY).count() <= 1, plan.name() + ": at most one legendary");

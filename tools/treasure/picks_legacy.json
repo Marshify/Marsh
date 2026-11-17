@@ -34,5 +34,43 @@
    "floor": "grass_block",
    "why": "walls ne"
   }
+ ],
+ "Frostpeak Isle": [
+  {
+   "tier": "LEGENDARY",
+   "x": 32,
+   "y": 67,
+   "z": 4,
+   "facing": "SOUTH",
+   "floor": "snow_block",
+   "why": "dark, covered, walls ne"
+  },
+  {
+   "tier": "RARE",
+   "x": -17,
+   "y": 66,
+   "z": 7,
+   "facing": "NORTH",
+   "floor": "snow_block",
+   "why": "by crates, indoors, walls s"
+  },
+  {
+   "tier": "COMMON",
+   "x": 24,
+   "y": 66,
+   "z": 24,
+   "facing": "SOUTH",
+   "floor": "snow_block",
+   "why": "walls n"
+  },
+  {
+   "tier": "COMMON",
+   "x": 2,
+   "y": 63,
+   "z": 23,
+   "facing": "NORTH",
+   "floor": "snow_block",
+   "why": "walls s"
+  }
  ]
 }

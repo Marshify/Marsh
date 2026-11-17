@@ -43,13 +43,14 @@ import java.util.Set;
  * removed;</li>
  * <li>a flower pot, decorated pot or campfire floating over a bottom slab drops into the slab's place (onto the solid
  * block under it), or is removed if there is only air;</li>
+ * <li>loose snow layers with nothing full under them are removed;</li>
  * <li>plants and vines that cannot grow where they are (grass on stone, a dead bush on planks) are removed; a dirt path
  * under a block turns back to dirt.</li>
  * </ul>
  * Nothing else is touched. {@link #VERSION} is bumped when the rules change so every chunk is checked again.
  */
 public final class IslandTidy {
-	public static final int VERSION = 1;
+	public static final int VERSION = 2;
 	private static final int MIN_Y = 55, MAX_Y = 260;
 	private static final Queue<Long> PENDING = new ArrayDeque<>();
 	private static final Set<Long> QUEUED = new HashSet<>();
@@ -213,6 +214,10 @@ public final class IslandTidy {
 		if (b instanceof LanternBlock) {
 			BlockState flipped = s.setValue(LanternBlock.HANGING, !s.getValue(LanternBlock.HANGING));
 			level.setBlock(p, flipped.canSurvive(level, p) ? flipped : Blocks.AIR.defaultBlockState(), 2);
+			return true;
+		}
+		if (b instanceof net.minecraft.world.level.block.SnowLayerBlock) {
+			level.setBlock(p, Blocks.AIR.defaultBlockState(), 2);           // a snow layer on a slab, stair or nothing
 			return true;
 		}
 		if (b == Blocks.DIRT_PATH) {

@@ -30,11 +30,6 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.RARE, -33, 79, -77, Direction.EAST, "by crates, indoors, raised 13, walls sw"),
 				new TreasureSpot(TreasureTier.COMMON, -25, 67, 59, Direction.WEST, "by crates, walls e"),
 				new TreasureSpot(TreasureTier.COMMON, -6, 65, 96, Direction.SOUTH, "by crates, walls n"))),
-			Map.entry("Frostpeak Isle", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, 32, 67, 4, Direction.SOUTH, "dark, covered, walls ne"),
-				new TreasureSpot(TreasureTier.RARE, -17, 66, 7, Direction.NORTH, "by crates, indoors, walls s"),
-				new TreasureSpot(TreasureTier.COMMON, 24, 66, 24, Direction.SOUTH, "walls n"),
-				new TreasureSpot(TreasureTier.COMMON, 2, 63, 23, Direction.NORTH, "walls s"))),
 			Map.entry("Gladiator's Ring", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -39, 88, -25, Direction.EAST, "raised 21, walls w"),
 				new TreasureSpot(TreasureTier.RARE, 40, 66, -45, Direction.EAST, "by crates, indoors, walls w"),
@@ -84,11 +79,19 @@ public final class TreasureSpots {
 
 	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
 	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Frostpeak Isle", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 32, 67, 4, Direction.SOUTH, "dark, covered, walls ne"),
+				new TreasureSpot(TreasureTier.RARE, -17, 66, 7, Direction.NORTH, "by crates, indoors, walls s"),
+				new TreasureSpot(TreasureTier.COMMON, 24, 66, 24, Direction.SOUTH, "walls n"),
+				new TreasureSpot(TreasureTier.COMMON, 2, 63, 23, Direction.NORTH, "walls s")),
 			"Saltmarket Docks", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -19, 66, -19, Direction.WEST, "under the warehouse awning, by crates"),
 				new TreasureSpot(TreasureTier.RARE, 19, 66, -19, Direction.EAST, "under the warehouse awning, by crates"),
 				new TreasureSpot(TreasureTier.COMMON, 4, 64, 28, Direction.WEST, "by crates, walls e"),
 				new TreasureSpot(TreasureTier.COMMON, -3, 66, -24, Direction.SOUTH, "walls ne")));
+
+	/** Islands that, by their owner's design, have no treasure chests. */
+	public static final java.util.Set<String> NONE_BY_DESIGN = java.util.Set.of("Frostpeak Isle");
 
 	private TreasureSpots() {
 	}

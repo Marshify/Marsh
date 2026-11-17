@@ -41,12 +41,12 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy());
 	}
 
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
-				new FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
+				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
 				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
 	}
 
@@ -347,8 +347,8 @@ public final class FirstSeaPlans {
 	// ==================================================================================================== Lv 90
 
 	/** Snow island: a stone peak with a snow cap, a frozen waterfall into an ice pond, pines, a lodge and igloos. */
-	static final class FrostpeakIsle extends BasePlan {
-		FrostpeakIsle() {
+	static final class FrostpeakIsleLegacy extends BasePlan {
+		FrostpeakIsleLegacy() {
 			super("Frostpeak Isle", 0.1);
 			terrain.mass(0, 0, 48, 42, 5, 2.0, Ground.SNOW)
 					.mass(4, -10, 26, 24, 26, 1.0, Ground.STONE)

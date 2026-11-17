@@ -16,7 +16,9 @@ public final class IslandPlans {
 	/** Old plans that worlds created before an island's redesign keep using, by island name. */
 	private static final Map<String, IslandPlan> LEGACY = new HashMap<>();
 	/** The world layout version in which each redesigned island got its new plan. */
-	private static final Map<String, Integer> REDESIGNED_IN = Map.of("Verdant Wilds", 2, "Dawnreach Harbor", 3, "Millbrook Village", 4, "Sunscorch Dunes", 5, "Gladiator's Ring", 6, "Cloudtop Isles", 7, "Emberfall Isle", 8, "Stonewall Prison", 9, "Saltmarket Docks", 10);
+	private static final Map<String, Integer> REDESIGNED_IN = Map.ofEntries(Map.entry("Verdant Wilds", 2), Map.entry("Dawnreach Harbor", 3),
+			Map.entry("Millbrook Village", 4), Map.entry("Sunscorch Dunes", 5), Map.entry("Gladiator's Ring", 6), Map.entry("Cloudtop Isles", 7),
+			Map.entry("Emberfall Isle", 8), Map.entry("Stonewall Prison", 9), Map.entry("Saltmarket Docks", 10), Map.entry("Frostpeak Isle", 11));
 
 	static {
 		FirstSeaPlans.all().forEach(IslandPlans::add);
