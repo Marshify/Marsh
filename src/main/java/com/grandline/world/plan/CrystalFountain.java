@@ -57,7 +57,13 @@ public final class CrystalFountain extends BasePlan {
 
 	CrystalFountain() {
 		super("Crystal Fountain", 0.04);
-		terrain.reach(290);
+		// The city's ground as land (keepers, spawns and the island's gameplay area read the terrain).
+		terrain.flat(0, 0, R_WALL_IN, R_WALL_IN, G_OUT, 1, null)
+				.flat(0, 0, R_INNER, R_INNER, G_IN, 0.5, null)
+				.flat(0, 0, R_COURT, R_COURT, G_CT, 0.5, null)
+				.flat(0, (PLAZA_Z1 + PLAZA_Z2) / 2.0, PLAZA_X, (PLAZA_Z2 - PLAZA_Z1) / 2.0, PLAZA_Y, 1, null)
+				.flat(YARD_X, YARD_Z, YARD_RX - 13, YARD_RZ - 11, YARD_Y, 1, null)
+				.reach(290);
 		anchor(new Anchor(Type.ARRIVAL, 0, PLAZA_Y + 1, 178, 0, 180));
 		anchor(Anchor.at(Type.FISHERMAN, 0, PIER_Y + 1, 236, 180));
 		anchor(Anchor.at(Type.DOCK, 9, 63, 246));

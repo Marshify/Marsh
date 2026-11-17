@@ -1,1069 +1,1424 @@
 package com.grandline.world.plan;
 
 import com.grandline.world.plan.Anchor.Type;
-import com.grandline.world.plan.Terrain.Ground;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.WallBannerBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BedPart;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoorHingeSide;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 /**
- * Stonewall Prison, rebuilt: a rocky offshore island (about 135 x 130) that is one great prison fortress.
- * <ul>
- * <li>Outer walls 96 x 86, 3 thick, 22 high (floor y 68, wall-walk y 90) with buttresses, barred slit windows and a
- * crenellated wall-walk; four corner towers 13 x 13, 30 high, each with an inside stair, slit windows, an observation
- * deck and battlements.</li>
- * <li>South: the gatehouse (a broad stair, a 7-wide passage under a raised portcullis, flanking guard posts, banners, a
- * checkpoint) facing the pier and the forecourt where the quest giver and innkeeper stand.</li>
- * <li>Inside: a central courtyard (46 x 40) ringed by two-storey wings with a gallery walkway: west, Cell Block A and the
- * high-security cells; east, Cell Block B and the Commander's chamber; north, the Warden's arena (quest bosses fight
- * here); south, administration (office, briefing, storage, records, observation balcony). Below the courtyard, the
- * Overseer's chamber.</li>
- * <li>Combat areas: the courtyard (guards, basic) and the north patrol yard outside the walls (stronger).</li>
- * </ul>
- * Every way in is an opening or an open door (adventure mode). Island-local coordinates, +x east, +z south; built from
- * code. Older worlds keep the original prison ({@link FirstSeaPlans} legacy plan).
+ * Stonewall Prison (layout 15), built to the owner's specification: a round ocean fortress.
+ * <pre>
+ *  piece                    radius (local, from the tower's centre)      y
+ *  outer wall               r ~42-44 (irregular), 5 high, battlements   ground 66, top 71
+ *  guard towers             five in the wall, 5 across, blue domes       67-75, domes to 80
+ *  gatehouse                south, twin towers, portcullis, blue roof    to 82
+ *  entrance bridge          over the moat inside the gate                66
+ *  outer courtyard          paved ring r 35-42; grass sectors r 27-34
+ *  inner enclosure          ring r 21-26, curved corridor inside, ledge  66-75, ledge 75
+ *  central courtyard        r 12-21: grass, dark paths, radial bridges   66; bridges at 75
+ *  central tower            lower r 12 (atrium, 4 cell levels), middle r 10, upper r 8 (furnished room), roof 101
+ *  secondary chamber        underground, r 20, towers, chains, cages     47-65 (the boss arena)
+ *  waterfront landing       west, at sea level                           63-65
+ * </pre>
+ * Island-local coordinates: +x east, +z south. Deterministic; older worlds keep their prison.
  */
 final class StonewallPrison extends BasePlan {
-	static final int G = 66, F = 68, F2 = 77, ROOF = 86, WT = 90, TT = 98;
-	static final int X1 = -48, X2 = 47, Z1 = -52, Z2 = 33;           // outer faces of the curtain wall
-	static final int CX1 = -23, CX2 = 22, CZ1 = -28, CZ2 = 11;       // the courtyard
-	static final int UX1 = -15, UX2 = 14, UZ1 = -26, UZ2 = -2, UY = 56; // the Overseer's chamber (below)
-	static final int DOCK_LAND_Z = 55, DOCK_END_Z = 80, DOCK_Y = 64;
+	static final int SEA = 62, G = 66, WALL_TOP = 71, ENC_TOP = 75;
+	static final double R_ENC_IN = 21, R_ENC_OUT = 26, R_TOWER = 12;
+	/** Atrium floors: ground and three galleries; the atrium's ceiling (the middle floor), the upper floor, the roof. */
+	static final int[] LEVELS = {66, 71, 75, 79};
+	static final int MID_FLOOR = 85, UP_FLOOR = 94, ROOF = 101;
+	/** The underground chamber. */
+	static final int CH_FLOOR = 47, CH_CEIL = 65;
+	static final double CH_R = 20;
+	/** Perimeter towers (degrees: 0 east, 90 south). */
+	static final int[] TOWERS = {30, 150, 210, 270, 330};
+	static final int GATE_Z = 42;
 
 	StonewallPrison() {
-		super("Stonewall Prison", 0.13);
-		terrain.mass(0, -8, 76, 72, 3.8, 6.0, Ground.STONE)
-				.mass(-40, 44, 20, 13, 4.0, 3.0, Ground.STONE)
-				.mass(44, 40, 18, 14, 4.5, 3.0, Ground.STONE)
-				.flat(0, -10, 54, 48, G, 4, null)
-				.flat(0, 48, 12, 7, G, 3, null)                            // the forecourt
-				.path(s(Blocks.STONE_BRICKS), 7, 0, 42, 0, 54)
-				.path(s(Blocks.GRAVEL), 3, X2 + 4, 30, X2 + 6, -40, 20, Z1 - 6, -20, Z1 - 6, X1 - 6, -40, X1 - 4, 30)
-				.shoreMix(s(Blocks.STONE), s(Blocks.COBBLESTONE), s(Blocks.GRAVEL), s(Blocks.ANDESITE), s(Blocks.STONE))
-				.reach(DOCK_END_Z + 4);
-		anchor(Anchor.at(Type.QUEST, 7, G + 1, 47, 180));                      // the forecourt, by the gate, facing in
-		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, DOCK_LAND_Z - 2, 0, 180));
-		anchor(Anchor.at(Type.HOME, -7, G + 1, 50, 90));
-		anchor(Anchor.at(Type.FISHERMAN, 4, DOCK_Y + 1, DOCK_END_Z - 2, 0));
-		anchor(Anchor.at(Type.DOCK, -8, 63, DOCK_END_Z - 3));
-		anchor(new Anchor(Type.ENEMY_CAMP, 0, F, -8, 9));                     // the courtyard guards (basic)
-		anchor(Anchor.area(Type.ENEMY_CAMP, 0, Z1 - 9, 6));                    // the north patrol yard (stronger)
-		anchor(Anchor.at(Type.BOSS_ARENA, 0, F, -39));                        // the Warden's arena
-		anchor(Anchor.of(Type.TREASURE, 50, 46));
+		super("Stonewall Prison", 0.04);
+		// The fortress floor as land (keepers, spawns and the island's gameplay area read the terrain).
+		terrain.flat(0, 0, 42, 42, G, 1, null).reach(82);
+		anchor(new Anchor(Type.ARRIVAL, 0, 65, 53, 0, 180));
+		anchor(Anchor.at(Type.QUEST, 12, G + 1, 36, 0));
+		anchor(Anchor.at(Type.HOME, -12, G + 1, 36, 0));
+		anchor(Anchor.at(Type.FISHERMAN, 0, 65, 72, 180));
+		anchor(Anchor.at(Type.DOCK, -4, 63, 68));
+		anchor(new Anchor(Type.ENEMY_CAMP, 0, G, -38, 6));       // the outer courtyard, north (basic)
+		anchor(new Anchor(Type.ENEMY_CAMP, 0, G, -16, 4));       // the central courtyard (stronger)
+		anchor(Anchor.at(Type.BOSS_ARENA, 0, CH_FLOOR, -10));    // the secondary chamber, underground
 	}
 
-	// ==================================================================================================== helpers
-
-	static long hash(int x, int z) {
-		long h = x * 0x9E3779B97F4A7C15L ^ z * 0xC2B2AE3D27D4EB4FL;
-		h ^= h >>> 29;
-		h *= 0xBF58476D1CE4E5B9L;
-		return h ^ (h >>> 32);
+	protected static BlockState s(Block b) {
+		return b.defaultBlockState();
 	}
 
 	static double unit(int x, int z, int salt) {
-		return ((hash(x * 31 + salt, z * 17 - salt) >>> 11) & 0xFFFF) / 65536.0;
+		return CloudtopIslesV7.unit(x, z, salt);
 	}
 
-	static BlockState stair(Block b, Direction f, boolean top) {
-		return Kit.stairs(b, f, top);
+	static double angle(double x, double z) {
+		double a = Math.toDegrees(Math.atan2(z, x));
+		return a < 0 ? a + 360 : a;
 	}
 
-	/** A lantern hung on {@code len} links of chain below the ceiling block at {@code ceil}. */
-	static void hang(Canvas c, int x, int ceil, int z, int len, boolean soul) {
-		for (int k = 1; k <= len; k++) {
-			c.set(x, ceil - k, z, s(Blocks.CHAIN));
-		}
-		c.set(x, ceil - len - 1, z, s(soul ? Blocks.SOUL_LANTERN : Blocks.LANTERN).setValue(LanternBlock.HANGING, true));
+	static double angDiff(double a, double b) {
+		double d = Math.abs(((a - b) % 360 + 360) % 360);
+		return Math.min(d, 360 - d);
 	}
 
-	/** A lantern on a short stone post. */
-	static void post(Canvas c, int x, int y, int z) {
-		c.set(x, y, z, s(Blocks.STONE_BRICK_WALL));
-		c.set(x, y + 1, z, lantern(false));
+	/** The outer wall's inner radius at a bearing: about 42, gently irregular. */
+	static double rIn(double deg) {
+		double t = Math.toRadians(deg);
+		return 42 + 0.9 * Math.sin(3 * t + 0.7) + 0.6 * Math.sin(5 * t + 1.9);
+	}
+
+	static Direction outward(double dx, double dz) {
+		return Math.abs(dx) >= Math.abs(dz) ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
+	}
+
+	/** Direction of travel along a circle at a bearing (increasing angle). */
+	static Direction tangent(double deg) {
+		double t = Math.toRadians(deg);
+		return outward(-Math.sin(t), Math.cos(t));
 	}
 
 	static BlockState lantern(boolean hanging) {
-		return s(Blocks.LANTERN).setValue(LanternBlock.HANGING, hanging);
+		return CloudtopIsles.lantern(Blocks.LANTERN, hanging);
 	}
 
-	/** Muted, weathered prison stone: stone brick with cracked, mossy and cobble courses. */
-	static BlockState wall(int x, int y, int z) {
-		double u = unit(x * 3 + y, z * 5 - y, 11);
-		return u < 0.12 ? s(Blocks.CRACKED_STONE_BRICKS) : u < 0.18 ? s(Blocks.MOSSY_STONE_BRICKS) : u < 0.22 ? s(Blocks.COBBLESTONE) : s(Blocks.STONE_BRICKS);
+	static BlockState masonry(int x, int y, int z) {
+		return unit(x * 3 + y, z, 17) < 0.06 ? s(Blocks.CRACKED_STONE_BRICKS) : s(Blocks.STONE_BRICKS);
 	}
 
-	static BlockState openDoor(Block door, Direction facing, DoubleBlockHalf half) {
-		return s(door).setValue(BlockStateProperties.HORIZONTAL_FACING, facing).setValue(BlockStateProperties.OPEN, true)
-				.setValue(BlockStateProperties.DOOR_HINGE, DoorHingeSide.LEFT).setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, half);
-	}
-
-	/** A door standing open in a wall (adventure mode can't open doors). */
-	static void door(Canvas c, int x, int y, int z, Block door, Direction facing) {
-		c.set(x, y, z, openDoor(door, facing, DoubleBlockHalf.LOWER));
-		c.set(x, y + 1, z, openDoor(door, facing, DoubleBlockHalf.UPPER));
-	}
-
-	/** A solid box of a material (inclusive). */
-	static void box(Canvas c, int x1, int y1, int z1, int x2, int y2, int z2, BlockState b) {
-		c.fill(x1, y1, z1, x2, y2, z2, b);
-	}
-
-	/** A room: walls of weathered stone, floor, ceiling, cleared inside. */
-	static void room(Canvas c, int x1, int z1, int x2, int z2, int floor, int ceil, Block floorBlock) {
-		for (int x = x1; x <= x2; x++) {
-			for (int z = z1; z <= z2; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
-				}
-				boolean w = x == x1 || x == x2 || z == z1 || z == z2;
-				c.set(x, floor, z, s(floorBlock));
-				for (int y = floor + 1; y < ceil; y++) {
-					c.set(x, y, z, w ? wall(x, y, z) : s(Blocks.AIR));
-				}
-				c.set(x, ceil, z, s(Blocks.STONE_BRICKS));
-			}
-		}
+	/** A black wall banner (the fortress colours). */
+	static void banner(Canvas c, int x, int y, int z, Direction facing, Block b) {
+		c.set(x, y, z, s(b).setValue(WallBannerBlock.FACING, facing));
 	}
 
 	// ==================================================================================================== build
 
 	@Override
 	public void build(Canvas c) {
-		if (c.near(0, -10, 70)) {
-			base(c);
-			curtainWalls(c);
-			for (int[] t : new int[][]{{X1, Z1}, {X2 - 12, Z1}, {X1, Z2 - 12}, {X2 - 12, Z2 - 12}}) {
-				tower(c, t[0], t[1]);
-			}
-			courtyard(c);
-			westWing(c);
-			eastWing(c);
-			northWing(c);
-			southWing(c);
-			galleryStairs(c);
-			overseer(c);
-			gatehouse(c);
-			cornerYards(c);
-			patrolYard(c);
+		if (!c.near(0, 10, 75)) {
+			return;
 		}
-		rocks(c);
-		dock(c);
-		treasure(c);
+		foundation(c);
+		outerWall(c);
+		for (int deg : TOWERS) {
+			double t = Math.toRadians(deg);
+			double r = rIn(deg) + 1;
+			guardTower(c, (int) Math.round(Math.cos(t) * r), (int) Math.round(Math.sin(t) * r), 2.5, G + 1, 9, 3, null, true);
+		}
+		gatehouse(c);
+		courtyards(c);
+		enclosure(c);
+		tower(c);
+		atrium(c);
+		upperRooms(c);
+		centralCourtyard(c);
+		chamber(c);
+		landing(c);
 	}
 
-	/** The fortress floor: a stone plinth two blocks above the island under the whole complex. */
-	private void base(Canvas c) {
-		for (int x = X1 - 3; x <= X2 + 3; x++) {
-			for (int z = Z1 - 3; z <= Z2 + 3; z++) {
+	// ---------------------------------------------------------------------------------------------------- ground
+
+	/** The island: solid stone from the sea bed up under the fortress, its surface at y 66. */
+	private void foundation(Canvas c) {
+		for (int x = -48; x <= 48; x++) {
+			for (int z = -48; z <= 48; z++) {
 				if (!c.inChunk(x, z)) {
 					continue;
 				}
-				c.fill(x, G - 2, z, x, F, z, s(Blocks.STONE));
-				c.set(x, F, z, s(Blocks.SMOOTH_STONE));
-				c.fill(x, F + 1, z, x, TT + 3, z, s(Blocks.AIR));
+				double d = Math.hypot(x, z);
+				double ri = rIn(angle(x, z));
+				if (d > ri + 2.2) {
+					continue;
+				}
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				c.fill(x, bed, z, x, G - 1, z, s(Blocks.STONE));
+				c.set(x, G, z, s(Blocks.SMOOTH_STONE));
+				c.fill(x, G + 1, z, x, G + 12, z, s(Blocks.AIR));
 			}
 		}
 	}
+
+	// ---------------------------------------------------------------------------------------------------- outer wall
 
 	/**
-	 * The curtain walls: 3 thick, F..WT, with a plinth course, buttresses every 8 blocks on the outside, barred slit
-	 * windows in two rows, a smooth-stone string course, the wall-walk on top with crenellations on the outer edge and
-	 * a rail on the inner edge, and lanterns.
+	 * The outer wall: two thick, from the sea to y 71, a walk on top with square battlements on the outer edge, a white
+	 * band (calcite with white concrete diamonds) round the outer face, and buttresses widening toward the sea.
 	 */
-	private void curtainWalls(Canvas c) {
-		for (int x = X1; x <= X2; x++) {
-			for (int z = Z1; z <= Z2; z++) {
+	private void outerWall(Canvas c) {
+		for (int x = -48; x <= 48; x++) {
+			for (int z = -48; z <= 48; z++) {
 				if (!c.inChunk(x, z)) {
 					continue;
 				}
-				int dx = Math.min(x - X1, X2 - x), dz = Math.min(z - Z1, Z2 - z);
-				int d = Math.min(dx, dz);
-				if (d > 2) {
+				double d = Math.hypot(x, z), a = angle(x, z), ri = rIn(a);
+				boolean gate = z > 30 && Math.abs(x) <= 3;
+				if (d <= ri || d > ri + 2.2 || gate) {
 					continue;
 				}
-				boolean outer = d == 0;
-				boolean alongX = dz <= 2 && dz <= dx; // a north or south wall
-				int along = alongX ? x : z;
-				for (int y = F + 1; y <= WT; y++) {
-					BlockState b = y <= F + 2 ? s(Blocks.STONE_BRICKS) : y == F + 12 ? s(Blocks.SMOOTH_STONE) : wall(x, y, z);
-					boolean slit = outer && Math.floorMod(along, 8) == 4 && (y == F + 6 || y == F + 7 || y == F + 15 || y == F + 16);
-					if (slit) {
-						b = Kit.connected(Blocks.IRON_BARS, alongX);
+				boolean outer = d > ri + 1.1;
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				double arc = Math.toRadians(a) * ri;
+				int diamond = (int) Math.round(Math.abs(((arc % 12) + 12) % 12 - 6));
+				for (int y = bed; y <= WALL_TOP; y++) {
+					BlockState b = y < G - 1 ? s(Blocks.STONE_BRICKS) : masonry(x, y, z);
+					if (outer && y == G + 3) {
+						b = s(Blocks.CALCITE);
+					}
+					if (outer && diamond <= 1 && (y == G + 2 || y == G + 4) && diamond == 0) {
+						b = s(Blocks.WHITE_CONCRETE);
+					}
+					if (outer && diamond == 1 && y == G + 3) {
+						b = s(Blocks.WHITE_CONCRETE);
 					}
 					c.set(x, y, z, b);
 				}
-				c.set(x, WT, z, s(Blocks.POLISHED_ANDESITE));
+				c.set(x, WALL_TOP, z, outer ? s(Blocks.STONE_BRICKS) : s(Blocks.SMOOTH_STONE));
 				if (outer) {
-					c.set(x, WT + 1, z, Math.floorMod(along, 2) == 0 ? s(Blocks.STONE_BRICKS) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-				} else if (d == 2) {
-					c.set(x, WT + 1, z, s(Blocks.STONE_BRICK_WALL));
-				}
-				if (d == 2 && Math.floorMod(along, 12) == 6) {
-					c.set(x, WT + 2, z, lantern(false));
-				}
-			}
-		}
-		// Buttresses on the outside.
-		for (int x = X1; x <= X2; x += 8) {
-			buttress(c, x, Z1 - 1, Direction.NORTH);
-			buttress(c, x, Z2 + 1, Direction.SOUTH);
-		}
-		for (int z = Z1; z <= Z2; z += 8) {
-			buttress(c, X1 - 1, z, Direction.WEST);
-			buttress(c, X2 + 1, z, Direction.EAST);
-		}
-	}
-
-	private static void buttress(Canvas c, int x, int z, Direction out) {
-		if (!c.inChunk(x, z) || (Math.abs(x) <= 9 && z > 0)) {
-			return; // never across the gate
-		}
-		c.fill(x, G - 1, z, x, F + 10, z, s(Blocks.STONE_BRICKS));
-		c.set(x, F + 11, z, stair(Blocks.STONE_BRICK_STAIRS, out.getOpposite(), false));
-		int ox = x + out.getStepX(), oz = z + out.getStepZ();
-		c.fill(ox, G - 1, oz, ox, F + 4, oz, s(Blocks.STONE_BRICKS));
-		c.set(ox, F + 5, oz, stair(Blocks.STONE_BRICK_STAIRS, out.getOpposite(), false));
-	}
-
-	/**
-	 * A corner tower (13 x 13 at (x0, z0), F..TT): walls two thick with barred slits. Inside, a stair climbs round the
-	 * walls from the ground door (from the corner yard) to a landing at wall-walk height, with doorways onto both
-	 * wall-walks; a second flight climbs from the landing through a hatch onto the observation deck with battlements.
-	 */
-	private void tower(Canvas c, int x0, int z0) {
-		int x1 = x0 + 12, z1 = z0 + 12;
-		for (int x = x0; x <= x1; x++) {
-			for (int z = z0; z <= z1; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
-				}
-				boolean shell = x == x0 || x == x1 || z == z0 || z == z1;
-				boolean shell2 = x == x0 + 1 || x == x1 - 1 || z == z0 + 1 || z == z1 - 1;
-				for (int y = F + 1; y <= TT; y++) {
-					if (shell || shell2) {
-						int along = (x == x0 || x == x1) ? z : x;
-						boolean slit = shell && Math.floorMod(along - z0, 6) == 3 && (y - F) % 6 == 4 && y < WT;
-						c.set(x, y, z, slit ? Kit.connected(Blocks.IRON_BARS, !(x == x0 || x == x1)) : y == F + 12 || y == TT - 4 ? s(Blocks.SMOOTH_STONE) : wall(x, y, z));
-					} else {
-						c.set(x, y, z, s(Blocks.AIR));
+					c.set(x, WALL_TOP + 1, z, Math.floorMod((int) Math.round(arc), 3) == 0 ? s(Blocks.STONE_BRICK_WALL) : s(Blocks.STONE_BRICKS));
+					if (Math.floorMod((int) Math.round(arc), 3) == 0) {
+						c.set(x, WALL_TOP + 1, z, s(Blocks.AIR));
 					}
 				}
-				c.set(x, TT, z, s(Blocks.POLISHED_ANDESITE));
-				if (shell) {
-					c.set(x, TT + 1, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICKS) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-				}
 			}
 		}
-		boolean west = x0 == X1, north = z0 == Z1;
-		int ix0 = x0 + 2, ix1 = x1 - 2, iz0 = z0 + 2, iz1 = z1 - 2;
-		int ixIn = west ? ix1 : ix0, ixWall = west ? ix0 : ix1;   // the ring column toward the courtyard / the side wall
-		int izIn = north ? iz1 : iz0, izWall = north ? iz0 : iz1;
-		int sx = Integer.signum(ixWall - ixIn), sz = Integer.signum(izWall - izIn);
-		// The ring: from the inner corner along the inner row to the side wall, along it to the outer wall, back along that.
-		int[][] ring = new int[22][];
-		int n = 0;
-		for (int k = 0; k < 8; k++) {
-			ring[n++] = new int[]{ixIn + sx * k, izIn};
-		}
-		for (int k = 0; k < 8; k++) {
-			ring[n++] = new int[]{ixWall, izIn + sz * k};
-		}
-		for (int k = 0; k < 6; k++) {
-			ring[n++] = new int[]{ixWall - sx * k, izWall};
-		}
-		for (int k = 0; k < ring.length; k++) {
-			int[] cell = ring[k];
-			int[] next = k + 1 < ring.length ? ring[k + 1] : new int[]{cell[0] - sx, cell[1]};
-			int y = F + 1 + k;
-			Direction up = next[0] > cell[0] ? Direction.EAST : next[0] < cell[0] ? Direction.WEST : next[1] > cell[1] ? Direction.SOUTH : Direction.NORTH;
-			if (k > 0) {
-				c.fill(cell[0], F + 1, cell[1], cell[0], y - 1, cell[1], s(Blocks.STONE_BRICKS));
+		// Buttresses every 24 degrees (not at towers or the gate), widening toward the sea.
+		for (int deg = 6; deg < 360; deg += 24) {
+			boolean nearTower = false;
+			for (int t : TOWERS) {
+				nearTower |= angDiff(deg, t) < 9;
 			}
-			c.set(cell[0], y, cell[1], stair(Blocks.STONE_BRICK_STAIRS, up, false));
-		}
-		// The landing at WT: everything inside except the last steps of the stair (which arrive at it).
-		for (int x = ix0; x <= ix1; x++) {
-			for (int z = iz0; z <= iz1; z++) {
-				boolean open = false;
-				for (int k = 19; k < ring.length; k++) {
-					open |= ring[k][0] == x && ring[k][1] == z;
-				}
-				if (!open) {
-					c.set(x, WT, z, s(Blocks.STONE_BRICKS));
-				}
+			if (nearTower || angDiff(deg, 90) < 14 || angDiff(deg, 180) < 6) {
+				continue;
 			}
-		}
-		// The second flight: along the middle row, from the landing up to the deck (its last step is part of the deck).
-		int cz = (iz0 + iz1) / 2;
-		for (int k = 0; k <= TT - WT - 1; k++) {
-			int x = ix0 + 1 + k, y = WT + 1 + k;
-			c.fill(x, WT + 1, cz, x, y - 1, cz, s(Blocks.STONE_BRICKS));
-			c.set(x, y, cz, stair(Blocks.STONE_BRICK_STAIRS, Direction.EAST, false));
-			c.fill(x, y + 1, cz, x, y + 3, cz, s(Blocks.AIR));
-		}
-		int mx = (ix0 + ix1) / 2;
-		c.set(mx, F + 1, cz, lantern(false));
-		c.set(mx, WT + 1, cz - 2, lantern(false));
-		c.set(mx, TT - 1, cz + 2, lantern(true));
-		// The ground door, from the corner yard into the first step.
-		int gx = west ? x1 : x0, in = west ? -1 : 1;
-		c.fill(gx, F + 1, izIn, gx + in, F + 3, izIn, s(Blocks.AIR));
-		// Doorways onto the two wall-walks (through the rail on the walk's inner edge).
-		c.fill(gx, WT + 1, izWall, gx + in, WT + 3, izWall, s(Blocks.AIR));
-		c.set(gx - in, WT + 1, izWall, s(Blocks.AIR));
-		int gz = north ? z1 : z0, inz = north ? -1 : 1;
-		c.fill(ixWall, WT + 1, gz, ixWall, WT + 3, gz + inz, s(Blocks.AIR));
-		c.set(ixWall, WT + 1, gz - inz, s(Blocks.AIR));
-	}
-
-	// ---------------------------------------------------------------------------------------------------- courtyard
-
-	/**
-	 * The courtyard: stone and gravel paving with a patrol ring, two guard stations (roofed posts with a lantern and a
-	 * barrel), weapon racks, barrels, stone cover and lamp posts; the middle stays open for fighting. The stair down to
-	 * the Overseer's chamber opens in the north-east corner behind iron bars.
-	 */
-	private void courtyard(Canvas c) {
-		for (int x = CX1; x <= CX2; x++) {
-			for (int z = CZ1; z <= CZ2; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
-				}
-				boolean ring = x == CX1 + 2 || x == CX2 - 2 || z == CZ1 + 2 || z == CZ2 - 2;
-				double u = unit(x, z, 21);
-				c.set(x, F, z, ring ? s(Blocks.STONE_BRICKS) : u < 0.4 ? s(Blocks.GRAVEL) : u < 0.55 ? s(Blocks.COBBLESTONE) : s(Blocks.STONE));
-			}
-		}
-		for (int[] p : new int[][]{{CX1 + 5, CZ2 - 5}, {CX2 - 6, CZ2 - 5}}) {
-			for (int[] o : new int[][]{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}}) {
-				c.fill(p[0] + o[0], F + 1, p[1] + o[1], p[0] + o[0], F + 3, p[1] + o[1], s(Blocks.DARK_OAK_FENCE));
-			}
-			c.fill(p[0] - 1, F + 4, p[1] - 1, p[0] + 1, F + 4, p[1] + 1, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-			c.set(p[0], F + 3, p[1], lantern(true));
-			c.set(p[0], F + 1, p[1], Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		}
-		for (int x : new int[]{-19, -8, 5}) {
-			rack(c, x, CZ1 + 1);
-		}
-		for (int[] b : new int[][]{{CX1 + 1, CZ1 + 1}, {CX1 + 2, CZ1 + 1}, {CX1 + 1, CZ1 + 2}, {CX2 - 1, CZ2 - 1}, {CX2 - 2, CZ2 - 1}, {CX1 + 1, CZ2 - 1}}) {
-			c.set(b[0], F + 1, b[1], Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		}
-		// Stone cover: two low wall stubs.
-		for (int k = -2; k <= 2; k++) {
-			c.set(-10 + k, F + 1, -16, s(Blocks.STONE_BRICK_WALL));
-			c.set(10, F + 1, k, s(Blocks.STONE_BRICK_WALL));
-		}
-		// Lamp posts.
-		for (int[] l : new int[][]{{CX1 + 2, CZ1 + 2}, {CX2 - 2, CZ1 + 9}, {CX1 + 2, CZ2 - 2}, {CX2 - 2, CZ2 - 2}, {-1, -8}}) {
-			c.fill(l[0], F + 1, l[1], l[0], F + 3, l[1], s(Blocks.STONE_BRICK_WALL));
-			c.set(l[0], F + 4, l[1], lantern(false));
-		}
-	}
-
-	/** Stairs from the courtyard up to the gallery on its west and east sides (rising north), through a gap in its rail. */
-	private void galleryStairs(Canvas c) {
-		for (int gx : new int[]{CX1 + 1, CX2 - 1}) {
-			for (int k = 0; k < F2 - F; k++) {
-				int z = -4 - k, y = F + 1 + k;
-				c.fill(gx, F + 1, z, gx, y - 1, z, s(Blocks.STONE_BRICKS));
-				c.set(gx, y, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-				c.fill(gx, y + 1, z, gx, y + 3, z, s(Blocks.AIR));
-			}
-		}
-	}
-
-	private static void rack(Canvas c, int x, int z) {
-		c.fill(x, F + 1, z, x, F + 2, z, s(Blocks.DARK_OAK_FENCE));
-		c.fill(x + 2, F + 1, z, x + 2, F + 2, z, s(Blocks.DARK_OAK_FENCE));
-		c.set(x + 1, F + 2, z, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		c.set(x + 1, F + 1, z, s(Blocks.LIGHTNING_ROD));
-	}
-
-	/**
-	 * A two-storey wing between the curtain wall and the courtyard: outer walls, the courtyard face with barred windows,
-	 * the upper floor (lit, reached by {@code doors} on the gallery) and the roof with a parapet. The courtyard face
-	 * carries a gallery walkway (stone deck on corbels with a barred rail) at the upper floor, over the courtyard only, so
-	 * the four galleries meet at the corners.
-	 */
-	private void wing(Canvas c, int x1, int z1, int x2, int z2, Direction face, int... doors) {
-		for (int x = x1; x <= x2; x++) {
-			for (int z = z1; z <= z2; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
-				}
-				boolean w = x == x1 || x == x2 || z == z1 || z == z2;
-				for (int y = F + 1; y < ROOF; y++) {
-					c.set(x, y, z, w ? wall(x, y, z) : s(Blocks.AIR));
-				}
-				c.set(x, F2, z, s(Blocks.STONE_BRICKS));
-				c.set(x, ROOF, z, s(Blocks.STONE_BRICKS));
-				if (w) {
-					c.set(x, ROOF + 1, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICK_WALL) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-				}
-			}
-		}
-		int fx = face == Direction.EAST ? x2 : face == Direction.WEST ? x1 : 0, fz = face == Direction.SOUTH ? z2 : face == Direction.NORTH ? z1 : 0;
-		boolean alongX = face.getAxis() == Direction.Axis.Z;
-		// Lanterns hung from the roof of the upper floor, down the middle.
-		for (int t = (alongX ? x1 : z1) + 4; t <= (alongX ? x2 : z2) - 2; t += 8) {
-			hang(c, alongX ? t : (x1 + x2) / 2, ROOF, alongX ? (z1 + z2) / 2 : t, 2, false);
-		}
-		int lo = alongX ? CX1 : CZ1, hi = alongX ? CX2 : CZ2;
-		// Barred windows on the courtyard face, both floors.
-		for (int t = Math.max(lo, alongX ? x1 : z1) + 2; t <= Math.min(hi, alongX ? x2 : z2) - 2; t += 4) {
-			for (int y : new int[]{F + 3, F2 + 3}) {
-				c.set(alongX ? t : fx, y, alongX ? fz : t, Kit.connected(Blocks.IRON_BARS, alongX));
-			}
-		}
-		// The gallery outside the courtyard face.
-		for (int t = Math.max(lo, alongX ? x1 : z1); t <= Math.min(hi, alongX ? x2 : z2); t++) {
-			int gx = alongX ? t : fx + face.getStepX(), gz = alongX ? fz + face.getStepZ() : t;
-			c.set(gx, F2, gz, s(Blocks.POLISHED_ANDESITE));
-			c.set(gx, F2 - 1, gz, stair(Blocks.STONE_BRICK_STAIRS, face.getOpposite(), true));
-			if (t > lo && t < hi) {
-				int rx = gx + face.getStepX(), rz = gz + face.getStepZ();
-				c.set(rx, F2 + 1, rz, Kit.connected(Blocks.IRON_BARS, alongX));
-				c.set(rx, F2, rz, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
-				if (Math.floorMod(t, 8) == 4) {
-					c.set(rx, F2 + 2, rz, lantern(false));
-				}
-			}
-		}
-		for (int t : doors) {
-			c.fill(alongX ? t : fx, F2 + 1, alongX ? fz : t, alongX ? t : fx, F2 + 2, alongX ? fz : t, s(Blocks.AIR));
-		}
-	}
-
-	/** A cell: a barred front with an open iron door, a ceiling and a hanging light, a bed, a bench, a barred vent. */
-	private static void cell(Canvas c, int x1, int z1, int x2, int z2, Direction front, int floor, boolean secure) {
-		for (int x = x1; x <= x2; x++) {
-			for (int z = z1; z <= z2; z++) {
-				boolean w = x == x1 || x == x2 || z == z1 || z == z2;
-				boolean isFront = (front == Direction.EAST && x == x2) || (front == Direction.WEST && x == x1)
-						|| (front == Direction.SOUTH && z == z2) || (front == Direction.NORTH && z == z1);
-				for (int y = floor + 1; y <= floor + 3; y++) {
-					BlockState b;
-					if (!w) {
-						b = s(Blocks.AIR);
-					} else if (isFront && !((x == x1 || x == x2) && (z == z1 || z == z2))) {
-						b = Kit.connected(Blocks.IRON_BARS, front.getAxis() == Direction.Axis.Z);
-					} else {
-						b = secure ? s(Blocks.POLISHED_ANDESITE) : wall(x, y, z);
+			double t = Math.toRadians(deg), ux = Math.cos(t), uz = Math.sin(t);
+			double r0 = rIn(deg) + 2;
+			for (int step = 1; step <= 2; step++) {
+				for (double k = -1; k <= 1; k += 0.5) {
+					int x = (int) Math.round(ux * (r0 + step) - uz * k), z = (int) Math.round(uz * (r0 + step) + ux * k);
+					if (!c.inChunk(x, z)) {
+						continue;
 					}
+					int top = step == 1 ? G + 2 : G - 1;
+					int bed = Math.min(c.ground(x, z), SEA - 4);
+					c.fill(x, bed, z, x, top, z, Math.abs(k) < 0.6 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS));
+					c.set(x, top + 1, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, outward(-ux, -uz), false));
+				}
+			}
+		}
+		// Black banners on the wall's inner face.
+		for (int deg = 18; deg < 360; deg += 36) {
+			if (angDiff(deg, 90) < 15) {
+				continue;
+			}
+			double t = Math.toRadians(deg);
+			double r = rIn(deg) - 0.2;
+			int x = (int) Math.round(Math.cos(t) * r), z = (int) Math.round(Math.sin(t) * r);
+			Direction in = outward(-Math.cos(t), -Math.sin(t));
+			if (c.inChunk(x, z) && Math.hypot(x - in.getStepX(), z - in.getStepZ()) > 0) {
+				int wx = x - in.getStepX(), wz = z - in.getStepZ();
+				if (Math.hypot(wx, wz) > rIn(angle(wx, wz))) {
+					banner(c, x, G + 4, z, in, Blocks.BLACK_WALL_BANNER);
+				}
+			}
+		}
+	}
+
+	/**
+	 * A round guard tower: a wider foundation in the sea, a pale body of {@code r} radius with three narrow barred slits
+	 * facing out, a door in and a ladder to the wall walk, a projecting rim, a layered blue dome, a small black flag.
+	 */
+	private static void guardTower(Canvas c, int cx, int cz, double r, int y0, int h, int domeR, Direction door, boolean wallWalk) {
+		if (!c.near(cx, cz, (int) r + 4)) {
+			return;
+		}
+		Direction out = outward(cx, cz), in = out.getOpposite();
+		for (int dx = -(int) r - 2; dx <= r + 2; dx++) {
+			for (int dz = -(int) r - 2; dz <= r + 2; dz++) {
+				double d = Math.hypot(dx, dz);
+				int x = cx + dx, z = cz + dz;
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				if (d <= r + 1.2) {
+					c.fill(x, bed, z, x, y0 - 1, z, d > r + 0.4 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS));
+					if (d > r + 0.4) {
+						c.set(x, y0, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+					}
+				}
+				if (d > r + 0.4) {
+					continue;
+				}
+				boolean shell = d > r - 1.1;
+				for (int y = y0; y < y0 + h; y++) {
+					BlockState b = shell ? (y >= y0 + 3 ? s(Blocks.END_STONE_BRICKS) : s(Blocks.STONE_BRICKS)) : s(Blocks.AIR);
 					c.set(x, y, z, b);
 				}
-				c.set(x, floor + 4, z, secure ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS));
-			}
-		}
-		int dx = front.getAxis() == Direction.Axis.X ? (front == Direction.EAST ? x2 : x1) : (x1 + x2) / 2;
-		int dz = front.getAxis() == Direction.Axis.Z ? (front == Direction.SOUTH ? z2 : z1) : (z1 + z2) / 2;
-		door(c, dx, floor + 1, dz, Blocks.IRON_DOOR, front);
-		Direction back = front.getOpposite();
-		int bx = dx + back.getStepX() * (front.getAxis() == Direction.Axis.X ? (x2 - x1 - 1) : 0);
-		int bz = dz + back.getStepZ() * (front.getAxis() == Direction.Axis.Z ? (z2 - z1 - 1) : 0);
-		Direction side = front.getClockWise();
-		int ex = bx + side.getStepX(), ez = bz + side.getStepZ();
-		c.set(ex, floor + 1, ez, s(Blocks.WHITE_BED).setValue(BedBlock.FACING, back).setValue(BedBlock.PART, BedPart.HEAD));
-		c.set(ex - back.getStepX(), floor + 1, ez - back.getStepZ(), s(Blocks.WHITE_BED).setValue(BedBlock.FACING, back).setValue(BedBlock.PART, BedPart.FOOT));
-		c.set(bx - side.getStepX(), floor + 1, bz - side.getStepZ(), Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-		c.set(bx + back.getStepX(), floor + 2, bz + back.getStepZ(), Kit.connected(Blocks.IRON_BARS, front.getAxis() == Direction.Axis.Z));
-		c.set((x1 + x2) / 2, floor + 3, (z1 + z2) / 2, secure ? s(Blocks.SOUL_LANTERN).setValue(LanternBlock.HANGING, true) : lantern(true));
-	}
-
-	/** A doorway (w wide, 3 high) through a wall running along z at x, or along x at z. */
-	private static void opening(Canvas c, int x1, int z1, int x2, int z2, int h) {
-		c.fill(x1, F + 1, z1, x2, F + h, z2, s(Blocks.AIR));
-	}
-
-	// ---------------------------------------------------------------------------------------------------- wings
-
-	/**
-	 * West wing: Cell Block A (south: a corridor with cells both sides and a guard desk at its entrance) and the
-	 * high-security block (north: larger reinforced cells off their own corridor, behind a barred divider).
-	 */
-	private void westWing(Canvas c) {
-		int x1 = X1 + 3, x2 = CX1 - 1, z1 = Z1 + 13, z2 = Z2 - 13;
-		if (!c.near((x1 + x2) / 2, (z1 + z2) / 2, 50)) {
-			return;
-		}
-		wing(c, x1, z1, x2, z2, Direction.EAST, -16, 4);
-		int cx = (x1 + x2) / 2;
-		// Cell Block A: corridor cx-1..cx+1 from z -7 to the south end; the courtyard way in at z 6..8.
-		for (int z = -7; z <= z2 - 1; z++) {
-			for (int x = cx - 1; x <= cx + 1; x++) {
-				c.set(x, F, z, s(Blocks.POLISHED_ANDESITE));
-			}
-			if (Math.floorMod(z, 6) == 0) {
-				hang(c, cx, F2, z, 2, false);
-			}
-		}
-		for (int z = -5; z + 4 <= z2 - 1; z += 5) {
-			cell(c, x1 + 1, z, cx - 2, z + 4, Direction.EAST, F, false);
-			if (z != 5) {
-				cell(c, cx + 2, z, x2 - 1, z + 4, Direction.WEST, F, false);
-			}
-		}
-		opening(c, cx + 2, 6, x2, 8, 3);
-		c.set(cx + 4, F + 1, 9, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		c.set(cx + 4, F + 2, 9, s(Blocks.LANTERN));
-		c.set(cx + 5, F + 1, 9, stair(Blocks.DARK_OAK_STAIRS, Direction.EAST, false));
-		// High-security block: z z1+1 .. -9, a corridor along cx and 7-deep cells of polished andesite.
-		for (int z = z1 + 1; z <= -9; z++) {
-			for (int x = cx - 1; x <= cx + 1; x++) {
-				c.set(x, F, z, s(Blocks.SMOOTH_STONE));
-			}
-			if (Math.floorMod(z, 7) == 0) {
-				hang(c, cx, F2, z, 3, Math.floorMod(z, 14) == 0);
-			}
-		}
-		for (int z : new int[]{z1 + 1, z1 + 8, z1 + 15, z1 + 22}) {
-			cell(c, x1 + 1, z, cx - 2, z + 6, Direction.EAST, F, true);
-			if (z != z1 + 15) {
-				cell(c, cx + 2, z, x2 - 1, z + 6, Direction.WEST, F, true);
-			}
-		}
-		opening(c, cx + 2, z1 + 17, x2, z1 + 19, 3);
-		// The divider between the blocks: solid, with a barred gate (a two-high gap) on the corridor.
-		for (int x = x1 + 1; x <= x2 - 1; x++) {
-			c.fill(x, F + 1, -8, x, F2 - 1, -8, s(Blocks.POLISHED_ANDESITE));
-		}
-		c.fill(cx - 1, F + 1, -8, cx + 1, F + 4, -8, Kit.connected(Blocks.IRON_BARS, true));
-		c.fill(cx, F + 1, -8, cx, F + 2, -8, s(Blocks.AIR));
-	}
-
-	/**
-	 * East wing: Cell Block B (south: a narrow corridor, small reinforced cells, a barred checkpoint at the way in) and
-	 * the Commander's chamber (north: a tall hall with iron-bar partitions, a central platform, a raised balcony with
-	 * banners along the outer wall reached by a stair, and an overlook from the upper floor). No boss is registered for it.
-	 */
-	private void eastWing(Canvas c) {
-		int x1 = CX2 + 1, x2 = X2 - 3, z1 = Z1 + 13, z2 = Z2 - 13;
-		if (!c.near((x1 + x2) / 2, (z1 + z2) / 2, 50)) {
-			return;
-		}
-		wing(c, x1, z1, x2, z2, Direction.WEST, 6);
-		int cx = (x1 + x2) / 2;
-		// Cell Block B: corridor cx..cx+1, cells of polished andesite both sides; the way in at z 4..6.
-		for (int z = -4; z <= z2 - 1; z++) {
-			c.set(cx, F, z, s(Blocks.SMOOTH_STONE));
-			c.set(cx + 1, F, z, s(Blocks.SMOOTH_STONE));
-			if (Math.floorMod(z, 4) == 0) {
-				hang(c, cx, F2, z, 3, Math.floorMod(z, 8) == 0);
-			}
-		}
-		for (int z = -3; z + 4 <= z2 - 1; z += 5) {
-			if (z != 2) {
-				cell(c, x1 + 1, z, cx - 1, z + 4, Direction.EAST, F, true);
-			}
-			cell(c, cx + 2, z, x2 - 1, z + 4, Direction.WEST, F, true);
-		}
-		opening(c, x1, 4, cx - 1, 6, 3);
-		c.fill(cx - 1, F + 1, 3, cx - 1, F + 3, 6, Kit.connected(Blocks.IRON_BARS, false));
-		c.fill(cx - 1, F + 1, 5, cx - 1, F + 2, 5, s(Blocks.AIR));
-		c.set(x1 + 2, F + 1, 2, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		c.set(x1 + 2, F + 2, 2, s(Blocks.LANTERN));
-		c.set(x1 + 3, F + 1, 2, stair(Blocks.DARK_OAK_STAIRS, Direction.EAST, false));
-		// The Commander's chamber: z z1+1 .. -6, open to the roof.
-		int hz1 = z1 + 1, hz2 = -6;
-		for (int x = x1 + 1; x <= x2 - 1; x++) {
-			for (int z = hz1; z <= hz2; z++) {
-				c.set(x, F, z, Math.floorMod(x + z, 4) == 0 ? s(Blocks.CHISELED_STONE_BRICKS) : s(Blocks.POLISHED_ANDESITE));
-				c.fill(x, F + 1, z, x, ROOF - 1, z, s(Blocks.AIR));
-			}
-			c.fill(x, F + 1, hz2 + 1, x, F2 - 1, hz2 + 1, s(Blocks.POLISHED_ANDESITE));
-			if (x < x2 - 2) {
-				c.set(x, F2 + 1, hz2 + 1, Kit.connected(Blocks.IRON_BARS, true)); // the overlook's rail
-			}
-		}
-		opening(c, cx - 1, hz2 + 1, cx + 1, hz2 + 1, 4);                         // from Cell Block B
-		opening(c, x1, -20, x1, -17, 4);                                          // from the courtyard
-		for (int z = hz1 + 4; z <= hz2 - 4; z += 6) {
-			if (z < -21 || z > -16) {
-				c.fill(x1 + 1, F + 1, z, x1 + 3, F + 4, z, Kit.connected(Blocks.IRON_BARS, true));
-			}
-			c.fill(x2 - 4, F + 1, z, x2 - 3, F + 4, z, Kit.connected(Blocks.IRON_BARS, true));
-		}
-		// The balcony along the outer wall, its rail, banners and the stair up from the floor.
-		for (int z = hz1; z <= hz2; z++) {
-			c.set(x2 - 1, F2, z, s(Blocks.POLISHED_ANDESITE));
-			c.set(x2 - 2, F2, z, s(Blocks.POLISHED_ANDESITE));
-			c.set(x2 - 1, F2 - 1, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.EAST, true));
-			c.set(x2 - 2, F2 - 1, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.EAST, true));
-			c.set(x2 - 3, F2 + 1, z, Kit.connected(Blocks.IRON_BARS, false));
-			if (Math.floorMod(z, 6) == 0) {
-				c.set(x2 - 1, F2 + 3, z, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.WEST));
-			}
-		}
-		for (int k = 0; k < F2 - F; k++) {
-			int z = hz2 - 1 - k, y = F + 1 + k;
-			c.fill(x2 - 2, F + 1, z, x2 - 2, y - 1, z, s(Blocks.STONE_BRICKS));
-			c.set(x2 - 2, y, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-			c.fill(x2 - 2, y + 1, z, x2 - 2, y + 3, z, s(Blocks.AIR));
-			c.set(x2 - 3, y + 1, z, s(Blocks.AIR));
-		}
-		int pz = (hz1 + hz2) / 2;
-		c.fill(cx - 2, F + 1, pz - 2, cx + 2, F + 1, pz + 2, s(Blocks.POLISHED_ANDESITE));
-		c.set(cx, F + 2, pz, s(Blocks.CHISELED_STONE_BRICKS));
-		for (int dz : new int[]{-12, -6, 0, 6, 12}) {
-			hang(c, cx, ROOF, pz + dz, 8, false);
-			hang(c, cx - 6, ROOF, pz + dz, 8, false);
-		}
-		for (int z = hz1 + 1; z <= hz2 - 1; z += 4) {
-			post(c, x1 + 1, F + 1, z);
-		}
-		for (int z : new int[]{hz1 + 2, hz2 - 2}) {
-			c.set(x1 + 1, F + 1, z, lantern(false));
-		}
-	}
-
-	/**
-	 * North wing: the Warden's arena (44 x 19 floor, open to the roof): pillars, a raised platform at the far end,
-	 * barred windows high up, banners and light, three entrances from the courtyard and doors from the corner yards.
-	 * Quest bosses fight here.
-	 */
-	private void northWing(Canvas c) {
-		int x1 = CX1, x2 = CX2, z1 = Z1 + 3, z2 = CZ1 - 1;
-		if (!c.near(0, (z1 + z2) / 2, 40)) {
-			return;
-		}
-		wing(c, x1, z1, x2, z2, Direction.SOUTH);
-		for (int x = x1 + 1; x <= x2 - 1; x++) {
-			for (int z = z1 + 1; z <= z2 - 1; z++) {
-				c.set(x, F, z, (Math.floorMod(x, 4) == 0 && Math.floorMod(z, 4) == 0) ? s(Blocks.CHISELED_STONE_BRICKS)
-						: unit(x, z, 31) < 0.2 ? s(Blocks.CRACKED_STONE_BRICKS) : s(Blocks.STONE_BRICKS));
-				c.fill(x, F + 1, z, x, ROOF - 1, z, s(Blocks.AIR));
-			}
-		}
-		for (int x = x1 + 5; x <= x2 - 5; x += 9) {
-			for (int z : new int[]{z1 + 4, z2 - 4}) {
-				c.fill(x, F + 1, z, x, ROOF - 1, z, s(Blocks.POLISHED_ANDESITE));
-				c.set(x, F + 1, z, s(Blocks.CHISELED_STONE_BRICKS));
-				c.set(x, F + 8, z, s(Blocks.CHISELED_STONE_BRICKS));
-			}
-		}
-		for (int x = -6; x <= 6; x++) {
-			c.set(x, F + 1, z1 + 1, s(Blocks.POLISHED_ANDESITE));
-			c.set(x, F + 1, z1 + 2, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-		}
-		for (int x = x1 + 3; x <= x2 - 3; x += 4) {
-			c.set(x, F2 + 4, z1, Kit.connected(Blocks.IRON_BARS, true));
-		}
-		for (int x = x1 + 4; x <= x2 - 4; x += 6) {
-			for (int z : new int[]{z1 + 6, z2 - 6}) {
-				hang(c, x, ROOF, z, 8, false);
-			}
-		}
-		for (int x = x1 + 2; x <= x2 - 2; x += 4) {
-			if (Math.abs(x) > 7) {
-				post(c, x, F + 1, z1 + 1);
-			}
-		}
-		for (int z = z1 + 2; z <= z2 - 2; z += 4) {
-			post(c, x1 + 1, F + 1, z);
-			post(c, x2 - 1, F + 1, z);
-		}
-		for (int x : new int[]{-12, 0, 12}) {
-			opening(c, x - 1, z2, x + 1, z2, 4);
-			c.set(x, F + 5, z2, s(Blocks.CHISELED_STONE_BRICKS));
-		}
-		for (int x : new int[]{-9, -3, 3, 9}) {
-			c.set(x, F + 7, z1 + 1, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.SOUTH));
-		}
-		for (int x : new int[]{x1 + 1, x2 - 1}) {
-			for (int z : new int[]{z1 + 2, z2 - 2}) {
-				c.set(x, F + 1, z, lantern(false));
-			}
-		}
-		// Doors from the corner yards on either side.
-		opening(c, x1, -45, x1, -44, 3);
-		opening(c, x2, -45, x2, -44, 3);
-	}
-
-	/**
-	 * South wing either side of the gate passage: administration (west: the warden's office with a desk, shelves and a
-	 * map table; the records room of shelves and a lectern; upstairs, the observation balcony over the courtyard) and the
-	 * guard block (east: the briefing room with benches round a table; the storage room of barrels and chests). Over the
-	 * passage, a bridge joins the two upper floors.
-	 */
-	private void southWing(Canvas c) {
-		int z1 = CZ2 + 1, z2 = Z2 - 3;
-		if (!c.near(0, (z1 + z2) / 2, 40)) {
-			return;
-		}
-		wing(c, CX1, z1, -5, z2, Direction.NORTH);
-		wing(c, 4, z1, CX2, z2, Direction.NORTH, 13);
-		// The passage roof and the bridge room above it.
-		for (int x = -4; x <= 3; x++) {
-			for (int z = z1; z <= z2; z++) {
-				boolean w = z == z1 || z == z2;
-				c.set(x, F2, z, s(Blocks.STONE_BRICKS));
-				for (int y = F2 + 1; y < ROOF; y++) {
-					c.set(x, y, z, w ? wall(x, y, z) : s(Blocks.AIR));
+				if (!shell) {
+					c.set(x, y0 - 1, z, s(Blocks.SMOOTH_STONE));
 				}
-				c.set(x, ROOF, z, s(Blocks.STONE_BRICKS));
-			}
-			c.set(x, F2 + 3, z1, x % 2 == 0 ? Kit.connected(Blocks.IRON_BARS, true) : wall(x, F2 + 3, z1));
-			c.set(x, F2, z1 - 1, s(Blocks.POLISHED_ANDESITE)); // the gallery over the gate passage
-			c.set(x, F2 - 1, z1 - 1, stair(Blocks.STONE_BRICK_STAIRS, Direction.SOUTH, true));
-			c.set(x, F2, z1 - 2, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
-			c.set(x, F2 + 1, z1 - 2, Kit.connected(Blocks.IRON_BARS, true));
-		}
-		c.fill(-1, F2 + 1, z1, 0, F2 + 2, z1, s(Blocks.AIR));
-		hang(c, 0, ROOF, (z1 + z2) / 2, 2, false);
-		for (int x : new int[]{-5, 4}) {
-			c.fill(x, F2 + 1, 20, x, F2 + 2, 21, s(Blocks.AIR));
-		}
-		// The warden's office (x -23..-12) and the records room (x -12..-5).
-		room(c, CX1, z1, -12, z2, F, F2, Blocks.DARK_OAK_PLANKS);
-		room(c, -12, z1, -5, z2, F, F2, Blocks.SPRUCE_PLANKS);
-		door(c, -17, F + 1, z1, Blocks.DARK_OAK_DOOR, Direction.NORTH);
-		door(c, -8, F + 1, z1, Blocks.SPRUCE_DOOR, Direction.NORTH);
-		c.fill(-12, F + 1, 21, -12, F + 2, 21, s(Blocks.AIR));
-		c.fill(CX1, F + 1, 24, CX1, F + 3, 25, s(Blocks.AIR)); // from the south-west corner yard
-		for (int x = -20; x <= -16; x++) {
-			c.set(x, F + 1, z2 - 4, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		}
-		c.set(-18, F + 1, z2 - 3, stair(Blocks.DARK_OAK_STAIRS, Direction.SOUTH, false));
-		c.set(-18, F + 2, z2 - 4, s(Blocks.LANTERN));
-		c.set(-20, F + 2, z2 - 4, s(Blocks.FLOWER_POT));
-		for (int x = CX1 + 1; x <= -13; x++) {
-			c.set(x, F + 1, z2 - 1, s(Blocks.BOOKSHELF));
-			c.set(x, F + 2, z2 - 1, s(Blocks.BOOKSHELF));
-		}
-		c.set(-14, F + 1, z1 + 2, s(Blocks.CARTOGRAPHY_TABLE));
-		c.set(-22, F + 1, z1 + 1, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set(-17, F + 5, z2 - 1, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.NORTH));
-		hang(c, -17, F2, (z1 + z2) / 2, 3, false);
-		hang(c, -17, F2, z1 + 3, 3, false);
-		for (int z = z1 + 2; z <= z2 - 1; z += 2) {
-			c.set(-11, F + 1, z, s(Blocks.BOOKSHELF));
-			c.set(-11, F + 2, z, s(Blocks.BOOKSHELF));
-			c.set(-6, F + 1, z, s(Blocks.BOOKSHELF));
-			c.set(-6, F + 2, z, s(Blocks.BOOKSHELF));
-		}
-		c.set(-8, F + 1, z2 - 2, s(Blocks.LECTERN));
-		hang(c, -8, F2, (z1 + z2) / 2, 3, false);
-		hang(c, -8, F2, z1 + 3, 3, false);
-		// The briefing room (x 4..14) and storage (x 14..22).
-		room(c, 4, z1, 14, z2, F, F2, Blocks.SPRUCE_PLANKS);
-		room(c, 14, z1, CX2, z2, F, F2, Blocks.STONE);
-		door(c, 9, F + 1, z1, Blocks.SPRUCE_DOOR, Direction.NORTH);
-		door(c, 18, F + 1, z1, Blocks.SPRUCE_DOOR, Direction.NORTH);
-		c.fill(CX2, F + 1, 24, CX2, F + 3, 25, s(Blocks.AIR)); // from the south-east corner yard
-		c.fill(7, F + 1, z2 - 5, 11, F + 1, z2 - 5, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		for (int x = 6; x <= 12; x++) {
-			c.set(x, F + 1, z2 - 3, stair(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
-			c.set(x, F + 1, z2 - 7, stair(Blocks.SPRUCE_STAIRS, Direction.NORTH, false));
-		}
-		c.set(9, F + 2, z2 - 5, s(Blocks.LANTERN));
-		c.set(9, F + 4, z2 - 1, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.NORTH));
-		hang(c, 9, F2, (z1 + z2) / 2, 3, false);
-		hang(c, 9, F2, z1 + 3, 3, false);
-		for (int x = 15; x <= CX2 - 1; x++) {
-			for (int z = z1 + 2; z <= z2 - 1; z += 2) {
-				if (x != 18) {
-					c.set(x, F + 1, z, unit(x, z, 41) < 0.5 ? Canvas.facing(s(Blocks.BARREL), Direction.UP) : s(Blocks.CHEST));
-				}
+				c.set(x, y0 + h, z, s(Blocks.STONE_BRICKS));
 			}
 		}
-		hang(c, 18, F2, (z1 + z2) / 2, 3, false);
-		hang(c, 18, F2, z1 + 3, 3, false);
-		// The observation balcony: the administration's upper floor opens onto the gallery, with seats looking out.
-		c.fill(-20, F2 + 1, z1, -8, F2 + 2, z1, s(Blocks.AIR));
-		for (int x = -19; x <= -9; x += 2) {
-			c.set(x, F2 + 1, z1 + 2, stair(Blocks.DARK_OAK_STAIRS, Direction.SOUTH, false));
+		// Three narrow slits facing out.
+		Direction side = out.getClockWise();
+		for (int k = -1; k <= 1; k++) {
+			int sx = cx + out.getStepX() * (int) Math.floor(r) + side.getStepX() * k, sz = cz + out.getStepZ() * (int) Math.floor(r) + side.getStepZ() * k;
+			if (k != 0) {
+				sx -= out.getStepX();
+				sz -= out.getStepZ();
+			}
+			c.fill(sx, y0 + 3, sz, sx, y0 + 5, sz, Kit.connected(Blocks.IRON_BARS, out.getAxis() == Direction.Axis.Z));
 		}
-		c.set(-14, F2 + 1, z1 + 4, lantern(false));
-	}
-
-	/**
-	 * The Overseer's chamber under the courtyard (floor y 56, 9 high): a stair down from the courtyard's north-east
-	 * corner behind iron bars, massive pillars, a raised walkway round three walls (reached by a short stair), a central
-	 * platform, soul lanterns. No boss is registered for it.
-	 */
-	private void overseer(Canvas c) {
-		if (!c.near(0, (UZ1 + UZ2) / 2, 30)) {
-			return;
+		// Door inward at the bottom, ladder up to an opening onto the wall walk.
+		Direction dd = door != null ? door : in;
+		int ix = cx + dd.getStepX() * (int) Math.floor(r), iz = cz + dd.getStepZ() * (int) Math.floor(r);
+		c.fill(ix, y0, iz, ix, y0 + 1, iz, s(Blocks.AIR));
+		c.set(ix, y0 - 1, iz, s(Blocks.SMOOTH_STONE));
+		int ld = (int) Math.floor(r - 1.1);
+		Direction ls = door == side ? side.getOpposite() : side; // never against the door
+		int lx = cx + ls.getStepX() * ld, lz = cz + ls.getStepZ() * ld;
+		for (int y = y0; y < (wallWalk ? WALL_TOP + 1 : y0 + h); y++) {
+			c.set(lx, y, lz, Canvas.facing(s(Blocks.LADDER), ls.getOpposite()));
 		}
-		int top = UY + 9;
-		for (int x = UX1 - 1; x <= UX2 + 1; x++) {
-			for (int z = UZ1 - 1; z <= UZ2 + 1; z++) {
-				if (!c.inChunk(x, z)) {
-					continue;
+		for (Direction sd : wallWalk ? new Direction[]{side.getOpposite()} : new Direction[0]) {
+			int ox = cx + sd.getStepX() * (int) Math.floor(r), oz = cz + sd.getStepZ() * (int) Math.floor(r);
+			c.fill(ox, WALL_TOP + 1, oz, ox, WALL_TOP + 2, oz, s(Blocks.AIR));
+		}
+		// Rim and dome.
+		int ry = y0 + h + 1;
+		for (int dx = -domeR - 1; dx <= domeR + 1; dx++) {
+			for (int dz = -domeR - 1; dz <= domeR + 1; dz++) {
+				double d = Math.hypot(dx, dz);
+				int x = cx + dx, z = cz + dz;
+				if (d <= domeR + 1.3 && d > domeR + 0.3) {
+					c.set(x, ry, z, Kit.slab(Blocks.DARK_PRISMARINE_SLAB, false));
 				}
-				boolean w = x < UX1 || x > UX2 || z < UZ1 || z > UZ2;
-				c.set(x, UY, z, w ? s(Blocks.STONE_BRICKS) : Math.floorMod(x + z, 3) == 0 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.SMOOTH_STONE));
-				for (int y = UY + 1; y < top; y++) {
-					c.set(x, y, z, w ? wall(x, y, z) : s(Blocks.AIR));
-				}
-				c.set(x, top, z, s(Blocks.STONE_BRICKS));
-				boolean walk = !w && (x <= UX1 + 1 || x >= UX2 - 1 || z <= UZ1 + 1);
-				if (walk) {
-					c.set(x, UY + 4, z, s(Blocks.POLISHED_ANDESITE));
-					boolean edge = (x == UX1 + 1 && z > UZ1 + 1) || (x == UX2 - 1 && z > UZ1 + 1) || (z == UZ1 + 1 && x > UX1 + 1 && x < UX2 - 1);
-					if (edge) {
-						c.set(x, UY + 5, z, Kit.connected(Blocks.IRON_BARS, z == UZ1 + 1));
+				for (int k = 0; k <= domeR; k++) {
+					double rk = Math.sqrt(Math.max(0, (domeR + 0.4) * (domeR + 0.4) - k * k));
+					if (d <= rk) {
+						boolean edge = d > rk - 1;
+						BlockState b = k == 0 ? s(Blocks.BLUE_TERRACOTTA) : edge && k < domeR && d > rk - 0.6 ? Kit.stairs(Blocks.DARK_PRISMARINE_STAIRS, outward(-dx, -dz), false)
+								: s(Blocks.BLUE_CONCRETE);
+						if (k > 0 && !edge) {
+							b = s(Blocks.BLUE_CONCRETE);
+						}
+						c.set(x, ry + k, z, b);
 					}
 				}
 			}
 		}
-		for (int x = UX1 + 5; x <= UX2 - 5; x += 9) {
-			for (int z = UZ1 + 6; z <= UZ2 - 4; z += 10) {
-				c.fill(x - 1, UY + 1, z - 1, x, top - 1, z, s(Blocks.POLISHED_DEEPSLATE));
-				c.set(x + 1, UY + 1, z + 1, s(Blocks.SOUL_LANTERN));
-			}
-		}
-		int cx = (UX1 + UX2) / 2, cz = (UZ1 + UZ2) / 2;
-		c.fill(cx - 3, UY + 1, cz - 3, cx + 3, UY + 1, cz + 3, s(Blocks.POLISHED_ANDESITE));
-		c.fill(cx - 2, UY + 2, cz - 2, cx + 2, UY + 2, cz + 2, Kit.slab(Blocks.POLISHED_ANDESITE_SLAB, false));
-		for (int dx : new int[]{-8, 0, 8}) {
-			c.set(cx + dx, top - 1, cz, s(Blocks.SOUL_LANTERN).setValue(LanternBlock.HANGING, true));
-			c.set(cx + dx, top - 1, UZ1 + 4, s(Blocks.SOUL_LANTERN).setValue(LanternBlock.HANGING, true));
-		}
-		for (int dx : new int[]{-5, 5}) {
-			hang(c, cx + dx, top, cz + 6, 2, false);
-			hang(c, cx + dx, top, cz - 6, 2, false);
-		}
-		// A short stair from the floor up to the north walkway.
-		for (int k = 0; k < 4; k++) {
-			int z = UZ1 + 5 - k, y = UY + 1 + k;
-			c.fill(4, UY + 1, z, 4, y - 1, z, s(Blocks.STONE_BRICKS));
-			c.set(4, y, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-			c.fill(4, y + 1, z, 4, y + 3, z, s(Blocks.AIR));
-		}
-		c.set(4, UY + 5, UZ1 + 1, s(Blocks.AIR));
-		// The stair down from the courtyard (x 18..20, z -26 south, F down to UY) behind iron bars.
-		for (int k = 0; k <= F - UY; k++) {
-			int z = -26 + k, y = F - k;
-			for (int x = 18; x <= 20; x++) {
-				c.set(x, y, z, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-				c.fill(x, y + 1, z, x, y + 4, z, s(Blocks.AIR));
-			}
-			c.set(17, y + 1, z, s(Blocks.STONE_BRICKS));
-			c.set(21, y + 1, z, s(Blocks.STONE_BRICKS));
-			if (k > 0 && k % 4 == 0) {
-				c.set(19, y + 4, z, s(Blocks.SOUL_LANTERN).setValue(LanternBlock.HANGING, true));
-			}
-		}
-		for (int z = -26; z <= -21; z++) {
-			c.set(17, F + 1, z, Kit.connected(Blocks.IRON_BARS, false));
-			c.set(21, F + 1, z, Kit.connected(Blocks.IRON_BARS, false));
-		}
-		c.fill(18, F + 1, -21, 20, F + 1, -21, Kit.connected(Blocks.IRON_BARS, true));
-		c.fill(UX2 + 1, UY + 1, -14, 20, UY + 4, -12, s(Blocks.AIR));
-		c.fill(UX2 + 1, UY, -14, 20, UY, -12, s(Blocks.STONE_BRICKS));
-		c.set(UX2 + 1, UY + 4, -14, Kit.connected(Blocks.IRON_BARS, false));
-		c.set(UX2 + 1, UY + 4, -12, Kit.connected(Blocks.IRON_BARS, false));
+		int top = ry + domeR + 1;
+		c.fill(cx, top, cz, cx, top + 1, cz, s(Blocks.POLISHED_BLACKSTONE_WALL));
+		c.set(cx, top + 2, cz, s(Blocks.POLISHED_BLACKSTONE));
+		banner(c, cx + out.getStepX(), top + 2, cz + out.getStepZ(), out, Blocks.BLACK_WALL_BANNER);
+		c.set(cx, top + 3, cz, s(Blocks.LIGHTNING_ROD));
 	}
 
+	// ---------------------------------------------------------------------------------------------------- gate
+
 	/**
-	 * The gatehouse: a projecting block with the 7-wide passage (a raised portcullis of iron bars in its top course), a
-	 * broad stair down to the forecourt, two guard posts, banners, a checkpoint desk, and a crenellated platform on top
-	 * that joins the wall-walk.
+	 * The gatehouse on the south: two big round towers with blue domes, the stone gatehouse between them with a tall
+	 * pointed arch, a raised iron portcullis with spikes, chains either side, dark spikes along the sloped blue roof, a
+	 * small stone arrival platform and the pier; inside, the wooden bridge over the moat and the barred checkpoint.
 	 */
 	private void gatehouse(Canvas c) {
-		if (!c.near(0, Z2 + 3, 20)) {
+		if (!c.near(0, 48, 28)) {
 			return;
 		}
-		int gz1 = Z2 - 2, gz2 = Z2 + 6;
-		for (int x = -8; x <= 8; x++) {
-			for (int z = gz1; z <= gz2; z++) {
-				boolean passage = Math.abs(x) <= 3;
-				for (int y = F + 1; y <= WT + 2; y++) {
-					boolean open = passage && y <= F + 8;
-					boolean crenel = y >= WT + 1 && (z == gz2 || (Math.abs(x) == 8 && z > Z2));
-					BlockState b = open ? s(Blocks.AIR) : crenel ? (y == WT + 1 ? s(Blocks.STONE_BRICKS) : (x + z) % 2 == 0 ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR))
-							: y > WT ? s(Blocks.AIR) : y == WT ? s(Blocks.POLISHED_ANDESITE) : wall(x, y, z);
-					c.set(x, y, z, b);
+		int y = G;
+		// The gatehouse block.
+		for (int x = -4; x <= 4; x++) {
+			for (int z = GATE_Z - 2; z <= GATE_Z + 8; z++) {
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				c.fill(x, bed, z, x, y, z, s(Blocks.STONE_BRICKS));
+				for (int k = 1; k <= 10; k++) {
+					boolean passage = Math.abs(x) <= 2 && k <= archTop(x);
+					c.set(x, y + k, z, passage ? s(Blocks.AIR) : k == 4 && (z == GATE_Z + 8 || z == GATE_Z - 2) ? s(Blocks.CALCITE) : masonry(x, y + k, z));
 				}
-				c.fill(x, G - 3, z, x, F - 1, z, s(Blocks.STONE_BRICKS));
-				c.set(x, F, z, passage ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS));
+				c.set(x, y, z, Math.abs(x) <= 2 ? (Math.floorMod(x + z, 2) == 0 ? s(Blocks.SMOOTH_STONE) : s(Blocks.POLISHED_ANDESITE)) : s(Blocks.STONE_BRICKS));
 			}
+		}
+		// Arch shoulders (stairs) on both faces.
+		for (int z : new int[]{GATE_Z - 2, GATE_Z + 8}) {
+			for (int x : new int[]{-2, 2}) {
+				c.set(x, y + archTop(x) + 1, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, x < 0 ? Direction.EAST : Direction.WEST, true));
+			}
+		}
+		// The portcullis: raised, its bars filling the arch's top, spikes pointing down.
+		int pz = GATE_Z + 6;
+		for (int x = -2; x <= 2; x++) {
+			int top = archTop(x);
+			for (int k = 6; k <= top; k++) {
+				c.set(x, y + k, pz, Kit.connected(Blocks.IRON_BARS, true));
+			}
+			c.set(x, y + 5, pz, s(Blocks.LIGHTNING_ROD).setValue(LightningRodBlock.FACING, Direction.DOWN));
+		}
+		// Chains either side of the arch on the front, spikes along the roof edge.
+		for (int x : new int[]{-3, 3}) {
+			c.fill(x, y + 3, GATE_Z + 9, x, y + 8, GATE_Z + 9, s(Blocks.CHAIN));
+			c.set(x, y + 9, GATE_Z + 9, s(Blocks.POLISHED_BLACKSTONE));
+		}
+		// Sloped roof (a gable along z), blue concrete over blue terracotta, dark prismarine edges, spikes on the ridge.
+		for (int x = -5; x <= 5; x++) {
+			int ax = Math.abs(x);
+			int rise = 5 - ax;
+			for (int z = GATE_Z - 3; z <= GATE_Z + 9; z++) {
+				for (int k = 0; k < rise; k++) {
+					c.set(x, y + 11 + k, z, s(Blocks.BLUE_TERRACOTTA));
+				}
+				c.set(x, y + 11 + rise, z, ax == 0 ? Kit.slab(Blocks.DARK_PRISMARINE_SLAB, false) : ax == 5 ? Kit.stairs(Blocks.DARK_PRISMARINE_STAIRS, x < 0 ? Direction.EAST : Direction.WEST, false)
+						: s(Blocks.BLUE_CONCRETE));
+			}
+		}
+		for (int z = GATE_Z - 3; z <= GATE_Z + 9; z += 3) {
+			c.set(0, y + 17, z, s(Blocks.LIGHTNING_ROD));
+		}
+		// Twin towers.
+		guardTower(c, -7, GATE_Z + 4, 3.5, y + 1, 12, 4, Direction.EAST, false);
+		guardTower(c, 7, GATE_Z + 4, 3.5, y + 1, 12, 4, Direction.WEST, false);
+		for (int sx : new int[]{-3, 3}) {
+			c.fill(sx, y + 1, GATE_Z + 4, sx, y + 2, GATE_Z + 4, s(Blocks.AIR)); // the towers' doors open onto the passage
+		}
+		// The arrival platform and steps up to the gate, then the pier.
+		for (int x = -6; x <= 6; x++) {
+			for (int z = GATE_Z + 9; z <= GATE_Z + 14; z++) {
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				int top = z == GATE_Z + 9 ? y : z == GATE_Z + 10 ? y - 1 : 64;
+				c.fill(x, bed, z, x, top - 1, z, s(Blocks.STONE_BRICKS));
+				c.set(x, top, z, z <= GATE_Z + 10 && Math.abs(x) <= 2 ? Kit.stairs(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false)
+						: Math.abs(x) == 6 || z == GATE_Z + 14 ? s(Blocks.STONE_BRICKS) : s(Blocks.SMOOTH_STONE));
+				c.fill(x, top + 1, z, x, top + 4, z, s(Blocks.AIR));
+			}
+		}
+		for (int z = GATE_Z + 15; z <= 74; z++) {
+			for (int x = -1; x <= 1; x++) {
+				c.set(x, 64, z, x == 0 ? s(Blocks.STRIPPED_SPRUCE_LOG).setValue(RotatedPillarBlock.AXIS, Direction.Axis.Z) : s(Blocks.SPRUCE_PLANKS));
+				c.fill(x, 65, z, x, 67, z, s(Blocks.AIR));
+			}
+			for (int x : new int[]{-2, 2}) {
+				if (z % 4 == 0 || z == 74) {
+					c.fill(x, Math.min(c.ground(x, z), SEA - 4), z, x, 64, z, s(Blocks.DARK_OAK_PLANKS));
+					c.set(x, 65, z, s(Blocks.DARK_OAK_FENCE));
+					if (z % 8 == 0) {
+						c.set(x, 66, z, lantern(false));
+					}
+				} else {
+					c.set(x, 64, z, s(Blocks.SPRUCE_PLANKS));
+					c.set(x, 65, z, Kit.connected(Blocks.DARK_OAK_FENCE, false));
+				}
+			}
+		}
+		// Inside: the moat (open sea water) and the wooden bridge over it, the barred checkpoint at its inner end.
+		for (int x = -6; x <= 6; x++) {
+			for (int z = 33; z <= GATE_Z - 3; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				boolean edge = Math.abs(x) == 6;
+				c.fill(x, bed, z, x, bed + 1, z, s(Blocks.STONE_BRICKS));
+				c.fill(x, bed + 2, z, x, SEA, z, edge ? s(Blocks.STONE_BRICKS) : s(Blocks.WATER));
+				c.fill(x, SEA + 1, z, x, G, z, edge ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR));
+				if (Math.abs(x) <= 2) {
+					c.set(x, G, z, Math.abs(x) == 2 ? s(Blocks.DARK_OAK_PLANKS) : s(Blocks.SPRUCE_PLANKS));
+					c.set(x, G - 1, z, Math.abs(x) == 2 ? s(Blocks.DARK_OAK_PLANKS) : s(Blocks.AIR));
+					if (Math.abs(x) == 2) {
+						c.set(x, G + 1, z, z % 2 == 0 ? s(Blocks.DARK_OAK_FENCE) : Kit.connected(Blocks.IRON_BARS, false));
+					}
+				}
+				if (edge) {
+					c.set(x, G + 1, z, Kit.connected(Blocks.IRON_BARS, false));
+				}
+			}
+		}
+		for (int x = -2; x <= 2; x++) {
+			c.set(x, G, 32, s(Blocks.POLISHED_ANDESITE));
+			c.set(x, G, GATE_Z - 2, s(Blocks.POLISHED_ANDESITE));
+		}
+		for (int x = 3; x <= 7; x++) {
+			for (int sx : new int[]{-1, 1}) {
+				c.set(sx * x, G + 1, 32, Kit.connected(Blocks.IRON_BARS, true));
+				c.set(sx * x, G + 2, 32, Kit.connected(Blocks.IRON_BARS, true));
+			}
+		}
+		for (int sx : new int[]{-1, 1}) {
+			c.fill(sx * 3, G + 1, 31, sx * 3, G + 4, 31, s(Blocks.POLISHED_ANDESITE));
+			banner(c, sx * 3, G + 3, 30, Direction.NORTH, Blocks.BLACK_WALL_BANNER);
 		}
 		for (int x = -3; x <= 3; x++) {
-			c.set(x, F + 8, gz2 - 1, Kit.connected(Blocks.IRON_BARS, true)); // the raised portcullis
-			c.set(x, F + 9, gz2, s(Blocks.CHISELED_STONE_BRICKS));
+			c.set(x, G + 5, 31, Math.abs(x) == 3 ? s(Blocks.POLISHED_ANDESITE) : Kit.connected(Blocks.IRON_BARS, true));
 		}
-		for (int x : new int[]{-4, 4}) {
-			c.set(x, F + 9, gz2, s(Blocks.CHISELED_STONE_BRICKS));
+		for (int sx : new int[]{-4, 4}) {
+			banner(c, sx, G + 6, GATE_Z - 3, Direction.NORTH, Blocks.BLACK_WALL_BANNER);
 		}
-		// The passage on through the south wing to the courtyard.
-		for (int z = CZ2 + 1; z < gz1; z++) {
-			for (int x = -3; x <= 3; x++) {
-				c.set(x, F, z, s(Blocks.POLISHED_ANDESITE));
-				c.fill(x, F + 1, z, x, F + 8, z, s(Blocks.AIR));
-			}
-			c.fill(-4, F + 1, z, -4, F2 - 1, z, wall(-4, F + 1, z));
-			c.fill(4, F + 1, z, 4, F2 - 1, z, wall(4, F + 1, z));
-			if (z % 5 == 0) {
-				c.set(-3, F + 8, z, lantern(true));
-				c.set(3, F + 8, z, lantern(true));
-			}
-		}
-		for (int z = gz1; z <= gz2; z += 4) {
-			c.set(-3, F + 8, z, lantern(true));
-			c.set(3, F + 8, z, lantern(true));
-		}
-		// Broad stair from the forecourt (66) to the floor (68).
-		for (int k = 0; k < 2; k++) {
-			for (int x = -9; x <= 9; x++) {
-				c.set(x, G + 1 + k, gz2 + 2 - k, stair(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
-				c.fill(x, G - 2, gz2 + 2 - k, x, G + k, gz2 + 2 - k, s(Blocks.STONE_BRICKS));
-				c.fill(x, G + 2 + k, gz2 + 2 - k, x, G + 5, gz2 + 2 - k, s(Blocks.AIR));
-			}
-		}
-		// Guard posts either side.
-		for (int sx : new int[]{-12, 12}) {
-			for (int x = sx - 2; x <= sx + 2; x++) {
-				for (int z = gz2 - 3; z <= gz2 + 1; z++) {
-					boolean w = Math.abs(x - sx) == 2 || z == gz2 - 3 || z == gz2 + 1;
-					for (int y = G + 1; y <= F + 10; y++) {
-						c.set(x, y, z, w ? wall(x, y, z) : s(Blocks.AIR));
+	}
+
+	/** Height of the pointed gate arch above the floor at x (centre 7). */
+	static int archTop(int x) {
+		int ax = Math.abs(x);
+		return ax == 0 ? 7 : ax == 1 ? 7 : 6;
+	}
+
+	// ---------------------------------------------------------------------------------------------------- courtyards
+
+	/**
+	 * The outer courtyard (a paved ring by the wall, square tiles) and the grass sectors between it and the inner
+	 * enclosure (low walls, small angular trees, coarse dirt and tuff), with banners, fences, lanterns, barrels, debris
+	 * and small cages.
+	 */
+	private void courtyards(Canvas c) {
+		for (int x = -44; x <= 44; x++) {
+			for (int z = -44; z <= 44; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double d = Math.hypot(x, z), a = angle(x, z);
+				if (d <= R_ENC_OUT || d > rIn(a)) {
+					continue;
+				}
+				if (z > 32 && Math.abs(x) <= 6 && z < GATE_Z - 2) {
+					continue; // the moat
+				}
+				boolean path = angDiff(a, 0) * Math.PI / 180 * d <= 2 || angDiff(a, 90) * Math.PI / 180 * d <= 2.5
+						|| angDiff(a, 180) * Math.PI / 180 * d <= 2 || angDiff(a, 270) * Math.PI / 180 * d <= 2;
+				if (d > 34.5 || path) {
+					boolean dark = (Math.floorMod(x, 4) < 2) == (Math.floorMod(z, 4) < 2);
+					c.set(x, G, z, dark ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.SMOOTH_STONE));
+				} else {
+					double u = unit(x / 2, z / 2, 5);
+					c.set(x, G, z, u < 0.08 ? s(Blocks.COARSE_DIRT) : u < 0.12 ? s(Blocks.TUFF) : s(Blocks.GRASS_BLOCK));
+					c.set(x, G - 1, z, s(Blocks.DIRT));
+					// Low curved walls round the sectors (stone bricks, slab cap), open at each sector's middle.
+					if (d > 33.6 && d <= 34.5) {
+						double mid = ((a % 90) + 90) % 90;
+						if (Math.abs(mid - 45) * Math.PI / 180 * d > 2) {
+							c.set(x, G + 1, z, s(Blocks.STONE_BRICKS));
+							c.set(x, G + 2, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+						}
 					}
-					c.set(x, F + 11, z, (x + z) % 2 == 0 ? s(Blocks.STONE_BRICKS) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-					c.fill(x, G - 2, z, x, G, z, s(Blocks.STONE_BRICKS));
 				}
 			}
-			c.fill(sx, G + 1, gz2 + 1, sx, G + 2, gz2 + 1, s(Blocks.AIR));
-			c.set(sx - 1, G + 1, gz2 - 2, lantern(false));
-			c.set(sx + 1, G + 1, gz2 - 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-			c.set(sx, G + 4, gz2 + 1, Kit.connected(Blocks.IRON_BARS, true));
-			c.set(sx, G + 8, gz2 + 2, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.SOUTH));
 		}
-		// Banners and the checkpoint.
-		for (int x : new int[]{-6, -5, 5, 6}) {
-			c.set(x, F + 7, gz2 + 1, s(Blocks.RED_WALL_BANNER).setValue(WallBannerBlock.FACING, Direction.SOUTH));
+		// Small angular trees in clusters in the grass sectors.
+		for (int[] t : new int[][]{{-22, -22}, {-25, -17}, {22, -22}, {18, -26}, {-22, 22}, {-26, 17}, {24, 20}, {19, 25}}) {
+			tree(c, t[0], t[1]);
 		}
-		c.fill(2, F + 1, gz1 - 2, 3, F + 1, gz1 - 2, Kit.slab(Blocks.DARK_OAK_SLAB, true));
-		c.set(3, F + 2, gz1 - 2, s(Blocks.LANTERN));
+		// Props along the outer courtyard.
+		for (int deg = 10; deg < 360; deg += 40) {
+			if (angDiff(deg, 90) < 16) {
+				continue;
+			}
+			double t = Math.toRadians(deg);
+			int x = (int) Math.round(Math.cos(t) * 38), z = (int) Math.round(Math.sin(t) * 38);
+			if (!c.near(x, z, 3)) {
+				continue;
+			}
+			int kind = (deg / 40) % 4;
+			switch (kind) {
+				case 0 -> {
+					c.set(x, G + 1, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+					c.set(x, G + 2, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+					c.set(x, G + 3, z, lantern(false));
+				}
+				case 1 -> {
+					c.set(x, G + 1, z, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+					c.set(x + 1, G + 1, z, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+					c.set(x, G + 2, z, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+					c.set(x - 1, G + 1, z + 1, Kit.slab(Blocks.SPRUCE_SLAB, false));
+				}
+				case 2 -> cage(c, x, G + 1, z, false);
+				default -> {
+					c.set(x, G + 1, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+					c.set(x + 1, G + 1, z - 1, s(Blocks.COBBLESTONE));
+					c.set(x - 1, G + 1, z, Kit.connected(Blocks.IRON_BARS, true));
+					c.set(x, G + 1, z + 1, Kit.connected(Blocks.IRON_BARS, true));
+				}
+			}
+		}
 	}
 
-	/** The four corner yards between the towers and the wings: paved, lit, with doors into the tower and the wings. */
-	private void cornerYards(Canvas c) {
-		for (int[] y : new int[][]{{-30, -45}, {28, -45}, {-30, 25}, {28, 25}}) {
-			c.fill(y[0], F + 1, y[1], y[0], F + 3, y[1], s(Blocks.STONE_BRICK_WALL));
-			c.set(y[0], F + 4, y[1], lantern(false));
-			c.set(y[0] + 2, F + 1, y[1] + 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		}
-	}
-
-	/** The north patrol yard outside the walls: a gravel yard with a watch post, crates and a low wall to the sea. */
-	private void patrolYard(Canvas c) {
-		int cz = Z1 - 9;
-		if (!c.near(0, cz, 14)) {
+	/** A short angular tree: dark oak trunk, a blocky crown of green concrete with green terracotta shading. */
+	private static void tree(Canvas c, int x, int z) {
+		if (!c.near(x, z, 4)) {
 			return;
 		}
-		for (int x = -12; x <= 12; x++) {
-			for (int z = cz - 6; z <= cz + 5; z++) {
-				if (c.inChunk(x, z) && c.ground(x, z) > Terrain.WATER_TOP + 1) {
-					c.set(x, c.ground(x, z), z, unit(x, z, 51) < 0.6 ? s(Blocks.GRAVEL) : s(Blocks.COBBLESTONE));
+		int h = 3 + (int) (unit(x, z, 3) * 2);
+		c.fill(x, G + 1, z, x, G + h, z, s(Blocks.DARK_OAK_LOG));
+		for (int dy = 0; dy <= 2; dy++) {
+			int r = dy == 2 ? 1 : 2;
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (dy == 0 && Math.abs(dx) == 2 && Math.abs(dz) == 2) {
+						continue;
+					}
+					if ((dx != 0 || dz != 0) || dy > 0) {
+						c.set(x + dx, G + h + dy, z + dz, dy == 0 || unit(x + dx, z + dz, dy) < 0.3 ? s(Blocks.GREEN_TERRACOTTA) : s(Blocks.GREEN_CONCRETE));
+					}
 				}
 			}
 		}
-		for (int x = -12; x <= 12; x++) {
-			int z = cz - 7;
-			if (c.inChunk(x, z)) {
-				int g = c.ground(x, z);
-				c.set(x, g + 1, z, s(Blocks.COBBLESTONE_WALL));
+	}
+
+	/** A small iron cage (2 x 2 x 2 of bars with a slab roof), standing or hanging (with a chain above). */
+	private static void cage(Canvas c, int x, int y, int z, boolean hanging) {
+		for (int dx = 0; dx <= 1; dx++) {
+			for (int dz = 0; dz <= 1; dz++) {
+				for (int k = 0; k <= 1; k++) {
+					c.set(x + dx, y + k, z + dz, s(Blocks.IRON_BARS).setValue(net.minecraft.world.level.block.IronBarsBlock.EAST, dx == 0)
+							.setValue(net.minecraft.world.level.block.IronBarsBlock.WEST, dx == 1).setValue(net.minecraft.world.level.block.IronBarsBlock.SOUTH, dz == 0)
+							.setValue(net.minecraft.world.level.block.IronBarsBlock.NORTH, dz == 1));
+				}
+				c.set(x + dx, y + 2, z + dz, Kit.slab(Blocks.POLISHED_BLACKSTONE_SLAB, false));
+				if (hanging) {
+					c.set(x + dx, y - 1, z + dz, Kit.slab(Blocks.POLISHED_BLACKSTONE_SLAB, true));
+				}
 			}
 		}
-		int g = c.ground(10, cz);
-		c.fill(9, g + 1, cz - 1, 9, g + 3, cz - 1, s(Blocks.DARK_OAK_FENCE));
-		c.fill(11, g + 1, cz + 1, 11, g + 3, cz + 1, s(Blocks.DARK_OAK_FENCE));
-		c.fill(9, g + 4, cz - 1, 11, g + 4, cz + 1, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-		c.set(10, g + 3, cz, lantern(true));
-		c.set(-10, c.ground(-10, cz) + 1, cz, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set(-9, c.ground(-9, cz) + 1, cz, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		if (hanging) {
+			c.set(x, y + 3, z, s(Blocks.CHAIN));
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------- inner enclosure
+
+	/**
+	 * The inner enclosure: a thick ring (r 21-26) with a curved corridor inside (barred windows, lanterns, ladders up to
+	 * the broad top ledge, hanging cages, barrels, debris, chains strung overhead), four arched gates, a broad ledge on
+	 * top with battlements, long black banners outside.
+	 */
+	private void enclosure(Canvas c) {
+		if (!c.near(0, 0, 28)) {
+			return;
+		}
+		for (int x = -27; x <= 27; x++) {
+			for (int z = -27; z <= 27; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double d = Math.hypot(x, z), a = angle(x, z);
+				if (d <= R_ENC_IN - 0.5 || d > R_ENC_OUT) {
+					continue;
+				}
+				boolean innerWall = d <= R_ENC_IN + 0.6, outerWall = d > R_ENC_OUT - 1.2;
+				boolean gate = false;
+				for (int g = 0; g < 360; g += 90) {
+					gate |= angDiff(a, g) * Math.PI / 180 * d <= 2.2;
+				}
+				c.set(x, G, z, (Math.floorMod(x, 2) == Math.floorMod(z, 2)) ? s(Blocks.SMOOTH_STONE) : s(Blocks.POLISHED_ANDESITE));
+				for (int y = G + 1; y < ENC_TOP; y++) {
+					int k = y - G;
+					BlockState b;
+					if (innerWall || outerWall) {
+						boolean window = outerWall && !gate && k >= 2 && k <= 3 && Math.floorMod((int) Math.round(Math.toRadians(a) * d), 7) == 0;
+						b = window ? Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7) : k == 7 ? s(Blocks.CALCITE) : masonry(x, y, z);
+					} else {
+						b = k <= 4 ? s(Blocks.AIR) : s(Blocks.STONE_BRICKS);
+					}
+					if (gate && k <= (angDiffWidth(a, d) <= 1.2 ? 5 : 4)) {
+						b = s(Blocks.AIR);
+					}
+					c.set(x, y, z, b);
+				}
+				c.set(x, ENC_TOP, z, s(Blocks.SMOOTH_STONE));
+				boolean rimOut = d > R_ENC_OUT - 0.8, rimIn = d <= R_ENC_IN + 0.3;
+				if ((rimOut || rimIn) && Math.floorMod((int) Math.round(Math.toRadians(a) * d), 3) != 0) {
+					c.set(x, ENC_TOP + 1, z, s(Blocks.STONE_BRICK_WALL));
+				}
+			}
+		}
+		// Corridor details: lanterns, cages, barrels, debris, chains overhead; ladders up to the ledge.
+		for (int deg = 15; deg < 360; deg += 30) {
+			double t = Math.toRadians(deg);
+			int x = (int) Math.round(Math.cos(t) * 23.5), z = (int) Math.round(Math.sin(t) * 23.5);
+			if (!c.near(x, z, 2)) {
+				continue;
+			}
+			c.set(x, G + 4, z, lantern(true));
+			int kind = (deg / 30) % 4;
+			Direction tan = tangent(deg);
+			int px = x + tan.getStepX() * 2, pz = z + tan.getStepZ() * 2;
+			switch (kind) {
+				case 0 -> c.set(px, G + 1, pz, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+				case 1 -> {
+					c.set(px, G + 3, pz, s(Blocks.CHAIN));
+					c.set(px, G + 2, pz, Kit.connected(Blocks.IRON_BARS, tan.getAxis() == Direction.Axis.X));
+				}
+				case 2 -> {
+					c.set(px, G + 1, pz, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+					c.set(px + 1, G + 1, pz, s(Blocks.COBBLESTONE));
+				}
+				default -> {
+					// A ladder against the inner wall up through the ceiling to the ledge.
+					double rr = R_ENC_IN + 1.5;
+					int lx = (int) Math.round(Math.cos(t) * rr), lz = (int) Math.round(Math.sin(t) * rr);
+					Direction face = outward(Math.cos(t), Math.sin(t));
+					int bx = lx - face.getStepX(), bz = lz - face.getStepZ();
+					if (Math.hypot(bx, bz) <= R_ENC_IN + 0.6 && Math.hypot(lx, lz) > R_ENC_IN + 0.6 && Math.hypot(lx, lz) <= R_ENC_OUT - 1.2) {
+						for (int y = G + 1; y <= ENC_TOP; y++) {
+							c.set(lx, y, lz, Canvas.facing(s(Blocks.LADDER), face));
+						}
+						c.set(bx, ENC_TOP, bz, s(Blocks.SMOOTH_STONE));
+					}
+				}
+			}
+			// Chains strung under the ceiling, across the corridor.
+			Direction across = outward(Math.cos(t), Math.sin(t));
+			c.set(x, G + 4, z, lantern(true));
+			int cx2 = x + tan.getStepX() * -2, cz2 = z + tan.getStepZ() * -2;
+			c.set(cx2, G + 4, cz2, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, across.getAxis()));
+		}
+		// Long black banners on the outside, between the gates.
+		for (int deg = 45; deg < 360; deg += 90) {
+			for (int off : new int[]{-12, 12}) {
+				double t = Math.toRadians(deg + off);
+				int x = (int) Math.round(Math.cos(t) * (R_ENC_OUT + 0.6)), z = (int) Math.round(Math.sin(t) * (R_ENC_OUT + 0.6));
+				Direction out = outward(Math.cos(t), Math.sin(t));
+				int wx = x - out.getStepX(), wz = z - out.getStepZ();
+				if (Math.hypot(wx, wz) <= R_ENC_OUT && Math.hypot(wx, wz) > R_ENC_OUT - 1.2 && Math.hypot(x, z) > R_ENC_OUT) {
+					banner(c, x, G + 6, z, out, Blocks.BLACK_WALL_BANNER);
+					banner(c, x, G + 4, z, out, Blocks.BLACK_WALL_BANNER);
+				}
+			}
+		}
+	}
+
+	static double angDiffWidth(double a, double d) {
+		double best = 99;
+		for (int g = 0; g < 360; g += 90) {
+			best = Math.min(best, angDiff(a, g) * Math.PI / 180 * d);
+		}
+		return best;
+	}
+
+	// ---------------------------------------------------------------------------------------------------- central courtyard
+
+	/**
+	 * The central courtyard: grass with dark paths radiating from the tower's four entrances to the enclosure gates,
+	 * rocky patches, barrels, debris, lanterns, a ladder up the enclosure's inner face; the four wooden bridges from the
+	 * enclosure's ledge to the tower's third level, two on dark triangular supports.
+	 */
+	private void centralCourtyard(Canvas c) {
+		if (!c.near(0, 0, 22)) {
+			return;
+		}
+		for (int x = -21; x <= 21; x++) {
+			for (int z = -21; z <= 21; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double d = Math.hypot(x, z), a = angle(x, z);
+				if (d <= R_TOWER + 0.4 || d > R_ENC_IN - 0.5) {
+					continue;
+				}
+				boolean path = angDiffWidth(a, d) <= 1.6;
+				double u = unit(x, z, 9);
+				BlockState b;
+				if (path) {
+					b = u < 0.35 ? s(Blocks.TUFF) : u < 0.65 ? s(Blocks.POLISHED_ANDESITE) : u < 0.85 ? s(Blocks.STONE) : s(Blocks.COARSE_DIRT);
+				} else {
+					double patch = unit(x / 3, z / 3, 10);
+					b = patch < 0.12 ? s(Blocks.TUFF) : patch < 0.2 ? s(Blocks.COARSE_DIRT) : s(Blocks.GRASS_BLOCK);
+				}
+				c.set(x, G, z, b);
+			}
+		}
+		for (int[] p : new int[][]{{14, 6}, {-15, -6}, {7, -15}}) {
+			if (c.near(p[0], p[1], 2)) {
+				c.set(p[0], G + 1, p[1], Canvas.facing(s(Blocks.BARREL), Direction.UP));
+				c.set(p[0] + 1, G + 1, p[1], Canvas.facing(s(Blocks.BARREL), Direction.UP));
+			}
+		}
+		for (int[] p : new int[][]{{-7, 16}, {16, -8}}) {
+			if (c.near(p[0], p[1], 2)) {
+				c.set(p[0], G + 1, p[1], s(Blocks.COBBLESTONE));
+				c.set(p[0] + 1, G + 1, p[1], Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+			}
+		}
+		for (int deg = 22; deg < 360; deg += 90) {
+			double t = Math.toRadians(deg);
+			int x = (int) Math.round(Math.cos(t) * 17), z = (int) Math.round(Math.sin(t) * 17);
+			if (c.near(x, z, 2)) {
+				c.set(x, G + 1, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+				c.set(x, G + 2, z, lantern(false));
+			}
+		}
+		// The ladder up the enclosure's inner face (north-east).
+		double t = Math.toRadians(300);
+		int lx = (int) Math.round(Math.cos(t) * (R_ENC_IN - 1)), lz = (int) Math.round(Math.sin(t) * (R_ENC_IN - 1));
+		Direction face = outward(-Math.cos(t), -Math.sin(t));
+		if (Math.hypot(lx - face.getStepX(), lz - face.getStepZ()) > R_ENC_IN - 0.5) {
+			for (int y = G + 1; y <= ENC_TOP; y++) {
+				c.set(lx, y, lz, Canvas.facing(s(Blocks.LADDER), face));
+			}
+		}
+		// Radial bridges (diagonals) from the ledge (y 75) to the tower's third level.
+		for (int deg = 45; deg < 360; deg += 90) {
+			double tt = Math.toRadians(deg), ux = Math.cos(tt), uz = Math.sin(tt);
+			for (double r = R_TOWER - 0.5; r <= R_ENC_IN + 0.5; r += 0.5) {
+				for (double k = -0.9; k <= 0.9; k += 0.45) {
+					int x = (int) Math.round(ux * r - uz * k), z = (int) Math.round(uz * r + ux * k);
+					if (!c.inChunk(x, z)) {
+						continue;
+					}
+					c.set(x, LEVELS[2], z, Math.abs(k) > 0.6 ? s(Blocks.DARK_OAK_PLANKS) : s(Blocks.SPRUCE_PLANKS));
+					c.fill(x, LEVELS[2] + 1, z, x, LEVELS[2] + 3, z, s(Blocks.AIR));
+				}
+			}
+			if (deg == 45 || deg == 225) {
+				// The dark triangular support under the middle.
+				for (int i = 0; i <= 4; i++) {
+					double r = 14 + i;
+					int x = (int) Math.round(ux * r), z = (int) Math.round(uz * r);
+					int drop = Math.min(i, 4 - i);
+					c.fill(x, LEVELS[2] - 1 - drop, z, x, LEVELS[2] - 1, z, s(Blocks.DARK_OAK_PLANKS));
+				}
+				int x = (int) Math.round(ux * 16), z = (int) Math.round(uz * 16);
+				c.fill(x, G + 1, z, x, LEVELS[2] - 4, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+			}
+			// Fence railings along the bridge edges.
+			for (double r = R_TOWER + 1; r <= R_ENC_IN - 1; r += 1) {
+				for (double k : new double[]{-1.3, 1.3}) {
+					int x = (int) Math.round(ux * r - uz * k), z = (int) Math.round(uz * r + ux * k);
+					if (c.inChunk(x, z)) {
+						c.set(x, LEVELS[2], z, s(Blocks.DARK_OAK_PLANKS));
+						c.set(x, LEVELS[2] + 1, z, s(Blocks.DARK_OAK_FENCE));
+					}
+				}
+			}
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------- central tower
+
+	/**
+	 * The central tower's shell: the lower section (r 12: stone bricks with andesite pilasters, a white band, four large
+	 * arched entrances, barred cell windows, wall lanterns, a projecting ledge with battlements), the middle (r 10: small
+	 * arched windows), the upper (r 8: end stone bricks, tall arched blue windows), the flat round roof with battlements,
+	 * the dark blue ring under its edge, white lights.
+	 */
+	private void tower(Canvas c) {
+		if (!c.near(0, 0, 15)) {
+			return;
+		}
+		for (int x = -14; x <= 14; x++) {
+			for (int z = -14; z <= 14; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double d = Math.hypot(x, z), a = angle(x, z);
+				// Lower section.
+				if (d <= R_TOWER + 0.4) {
+					boolean shell = d > R_TOWER - 1.1;
+					if (shell) {
+						for (int y = G; y < MID_FLOOR; y++) {
+							int k = y - G;
+							boolean pilaster = Math.floorMod((int) Math.round(a), 30) <= 2;
+							BlockState b = k == 4 ? s(Blocks.CALCITE) : pilaster ? s(Blocks.POLISHED_ANDESITE) : masonry(x, y, z);
+							// Barred windows into the cells (centred on each cell, levels 1-3).
+							double cellMid = ((a - 15) % 30 + 30) % 30;
+							for (int L = 1; L < LEVELS.length; L++) {
+								if (y == LEVELS[L] + 2 && Math.abs(cellMid - 15) < 3 && Math.abs(cellMid - 15) * Math.PI / 180 * d < 0.7) {
+									b = Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7);
+								}
+							}
+							c.set(x, y, z, b);
+						}
+					}
+					c.set(x, MID_FLOOR, z, shell ? s(Blocks.STONE_BRICKS) : s(Blocks.SMOOTH_STONE));
+				}
+				// The projecting ledge with battlements.
+				if (d > R_TOWER + 0.4 && d <= R_TOWER + 1.6) {
+					c.set(x, MID_FLOOR, z, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
+					c.set(x, MID_FLOOR - 1, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, outward(-x, -z), true));
+				}
+				if (d > R_TOWER - 0.6 && d <= R_TOWER + 1.6 && Math.floorMod((int) Math.round(Math.toRadians(a) * d), 3) != 0) {
+					c.set(x, MID_FLOOR + 1, z, s(Blocks.STONE_BRICK_WALL));
+				}
+				// Middle section.
+				if (d <= 10.4) {
+					boolean shell = d > 9.3;
+					for (int y = MID_FLOOR + 1; y < UP_FLOOR; y++) {
+						int k = y - MID_FLOOR;
+						boolean window = Math.floorMod((int) Math.round(a), 45) <= 3 && k >= 3 && k <= 4;
+						BlockState b = !shell ? s(Blocks.AIR) : window ? Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7)
+								: k == 5 && Math.floorMod((int) Math.round(a), 45) <= 3 ? Kit.stairs(Blocks.STONE_BRICK_STAIRS, outward(-x, -z), true)
+								: Math.floorMod((int) Math.round(a), 45) >= 20 && Math.floorMod((int) Math.round(a), 45) <= 24 ? s(Blocks.POLISHED_ANDESITE) : masonry(x, y, z);
+						if (shell || y == MID_FLOOR + 1) {
+							c.set(x, y, z, b);
+						}
+					}
+					c.set(x, UP_FLOOR, z, shell ? s(Blocks.STONE_BRICKS) : s(Blocks.SPRUCE_PLANKS));
+				}
+				if (d > 10.4 && d <= 11.4) {
+					c.set(x, UP_FLOOR, z, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+				}
+				// Upper section.
+				if (d <= 8.4) {
+					boolean shell = d > 7.3;
+					for (int y = UP_FLOOR + 1; y < ROOF; y++) {
+						int k = y - UP_FLOOR;
+						double m = ((a % 60) + 60) % 60;
+						boolean win = Math.abs(m - 30) < 4.5;
+						boolean frame = Math.abs(m - 30) < 9 && !win;
+						BlockState b;
+						if (!shell) {
+							b = s(Blocks.AIR);
+						} else if (win && k >= 1 && k <= 5) {
+							b = k == 5 ? Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7)
+									: Kit.connected(Blocks.LIGHT_BLUE_STAINED_GLASS_PANE, Math.abs(Math.sin(Math.toRadians(a))) > 0.7);
+						} else if (frame && k <= 5) {
+							b = s(Blocks.POLISHED_ANDESITE);
+						} else if (Math.floorMod((int) Math.round(a), 60) == 0 && k == 3) {
+							b = s(Blocks.SEA_LANTERN);
+						} else {
+							b = s(Blocks.END_STONE_BRICKS);
+						}
+						c.set(x, y, z, b);
+					}
+					c.set(x, ROOF, z, s(Blocks.SMOOTH_STONE));
+					if (d > 7.4 && Math.floorMod((int) Math.round(Math.toRadians(a) * d), 3) != 0) {
+						c.set(x, ROOF + 1, z, s(Blocks.STONE_BRICK_WALL));
+					}
+				}
+				// The dark blue ring under the roof's edge, with white lights.
+				if (d > 8.4 && d <= 9.5) {
+					boolean light = Math.floorMod((int) Math.round(a), 45) <= 2;
+					c.set(x, ROOF, z, light ? s(Blocks.SEA_LANTERN) : Kit.slab(Blocks.DARK_PRISMARINE_SLAB, true));
+				}
+			}
+		}
+		for (int deg = 0; deg < 360; deg += 90) {
+			double t = Math.toRadians(deg + 45);
+			int x = (int) Math.round(Math.cos(t) * 7.8), z = (int) Math.round(Math.sin(t) * 7.8);
+			c.set(x, ROOF + 2, z, s(Blocks.END_ROD));
+		}
+		// Four large arched entrances at the bottom (N, E, S, W) and wall lanterns between them.
+		for (int deg = 0; deg < 360; deg += 90) {
+			double t = Math.toRadians(deg), ux = Math.cos(t), uz = Math.sin(t);
+			for (double r = R_TOWER - 1.5; r <= R_TOWER + 0.6; r += 0.5) {
+				for (int k = -1; k <= 1; k++) {
+					int x = (int) Math.round(ux * r - uz * k), z = (int) Math.round(uz * r + ux * k);
+					c.fill(x, G + 1, z, x, G + (k == 0 ? 5 : 4), z, s(Blocks.AIR));
+					c.set(x, G, z, s(Blocks.POLISHED_ANDESITE));
+				}
+			}
+			double tl = Math.toRadians(deg + 45);
+			int lx = (int) Math.round(Math.cos(tl) * (R_TOWER + 1)), lz = (int) Math.round(Math.sin(tl) * (R_TOWER + 1));
+			Direction out = outward(Math.cos(tl), Math.sin(tl));
+			if (Math.hypot(lx - out.getStepX(), lz - out.getStepZ()) <= R_TOWER + 0.4) {
+				c.set(lx, G + 4, lz, s(Blocks.POLISHED_ANDESITE));
+				c.set(lx, G + 3, lz, lantern(true));
+			}
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------- atrium
+
+	/**
+	 * The prison atrium inside the lower tower: open from the floor to the ceiling, cells round the wall on four levels
+	 * (arched barred fronts, small chambers), curved galleries with low parapets, curved spruce staircases between the
+	 * levels, the doorways to the four radial bridges, the stone bridge across at the top level, the great spiked beam
+	 * above, and the spiral staircase down to the chamber below.
+	 */
+	private void atrium(Canvas c) {
+		if (!c.near(0, 0, 13)) {
+			return;
+		}
+		// Clear the inside, lay the floor.
+		for (int x = -11; x <= 11; x++) {
+			for (int z = -11; z <= 11; z++) {
+				double d = Math.hypot(x, z);
+				if (d > R_TOWER - 1.1 || !c.inChunk(x, z)) {
+					continue;
+				}
+				c.fill(x, G + 1, z, x, MID_FLOOR - 1, z, s(Blocks.AIR));
+				c.set(x, G, z, (Math.floorMod(x, 4) < 2) == (Math.floorMod(z, 4) < 2) ? s(Blocks.SMOOTH_STONE) : s(Blocks.POLISHED_ANDESITE));
+			}
+		}
+		for (int L = 0; L < LEVELS.length; L++) {
+			int fy = LEVELS[L];
+			int ceil = L + 1 < LEVELS.length ? LEVELS[L + 1] : fy + 4;
+			for (int x = -11; x <= 11; x++) {
+				for (int z = -11; z <= 11; z++) {
+					if (!c.inChunk(x, z)) {
+						continue;
+					}
+					double d = Math.hypot(x, z), a = angle(x, z);
+					if (d > R_TOWER - 1.1) {
+						continue;
+					}
+					double cellMid = ((a % 30) + 30) % 30; // dividers at 0, the cell door at 15
+					boolean bridgeDoor = L == 2 && Math.floorMod((int) Math.round(a) - 45, 90) <= 4 || L == 2 && Math.floorMod((int) Math.round(a) - 45, 90) >= 86;
+					boolean entrance = L == 0 && angDiffWidth(a, d) <= 1.6;
+					// Gallery floor (levels 1-3): r 6-8, a parapet on the inner edge.
+					if (L > 0 && d > 6 && d <= 8.4) {
+						c.set(x, fy, z, (x + z) % 2 == 0 ? s(Blocks.SMOOTH_STONE) : s(Blocks.POLISHED_ANDESITE));
+						if (d <= 6.7) {
+							c.set(x, fy + 1, z, s(Blocks.STONE_BRICK_WALL));
+						}
+					}
+					// The cell ring: front wall (r 8-9) with arched barred doors, chambers (r 9-11), dividers.
+					if (d > 8.4 && d <= R_TOWER - 1.1) {
+						c.set(x, fy, z, s(Blocks.STONE_BRICKS));
+						boolean front = d <= 9.4;
+						boolean divider = cellMid < 3.5 || cellMid > 26.5;
+						for (int y = fy + 1; y < ceil; y++) {
+							int k = y - fy;
+							BlockState b;
+							if (entrance || bridgeDoor) {
+								b = k <= 3 ? s(Blocks.AIR) : s(Blocks.STONE_BRICKS);
+							} else if (front) {
+								double off = Math.abs(cellMid - 15) * Math.PI / 180 * d;
+								if (off <= 1.0 && k <= 2) {
+									b = Kit.connected(Blocks.IRON_BARS, Math.abs(Math.sin(Math.toRadians(a))) > 0.7);
+								} else if (off <= 1.0 && k == 3) {
+									b = Kit.slab(Blocks.STONE_BRICK_SLAB, true);
+								} else if (off <= 1.7 && k == 3) {
+									b = Kit.stairs(Blocks.STONE_BRICK_STAIRS, tangent(a + (cellMid < 15 ? 0 : 180)), true);
+								} else {
+									b = off <= 2.2 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.STONE_BRICKS);
+								}
+							} else if (divider) {
+								b = s(Blocks.STONE_BRICKS);
+							} else {
+								b = k == ceil - fy - 1 ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR);
+							}
+							c.set(x, y, z, b);
+						}
+					}
+				}
+			}
+			// A bench in each cell and a chain from its ceiling.
+			for (int deg = 15; deg < 360; deg += 30) {
+				double t = Math.toRadians(deg);
+				int x = (int) Math.round(Math.cos(t) * 10.2), z = (int) Math.round(Math.sin(t) * 10.2);
+				if (!c.inChunk(x, z) || (L == 0 && angDiffWidth(deg, 10) < 2) || L == 2 && Math.floorMod(deg - 45, 90) <= 4) {
+					continue;
+				}
+				if (Math.hypot(x, z) > 9.4 && Math.hypot(x, z) <= R_TOWER - 1.1) {
+					c.set(x, fy + 1, z, (deg / 30) % 2 == 0 ? Kit.slab(Blocks.SPRUCE_SLAB, false) : s(Blocks.CHAIN));
+				}
+			}
+		}
+		// Curved staircases between the levels (two wide, along the gallery ring, spruce steps), with holes above.
+		int[][] runs = {{LEVELS[0], LEVELS[1], 100}, {LEVELS[1], LEVELS[2], 190}, {LEVELS[2], LEVELS[3], 280}, {LEVELS[3], MID_FLOOR, 10}};
+		for (int[] run : runs) {
+			curvedStair(c, run[0], run[1], run[2], 6.6, 7.6);
+		}
+		// The stone bridge across the top level (north-south) and the great spiked beam above (east-west).
+		for (int z = -8; z <= 8; z++) {
+			for (int x = -1; x <= 0; x++) {
+				c.set(x, LEVELS[3], z, (z % 2 == 0) ? s(Blocks.SMOOTH_STONE) : s(Blocks.POLISHED_ANDESITE));
+			}
+			if (Math.abs(z) <= 6) {
+				c.set(-2, LEVELS[3], z, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
+				c.set(1, LEVELS[3], z, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
+				c.set(-2, LEVELS[3] + 1, z, s(Blocks.STONE_BRICK_WALL));
+				c.set(1, LEVELS[3] + 1, z, s(Blocks.STONE_BRICK_WALL));
+			}
+		}
+		for (int x = -11; x <= 11; x++) {
+			for (int z = 0; z <= 1; z++) {
+				c.set(x, MID_FLOOR - 1, z, Math.floorMod(x, 4) == 0 ? s(Blocks.POLISHED_BLACKSTONE) : s(Blocks.STRIPPED_SPRUCE_LOG).setValue(RotatedPillarBlock.AXIS, Direction.Axis.X));
+			}
+			if (Math.floorMod(x, 3) == 1 && Math.abs(x) <= 9) {
+				c.set(x, MID_FLOOR - 2, 0, s(Blocks.LIGHTNING_ROD).setValue(LightningRodBlock.FACING, Direction.DOWN));
+				c.set(x, MID_FLOOR - 2, 1, s(Blocks.LIGHTNING_ROD).setValue(LightningRodBlock.FACING, Direction.DOWN));
+			}
+		}
+		// Lanterns hanging from the gallery undersides.
+		for (int deg = 0; deg < 360; deg += 45) {
+			double t = Math.toRadians(deg + 22);
+			int x = (int) Math.round(Math.cos(t) * 7), z = (int) Math.round(Math.sin(t) * 7);
+			for (int L = 1; L < LEVELS.length; L++) {
+				double run = new double[]{100, 190, 280}[L - 1]; // the stair below this gallery opens its floor
+				if (angDiff(deg + 22, run + 24) < 32) {
+					continue;
+				}
+				c.set(x, LEVELS[L] - 1, z, lantern(true));
+			}
+		}
+		// The spiral staircase down to the chamber, round a central pillar, with a stone rail round the opening.
+		spiral(c, G, CH_FLOOR, true);
+		for (int x = -4; x <= 4; x++) {
+			for (int z = -4; z <= 4; z++) {
+				double d = Math.hypot(x, z);
+				if (d > 3.6 && d <= 4.5 && c.inChunk(x, z) && !(x >= 0 && x <= 4 && z >= -1 && z <= 0)) {
+					c.set(x, G + 1, z, s(Blocks.STONE_BRICK_WALL));
+				}
+			}
+		}
 	}
 
 	/**
-	 * The rocky coast: boulder heaps of grey stone along the shore and a few sea stacks offshore, so the island reads as
-	 * a crag rather than smooth terraces. Kept clear of the fortress, the forecourt and the pier.
+	 * A curved staircase from y1 up to y2 along the ring between radii r1 and r2, starting at bearing {@code start} and
+	 * climbing one block per block of arc; the floor above is opened over the steps for headroom.
 	 */
-	private void rocks(Canvas c) {
-		for (int gx = -84; gx <= 84; gx += 6) {
-			for (int gz = -84; gz <= 96; gz += 6) {
-				int x = gx + (int) (unit(gx, gz, 61) * 5) - 2, z = gz + (int) (unit(gx, gz, 62) * 5) - 2;
-				if (!c.near(x, z, 6) || (x >= X1 - 5 && x <= X2 + 5 && z >= Z1 - 5 && z <= Z2 + 9)
-						|| (Math.abs(x) <= 16 && z >= Z2 && z <= DOCK_END_Z + 6) || (Math.abs(x) <= 14 && z >= Z1 - 16 && z <= Z1 - 2)) {
+	private static void curvedStair(Canvas c, int y1, int y2, double start, double r1, double r2) {
+		double rm = (r1 + r2) / 2;
+		double step = Math.toDegrees(1.0 / rm);
+		int rise = y2 - y1;
+		for (int i = 1; i <= rise; i++) {
+			double a = start + step * i;
+			int y = y1 + i;
+			for (double r = r1; r <= r2 + 0.01; r += 0.5) {
+				double t = Math.toRadians(a);
+				int x = (int) Math.round(Math.cos(t) * r), z = (int) Math.round(Math.sin(t) * r);
+				if (!c.inChunk(x, z)) {
 					continue;
 				}
-				int g = c.ground(x, z);
-				double u = unit(x, z, 63);
-				if (g >= Terrain.WATER_TOP - 1 && g <= G && u < 0.55) {
-					boulder(c, x, z, 1.6 + u * 3.2, 2 + (int) (u * 6));
-				} else if (g < Terrain.WATER_TOP - 1 && g >= Terrain.WATER_TOP - 7 && u < 0.07) {
-					boulder(c, x, z, 2.0 + u * 10, Terrain.WATER_TOP - g + 4 + (int) (u * 40));
-				}
+				c.fill(x, y1 + 1, z, x, y - 1, z, s(Blocks.STONE_BRICKS));
+				c.set(x, y, z, i == rise ? s(Blocks.SPRUCE_PLANKS) : Kit.stairs(Blocks.SPRUCE_STAIRS, tangent(a), false));
+				c.fill(x, y + 1, z, x, Math.min(y + 3, y2 + 3), z, s(Blocks.AIR));
+			}
+		}
+		// Polished andesite trim along the outer edge of the run.
+		for (int i = 1; i <= rise; i++) {
+			double t = Math.toRadians(start + step * i);
+			int x = (int) Math.round(Math.cos(t) * (r2 + 0.9)), z = (int) Math.round(Math.sin(t) * (r2 + 0.9));
+			if (c.inChunk(x, z) && Math.hypot(x, z) <= 8.4) {
+				c.set(x, y1 + i, z, s(Blocks.POLISHED_ANDESITE));
 			}
 		}
 	}
 
-	/** A rounded heap of weathered stone, {@code h} tall over the ground (columns taper toward the edge). */
-	private static void boulder(Canvas c, int x0, int z0, double r, int h) {
-		int ri = (int) Math.ceil(r);
-		for (int dx = -ri; dx <= ri; dx++) {
-			for (int dz = -ri; dz <= ri; dz++) {
-				double d = Math.sqrt(dx * dx + dz * dz) / r + (unit(x0 + dx, z0 + dz, 64) - 0.5) * 0.35;
-				int x = x0 + dx, z = z0 + dz;
-				if (d > 1.0 || !c.inChunk(x, z)) {
-					continue;
-				}
-				int g = c.ground(x, z);
-				int top = g + (int) Math.round(h * Math.sqrt(1 - d * d));
-				for (int y = Math.min(g, Terrain.WATER_TOP - 6); y <= top; y++) {
-					double v = unit(x * 7 + y, z * 3 - y, 65);
-					c.set(x, y, z, v < 0.45 ? s(Blocks.STONE) : v < 0.65 ? s(Blocks.ANDESITE) : v < 0.8 ? s(Blocks.COBBLESTONE)
-							: v < 0.9 ? s(Blocks.TUFF) : y >= top - 1 ? s(Blocks.MOSSY_COBBLESTONE) : s(Blocks.STONE));
-				}
-			}
-		}
-	}
-
-	/** A short pier on stone footings with a guard checkpoint at the landing, cargo and lanterns. */
-	private void dock(Canvas c) {
-		if (!c.near(0, (DOCK_LAND_Z + DOCK_END_Z) / 2, 20)) {
+	/**
+	 * A spiral staircase from {@code yTop} down to {@code yBottom} round a central pillar (steps at radius 2-3), the shaft
+	 * cleared round it; {@code pillar} also raises the central stone pillar.
+	 */
+	private static void spiral(Canvas c, int yTop, int yBottom, boolean pillar) {
+		if (!c.near(0, 0, 4)) {
 			return;
 		}
-		for (int z = DOCK_LAND_Z; z <= DOCK_END_Z; z++) {
-			boolean head = z >= DOCK_END_Z - 4;
-			int half = head ? 6 : 2;
-			for (int x = -half; x <= half; x++) {
-				boolean edgeX = Math.abs(x) == half;
-				c.set(x, DOCK_Y, z, s(Blocks.SPRUCE_PLANKS));
-				c.fill(x, DOCK_Y + 1, z, x, DOCK_Y + 4, z, s(Blocks.AIR));
-				if (edgeX && ((z - DOCK_LAND_Z) % 4 == 0 || z == DOCK_END_Z)) {
-					c.fill(x, Math.min(c.ground(x, z), Terrain.WATER_TOP - 1), z, x, DOCK_Y - 1, z, s(Blocks.STONE_BRICKS));
-					c.set(x, DOCK_Y + 1, z, s(Blocks.DARK_OAK_FENCE));
-					if ((z - DOCK_LAND_Z) % 8 == 0) {
-						c.set(x, DOCK_Y + 2, z, lantern(false));
-					}
-				} else if (edgeX && !head) {
-					c.set(x, DOCK_Y + 1, z, Kit.connected(Blocks.DARK_OAK_FENCE, false));
+		for (int x = -3; x <= 3; x++) {
+			for (int z = -3; z <= 3; z++) {
+				double d = Math.hypot(x, z);
+				if (d <= 3.5 && c.inChunk(x, z)) {
+					c.fill(x, yBottom + 1, z, x, yTop, z, d <= 1.0 && pillar ? s(Blocks.STONE_BRICKS) : s(Blocks.AIR));
 				}
 			}
 		}
-		c.set(-5, DOCK_Y + 1, DOCK_END_Z - 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		c.set(-4, DOCK_Y + 1, DOCK_END_Z - 2, Canvas.facing(s(Blocks.BARREL), Direction.UP));
-		// The checkpoint booth at the landing.
-		int bz = DOCK_LAND_Z - 4;
-		for (int[] p : new int[][]{{5, bz - 1}, {8, bz - 1}, {5, bz + 2}, {8, bz + 2}}) {
-			int g = c.ground(p[0], p[1]);
-			c.fill(p[0], g + 1, p[1], p[0], g + 3, p[1], s(Blocks.STONE_BRICK_WALL));
+		int n = yTop - yBottom;
+		for (int i = 0; i < n; i++) {
+			double a = 0 + i * 24.0; // clockwise going down
+			int y = yTop - i;
+			for (double r = 1.6; r <= 3.2; r += 0.5) {
+				double t = Math.toRadians(a);
+				int x = (int) Math.round(Math.cos(t) * r), z = (int) Math.round(Math.sin(t) * r);
+				if (!c.inChunk(x, z) || Math.hypot(x, z) <= 1.0) {
+					continue;
+				}
+				c.set(x, y, z, Kit.stairs(Blocks.SPRUCE_STAIRS, tangent(a - 180), false));
+			}
 		}
-		int g = c.ground(6, bz);
-		c.fill(5, g + 4, bz - 1, 8, g + 4, bz + 2, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
-		c.set(6, g + 3, bz, lantern(true));
-		c.set(7, g + 1, bz + 1, Kit.slab(Blocks.DARK_OAK_SLAB, true));
+	}
+
+	// ---------------------------------------------------------------------------------------------------- upper rooms
+
+	/**
+	 * The middle floor (a guard room with barrels and a table round the stair opening) and the furnished upper room:
+	 * spruce floor, end stone and andesite walls, tall blue windows with iron frames and white curtains, the golden
+	 * chandelier, the fireplace with its chimney, bookshelves and a desk, the pale-bordered stair opening, a ladder up to
+	 * the roof.
+	 */
+	private void upperRooms(Canvas c) {
+		if (!c.near(0, 0, 11)) {
+			return;
+		}
+		// Middle floor: a spiral up to the upper room in the middle, barrels and a table.
+		spiral(c, UP_FLOOR, MID_FLOOR, true);
+		for (int x = -3; x <= 3; x++) {
+			for (int z = -3; z <= 3; z++) {
+				double d = Math.hypot(x, z);
+				if (d > 3.5 && d <= 4.5 && c.inChunk(x, z)) {
+					c.set(x, MID_FLOOR, z, s(Blocks.POLISHED_ANDESITE));
+				}
+			}
+		}
+		c.set(6, MID_FLOOR + 1, -5, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(7, MID_FLOOR + 1, -4, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(-6, MID_FLOOR + 1, 5, s(Blocks.DARK_OAK_FENCE));
+		c.set(-6, MID_FLOOR + 2, 5, s(Blocks.DARK_OAK_PRESSURE_PLATE));
+		c.set(-5, MID_FLOOR + 1, 5, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.WEST, false));
+		c.set(0, UP_FLOOR - 1, 6, lantern(true));
+		c.set(0, UP_FLOOR - 1, -6, lantern(true));
+		// The upper room: the stair opening with a pale border.
+		for (int x = -4; x <= 4; x++) {
+			for (int z = -4; z <= 4; z++) {
+				double d = Math.hypot(x, z);
+				if (d > 3.5 && d <= 4.4 && c.inChunk(x, z)) {
+					c.set(x, UP_FLOOR, z, s(Blocks.SMOOTH_QUARTZ));
+				}
+			}
+		}
+		// Chandelier: chains from the ceiling, a gold hub with arms, end rods and sea lanterns.
+		int cy = ROOF - 1;
+		c.fill(0, cy - 1, 0, 0, cy, 0, s(Blocks.CHAIN));
+		c.set(0, cy - 2, 0, s(Blocks.GOLD_BLOCK));
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			c.set(d.getStepX(), cy - 2, d.getStepZ(), s(Blocks.END_ROD).setValue(net.minecraft.world.level.block.EndRodBlock.FACING, d));
+			c.set(d.getStepX() * 2, cy - 2, d.getStepZ() * 2, s(Blocks.GOLD_BLOCK));
+			c.set(d.getStepX() * 2, cy - 1, d.getStepZ() * 2, s(Blocks.CHAIN));
+			c.set(d.getStepX() * 2, cy, d.getStepZ() * 2, s(Blocks.CHAIN));
+			c.set(d.getStepX() * 2, cy - 3, d.getStepZ() * 2, s(Blocks.SEA_LANTERN));
+		}
+		// Fireplace on the west wall, a chimney through the roof.
+		int fx = -7;
+		for (int z = -2; z <= 2; z++) {
+			for (int k = 1; k <= 4; k++) {
+				boolean mouth = Math.abs(z) <= 1 && k <= 2;
+				c.set(fx, UP_FLOOR + k, z, mouth ? s(Blocks.AIR) : s(Blocks.STONE_BRICKS));
+			}
+			c.set(fx + 1, UP_FLOOR + 4, z, Kit.slab(Blocks.STONE_BRICK_SLAB, true));
+		}
+		c.set(fx, UP_FLOOR + 1, 0, s(Blocks.CAMPFIRE).setValue(CampfireBlock.FACING, Direction.EAST));
+		c.set(fx + 1, UP_FLOOR + 1, -1, Kit.connected(Blocks.IRON_BARS, false));
+		c.set(fx + 1, UP_FLOOR + 1, 1, Kit.connected(Blocks.IRON_BARS, false));
+		c.fill(fx, UP_FLOOR + 5, 0, fx, ROOF + 4, 0, s(Blocks.STONE_BRICKS));
+		c.set(fx, ROOF + 5, 0, Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+		// Bookshelves on the east wall and a desk.
+		for (int z = -3; z <= 3; z++) {
+			int bx = (int) Math.floor(Math.sqrt(Math.max(0, 7.2 * 7.2 - z * z)));
+			c.set(bx, UP_FLOOR + 1, z, s(Blocks.BOOKSHELF));
+			c.set(bx, UP_FLOOR + 2, z, s(Blocks.BOOKSHELF));
+		}
+		for (int x = 2; x <= 4; x++) {
+			c.set(x, UP_FLOOR + 1, -5, s(Blocks.SPRUCE_TRAPDOOR).setValue(net.minecraft.world.level.block.TrapDoorBlock.OPEN, true)
+					.setValue(net.minecraft.world.level.block.TrapDoorBlock.FACING, Direction.SOUTH));
+			c.set(x, UP_FLOOR + 2, -5, Kit.slab(Blocks.SPRUCE_SLAB, false));
+		}
+		c.set(3, UP_FLOOR + 1, -4, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.NORTH, false));
+		c.set(2, UP_FLOOR + 2, -5, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		// White curtains beside the windows (banners on the wall, facing in).
+		for (int k = 0; k < 6; k++) {
+			for (int side : new int[]{-1, 1}) {
+				double a = 30 + k * 60 + side * 11;
+				double t = Math.toRadians(a);
+				int x = (int) Math.round(Math.cos(t) * 6.8), z = (int) Math.round(Math.sin(t) * 6.8);
+				Direction in = outward(-Math.cos(t), -Math.sin(t));
+				int wx = x - in.getStepX(), wz = z - in.getStepZ();
+				if (Math.hypot(wx, wz) > 7.3 && Math.hypot(x, z) <= 7.3 && Math.abs(x) < 6 && c.inChunk(x, z)) {
+					banner(c, x, UP_FLOOR + 4, z, in, Blocks.WHITE_WALL_BANNER);
+				}
+			}
+		}
+		// Ladder from the room to the roof.
+		for (int y = UP_FLOOR + 1; y <= ROOF; y++) {
+			c.set(-3, y, 6, Canvas.facing(s(Blocks.LADDER), Direction.NORTH)); // against the wall between two windows
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------- chamber
+
+	/**
+	 * The secondary chamber, underground below the central courtyard: a tall curved wall, five narrow towers round it
+	 * with steep blue pointed roofs, curved platforms on the walls (ladders up), chains between the towers, hollow iron
+	 * cages hanging from the ceiling, a broad dark floor with a dark railing round part of it, scattered fragments.
+	 */
+	private void chamber(Canvas c) {
+		if (!c.near(0, 0, 23)) {
+			return;
+		}
+		for (int x = -22; x <= 22; x++) {
+			for (int z = -22; z <= 22; z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				double d = Math.hypot(x, z);
+				if (d > CH_R + 1.5) {
+					continue;
+				}
+				if (d <= CH_R) {
+					c.set(x, CH_FLOOR, z, ((int) Math.round(d)) % 4 == 0 ? s(Blocks.POLISHED_ANDESITE) : s(Blocks.TUFF));
+					c.fill(x, CH_FLOOR + 1, z, x, CH_CEIL - 1, z, s(Blocks.AIR));
+					c.set(x, CH_CEIL, z, s(Blocks.STONE_BRICKS));
+				} else {
+					for (int y = CH_FLOOR; y <= CH_CEIL; y++) {
+						c.set(x, y, z, (y - CH_FLOOR) % 6 == 0 ? s(Blocks.POLISHED_ANDESITE) : masonry(x, y, z));
+					}
+				}
+			}
+		}
+		// The spiral staircase's column passes through the middle (built by the atrium); keep it.
+		spiral(c, G, CH_FLOOR, true);
+		int[] towers = {30, 102, 174, 246, 318};
+		int[][] tops = new int[towers.length][];
+		for (int i = 0; i < towers.length; i++) {
+			double t = Math.toRadians(towers[i]);
+			int cx = (int) Math.round(Math.cos(t) * 17.5), cz = (int) Math.round(Math.sin(t) * 17.5);
+			tops[i] = new int[]{cx, cz};
+			for (int dx = -2; dx <= 2; dx++) {
+				for (int dz = -2; dz <= 2; dz++) {
+					double d = Math.hypot(dx, dz);
+					if (d <= 1.6) {
+						c.fill(cx + dx, CH_FLOOR + 1, cz + dz, cx + dx, CH_FLOOR + 10, cz + dz, d > 0.6 ? s(Blocks.END_STONE_BRICKS) : s(Blocks.STONE_BRICKS));
+					}
+					// Steep pointed roof.
+					for (int k = 0; k <= 5; k++) {
+						double rk = 2.4 - k * 0.45;
+						if (d <= rk && d > rk - 1) {
+							c.set(cx + dx, CH_FLOOR + 11 + k, cz + dz, k == 0 ? Kit.stairs(Blocks.DARK_PRISMARINE_STAIRS, outward(-dx, -dz), false) : s(Blocks.BLUE_CONCRETE));
+						} else if (d <= rk - 1) {
+							c.set(cx + dx, CH_FLOOR + 11 + k, cz + dz, s(Blocks.BLUE_CONCRETE));
+						}
+					}
+				}
+			}
+			c.set(cx, CH_FLOOR + 17, cz, s(Blocks.LIGHTNING_ROD));
+			c.set(cx + outward(-cx, -cz).getStepX() * 2, CH_FLOOR + 1, cz + outward(-cx, -cz).getStepZ() * 2, lantern(false));
+		}
+		// Chains strung between neighbouring towers (stepped lines).
+		for (int i = 0; i < towers.length; i++) {
+			int[] a = tops[i], b = tops[(i + 1) % towers.length];
+			int n = Math.max(Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1]));
+			for (int k = 1; k < n; k++) {
+				int x = (int) Math.round(a[0] + (b[0] - a[0]) * (k / (double) n)), z = (int) Math.round(a[1] + (b[1] - a[1]) * (k / (double) n));
+				int sag = (int) Math.round(2 * Math.sin(Math.PI * k / n));
+				c.set(x, CH_FLOOR + 10 - sag, z, s(Blocks.CHAIN).setValue(ChainBlock.AXIS, Math.abs(b[0] - a[0]) >= Math.abs(b[1] - a[1]) ? Direction.Axis.X : Direction.Axis.Z));
+			}
+		}
+		// Curved platforms on the wall between the towers (r 17.5-20), stone wall rails, ladders up.
+		for (int i = 0; i < towers.length; i++) {
+			double from = towers[i] + 12, to = towers[i] + 60;
+			for (double a = from; a <= to; a += 1.5) {
+				for (double r = 18.2; r <= CH_R + 0.4; r += 0.5) {
+					double t = Math.toRadians(a);
+					int x = (int) Math.round(Math.cos(t) * r), z = (int) Math.round(Math.sin(t) * r);
+					if (!c.inChunk(x, z)) {
+						continue;
+					}
+					c.set(x, CH_FLOOR + 8, z, s(Blocks.SMOOTH_STONE));
+					if (r < 18.7) {
+						c.set(x, CH_FLOOR + 9, z, s(Blocks.STONE_BRICK_WALL));
+					}
+				}
+			}
+			int[] spot = wallSpot(from + 6, CH_R);
+			if (spot != null) {
+				Direction in = Direction.values()[spot[2]];
+				for (int y = CH_FLOOR + 1; y <= CH_FLOOR + 9; y++) {
+					c.set(spot[0], y, spot[1], Canvas.facing(s(Blocks.LADDER), in));
+				}
+			}
+		}
+		// Hanging cages.
+		for (int deg : new int[]{66, 138, 210, 282}) {
+			double t = Math.toRadians(deg);
+			int x = (int) Math.round(Math.cos(t) * 10), z = (int) Math.round(Math.sin(t) * 10);
+			c.fill(x, CH_FLOOR + 11, z, x, CH_CEIL - 1, z, s(Blocks.CHAIN));
+			cage(c, x, CH_FLOOR + 8, z, true);
+		}
+		// The dark railing round the south half of the floor, fragments, lanterns.
+		for (double a = 200; a <= 340; a += 1.5) {
+			double t = Math.toRadians(a);
+			int x = (int) Math.round(Math.cos(t) * 13), z = (int) Math.round(Math.sin(t) * 13);
+			if (c.inChunk(x, z)) {
+				c.set(x, CH_FLOOR + 1, z, s(Blocks.POLISHED_BLACKSTONE_WALL));
+			}
+		}
+		for (int[] p : new int[][]{{8, 9}, {-11, 4}, {5, -14}, {-6, 12}}) {
+			if (c.inChunk(p[0], p[1])) {
+				c.set(p[0], CH_FLOOR + 1, p[1], p[0] % 2 == 0 ? s(Blocks.COBBLESTONE) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+			}
+		}
+		for (int deg = 0; deg < 360; deg += 60) {
+			double t = Math.toRadians(deg + 30);
+			int x = (int) Math.round(Math.cos(t) * 6), z = (int) Math.round(Math.sin(t) * 6);
+			c.fill(x, CH_FLOOR + 14, z, x, CH_CEIL - 1, z, s(Blocks.CHAIN));
+			c.set(x, CH_FLOOR + 13, z, lantern(true));
+		}
+		c.set(0, CH_FLOOR + 1, -16, s(Blocks.ANVIL));
+	}
+
+	/**
+	 * A ladder spot against a round wall of radius {@code wallR} near a bearing: an open block inside the wall whose
+	 * neighbour outward (along an axis) is in the wall. Returns {x, z, facing ordinal} or null.
+	 */
+	static int[] wallSpot(double deg, double wallR) {
+		for (double da = 0; da <= 12; da += 1) {
+			for (double sgn : new double[]{1, -1}) {
+				double t = Math.toRadians(deg + da * sgn);
+				int x = (int) Math.round(Math.cos(t) * (wallR - 0.6)), z = (int) Math.round(Math.sin(t) * (wallR - 0.6));
+				if (Math.hypot(x, z) > wallR) {
+					continue;
+				}
+				for (Direction out : Direction.Plane.HORIZONTAL) {
+					if (out.getStepX() * Math.cos(t) + out.getStepZ() * Math.sin(t) < 0.5) {
+						continue;
+					}
+					if (Math.hypot(x + out.getStepX(), z + out.getStepZ()) > wallR) {
+						return new int[]{x, z, out.getOpposite().ordinal()};
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	// ---------------------------------------------------------------------------------------------------- landing
+
+	/**
+	 * The waterfront landing on the west: a small stepped stone landing at sea level, a pale-stone doorway through the
+	 * wall with steps up, a black flag, planks, barrels, debris and a short wooden ramp into the water.
+	 */
+	private void landing(Canvas c) {
+		if (!c.near(-48, 0, 10)) {
+			return;
+		}
+		for (int x = -52; x <= -44; x++) {
+			for (int z = -5; z <= 5; z++) {
+				double edge = Math.abs(z) + (x + 52) * 0.4 + unit(x, z, 21) * 1.5;
+				if (edge > 7 || !c.inChunk(x, z)) {
+					continue;
+				}
+				int bed = Math.min(c.ground(x, z), SEA - 4);
+				int top = x >= -45 ? 64 : 63;
+				c.fill(x, bed, z, x, top - 1, z, s(Blocks.STONE_BRICKS));
+				c.set(x, top, z, Math.abs(z) == 0 && x >= -46 ? s(Blocks.POLISHED_ANDESITE) : Kit.slab(Blocks.SMOOTH_STONE_SLAB, true));
+				c.fill(x, top + 1, z, x, top + 4, z, s(Blocks.AIR));
+			}
+		}
+		// The doorway through the wall: steps up from the landing to the courtyard, a pale frame.
+		double ri = rIn(180);
+		int wallOut = (int) -Math.ceil(ri + 2.2), wallIn = (int) -Math.floor(ri);
+		for (int x = wallOut - 1; x <= wallIn + 1; x++) {
+			for (int z = -1; z <= 1; z++) {
+				int floor = x <= wallOut - 1 ? 64 : x == wallOut ? 65 : G;
+				c.set(x, floor, z, x <= wallOut ? Kit.stairs(Blocks.STONE_BRICK_STAIRS, Direction.EAST, false) : s(Blocks.SMOOTH_STONE));
+				if (x <= wallOut - 1) {
+					c.set(x, floor, z, s(Blocks.POLISHED_ANDESITE));
+				}
+				c.fill(x, floor + 1, z, x, G + 3, z, s(Blocks.AIR));
+			}
+			c.set(x, G + 4, -2, s(Blocks.CALCITE));
+			c.set(x, G + 4, 2, s(Blocks.CALCITE));
+			c.fill(x, G + 4, -1, x, G + 4, 1, s(Blocks.CALCITE));
+		}
+		for (int z : new int[]{-2, 2}) {
+			c.fill(wallOut, 65, z, wallOut, G + 3, z, s(Blocks.CALCITE));
+		}
+		// The flag, planks, barrels, debris, a ramp into the water.
+		c.fill(-50, 64, 3, -50, 67, 3, s(Blocks.POLISHED_BLACKSTONE_WALL));
+		c.set(-50, 68, 3, s(Blocks.POLISHED_BLACKSTONE));
+		banner(c, -51, 68, 3, Direction.WEST, Blocks.BLACK_WALL_BANNER);
+		c.set(-47, 65, -3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(-48, 65, -3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(-47, 66, -3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		c.set(-49, 64, 1, Kit.slab(Blocks.SPRUCE_SLAB, false));
+		c.set(-48, 64, 2, s(Blocks.SPRUCE_PLANKS));
+		c.set(-50, 64, -2, s(Blocks.COBBLESTONE));
+		for (int z = -1; z <= 1; z++) {
+			c.set(-53, 63, z, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
+			c.set(-54, 62, z, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
+		}
 	}
 }

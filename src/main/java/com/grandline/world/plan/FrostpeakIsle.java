@@ -547,7 +547,7 @@ public final class FrostpeakIsle extends BasePlan {
 			dz++;
 		}
 		c.fill(dx, y + 1, dz, dx, y + 3, dz, s(Blocks.AIR));
-		StonewallPrison.door(c, dx, y + 1, dz, Blocks.DARK_OAK_DOOR, d);
+		StonewallPrisonV9.door(c, dx, y + 1, dz, Blocks.DARK_OAK_DOOR, d);
 		c.set(dx, y + 3, dz, log(Blocks.STRIPPED_DARK_OAK_LOG, d.getAxis() == Direction.Axis.Z ? Direction.Axis.X : Direction.Axis.Z));
 		// interior
 		Kit.furnish(c, x1 + 2, z1 + 2, x2 - 2, z2 - 2, y, Kit.Interior.HOME, d);

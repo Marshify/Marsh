@@ -40,6 +40,9 @@ public final class GrandLineCrystalFountainGameTests implements FabricGameTest {
 		helper.assertTrue(quest.z() > 130 && quest.y() == 73, "the quest giver waits inside the gate");
 		helper.assertTrue(boss.x() > 160, "the boss fights in the scrapyard");
 		helper.assertTrue(plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).count() == 2, "two camps");
+		var t = plan.terrain();
+		helper.assertTrue(t.ground(0, 0) == 76 && t.ground(50, 0) == 74 && t.ground(0, -110) == 72 && t.ground(0, 177) == 65 && t.ground(215, -8) == 66,
+				"the city, harbour plaza and scrapyard are land in the terrain (keepers and spawns find them)");
 		var spots = TreasureSpots.forIsland("Crystal Fountain");
 		helper.assertTrue(spots.size() == 4 && !TreasureSpots.NONE_BY_DESIGN.contains("Crystal Fountain"), "four chests");
 		setLayout(registry, before);

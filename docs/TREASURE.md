@@ -100,10 +100,10 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Saltmarket Docks | Common | -33, 65, 57 | north | by cargo on the harbour promenade |
 | Saltmarket Docks | Common | -45, 68, -29 | north | back alley against the landward wall, by crates |
 | Saltmarket Docks | Common | 59, 66, -137 | west | among the rocks on the east headland |
-| Stonewall Prison | Legendary | -35, 91, -51 | east | raised 23, walls w |
-| Stonewall Prison | Rare | -44, 69, -9 | east | dark, covered, walls sw |
-| Stonewall Prison | Common | 15, 67, 39 | east | by crates, walls w |
-| Stonewall Prison | Common | 36, 68, 41 | north | walls s |
+| Stonewall Prison | Legendary | 4, 102, 0 | west | the central tower roof (0.48.0; older worlds keep their spots) |
+| Stonewall Prison | Rare | 0, 76, -23 | south | the inner enclosure ledge |
+| Stonewall Prison | Common | 30, 67, -8 | west | east grass courtyard |
+| Stonewall Prison | Common | -49, 64, -2 | east | the waterfront landing |
 | Sunscorch Dunes | Legendary | -23, 71, -51 | east | dark, covered, raised 5, walls w |
 | Sunscorch Dunes | Rare | -20, 71, -30 | east | indoors, raised 5, walls w |
 | Sunscorch Dunes | Common | -24, 67, 17 | south | by crates, walls n |

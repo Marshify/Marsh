@@ -63,10 +63,10 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, -45, 68, -29, Direction.NORTH, "back alley against the landward wall, by crates"),
 				new TreasureSpot(TreasureTier.COMMON, 59, 66, -137, Direction.WEST, "among the rocks on the east headland"))),
 			Map.entry("Stonewall Prison", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -35, 91, -51, Direction.EAST, "raised 23, walls w"),
-				new TreasureSpot(TreasureTier.RARE, -44, 69, -9, Direction.EAST, "dark, covered, walls sw"),
-				new TreasureSpot(TreasureTier.COMMON, 15, 67, 39, Direction.EAST, "by crates, walls w"),
-				new TreasureSpot(TreasureTier.COMMON, 36, 68, 41, Direction.NORTH, "walls s"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, 4, 102, 0, Direction.WEST, "on the central tower's roof (ladder up from the furnished room)"),
+				new TreasureSpot(TreasureTier.RARE, 0, 76, -23, Direction.SOUTH, "on the inner enclosure's ledge, north"),
+				new TreasureSpot(TreasureTier.COMMON, 30, 67, -8, Direction.WEST, "east grass courtyard"),
+				new TreasureSpot(TreasureTier.COMMON, -49, 64, -2, Direction.EAST, "the waterfront landing"))),
 			Map.entry("Sunscorch Dunes", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -23, 71, -51, Direction.EAST, "dark, covered, raised 5, walls w"),
 				new TreasureSpot(TreasureTier.RARE, -20, 71, -30, Direction.EAST, "indoors, raised 5, walls w"),
@@ -103,6 +103,11 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.RARE, 50, 115, -71, Direction.WEST, "Azure Rise, between the temple and the colonnade"),
 				new TreasureSpot(TreasureTier.COMMON, 24, 99, 2, Direction.SOUTH, "Mistfall, on the grass by the trees"),
 				new TreasureSpot(TreasureTier.COMMON, -30, 101, -36, Direction.NORTH, "Bloomhold, between the towers off the east path")),
+			"StonewallPrisonV9", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -35, 91, -51, Direction.EAST, "raised 23, walls w"),
+				new TreasureSpot(TreasureTier.RARE, -44, 69, -9, Direction.EAST, "dark, covered, walls sw"),
+				new TreasureSpot(TreasureTier.COMMON, 15, 67, 39, Direction.EAST, "by crates, walls w"),
+				new TreasureSpot(TreasureTier.COMMON, 36, 68, 41, Direction.NORTH, "walls s")),
 			"CloudtopIslesV7", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -69, 96, -35, Direction.WEST, "dark, covered, walls e"),
 				new TreasureSpot(TreasureTier.RARE, 55, 144, -104, Direction.EAST, "indoors, walls w"),

@@ -285,44 +285,6 @@
    "why": "among the rocks on the east headland"
   }
  ],
- "Stonewall Prison": [
-  {
-   "tier": "LEGENDARY",
-   "x": -35,
-   "y": 91,
-   "z": -51,
-   "facing": "EAST",
-   "floor": "polished_andesite",
-   "why": "raised 23, walls w"
-  },
-  {
-   "tier": "RARE",
-   "x": -44,
-   "y": 69,
-   "z": -9,
-   "facing": "EAST",
-   "floor": "smooth_stone",
-   "why": "dark, covered, walls sw"
-  },
-  {
-   "tier": "COMMON",
-   "x": 15,
-   "y": 67,
-   "z": 39,
-   "facing": "EAST",
-   "floor": "stone",
-   "why": "by crates, walls w"
-  },
-  {
-   "tier": "COMMON",
-   "x": 36,
-   "y": 68,
-   "z": 41,
-   "facing": "NORTH",
-   "floor": "stone",
-   "why": "walls s"
-  }
- ],
  "Sunscorch Dunes": [
   {
    "tier": "LEGENDARY",
@@ -473,6 +435,40 @@
    "z": 190,
    "facing": "SOUTH",
    "why": "harbour plaza, by the east pier"
+  }
+ ],
+ "Stonewall Prison": [
+  {
+   "tier": "LEGENDARY",
+   "x": 4,
+   "y": 102,
+   "z": 0,
+   "facing": "WEST",
+   "why": "on the central tower's roof (ladder up from the furnished room)"
+  },
+  {
+   "tier": "RARE",
+   "x": 0,
+   "y": 76,
+   "z": -23,
+   "facing": "SOUTH",
+   "why": "on the inner enclosure's ledge, north"
+  },
+  {
+   "tier": "COMMON",
+   "x": 30,
+   "y": 67,
+   "z": -8,
+   "facing": "WEST",
+   "why": "east grass courtyard"
+  },
+  {
+   "tier": "COMMON",
+   "x": -49,
+   "y": 64,
+   "z": -2,
+   "facing": "EAST",
+   "why": "the waterfront landing"
   }
  ]
 }

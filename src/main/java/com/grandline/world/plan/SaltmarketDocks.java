@@ -968,7 +968,7 @@ public final class SaltmarketDocks extends BasePlan {
 		doorway(c, -1, TOWN, z2, Direction.SOUTH, 3);
 		// side door east: an open door in a timber frame, a step and a torch
 		c.fill(x2, TOWN + 1, -12, x2, TOWN + 2, -12, s(Blocks.AIR));
-		StonewallPrison.door(c, x2, TOWN + 1, -12, Blocks.DARK_OAK_DOOR, Direction.EAST);
+		StonewallPrisonV9.door(c, x2, TOWN + 1, -12, Blocks.DARK_OAK_DOOR, Direction.EAST);
 		c.set(x2, TOWN + 3, -12, log(Blocks.STRIPPED_DARK_OAK_LOG, Direction.Axis.Z));
 		c.set(x2 + 1, TOWN, -12, stair(Blocks.STONE_BRICK_STAIRS, Direction.WEST, false));
 		c.set(x2 + 1, TOWN + 3, -12, s(Blocks.WALL_TORCH).setValue(net.minecraft.world.level.block.WallTorchBlock.FACING, Direction.EAST));
@@ -1052,7 +1052,7 @@ public final class SaltmarketDocks extends BasePlan {
 		if (Math.floorMod(dz - h.z1(), 4) == 0 && h.door().getAxis() == Direction.Axis.X) {
 			dz++;
 		}
-		StonewallPrison.door(c, dx, TOWN + 1, dz, Blocks.DARK_OAK_DOOR, h.door());
+		StonewallPrisonV9.door(c, dx, TOWN + 1, dz, Blocks.DARK_OAK_DOOR, h.door());
 		c.set(dx, TOWN + 3, dz, log(Blocks.STRIPPED_DARK_OAK_LOG, h.door().getAxis() == Direction.Axis.Z ? Direction.Axis.X : Direction.Axis.Z));
 		c.set(dx + h.door().getStepX(), TOWN + 3, dz + h.door().getStepZ(), s(Blocks.LANTERN).setValue(LanternBlock.HANGING, false));
 		c.set(dx + h.door().getStepX(), TOWN + 2, dz + h.door().getStepZ(), s(Blocks.AIR));
