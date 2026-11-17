@@ -41,7 +41,7 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy());
 	}
 
 	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
@@ -52,7 +52,7 @@ public final class FirstSeaPlans {
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
 				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
-				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new CrystalFountain());
+				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new LotusPalace(), new com.grandline.world.plan.CrystalFountain());
 	}
 
 	// ==================================================================================================== Lv 1
@@ -805,9 +805,12 @@ public final class FirstSeaPlans {
 
 	// ==================================================================================================== Lv 625
 
-	/** Crystal temple: three tiers of quartz basins around a crystal spire, ringed by six glowing crystal spikes. */
-	static final class CrystalFountain extends BasePlan {
-		CrystalFountain() {
+	/**
+	 * The original Crystal Fountain (a crystal temple: three tiers of quartz basins round a crystal spire, six glowing
+	 * crystal spikes). Kept for worlds made before layout 14; newer worlds use {@link com.grandline.world.plan.CrystalFountain}.
+	 */
+	static final class CrystalFountainLegacy extends BasePlan {
+		CrystalFountainLegacy() {
 			super("Crystal Fountain", 0.06);
 			terrain.mass(0, 0, 42, 40, 4, 2.6, Ground.CALCITE)
 					.flat(0, 0, 22, 22, 66, 4, s(Blocks.QUARTZ_BRICKS))

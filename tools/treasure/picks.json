@@ -1,38 +1,4 @@
 {
- "Crystal Fountain": [
-  {
-   "tier": "LEGENDARY",
-   "x": -28,
-   "y": 64,
-   "z": 28,
-   "facing": "SOUTH",
-   "why": "beach camp shelter, guarded by the west camp"
-  },
-  {
-   "tier": "RARE",
-   "x": 26,
-   "y": 64,
-   "z": 31,
-   "facing": "SOUTH",
-   "why": "beside the east camp on the beach"
-  },
-  {
-   "tier": "COMMON",
-   "x": -25,
-   "y": 67,
-   "z": -7,
-   "facing": "SOUTH",
-   "why": "at the foot of a crystal pillar"
-  },
-  {
-   "tier": "COMMON",
-   "x": 19,
-   "y": 67,
-   "z": -17,
-   "facing": "SOUTH",
-   "why": "at the foot of a crystal pillar"
-  }
- ],
  "Dawnreach Harbor": [
   {
    "tier": "RARE",
@@ -473,6 +439,40 @@
    "z": -36,
    "facing": "NORTH",
    "why": "Bloomhold, between the towers off the east path"
+  }
+ ],
+ "Crystal Fountain": [
+  {
+   "tier": "LEGENDARY",
+   "x": 206,
+   "y": 67,
+   "z": -28,
+   "facing": "WEST",
+   "why": "scrapyard, by the foundry engine and the boss yard"
+  },
+  {
+   "tier": "RARE",
+   "x": 22,
+   "y": 77,
+   "z": 22,
+   "facing": "NORTH",
+   "why": "the landmark's courtyard, inside the enclosure"
+  },
+  {
+   "tier": "COMMON",
+   "x": -67,
+   "y": 73,
+   "z": -58,
+   "facing": "NORTH",
+   "why": "north-west fountain plaza"
+  },
+  {
+   "tier": "COMMON",
+   "x": 30,
+   "y": 66,
+   "z": 190,
+   "facing": "SOUTH",
+   "why": "harbour plaza, by the east pier"
   }
  ]
 }

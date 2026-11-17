@@ -60,10 +60,10 @@ island has well-spread chests (at most one legendary, 12+ blocks apart, on the i
 | Cloudtop Isles | Common | -52, 201, -134 | west | edge of the Ancient Tree combat field |
 | Cloudtop Isles | Common | 24, 99, 2 | south | Mistfall, on the grass |
 | Cloudtop Isles | Common | -30, 101, -36 | north | Bloomhold, between the towers |
-| Crystal Fountain | Legendary | -28, 64, 28 | south | beach camp shelter, guarded by the west camp |
-| Crystal Fountain | Rare | 26, 64, 31 | south | beside the east camp on the beach |
-| Crystal Fountain | Common | -25, 67, -7 | south | at the foot of a crystal pillar |
-| Crystal Fountain | Common | 19, 67, -17 | south | at the foot of a crystal pillar |
+| Crystal Fountain | Legendary | 206, 67, -28 | west | scrapyard, by the foundry engine (0.47.0; older worlds keep the old spots) |
+| Crystal Fountain | Rare | 22, 77, 22 | north | the landmark courtyard |
+| Crystal Fountain | Common | -67, 73, -58 | north | north-west fountain plaza |
+| Crystal Fountain | Common | 30, 66, 190 | south | harbour plaza |
 | Dawnreach Harbor | Rare | 24, 68, -12 | south | inside a market hall, by crates |
 | Dawnreach Harbor | Common | 22, 68, 10 | north | by crates in a market hall |
 | Dawnreach Harbor | Common | -62, 68, 32 | west | by crates near the west harbour |

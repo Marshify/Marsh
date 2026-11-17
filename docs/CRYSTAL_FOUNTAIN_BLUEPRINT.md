@@ -1,6 +1,6 @@
 # Crystal Fountain: Phase 1 plan and blueprint (for approval)
 
-Status: **proposed, waiting for the owner's approval.** Nothing is built yet.
+Status: **approved and built in 0.47.0** (see CRYSTAL_FOUNTAIN.md). Changes during the build: 132 townhouses (not ~110), treasure chests added at the owner's request, finials in diorite wall (quartz_wall is not a 1.20.1 block).
 
 ![top-down](images/crystal_fountain_topdown.png)
 ![elevation](images/crystal_fountain_elevation.png)

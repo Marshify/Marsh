@@ -18,10 +18,10 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 24, 99, 2, Direction.SOUTH, "Mistfall, on the grass by the trees"),
 				new TreasureSpot(TreasureTier.COMMON, -30, 101, -36, Direction.NORTH, "Bloomhold, between the towers off the east path"))),
 			Map.entry("Crystal Fountain", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, -28, 64, 28, Direction.SOUTH, "beach camp shelter, guarded by the west camp"),
-				new TreasureSpot(TreasureTier.RARE, 26, 64, 31, Direction.SOUTH, "beside the east camp on the beach"),
-				new TreasureSpot(TreasureTier.COMMON, -25, 67, -7, Direction.SOUTH, "at the foot of a crystal pillar"),
-				new TreasureSpot(TreasureTier.COMMON, 19, 67, -17, Direction.SOUTH, "at the foot of a crystal pillar"))),
+				new TreasureSpot(TreasureTier.LEGENDARY, 206, 67, -28, Direction.WEST, "scrapyard, by the foundry engine and the boss yard"),
+				new TreasureSpot(TreasureTier.RARE, 22, 77, 22, Direction.NORTH, "the landmark's courtyard, inside the enclosure"),
+				new TreasureSpot(TreasureTier.COMMON, -67, 73, -58, Direction.NORTH, "north-west fountain plaza"),
+				new TreasureSpot(TreasureTier.COMMON, 30, 66, 190, Direction.SOUTH, "harbour plaza, by the east pier"))),
 			Map.entry("Dawnreach Harbor", List.of(
 				new TreasureSpot(TreasureTier.RARE, 24, 68, -12, Direction.SOUTH, "inside a market hall, by crates"),
 				new TreasureSpot(TreasureTier.COMMON, 22, 68, 10, Direction.NORTH, "by crates in a market hall"),
@@ -80,6 +80,11 @@ public final class TreasureSpots {
 
 	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
 	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Crystal Fountain", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, -28, 64, 28, Direction.SOUTH, "beach camp shelter, guarded by the west camp"),
+				new TreasureSpot(TreasureTier.RARE, 26, 64, 31, Direction.SOUTH, "beside the east camp on the beach"),
+				new TreasureSpot(TreasureTier.COMMON, -25, 67, -7, Direction.SOUTH, "at the foot of a crystal pillar"),
+				new TreasureSpot(TreasureTier.COMMON, 19, 67, -17, Direction.SOUTH, "at the foot of a crystal pillar")),
 			"Frostpeak Isle", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, 32, 67, 4, Direction.SOUTH, "dark, covered, walls ne"),
 				new TreasureSpot(TreasureTier.RARE, -17, 66, 7, Direction.NORTH, "by crates, indoors, walls s"),
