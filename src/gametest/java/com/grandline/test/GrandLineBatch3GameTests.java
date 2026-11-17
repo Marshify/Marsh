@@ -216,8 +216,8 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 			}
 		});
 		helper.runAfterDelay(600, () -> {
-			helper.assertTrue(goodDone[0] && good.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 1,
-					"keeping the fish in the net lands exactly one fish: done=" + goodDone[0] + " fish=" + good.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) + " mastery=" + good.getAttached(ModAttachments.FISHING_MASTERY));
+			helper.assertTrue(goodDone[0] && com.grandline.fishing.FishBag.contents(good).getOrDefault("grandline:silverfin", 0) == 1,
+					"keeping the fish in the net lands exactly one fish in the fish bag: done=" + goodDone[0] + " fish=" + com.grandline.fishing.FishBag.contents(good).getOrDefault("grandline:silverfin", 0) + " mastery=" + good.getAttached(ModAttachments.FISHING_MASTERY));
 			var m = good.getAttached(ModAttachments.FISHING_MASTERY);
 			helper.assertTrue(m.catches() == 1 && (m.xp() > 0 || m.level() > 1), "and earns Fishing Mastery: " + m);
 			helper.assertTrue(idleDone[0] && idle.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 0, "doing nothing loses it");

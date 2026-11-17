@@ -80,7 +80,7 @@ public final class FishingService {
 
 	/** Total currency the player's carried catch is worth. */
 	public static long inventoryValue(ServerPlayer player) {
-		long total = 0;
+		long total = com.grandline.fishing.FishBag.value(player);
 		for (ItemStack stack : player.getInventory().items) {
 			total += value(stack.getItem()) * stack.getCount();
 		}
@@ -89,7 +89,7 @@ public final class FishingService {
 
 	/** Sells every Grand Line catch in the inventory. Returns the currency earned. */
 	public static long sellAll(ServerPlayer player) {
-		long total = 0;
+		long total = com.grandline.fishing.FishBag.sellAll(player);
 		for (ItemStack stack : player.getInventory().items) {
 			long each = value(stack.getItem());
 			if (each > 0) {

@@ -42,6 +42,14 @@ public final class ModAttachments {
 					.initializer(java.util.Map::of)
 					.buildAndRegister(GrandLineMod.id("treasure_refills"));
 
+	/** The fish bag: fish item id to count (persistent, survives death). See FishBag. */
+	public static final AttachmentType<java.util.Map<String, Integer>> FISH_BAG =
+			AttachmentRegistry.<java.util.Map<String, Integer>>builder()
+					.persistent(com.mojang.serialization.Codec.unboundedMap(com.mojang.serialization.Codec.STRING, com.mojang.serialization.Codec.INT))
+					.copyOnDeath()
+					.initializer(java.util.Map::of)
+					.buildAndRegister(GrandLineMod.id("fish_bag"));
+
 	/** Ids of islands this player has discovered (persistent). */
 	public static final AttachmentType<java.util.List<Long>> DISCOVERED_ISLANDS =
 			AttachmentRegistry.<java.util.List<Long>>builder()

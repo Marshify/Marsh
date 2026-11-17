@@ -67,6 +67,20 @@ public final class ItemsScreen extends Screen {
 	}
 
 	/** Inventory indices of Grand Line items (fruits, swords, guns, accessories). */
+	/** The fish bag as stacks (count = how many of that fish). */
+	private List<ItemStack> fish() {
+		List<ItemStack> out = new ArrayList<>();
+		com.grandline.client.ClientFishBag.fish().forEach((id, n) -> {
+			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.tryParse(id));
+			if (item != Items.AIR && n > 0) {
+				ItemStack st = new ItemStack(item);
+				st.getOrCreateTag().putInt("grandline_bag_count", n); // the real count (can exceed a stack)
+				out.add(st);
+			}
+		});
+		return out;
+	}
+
 	private List<Integer> backpack() {
 		List<Integer> list = new ArrayList<>();
 		var items = minecraft.player.getInventory().items;
@@ -112,7 +126,8 @@ public final class ItemsScreen extends Screen {
 
 	private void renderBackpack(GuiGraphics g, int mouseX, int mouseY) {
 		List<Integer> slots = backpack();
-		if (slots.isEmpty()) {
+		List<ItemStack> fish = fish();
+		if (slots.isEmpty() && fish.isEmpty()) {
 			g.drawCenteredString(font, Component.translatable("screen.grandline.items.empty"), left + WIDTH / 2, top + 90, 0xA9B2C0);
 			return;
 		}
@@ -120,6 +135,17 @@ public final class ItemsScreen extends Screen {
 			int[] b = backpackSlot(i);
 			ItemStack stack = minecraft.player.getInventory().items.get(slots.get(i));
 			drawSlot(g, b, stack, mouseX, mouseY);
+		}
+		// The fish bag, after the gear: one tile per kind of fish, with the count.
+		for (int k = 0; k < fish.size() && slots.size() + k < 28; k++) {
+			int[] b = backpackSlot(slots.size() + k);
+			ItemStack stack = fish.get(k);
+			drawSlot(g, b, stack, mouseX, mouseY);
+			String n = String.valueOf(stack.getTag() == null ? 1 : stack.getTag().getInt("grandline_bag_count"));
+			g.pose().pushPose();
+			g.pose().translate(0, 0, 300);
+			g.drawString(font, n, b[0] + b[2] - 3 - font.width(n), b[1] + b[3] - 10, 0xFFFFFF, true);
+			g.pose().popPose();
 		}
 		g.drawString(font, Component.translatable("screen.grandline.items.backpack_hint"), left + 10, top + HEIGHT - 14, 0xA9B2C0, false);
 	}

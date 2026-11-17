@@ -59,4 +59,23 @@ public final class GrandLineLoadoutGameTests implements FabricGameTest {
 				.equals(java.util.List.of(1, 2)), "a custom order is kept: style (key 2) then sword (key 3)");
 		helper.succeed();
 	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "loadout")
+	public void pickupsLandInSlotsFiveToNineAndFishGoToTheBag(GameTestHelper helper) {
+		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		p.getInventory().clearContent();
+		p.getInventory().add(new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.GRAND_LINE_CRYSTAL, 3));
+		helper.assertTrue(p.getInventory().getItem(4).is(com.grandline.registry.ModItems.GRAND_LINE_CRYSTAL), "an item goes to slot 5 even with 1-4 empty");
+		p.getInventory().add(new net.minecraft.world.item.ItemStack(com.grandline.gear.Gear.KATANA));
+		helper.assertTrue(p.getInventory().getItem(0).is(com.grandline.gear.Gear.KATANA), "a sword goes to slot 1");
+		p.getInventory().add(new net.minecraft.world.item.ItemStack(com.grandline.npc.FishingService.SILVERFIN, 4));
+		com.grandline.fishing.FishBag.absorb(p);
+		helper.assertTrue(p.getInventory().countItem(com.grandline.npc.FishingService.SILVERFIN) == 0
+				&& com.grandline.fishing.FishBag.contents(p).getOrDefault("grandline:silverfin", 0) == 4, "fish move into the bag");
+		long value = com.grandline.npc.FishingService.inventoryValue(p);
+		long paid = com.grandline.npc.FishingService.sellAll(p);
+		helper.assertTrue(value > 0 && paid == value && com.grandline.fishing.FishBag.contents(p).isEmpty(), "the fisherman buys the bag");
+		helper.getLevel().removePlayerImmediately(p, net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
+		helper.succeed();
+	}
 }

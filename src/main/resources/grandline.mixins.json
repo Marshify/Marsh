@@ -1,13 +1,13 @@
 {
-	"required": true,
-	"package": "com.grandline.mixin",
-	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-		"LivingEntityPvpBonusMixin",
-		"NaturalSpawnerMixin",
-		"FoodDataMixin",
-		"ExperienceOrbMixin",
-		"PlayerExperienceMixin",
+  "required": true,
+  "package": "com.grandline.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "LivingEntityPvpBonusMixin",
+    "NaturalSpawnerMixin",
+    "FoodDataMixin",
+    "ExperienceOrbMixin",
+    "PlayerExperienceMixin",
     "PlayerKeepInventoryMixin",
     "ExplosionNoBlockDamageMixin",
     "CraftingDisabledMixin",
@@ -15,9 +15,10 @@
     "VanillaLootMixin",
     "RaceDamageMixin",
     "ItemStackNoDurabilityMixin",
-    "EquipmentNoDropMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+    "EquipmentNoDropMixin",
+    "InventoryPickupSlotMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

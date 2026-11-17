@@ -62,6 +62,9 @@ public final class ClientNetworking {
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.LoadoutOrderPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.client.hud.LoadoutHotbar.setOrder(packet.order()));
 
+		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.FishBagPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.client.ClientFishBag.accept(packet.fish()));
+
 		ClientPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.ShipSyncPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.client.ClientShips.accept(packet));
 
@@ -71,6 +74,7 @@ public final class ClientNetworking {
 			com.grandline.client.ClientReputation.clear();
 			ClientProfileCache.clear();
 			com.grandline.client.ClientGear.clear();
+			com.grandline.client.ClientFishBag.clear();
 		});
 	}
 

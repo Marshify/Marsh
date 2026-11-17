@@ -299,10 +299,7 @@ public final class FishingSessions {
 		boolean levelUp = false;
 		long xp = 0;
 		if (caught && s.fish != null) {
-			ItemStack stack = new ItemStack(s.fish.item());
-			if (!player.getInventory().add(stack)) {
-				player.serverLevel().addFreshEntity(new ItemEntity(player.serverLevel(), player.getX(), player.getY() + 0.5, player.getZ(), stack));
-			}
+			FishBag.add(player, s.fish.item(), 1); // into the fish bag, never the inventory
 			FishingMastery before = mastery(player);
 			xp = FishingRules.catchXp(s.fish);
 			FishingMastery after = before.withCatch(xp);
