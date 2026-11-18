@@ -75,7 +75,11 @@ public final class GrandLineFlameGameTests implements FabricGameTest {
 				java.util.Map.of("grandline:ember", 2), 0L);
 		eq(helper, old.fruit(), "grandline:flame", "equipped ember fruit migrates");
 		helper.assertTrue(old.mastery().get("grandline:flame") == 40L && old.stash().get("grandline:flame") == 2, "mastery and stash migrate");
-		eq(helper, ((com.grandline.fruit.RenamedItem) Fruits.EMBER_FRUIT_LEGACY).replacement(), Fruits.FLAME.item(), "old item turns into the flame fruit");
+		var oldStack = new net.minecraft.nbt.CompoundTag();
+		oldStack.putString("id", "grandline:ember_fruit");
+		oldStack.putByte("Count", (byte) 1);
+		eq(helper, net.minecraft.world.item.ItemStack.of(oldStack).getItem(), Fruits.FLAME.item(), "stored ember_fruit loads as the flame fruit");
+		helper.assertFalse(net.minecraft.core.registries.BuiltInRegistries.ITEM.containsKey(com.grandline.GrandLineMod.id("ember_fruit")), "old item id is gone");
 		List<AbilityDef> moves = Fruits.FLAME.power().abilities();
 		eq(helper, moves.stream().map(AbilityDef::requiredMastery).toList(), List.of(1, 25, 50, 100, 10), "mastery Z X C V R");
 		eq(helper, moves.get(3).activation(), AbilityDef.Activation.CHARGED, "Flame Destroyer charges");

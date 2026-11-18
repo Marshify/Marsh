@@ -29,6 +29,32 @@ import java.util.Set;
  */
 public final class GrandLineRosterGameTests implements FabricGameTest {
 	@GameTest(template = EMPTY_STRUCTURE, batch = "roster")
+	public void fruitIdsMatchNamesAndOldIdsMigrate(GameTestHelper helper) {
+		JsonObject lang = json("/assets/grandline/lang/en_us.json").getAsJsonObject();
+		for (Fruits.FruitDef fruit : Fruits.all()) {
+			String path = new ResourceLocation(fruit.id()).getPath();
+			String name = lang.get("power.grandline." + path).getAsString();
+			String expected = name.toLowerCase(java.util.Locale.ROOT).replace('-', '_').replace(' ', '_');
+			helper.assertTrue(path.equals(expected), fruit.id() + " should be named after " + name);
+		}
+		com.grandline.fruit.FruitRenames.ITEMS.forEach((from, to) -> {
+			helper.assertFalse(BuiltInRegistries.ITEM.containsKey(new ResourceLocation(from)), from + " is still registered");
+			var tag = new net.minecraft.nbt.CompoundTag();
+			tag.putString("id", from);
+			tag.putByte("Count", (byte) 3);
+			var stack = net.minecraft.world.item.ItemStack.of(tag);
+			helper.assertTrue(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString().equals(to) && stack.getCount() == 3,
+					from + " loads as " + to);
+		});
+		com.grandline.fruit.FruitRenames.POWERS.forEach((from, to) -> {
+			var old = new com.grandline.player.PowerState("grandline:brawler", from, java.util.Map.of(from, 7L), java.util.Map.of(from, 1), 0L);
+			helper.assertTrue(old.fruit().equals(to) && old.mastery().get(to) == 7L && old.stash().get(to) == 1, from + " migrates to " + to);
+			helper.assertTrue(Fruits.get(to) != null, to + " exists");
+		});
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "roster")
 	public void everyFruitHasItsNameAndApprovedIcon(GameTestHelper helper) {
 		JsonArray roster = json("/fruit_roster.json").getAsJsonArray();
 		JsonObject lang = json("/assets/grandline/lang/en_us.json").getAsJsonObject();

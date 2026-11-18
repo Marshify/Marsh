@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "grandline:item/nova_fruit"
+    "layer0": "grandline:item/dark_fruit"
   }
 }

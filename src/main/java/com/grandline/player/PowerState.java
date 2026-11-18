@@ -16,11 +16,11 @@ public record PowerState(String fightingStyle, String fruit, Map<String, Long> m
 		long gachaReadyAtMillis) {
 	public static final String DEFAULT_STYLE = "grandline:brawler";
 	/** Power ids that were renamed: old saves load with the new id (equipped fruit, mastery and stash). */
-	public static final Map<String, String> RENAMED = Map.of("grandline:ember", "grandline:flame");
+	public static final Map<String, String> RENAMED = com.grandline.fruit.FruitRenames.POWERS;
 	public static final PowerState DEFAULT = new PowerState(DEFAULT_STYLE, "", Map.of(), Map.of(), 0L);
 
 	private static String renamed(String id) {
-		return id == null ? null : RENAMED.getOrDefault(id, id);
+		return com.grandline.fruit.FruitRenames.power(id);
 	}
 
 	public static final Codec<PowerState> CODEC = RecordCodecBuilder.create(instance -> instance.group(

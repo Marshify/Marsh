@@ -20,7 +20,8 @@
     "PlayerLavaSafetyMixin",
     "PlayerLavaHurtMixin",
     "MagmaBlockMixin",
-    "BiomeFreezeMixin"
+    "BiomeFreezeMixin",
+    "ItemStackRenameMixin"
   ],
   "injectors": {
     "defaultRequire": 1

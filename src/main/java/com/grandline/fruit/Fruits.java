@@ -32,7 +32,7 @@ public final class Fruits {
 	}
 
 	private static final Map<ResourceLocation, FruitDef> FRUITS = new LinkedHashMap<>();
-	// ===== Roster: one fruit per approved icon. Ids of carried-over fruits are kept for saves. =====
+	// ===== Roster: one fruit per approved icon. Renamed ids are migrated by FruitRenames. =====
 
 	public static final FruitDef ROCKET = register("rocket", FruitRarity.COMMON, Element.EXPLOSION, 0xD94A3A,
 			FruitMoves.bolt(Element.EXPLOSION, 16, 1.2, 6f),
@@ -42,8 +42,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.EXPLOSION, 2.4, 4f),
 			"rocket_missile", "rocket_thruster", "rocket_warhead", "rocket_barrage", "rocket_afterburner");
 
-	/** Spin (id "gale" kept so saves carry over). */
-	public static final FruitDef SPIN = register("gale", FruitRarity.COMMON, Element.WIND, 0x9BD13A,
+	/** Spin (formerly "gale", migrated by FruitRenames). */
+	public static final FruitDef SPIN = register("spin", FruitRarity.COMMON, Element.WIND, 0x9BD13A,
 			FruitMoves.bolt(Element.WIND, 14, 1.4, 6f),
 			FruitMoves.burst(Element.WIND, 5, 7f),
 			FruitMoves.bolt(Element.WIND, 20, 2, 9f),
@@ -67,8 +67,8 @@ public final class Fruits {
 			FruitMoves.updraft(Element.BOUNCE),
 			"spring_jab", "spring_recoil", "spring_pogo", "spring_overwound", "spring_hop");
 
-	/** Bomb (id "blast" kept so saves carry over). */
-	public static final FruitDef BOMB = register("blast", FruitRarity.COMMON, Element.EXPLOSION, 0x5A3A3A,
+	/** Bomb (formerly "blast", migrated by FruitRenames). */
+	public static final FruitDef BOMB = register("bomb", FruitRarity.COMMON, Element.EXPLOSION, 0x5A3A3A,
 			FruitMoves.bolt(Element.EXPLOSION, 14, 1.4, 7f),
 			FruitMoves.burst(Element.EXPLOSION, 5, 9f),
 			FruitMoves.lingering(Element.EXPLOSION, 14, 3.5, 6f, 3f, 5),
@@ -76,8 +76,8 @@ public final class Fruits {
 			FruitMoves.leap(Element.EXPLOSION, 3.5, 5f),
 			"bomb_fuse", "bomb_ring", "bomb_mines", "bomb_charge", "bomb_jump");
 
-	/** Smoke (id "mist" kept so saves carry over). */
-	public static final FruitDef SMOKE = register("mist", FruitRarity.COMMON, Element.MIST, 0xBDBDBD,
+	/** Smoke (formerly "mist", migrated by FruitRenames). */
+	public static final FruitDef SMOKE = register("smoke", FruitRarity.COMMON, Element.MIST, 0xBDBDBD,
 			FruitMoves.bolt(Element.MIST, 14, 1.6, 5f),
 			FruitMoves.burst(Element.MIST, 5.5, 6f),
 			FruitMoves.lingering(Element.MIST, 14, 4.5, 5f, 3f, 5),
@@ -93,14 +93,11 @@ public final class Fruits {
 			FruitMoves.dash(Element.METAL, 2, 5f),
 			"spike_needle", "spike_urchin", "spike_bed", "spike_maiden", "spike_quill");
 
-	/** Flame: hand-made moveset, see FlameMoves. Formerly "ember" (saves are migrated, see PowerState.RENAMED). */
+	/** Flame: hand-made moveset, see FlameMoves. Formerly "ember" (saves are migrated by FruitRenames). */
 	public static final FruitDef FLAME = register("flame", FruitRarity.UNCOMMON, 0xFF7A33, com.grandline.fruit.flame.FlameMoves.moves());
-	/** The old "ember_fruit" item: turns into a Flame Fruit as soon as it is in a player's inventory. */
-	public static final Item EMBER_FRUIT_LEGACY = Registry.register(BuiltInRegistries.ITEM, GrandLineMod.id("ember_fruit"),
-			new RenamedItem(() -> FLAME.item(), new Item.Properties().stacksTo(1).fireResistant()));
 
-	/** Ice (id "frost" kept so saves carry over). */
-	public static final FruitDef ICE = register("frost", FruitRarity.UNCOMMON, Element.ICE, 0x8FD0FF,
+	/** Ice (formerly "frost", migrated by FruitRenames). */
+	public static final FruitDef ICE = register("ice", FruitRarity.UNCOMMON, Element.ICE, 0x8FD0FF,
 			FruitMoves.bolt(Element.ICE, 16, 1.2, 8f),
 			FruitMoves.burst(Element.ICE, 5.5, 9f),
 			FruitMoves.bolt(Element.ICE, 22, 1.8, 11f),
@@ -108,8 +105,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.ICE, 2.2, 4.5f),
 			"ice_shard", "ice_nova", "ice_spear", "ice_permafrost", "ice_slide");
 
-	/** Sand (id "dune" kept so saves carry over). */
-	public static final FruitDef SAND = register("dune", FruitRarity.UNCOMMON, Element.SAND, 0xE0B866,
+	/** Sand (formerly "dune", migrated by FruitRenames). */
+	public static final FruitDef SAND = register("sand", FruitRarity.UNCOMMON, Element.SAND, 0xE0B866,
 			FruitMoves.bolt(Element.SAND, 14, 1.4, 8f),
 			FruitMoves.burst(Element.SAND, 5, 10f),
 			FruitMoves.lingering(Element.SAND, 14, 3.5, 6.5f, 3.5f, 5),
@@ -117,8 +114,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.SAND, 1.8, 5.5f),
 			"sand_grit", "sand_devil", "sand_sinkhole", "sand_collapse", "sand_slide");
 
-	/** Dark (id "umbra" kept so saves carry over). */
-	public static final FruitDef DARK = register("umbra", FruitRarity.UNCOMMON, Element.SHADOW, 0x3A2A55,
+	/** Dark (formerly "umbra", migrated by FruitRenames). */
+	public static final FruitDef DARK = register("dark", FruitRarity.UNCOMMON, Element.SHADOW, 0x3A2A55,
 			FruitMoves.bolt(Element.SHADOW, 16, 1.3, 8f),
 			FruitMoves.burst(Element.SHADOW, 5, 9f),
 			FruitMoves.vortex(Element.SHADOW, 16, 5, 13.5f),
@@ -126,8 +123,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.SHADOW, 10),
 			"dark_bolt", "dark_eclipse", "dark_pull", "dark_field", "dark_step");
 
-	/** Diamond (id "quartz" kept so saves carry over). */
-	public static final FruitDef DIAMOND = register("quartz", FruitRarity.UNCOMMON, Element.CRYSTAL, 0x6FD8F2,
+	/** Diamond (formerly "quartz", migrated by FruitRenames). */
+	public static final FruitDef DIAMOND = register("diamond", FruitRarity.UNCOMMON, Element.CRYSTAL, 0x6FD8F2,
 			FruitMoves.bolt(Element.CRYSTAL, 16, 1.2, 9f),
 			FruitMoves.burst(Element.CRYSTAL, 5, 9f),
 			FruitMoves.barrier(Element.CRYSTAL, 8, 2),
@@ -135,8 +132,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.CRYSTAL, 2, 5.5f),
 			"diamond_shard", "diamond_facet", "diamond_skin", "diamond_crown", "diamond_dash");
 
-	/** Eagle (id "feather" kept so saves carry over). */
-	public static final FruitDef EAGLE = register("feather", FruitRarity.UNCOMMON, Element.WIND, 0xC9A27A,
+	/** Eagle (formerly "feather", migrated by FruitRenames). */
+	public static final FruitDef EAGLE = register("eagle", FruitRarity.UNCOMMON, Element.WIND, 0xC9A27A,
 			FruitMoves.strike(Element.WIND, 14, 9f),
 			FruitMoves.burst(Element.WIND, 5, 8f),
 			FruitMoves.bolt(Element.WIND, 20, 2, 10f),
@@ -144,8 +141,8 @@ public final class Fruits {
 			FruitMoves.flight(Element.WIND, 200, 0.07f),
 			"eagle_talon", "eagle_gust", "eagle_volley", "eagle_strike", "eagle_soar", true);
 
-	/** Light (id "nova" kept so saves carry over). */
-	public static final FruitDef LIGHT = register("nova", FruitRarity.RARE, Element.LIGHT, 0xFFE36A,
+	/** Light (formerly "nova", migrated by FruitRenames). */
+	public static final FruitDef LIGHT = register("light", FruitRarity.RARE, Element.LIGHT, 0xFFE36A,
 			FruitMoves.bolt(Element.LIGHT, 24, 1, 10f),
 			FruitMoves.burst(Element.LIGHT, 5.5, 10f),
 			FruitMoves.bolt(Element.LIGHT, 26, 1.6, 14f),
@@ -153,8 +150,8 @@ public final class Fruits {
 			FruitMoves.flight(Element.LIGHT, 160, 0.09f),
 			"light_ray", "light_flash", "light_halo", "light_rain", "light_glide", true);
 
-	/** Rubber (id "bounce" kept so saves carry over). */
-	public static final FruitDef RUBBER = register("bounce", FruitRarity.RARE, Element.BOUNCE, 0xF2649A,
+	/** Rubber (formerly "bounce", migrated by FruitRenames). */
+	public static final FruitDef RUBBER = register("rubber", FruitRarity.RARE, Element.BOUNCE, 0xF2649A,
 			FruitMoves.strike(Element.BOUNCE, 14, 10f),
 			FruitMoves.burst(Element.BOUNCE, 5, 10f),
 			FruitMoves.bolt(Element.BOUNCE, 14, 2, 14f),
@@ -170,8 +167,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.SOUL, 12),
 			"ghost_wisp", "ghost_wail", "ghost_chill", "ghost_maw", "ghost_phase");
 
-	/** Magma (id "lava" kept so saves carry over). */
-	public static final FruitDef MAGMA = register("lava", FruitRarity.RARE, Element.LAVA, 0xFF5A1F,
+	/** Magma (formerly "lava", migrated by FruitRenames). */
+	public static final FruitDef MAGMA = register("magma", FruitRarity.RARE, Element.LAVA, 0xFF5A1F,
 			FruitMoves.bolt(Element.LAVA, 14, 1.4, 11f),
 			FruitMoves.lingering(Element.LAVA, 14, 3.5, 9f, 6f, 6),
 			FruitMoves.eruption(Element.LAVA, 16, 4.5, 19f, 1.3),
@@ -179,8 +176,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.LAVA, 2, 9f),
 			"magma_shot", "magma_pool", "magma_geyser", "magma_meteor", "magma_surge");
 
-	/** Quake (id "tremor" kept so saves carry over). */
-	public static final FruitDef QUAKE = register("tremor", FruitRarity.RARE, Element.EARTH, 0xDDE8EE,
+	/** Quake (formerly "tremor", migrated by FruitRenames). */
+	public static final FruitDef QUAKE = register("quake", FruitRarity.RARE, Element.EARTH, 0xDDE8EE,
 			FruitMoves.strike(Element.EARTH, 12, 11f),
 			FruitMoves.burst(Element.EARTH, 6, 11f),
 			FruitMoves.bolt(Element.EARTH, 20, 2.2, 14f),
@@ -220,8 +217,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.CONTROL, 12),
 			"creation_bolt", "creation_ring", "creation_bastion", "creation_forge", "creation_bridge");
 
-	/** Sound (id "echo" kept so saves carry over). */
-	public static final FruitDef SOUND = register("echo", FruitRarity.LEGENDARY, Element.SOUND, 0x8E3BD6,
+	/** Sound (formerly "echo", migrated by FruitRenames). */
+	public static final FruitDef SOUND = register("sound", FruitRarity.LEGENDARY, Element.SOUND, 0x8E3BD6,
 			FruitMoves.bolt(Element.SOUND, 20, 1.2, 11.5f),
 			FruitMoves.burst(Element.SOUND, 6, 14.5f),
 			FruitMoves.lingering(Element.SOUND, 16, 5, 11.5f, 6f, 6),
@@ -245,8 +242,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.PORTAL, 16),
 			"portal_rift", "portal_collapse", "portal_mine", "portal_tear", "portal_jump");
 
-	/** Lightning (id "volt" kept so saves carry over). */
-	public static final FruitDef LIGHTNING = register("volt", FruitRarity.LEGENDARY, Element.LIGHTNING, 0x4FB4FF,
+	/** Lightning (formerly "volt", migrated by FruitRenames). */
+	public static final FruitDef LIGHTNING = register("lightning", FruitRarity.LEGENDARY, Element.LIGHTNING, 0x4FB4FF,
 			FruitMoves.bolt(Element.LIGHTNING, 18, 1.2, 13f),
 			FruitMoves.burst(Element.LIGHTNING, 5.5, 16f),
 			FruitMoves.eruption(Element.LIGHTNING, 24, 4, 26f, 0.4),
@@ -286,8 +283,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.POISON, 12),
 			"gas_fume", "gas_cloud", "gas_burst", "gas_giant", "gas_drift");
 
-	/** Gravity (id "orbit" kept so saves carry over). */
-	public static final FruitDef GRAVITY = register("orbit", FruitRarity.MYTHICAL, Element.GRAVITY, 0x7A4FB8,
+	/** Gravity (formerly "orbit", migrated by FruitRenames). */
+	public static final FruitDef GRAVITY = register("gravity", FruitRarity.MYTHICAL, Element.GRAVITY, 0x7A4FB8,
 			FruitMoves.bolt(Element.GRAVITY, 18, 1.4, 15f),
 			FruitMoves.burst(Element.GRAVITY, 6, 18f),
 			FruitMoves.vortex(Element.GRAVITY, 18, 6, 26.5f),
@@ -319,8 +316,8 @@ public final class Fruits {
 			FruitMoves.dash(Element.BOUNCE, 2.6, 8f),
 			"dough_fist", "dough_knead", "dough_trap", "dough_oven", "dough_swing");
 
-	/** Shadow (id "ink" kept so saves carry over). */
-	public static final FruitDef SHADOW = register("ink", FruitRarity.MYTHICAL, Element.SHADOW, 0x4A2A7A,
+	/** Shadow (formerly "ink", migrated by FruitRenames). */
+	public static final FruitDef SHADOW = register("shadow", FruitRarity.MYTHICAL, Element.SHADOW, 0x4A2A7A,
 			FruitMoves.bolt(Element.SHADOW, 20, 1.3, 16.5f),
 			FruitMoves.vortex(Element.SHADOW, 16, 5.5, 21.5f),
 			FruitMoves.lingering(Element.SHADOW, 16, 5, 15f, 8f, 6),
@@ -328,8 +325,8 @@ public final class Fruits {
 			FruitMoves.blink(Element.SHADOW, 12),
 			"shadow_spear", "shadow_grasp", "shadow_pool", "shadow_crash", "shadow_slip");
 
-	/** Venom (id "toxin" kept so saves carry over). */
-	public static final FruitDef VENOM = register("toxin", FruitRarity.MYTHICAL, Element.POISON, 0x9A2BD6,
+	/** Venom (formerly "toxin", migrated by FruitRenames). */
+	public static final FruitDef VENOM = register("venom", FruitRarity.MYTHICAL, Element.POISON, 0x9A2BD6,
 			FruitMoves.bolt(Element.POISON, 18, 1.4, 15f),
 			FruitMoves.burst(Element.POISON, 6, 16.5f),
 			FruitMoves.lingering(Element.POISON, 16, 5.5, 13f, 8f, 6),

@@ -9,8 +9,8 @@
   },
   {
     "icon": "spin_fruit.png",
-    "id": "grandline:gale",
-    "item": "grandline:gale_fruit",
+    "id": "grandline:spin",
+    "item": "grandline:spin_fruit",
     "name": "Spin Fruit",
     "rarity": "COMMON",
     "carried_over_from_old_id": true
@@ -33,16 +33,16 @@
   },
   {
     "icon": "bomb_fruit.png",
-    "id": "grandline:blast",
-    "item": "grandline:blast_fruit",
+    "id": "grandline:bomb",
+    "item": "grandline:bomb_fruit",
     "name": "Bomb Fruit",
     "rarity": "COMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "smoke_fruit.png",
-    "id": "grandline:mist",
-    "item": "grandline:mist_fruit",
+    "id": "grandline:smoke",
+    "item": "grandline:smoke_fruit",
     "name": "Smoke Fruit",
     "rarity": "COMMON",
     "carried_over_from_old_id": true
@@ -65,56 +65,56 @@
   },
   {
     "icon": "ice_fruit.png",
-    "id": "grandline:frost",
-    "item": "grandline:frost_fruit",
+    "id": "grandline:ice",
+    "item": "grandline:ice_fruit",
     "name": "Ice Fruit",
     "rarity": "UNCOMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "sand_fruit.png",
-    "id": "grandline:dune",
-    "item": "grandline:dune_fruit",
+    "id": "grandline:sand",
+    "item": "grandline:sand_fruit",
     "name": "Sand Fruit",
     "rarity": "UNCOMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "dark_fruit.png",
-    "id": "grandline:umbra",
-    "item": "grandline:umbra_fruit",
+    "id": "grandline:dark",
+    "item": "grandline:dark_fruit",
     "name": "Dark Fruit",
     "rarity": "UNCOMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "diamond_fruit.png",
-    "id": "grandline:quartz",
-    "item": "grandline:quartz_fruit",
+    "id": "grandline:diamond",
+    "item": "grandline:diamond_fruit",
     "name": "Diamond Fruit",
     "rarity": "UNCOMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "eagle_fruit.png",
-    "id": "grandline:feather",
-    "item": "grandline:feather_fruit",
+    "id": "grandline:eagle",
+    "item": "grandline:eagle_fruit",
     "name": "Eagle Fruit",
     "rarity": "UNCOMMON",
     "carried_over_from_old_id": true
   },
   {
     "icon": "light_fruit.png",
-    "id": "grandline:nova",
-    "item": "grandline:nova_fruit",
+    "id": "grandline:light",
+    "item": "grandline:light_fruit",
     "name": "Light Fruit",
     "rarity": "RARE",
     "carried_over_from_old_id": true
   },
   {
     "icon": "rubber_fruit.png",
-    "id": "grandline:bounce",
-    "item": "grandline:bounce_fruit",
+    "id": "grandline:rubber",
+    "item": "grandline:rubber_fruit",
     "name": "Rubber Fruit",
     "rarity": "RARE",
     "carried_over_from_old_id": true
@@ -129,16 +129,16 @@
   },
   {
     "icon": "magma_fruit.png",
-    "id": "grandline:lava",
-    "item": "grandline:lava_fruit",
+    "id": "grandline:magma",
+    "item": "grandline:magma_fruit",
     "name": "Magma Fruit",
     "rarity": "RARE",
     "carried_over_from_old_id": true
   },
   {
     "icon": "quake_fruit.png",
-    "id": "grandline:tremor",
-    "item": "grandline:tremor_fruit",
+    "id": "grandline:quake",
+    "item": "grandline:quake_fruit",
     "name": "Quake Fruit",
     "rarity": "RARE",
     "carried_over_from_old_id": true
@@ -177,8 +177,8 @@
   },
   {
     "icon": "sound_fruit.png",
-    "id": "grandline:echo",
-    "item": "grandline:echo_fruit",
+    "id": "grandline:sound",
+    "item": "grandline:sound_fruit",
     "name": "Sound Fruit",
     "rarity": "LEGENDARY",
     "carried_over_from_old_id": true
@@ -201,8 +201,8 @@
   },
   {
     "icon": "lightning_fruit.png",
-    "id": "grandline:volt",
-    "item": "grandline:volt_fruit",
+    "id": "grandline:lightning",
+    "item": "grandline:lightning_fruit",
     "name": "Lightning Fruit",
     "rarity": "LEGENDARY",
     "carried_over_from_old_id": true
@@ -241,8 +241,8 @@
   },
   {
     "icon": "gravity_fruit.png",
-    "id": "grandline:orbit",
-    "item": "grandline:orbit_fruit",
+    "id": "grandline:gravity",
+    "item": "grandline:gravity_fruit",
     "name": "Gravity Fruit",
     "rarity": "MYTHICAL",
     "carried_over_from_old_id": true
@@ -273,16 +273,16 @@
   },
   {
     "icon": "shadow_fruit.png",
-    "id": "grandline:ink",
-    "item": "grandline:ink_fruit",
+    "id": "grandline:shadow",
+    "item": "grandline:shadow_fruit",
     "name": "Shadow Fruit",
     "rarity": "MYTHICAL",
     "carried_over_from_old_id": true
   },
   {
     "icon": "venom_fruit.png",
-    "id": "grandline:toxin",
-    "item": "grandline:toxin_fruit",
+    "id": "grandline:venom",
+    "item": "grandline:venom_fruit",
     "name": "Venom Fruit",
     "rarity": "MYTHICAL",
     "carried_over_from_old_id": true
