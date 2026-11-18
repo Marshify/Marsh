@@ -34,8 +34,13 @@ public final class GrandLineLotusGameTests implements FabricGameTest {
 		setLayout(registry, 16);
 		helper.assertTrue(legacy != null && IslandPlans.get("Lotus Palace") == legacy, "a layout-16 world keeps the original Lotus Palace");
 		helper.assertTrue(TreasureSpots.legacy("Lotus Palace").size() == 4, "and its chest spots");
+		setLayout(registry, 17);
+		IslandPlan v17 = IslandPlans.get("Lotus Palace");
+		helper.assertTrue(v17 instanceof LotusPalace && v17.getClass() != LotusPalace.class,
+				"a layout-17 world keeps the palace without the cavern overhaul (no half-old, half-new cavern)");
 		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
 		IslandPlan plan = IslandPlans.get("Lotus Palace");
+		helper.assertTrue(plan.getClass() == LotusPalace.class && IslandRegistry.CURRENT_LAYOUT >= 18, "new worlds get the overhauled cavern");
 		helper.assertTrue(plan instanceof LotusPalace && IslandRegistry.CURRENT_LAYOUT >= 17, "new worlds get the sunken palace");
 		helper.assertTrue(plan.extent() >= 220, "the plan reaches the whole palace pocket");
 		var t = plan.terrain();

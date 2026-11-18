@@ -108,6 +108,11 @@ public final class TreasureSpots {
 
 	/** Spots of in-between rebuilds that older worlds keep (see IslandPlans.INTERIM), by plan class name. */
 	private static final Map<String, List<TreasureSpot>> INTERIM = Map.of(
+			"LotusPalaceV17", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 22, 12, -134, Direction.WEST, "in the palace hall, north-east, behind the column rows"),
+				new TreasureSpot(TreasureTier.RARE, -31, 12, -58, Direction.EAST, "inside the tall shell house by the south-west path"),
+				new TreasureSpot(TreasureTier.COMMON, 4, 66, -24, Direction.SOUTH, "on the north islet, by the landing"),
+				new TreasureSpot(TreasureTier.COMMON, 30, 66, 22, Direction.NORTH, "on the south-east islet, among the palms")),
 			"CloudtopIslesV12", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, -44, 201, -128, Direction.EAST, "citadel lawn, west of the courtyard, guarded by the west camp"),
 				new TreasureSpot(TreasureTier.RARE, 50, 115, -71, Direction.WEST, "Azure Rise, between the temple and the colonnade"),

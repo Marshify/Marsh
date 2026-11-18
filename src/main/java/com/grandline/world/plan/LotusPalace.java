@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * Island-local coordinates from the surface whirlpool: +x east, +z south. The palace has its own origin P (palace
  * code runs on a canvas shifted to it); its garden level is y {@link #G}.
  */
-public final class LotusPalace extends BasePlan {
+public class LotusPalace extends BasePlan {
 	static final int SEA = 62;
 	/** The palace origin (island-local z) and its garden level. */
 	public static final int PZ = -120, G = 9;
@@ -47,8 +47,16 @@ public final class LotusPalace extends BasePlan {
 	/** Conch towers (palace-local). */
 	static final int[][] TOWERS = {{-58, -10}, {-25, -43}, {25, -43}, {58, -10}};
 
+	/** Layout 18: the cavern overhaul (LotusCavern); layout-17 worlds keep the plan without it (LotusPalaceV17). */
+	final boolean overhaul;
+
 	LotusPalace() {
+		this(true);
+	}
+
+	protected LotusPalace(boolean overhaul) {
 		super("Lotus Palace", 0.14);
+		this.overhaul = overhaul;
 		terrain.mass(0, -30, 14, 11.5, 2, 1.6, Ground.GRASS)
 				.mass(-26, 18, 15, 10.5, 2, 1.6, Ground.GRASS)
 				.mass(27, 19, 17, 13, 2, 1.6, Ground.GRASS)
@@ -127,7 +135,9 @@ public final class LotusPalace extends BasePlan {
 		pocketAndGardens(p);
 		courtAndPaths(p);
 		pools(p);
-		rockFormations(p);
+		if (!overhaul) {
+			rockFormations(p); // the overhaul's designed walls take their place
+		}
 		terraceAndHall(p);
 		hallInterior(p);
 		broadRoof(p);
@@ -167,6 +177,14 @@ public final class LotusPalace extends BasePlan {
 					p.fill(x, CEILING + 2, z, x, SEA, z, s(Blocks.WATER));
 				}
 			}
+		}
+		if (overhaul) {
+			// after the world's ores, so none show in the designed walls
+			LotusCavern.walls(p);
+			LotusCavern.galleryStairs(p);
+			LotusCavern.grandColumns(p);
+			LotusCavern.rimLife(p);
+			LotusCavern.lights(p);
 		}
 	}
 
@@ -401,7 +419,7 @@ public final class LotusPalace extends BasePlan {
 					p.fill(x, gy + 1, z, x, CEILING - 1, z, s(Blocks.AIR));
 					if (Math.floorMod(x, 9) == 4 && Math.floorMod(z, 9) == 4) {
 						// invisible light, so the grounds are not gloomy under the sea
-						p.set(x, gy + 7, z, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, 13));
+						p.set(x, gy + 7, z, s(Blocks.LIGHT).setValue(net.minecraft.world.level.block.LightBlock.LEVEL, overhaul ? 15 : 13));
 					}
 				} else {
 					for (int y = G - 10; y <= RIM_ROCK; y++) {
@@ -430,17 +448,23 @@ public final class LotusPalace extends BasePlan {
 				{{-70, -16}, {-56, 18}}, {{70, -16}, {56, 18}}};
 		for (int[][] path : paths) {
 			for (int i = 0; i + 1 < path.length; i++) {
-				line(p, path[i][0], path[i][1], path[i + 1][0], path[i + 1][1], 1.6);
+				line(p, path[i][0], path[i][1], path[i + 1][0], path[i + 1][1], 1.6, overhaul);
 			}
 			for (int[] j : path) {
-				disc(p, j[0], j[1], 2.6);
+				disc(p, j[0], j[1], 2.6, overhaul);
 			}
 		}
 		// the straight approach, 5 wide, from the court to the steps
 		for (int z = 27; z <= 50; z++) {
 			for (int x = -2; x <= 2; x++) {
 				if (p.inChunk(x, z)) {
-					p.set(x, G, z, Math.abs(x) == 2 ? s(Blocks.SANDSTONE) : s(Blocks.SMOOTH_SANDSTONE));
+					BlockState approach = Math.abs(x) == 2 ? s(Blocks.SANDSTONE) : s(Blocks.SMOOTH_SANDSTONE);
+					if (overhaul) {
+						// smooth quartz with prismarine bands every 4, polished diorite edges lit every 6
+						approach = Math.abs(x) == 2 ? (Math.floorMod(z, 6) == 0 ? s(Blocks.SEA_LANTERN) : s(Blocks.POLISHED_DIORITE))
+								: Math.floorMod(z, 4) == 0 ? s(Blocks.PRISMARINE_BRICKS) : x == 0 ? s(Blocks.CYAN_TERRACOTTA) : s(Blocks.SMOOTH_QUARTZ);
+					}
+					p.set(x, G, z, approach);
 				}
 			}
 		}
@@ -470,17 +494,21 @@ public final class LotusPalace extends BasePlan {
 				p.fill(x, G + 1, z, x, G + 6, z, s(Blocks.AIR));
 			}
 		}
-	}
-
-	static void line(Canvas p, int x1, int z1, int x2, int z2, double half) {
-		int n = Math.max(1, (int) Math.ceil(Math.hypot(x2 - x1, z2 - z1) * 2));
-		for (int i = 0; i <= n; i++) {
-			double t = i / (double) n;
-			disc(p, x1 + (x2 - x1) * t, z1 + (z2 - z1) * t, half);
+		if (overhaul) {
+			LotusCavern.whirlpoolPlaza(p, cx, cz, (int) PALACE_R);
+			LotusCavern.plazas(p);
 		}
 	}
 
-	static void disc(Canvas p, double cx, double cz, double r) {
+	static void line(Canvas p, int x1, int z1, int x2, int z2, double half, boolean fancy) {
+		int n = Math.max(1, (int) Math.ceil(Math.hypot(x2 - x1, z2 - z1) * 2));
+		for (int i = 0; i <= n; i++) {
+			double t = i / (double) n;
+			disc(p, x1 + (x2 - x1) * t, z1 + (z2 - z1) * t, half, fancy);
+		}
+	}
+
+	static void disc(Canvas p, double cx, double cz, double r, boolean fancy) {
 		for (int x = (int) Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
 			for (int z = (int) Math.floor(cz - r); z <= Math.ceil(cz + r); z++) {
 				double d = Math.hypot(x - cx, z - cz);
@@ -488,7 +516,8 @@ public final class LotusPalace extends BasePlan {
 					continue;
 				}
 				int gy = gardenY(x, z);
-				p.set(x, gy, z, d > r - 0.8 ? s(Blocks.SANDSTONE) : unit(x, z, 21) < 0.8 ? s(Blocks.SAND) : s(Blocks.SANDSTONE));
+				p.set(x, gy, z, fancy ? LotusCavern.path(x, z, d > r - 0.8)
+						: d > r - 0.8 ? s(Blocks.SANDSTONE) : unit(x, z, 21) < 0.8 ? s(Blocks.SAND) : s(Blocks.SANDSTONE));
 			}
 		}
 	}
@@ -498,7 +527,9 @@ public final class LotusPalace extends BasePlan {
 	 * fans and seagrass in it, rimmed with sandstone.
 	 */
 	private void pools(Canvas p) {
-		int[][] pools = {{-40, 34, 4}, {40, 34, 4}, {-46, -22, 3}, {46, -22, 3}, {-20, 66, 3}, {20, 66, 3}, {-76, -40, 3}, {76, -40, 3}};
+		int[][] pools = overhaul
+				? new int[][]{{-40, 34, 4}, {40, 34, 4}, {-46, -22, 3}, {46, -22, 3}, {-20, 66, 3}, {20, 66, 3}, {-62, -46, 3}, {62, -46, 3}}
+				: new int[][]{{-40, 34, 4}, {40, 34, 4}, {-46, -22, 3}, {46, -22, 3}, {-20, 66, 3}, {20, 66, 3}, {-76, -40, 3}, {76, -40, 3}};
 		Block[] coral = {Blocks.TUBE_CORAL, Blocks.BRAIN_CORAL, Blocks.BUBBLE_CORAL, Blocks.FIRE_CORAL, Blocks.HORN_CORAL};
 		Block[] fans = {Blocks.TUBE_CORAL_FAN, Blocks.BRAIN_CORAL_FAN, Blocks.BUBBLE_CORAL_FAN, Blocks.FIRE_CORAL_FAN, Blocks.HORN_CORAL_FAN};
 		for (int[] pool : pools) {
@@ -1387,7 +1418,9 @@ public final class LotusPalace extends BasePlan {
 		for (int i = 0; i < fans.length; i++) {
 			fanCoral(p, fans[i][0], gardenY(fans[i][0], fans[i][1]) + 1, fans[i][1], 3 + i % 3, i % 2 == 0 ? Direction.Axis.X : Direction.Axis.Z);
 		}
-		int[][] sponges = {{-36, 18, 5}, {36, 18, 6}, {-12, 34, 4}, {12, 34, 3}, {-54, 64, 7}, {54, 64, 5}, {-80, -14, 6},
+		int[][] sponges = overhaul ? new int[][]{{-36, 18, 5}, {36, 18, 6}, {-12, 34, 4}, {12, 34, 3}, {-54, 64, 7}, {54, 64, 5}, {-64, -4, 6},
+				{64, -4, 4}, {-30, -62, 5}, {30, -62, 7}, {-8, 72, 3}, {8, 72, 4}}
+				: new int[][]{{-36, 18, 5}, {36, 18, 6}, {-12, 34, 4}, {12, 34, 3}, {-54, 64, 7}, {54, 64, 5}, {-80, -14, 6},
 				{80, -14, 4}, {-30, -62, 5}, {30, -62, 7}, {-8, 72, 3}, {8, 72, 4}};
 		for (int[] s : sponges) {
 			int y = gardenY(s[0], s[1]) + 1;
@@ -1401,7 +1434,8 @@ public final class LotusPalace extends BasePlan {
 					i % 2 == 0 ? Blocks.RED_TERRACOTTA : Blocks.BROWN_TERRACOTTA, i);
 		}
 		// tall pink coral-like flowers: a stem of pink terracotta topped with pink and magenta
-		int[][] flowers = {{-8, 52}, {8, 52}, {-34, 30}, {34, 30}, {-50, 30}, {50, 30}, {-16, 70}, {16, 70}, {-60, -16}, {60, -16}};
+		int[][] flowers = overhaul ? new int[][]{{-18, 46}, {18, 46}, {-34, 30}, {34, 30}, {-50, 30}, {50, 30}, {-16, 70}, {16, 70}, {-60, -16}, {60, -16}}
+				: new int[][]{{-8, 52}, {8, 52}, {-34, 30}, {34, 30}, {-50, 30}, {50, 30}, {-16, 70}, {16, 70}, {-60, -16}, {60, -16}};
 		for (int[] f : flowers) {
 			if (!p.inChunk(f[0], f[1])) {
 				continue;

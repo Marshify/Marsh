@@ -46,7 +46,7 @@ public final class FirstSeaPlans {
 
 	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
 	public static java.util.Map<IslandPlan, Integer> interim() {
-		return java.util.Map.of(new CloudtopIslesV7(), 12, new CloudtopIslesV12(), 13, new StonewallPrisonV9(), 15);
+		return java.util.Map.of(new CloudtopIslesV7(), 12, new CloudtopIslesV12(), 13, new StonewallPrisonV9(), 15, new LotusPalaceV17(), 18);
 	}
 
 	public static List<IslandPlan> all() {
