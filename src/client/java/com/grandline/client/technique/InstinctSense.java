@@ -42,7 +42,8 @@ public final class InstinctSense {
 
 	public static void register() {
 		ClientTickEvents.END_CLIENT_TICK.register(InstinctSense::tick);
-		WorldRenderEvents.AFTER_TRANSLUCENT.register(InstinctSense::labels);
+		// LAST, not AFTER_TRANSLUCENT: text drawn there is lost under the later passes.
+		WorldRenderEvents.LAST.register(InstinctSense::labels);
 		HudRenderCallback.EVENT.register(InstinctSense::screenPulse);
 	}
 
@@ -136,7 +137,7 @@ public final class InstinctSense {
 			pose.pushPose();
 			pose.translate(at.x, at.y, at.z);
 			pose.mulPose(camera.rotation());
-			float scale = (float) (0.025 * Math.max(1, dist / 12));
+			float scale = (float) (0.032 * Math.max(1, dist / 10));
 			pose.scale(-scale, -scale, scale);
 			Matrix4f matrix = pose.last().pose();
 			Component name = e.hasCustomName() ? e.getCustomName() : e.getDisplayName();

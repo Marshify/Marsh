@@ -1028,9 +1028,9 @@
   "message.grandline.dash_tutorial.progress": "Tutorial: %s of %s done",
   "message.grandline.dash_tutorial.done": "Well done! You can Dash any way you like now: forward, back, sideways and through the air.",
   "entity.grandline.islander.movement_instructor": "Movement Instructor",
-  "entity.grandline.islander.flash_step_master": "Flash Step Master",
-  "entity.grandline.islander.aura_master": "Aura Master",
-  "entity.grandline.islander.instinct_sage": "Instinct Sage",
+  "entity.grandline.islander.flash_step_master": "Ability Master",
+  "entity.grandline.islander.aura_master": "Ability Master",
+  "entity.grandline.islander.instinct_sage": "Ability Master",
   "npc.grandline.trainer.back": "Back",
   "npc.grandline.trainer.leave": "Leave",
   "npc.grandline.trainer.owned": "You already know %s",
@@ -1099,5 +1099,8 @@
   "screen.grandline.techniques.locked": "Not learned",
   "screen.grandline.techniques.stage": "Stage %s",
   "screen.grandline.techniques.aura_bonus": "+%s%% damage, -%s%% taken",
-  "screen.grandline.techniques.charges": "%s / %s charges"
+  "screen.grandline.techniques.charges": "%s / %s charges",
+  "npc.grandline.ability.greeting": "Speed, strength, awareness: every technique begins with a single step. Which will you learn?",
+  "npc.grandline.ability.flash_step": "Flash Step",
+  "npc.grandline.ability.aura": "Aura"
 }

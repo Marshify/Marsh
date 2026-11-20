@@ -79,14 +79,16 @@ public final class FlashStep {
 		BlockHitResult hit = level.clip(new ClipContext(eye, eye.add(look.scale(range)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
 		double reach = hit.getType() == HitResult.Type.MISS ? range : hit.getLocation().distanceTo(eye);
 		double eyeHeight = player.getEyeHeight();
+		// First the farthest spot along the aim where the player can stand (just over a ledge's edge, a lower deck)...
 		for (double d = reach - 0.3; d >= 1.0; d -= 0.25) {
-			Vec3 point = eye.add(look.scale(d));
-			// Standing on the ground under the aimed point (up to 2.5 blocks down), else the body hanging from it.
-			Vec3 standing = standOn(level, player, point);
+			Vec3 standing = standOn(level, player, eye.add(look.scale(d)));
 			if (standing != null && valid(level, player, standing, eye)) {
 				return standing;
 			}
-			Vec3 hanging = point.subtract(0, eyeHeight * 0.5, 0);
+		}
+		// ...else the farthest point in the air (stepping out over open water or a chasm).
+		for (double d = reach - 0.3; d >= 1.0; d -= 0.25) {
+			Vec3 hanging = eye.add(look.scale(d)).subtract(0, eyeHeight * 0.5, 0);
 			if (valid(level, player, hanging, eye)) {
 				return hanging;
 			}

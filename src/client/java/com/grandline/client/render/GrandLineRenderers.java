@@ -46,9 +46,35 @@ public final class GrandLineRenderers {
 		return GrandLineMod.id("textures/entity/" + name + ".png");
 	}
 
+	/** Ability Masters wear a full player skin (own left limbs and outer layer); the other islanders the classic model. */
+	static boolean abilityMaster(Islander.Role role) {
+		return role == Islander.Role.FLASH_STEP_MASTER || role == Islander.Role.AURA_MASTER || role == Islander.Role.INSTINCT_SAGE;
+	}
+
+	private static final class IslanderRenderer extends net.minecraft.client.renderer.entity.HumanoidMobRenderer<Islander, HumanoidModel<Islander>> {
+		private final HumanoidModel<Islander> classic;
+		private final net.minecraft.client.model.PlayerModel<Islander> player;
+
+		IslanderRenderer(EntityRendererProvider.Context context) {
+			super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE)), 0.5F);
+			this.classic = this.model;
+			this.player = new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false);
+		}
+
+		@Override
+		public void render(Islander npc, float yaw, float partialTick, PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light) {
+			this.model = abilityMaster(npc.role()) ? player : classic;
+			super.render(npc, yaw, partialTick, pose, buffers, light);
+		}
+
+		@Override
+		public ResourceLocation getTextureLocation(Islander npc) {
+			return abilityMaster(npc.role()) ? tex("ability_master") : tex(npc.role().name().toLowerCase(Locale.ROOT));
+		}
+	}
+
 	public static void register() {
-		EntityRendererRegistry.register(GrandLineEntities.ISLANDER, ctx -> new Renderer<Islander>(ctx,
-				npc -> tex(npc.role().name().toLowerCase(Locale.ROOT)), 1.0F));
+		EntityRendererRegistry.register(GrandLineEntities.ISLANDER, IslanderRenderer::new);
 		EntityRendererRegistry.register(GrandLineEntities.BANDIT, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("bandit"), 1.0F));
 		EntityRendererRegistry.register(GrandLineEntities.RAIDER, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("raider"), 1.05F));
 		EntityRendererRegistry.register(GrandLineEntities.CORSAIR, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("corsair"), 1.1F));

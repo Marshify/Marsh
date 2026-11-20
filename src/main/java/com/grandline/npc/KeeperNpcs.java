@@ -64,8 +64,7 @@ public final class KeeperNpcs {
 			roles.add(Islander.Role.MOVEMENT_INSTRUCTOR);
 		}
 		if (FROST_ISLAND.equals(island.name())) {
-			roles.add(Islander.Role.FLASH_STEP_MASTER);
-			roles.add(Islander.Role.AURA_MASTER);
+			roles.add(Islander.Role.FLASH_STEP_MASTER); // the Ability Master: Flash Step and Aura
 		}
 		if (SKY_ISLAND.equals(island.name())) {
 			roles.add(Islander.Role.INSTINCT_SAGE);
@@ -240,7 +239,8 @@ public final class KeeperNpcs {
 			for (Anchor.Type t : new Anchor.Type[]{Anchor.Type.QUEST, Anchor.Type.GUNSMITH, Anchor.Type.ARRIVAL, Anchor.Type.FRUIT_DEALER}) {
 				for (Anchor a : plan.anchors()) {
 					if (a.type() == t) {
-						bases.add(new BlockPos(island.x() + a.x(), 0, island.z() + a.z()));
+						// A built terrace (Frostpeak's village) gives its own height; natural ground is found per column.
+						bases.add(new BlockPos(island.x() + a.x(), a.y() != Anchor.SURFACE ? a.y() : 0, island.z() + a.z()));
 					}
 				}
 			}
@@ -257,7 +257,7 @@ public final class KeeperNpcs {
 		}
 		bases.add(new BlockPos(island.x(), 0, island.z()));
 		for (BlockPos base : bases) {
-			BlockPos found = nearestSafe(level, base.getX(), base.getZ(), 8, island, taken);
+			BlockPos found = base.getY() != 0 ? nearestSafeAt(level, base, 8, taken) : nearestSafe(level, base.getX(), base.getZ(), 8, island, taken);
 			if (found != null) {
 				return found;
 			}
@@ -337,6 +337,38 @@ public final class KeeperNpcs {
 	}
 
 	/** On the island's ground (or a step above it), not on a roof, a wall or a canopy. */
+	/** Like {@link #nearestSafe}, but on a built level: the anchor's own height, a step up or down. */
+	private static BlockPos nearestSafeAt(ServerLevel level, BlockPos base, int radius, List<BlockPos> taken) {
+		for (int r = 2; r <= radius; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
+						continue;
+					}
+					int x = base.getX() + dx, z = base.getZ() + dz;
+					boolean clear = true;
+					for (BlockPos t : taken) {
+						if (Math.abs(t.getX() - x) <= 2 && Math.abs(t.getZ() - z) <= 2) {
+							clear = false;
+							break;
+						}
+					}
+					if (!clear) {
+						continue;
+					}
+					level.getChunk(x >> 4, z >> 4);
+					for (int dy : new int[]{0, 1, -1}) {
+						BlockPos p = new BlockPos(x, base.getY() + dy, z);
+						if (IslandSpawns.isSafe(level, p) && level.canSeeSky(p)) {
+							return p;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	private static boolean onGround(Island island, BlockPos feet) {
 		IslandPlan plan = IslandPlans.get(island);
 		if (plan == null) {

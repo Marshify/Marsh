@@ -43,7 +43,10 @@ public final class TechniqueHud {
 		Font font = mc.font;
 		var own = ClientTechniques.own();
 		int y = g.guiHeight() - 50;
-		int x = g.guiWidth() / 2 - 92;
+		if (mc.player.isEyeInFluid(net.minecraft.tags.FluidTags.WATER) || mc.player.getAirSupply() < mc.player.getMaxAirSupply()) {
+			y -= 12; // the air bubbles sit on this row
+		}
+		int x = g.guiWidth() / 2 + 14; // right of centre: the chat box covers the left side above the hotbar
 		// Dash: always available; the tile only shows a sweep while it recharges.
 		x = tile(g, font, x, y, DASH, true, false, TechniqueKeys.DASH, ClientTechniques.dashCooldown(), GrandLineMod.config().dashCooldownTicks, null);
 		// Flash Step: locked until bought.
@@ -89,10 +92,7 @@ public final class TechniqueHud {
 			g.pose().popPose();
 		}
 		// Key letter in the corner.
-		String k = key.getTranslatedKeyMessage().getString();
-		if (k.length() > 3) {
-			k = k.substring(0, 3);
-		}
+		String k = shortKey(key.getTranslatedKeyMessage().getString());
 		g.pose().pushPose();
 		g.pose().translate(x - 1, y - 6, 210);
 		g.pose().scale(0.6f, 0.6f, 1);
@@ -106,5 +106,11 @@ public final class TechniqueHud {
 			g.pose().popPose();
 		}
 		return x + TILE + 6;
+	}
+
+	/** "Left Shift" → "Shift", "Caps Lock" → "Caps": short enough for the tile corner. */
+	static String shortKey(String name) {
+		String k = name.replace("Left ", "").replace("Right ", "R").replace(" Lock", "");
+		return k.length() > 5 ? k.substring(0, 5) : k;
 	}
 }

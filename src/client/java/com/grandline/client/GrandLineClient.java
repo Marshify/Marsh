@@ -15,6 +15,7 @@ public final class GrandLineClient implements ClientModInitializer {
 		com.grandline.client.render.sword.HeldSwords.register();
 		com.grandline.client.technique.ClientTechniques.register();
 		com.grandline.client.technique.TechniqueKeys.register();
+		com.grandline.client.technique.ClientDash.register();
 		com.grandline.client.technique.InstinctSense.register();
 		com.grandline.client.hud.TechniqueHud.register();
 		net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, ctx) -> {

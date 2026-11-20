@@ -42,6 +42,11 @@ final class TrainerScreens {
 				DialogScreen.Option.of(t("npc.grandline.trainer.leave"), () -> { })));
 	}
 
+	/** Back to the Ability Master's first page. */
+	private static DialogScreen.Option backToMaster(OpenNpcPayload data) {
+		return new DialogScreen.Option(t("npc.grandline.trainer.back"), () -> NpcScreens.open(data), true);
+	}
+
 	private static DialogScreen.Option leave() {
 		return DialogScreen.Option.of(t("npc.grandline.trainer.leave"), () -> { });
 	}
@@ -70,6 +75,14 @@ final class TrainerScreens {
 
 	// ------------------------------------------------------------------------------------------------ Flash Step Master
 
+	/** The Ability Master on Frostpeak Isle: Flash Step and Aura, each on its own page. */
+	static DialogScreen abilityMaster(OpenNpcPayload data) {
+		return new DialogScreen(t("entity.grandline.islander.flash_step_master"), List.of(t("npc.grandline.ability.greeting")), List.of(
+				new DialogScreen.Option(t("npc.grandline.ability.flash_step"), () -> Minecraft.getInstance().setScreen(flashStepMaster(data)), true),
+				new DialogScreen.Option(t("npc.grandline.ability.aura"), () -> Minecraft.getInstance().setScreen(auraMaster(data)), true),
+				leave()));
+	}
+
 	static DialogScreen flashStepMaster(OpenNpcPayload data) {
 		String who = "entity.grandline.islander.flash_step_master";
 		var cfg = GrandLineMod.config();
@@ -88,6 +101,7 @@ final class TrainerScreens {
 		options.add(page(t("npc.grandline.flash.how"), data, who, List.of(
 				t("npc.grandline.flash.how.1"),
 				t("npc.grandline.flash.how.2", String.format(Locale.ROOT, "%.0f", cfg.flashStepCooldownTicks / 20.0), Math.round(cfg.flashStepEnergy)))));
+		options.add(backToMaster(data));
 		options.add(leave());
 		return new DialogScreen(t(who), List.of(t("npc.grandline.flash.greeting")), options);
 	}
@@ -108,6 +122,7 @@ final class TrainerScreens {
 		}
 		options.add(page(t("npc.grandline.aura.how"), data, who, List.of(t("npc.grandline.aura.how.1"), t("npc.grandline.aura.how.2"))));
 		options.add(page(t("npc.grandline.aura.progress"), data, who, auraProgress(own)));
+		options.add(backToMaster(data));
 		options.add(leave());
 		return new DialogScreen(t(who), List.of(t("npc.grandline.aura.greeting")), options);
 	}

@@ -104,7 +104,7 @@ public final class NpcService {
 			case NpcActionPayload.SET_HOME -> npc.role() == Islander.Role.INNKEEPER ? setHome(player, npc) : "too_far";
 			case NpcActionPayload.TRAIN -> npc.role() == Islander.Role.FLASH_STEP_MASTER
 					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.FLASH_STEP) : "too_far";
-			case NpcActionPayload.TRAIN + 1 -> npc.role() == Islander.Role.AURA_MASTER
+			case NpcActionPayload.TRAIN + 1 -> npc.role() == Islander.Role.FLASH_STEP_MASTER || npc.role() == Islander.Role.AURA_MASTER
 					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.AURA) : "too_far";
 			case NpcActionPayload.TRAIN + 2 -> npc.role() == Islander.Role.INSTINCT_SAGE
 					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.INSTINCT) : "too_far";

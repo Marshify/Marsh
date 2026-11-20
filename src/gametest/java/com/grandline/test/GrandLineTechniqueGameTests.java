@@ -314,7 +314,8 @@ public final class GrandLineTechniqueGameTests implements FabricGameTest {
 		List<Islander.Role> frost = KeeperNpcs.rolesFor(island(KeeperNpcs.FROST_ISLAND));
 		List<Islander.Role> sky = KeeperNpcs.rolesFor(island(KeeperNpcs.SKY_ISLAND));
 		helper.assertTrue(mill.contains(Islander.Role.MOVEMENT_INSTRUCTOR) && marine.contains(Islander.Role.MOVEMENT_INSTRUCTOR), "Movement Instructors");
-		helper.assertTrue(frost.contains(Islander.Role.FLASH_STEP_MASTER) && frost.contains(Islander.Role.AURA_MASTER), "Frostpeak's masters");
+		helper.assertTrue(frost.contains(Islander.Role.FLASH_STEP_MASTER) && !frost.contains(Islander.Role.AURA_MASTER),
+				"one Ability Master on Frostpeak (Flash Step and Aura)");
 		helper.assertTrue(sky.contains(Islander.Role.INSTINCT_SAGE), "the Instinct Sage on Cloudtop");
 		helper.succeed();
 	}

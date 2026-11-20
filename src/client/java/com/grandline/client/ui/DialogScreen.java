@@ -78,9 +78,13 @@ public class DialogScreen extends Screen {
 		GrandLineUi.scaled(graphics, font, speaker, width / 2f - font.width(speaker) * 0.65f, bandTop + 4, 1.3f, 0x1A1205, false);
 
 		int y = bandTop + 26;
+		int wrap = Math.min(width - 40, 460); // long lines wrap instead of running off the screen
 		for (Component line : lines) {
-			graphics.drawCenteredString(font, line, width / 2, y, 0xFFFFFF);
-			y += 12;
+			for (net.minecraft.util.FormattedCharSequence part : font.split(line, wrap)) {
+				graphics.drawString(font, part, width / 2 - font.width(part) / 2, y, 0xFFFFFF);
+				y += 11;
+			}
+			y += 1;
 		}
 		super.render(graphics, mouseX, mouseY, partialTick);
 	}

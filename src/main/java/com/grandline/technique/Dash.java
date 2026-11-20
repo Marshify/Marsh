@@ -1,7 +1,6 @@
 package com.grandline.technique;
 
 import com.grandline.combat.EnergyService;
-import com.grandline.combat.ability.TimedEffects;
 import com.grandline.combat.fx.FxEvents;
 import com.grandline.gear.sword.SwordKit;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,8 +10,9 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Directional Dash (everyone, from level 1): a quick burst of movement in the direction the player is pressing (W, A,
- * S, D and diagonals, forward when nothing is held), on the ground or in the air. The server carries the player over
- * a few ticks, stopping at walls, and holds their fall while it lasts. No damage.
+ * S, D and diagonals, forward when nothing is held), on the ground or in the air. The server checks and pays for it
+ * (cooldown, stun, energy) and tells the player's client to move: over a few ticks, stopping at walls, with the fall
+ * held while it lasts. No damage.
  */
 public final class Dash {
 	private Dash() {
@@ -57,27 +57,12 @@ public final class Dash {
 		FxEvents.send(player, "tq:dash", start.add(0, 0.9, 0), dir, distance / ticks, distance, grounded ? 1 : 0);
 		player.serverLevel().playSound(null, start.x, start.y, start.z, SoundEvents.PHANTOM_FLAP, net.minecraft.sounds.SoundSource.PLAYERS, 0.7f, 1.9f);
 		player.serverLevel().playSound(null, start.x, start.y, start.z, SoundEvents.ELYTRA_FLYING, net.minecraft.sounds.SoundSource.PLAYERS, 0.18f, 2.0f);
-		Vec3[] last = {start};
-		TimedEffects.start(age -> {
-			if (SwordKit.gone(player)) {
-				return false;
-			}
-			double t = Math.min(1, (age + 1) / (double) ticks);
-			Vec3 target = start.add(end.subtract(start).scale(t));
-			Vec3 step = target.subtract(player.position()).multiply(1, 0, 1);
-			// The fall is held while dashing: no more than a gentle drift downward.
-			double vy = Math.max(Math.min(player.getDeltaMovement().y, 0.1) * 0.2, -0.04);
-			player.setDeltaMovement(step.x, vy, step.z);
-			player.hurtMarked = true;
-			player.fallDistance = 0;
-			last[0] = target;
-			if (age + 1 >= ticks) {
-				player.setDeltaMovement(dir.scale(0.2).add(0, vy, 0));
-				player.hurtMarked = true;
-				return false;
-			}
-			return true;
-		});
+		// The player's client carries the dash out (players move themselves in Minecraft); walls stop it there.
+		if (net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.canSend(player, com.grandline.network.payload.DashMovePayload.TYPE)) {
+			net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player,
+					new com.grandline.network.payload.DashMovePayload((float) dir.x, (float) dir.z, (float) config.dashDistance, ticks));
+		}
+		player.fallDistance = 0;
 		TechniqueTrainers.dashed(player, forward, strafe, !grounded);
 		TechniqueService.sync(player);
 		return "ok";
