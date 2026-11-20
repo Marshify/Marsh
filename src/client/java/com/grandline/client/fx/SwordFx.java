@@ -94,12 +94,12 @@ final class SwordFx {
 			}
 			case "crescent" -> {
 				double roll = switch (v) {
-					case 1 -> -0.3;
-					case 2 -> 0.45;
-					case 3 -> -0.45;
-					case 4 -> 0.6;
-					case 5 -> -0.6;
-					default -> 0.12;
+					case 1 -> -0.5;
+					case 2 -> 0.6;
+					case 3 -> -0.6;
+					case 4 -> 0.75;
+					case 5 -> -0.75;
+					default -> 0.45;
 				};
 				GrandLineFx.add(new SwordShapes.Crescent(id, pos, dir, speed, range, size, roll, 1, pal, v >= 2));
 			}
@@ -152,6 +152,7 @@ final class SwordFx {
 			case "dragon" -> GrandLineFx.add(new DragonBurst(pos, dir, (int) size, pal));
 			case "blast" -> {
 				GrandLineFx.add(new SwordShapes.Flash(pos, size, 9, 0xFFF2B0, 0xFF6A10));
+				GrandLineFx.add(new Fireball(pos, size));
 				GrandLineFx.add(new SwordShapes.Shockwave(pos.subtract(0, 0.8, 0), 0.6, size + 0.5, 1.4, pal));
 				for (int i = 0; i < FxSprites.count(30); i++) {
 					Vec3 vel = SwordShapes.side(UP).scale(0).add(RANDOM.nextGaussian(), RANDOM.nextDouble() * 0.8, RANDOM.nextGaussian()).normalize().scale(0.25);
@@ -219,17 +220,17 @@ final class SwordFx {
 			case "storm_burst" -> {
 				for (int i = 0; i < 7; i++) {
 					Vec3 out = new Vec3(RANDOM.nextGaussian(), RANDOM.nextGaussian() * 0.5, RANDOM.nextGaussian()).normalize().scale(size);
-					GrandLineFx.add(new SwordShapes.Lightning(pos, pos.add(out), 0.35, 1, 0.07, 7, pal));
+					GrandLineFx.add(new SwordShapes.Lightning(pos, pos.add(out), 0.35, 1, 0.13, 9, pal));
 				}
 				GrandLineFx.add(new SwordShapes.Flash(pos, size * 0.8, 7, pal.edge(), pal.core()));
 				GrandLineFx.add(new SwordShapes.Shockwave(pos.subtract(0, 0.8, 0), 0.7, size, 1.0, pal));
 				SwordShapes.sparks(pos, Vec3.ZERO, 24, 0.5, pal);
 			}
-			case "thundercloud" -> GrandLineFx.add(new SwordShapes.Cloud(id, pos.add(0, 9, 0), Vec3.ZERO, 0, 0, size, (int) speed, pal));
+			case "thundercloud" -> GrandLineFx.add(new SwordShapes.Cloud(id, pos.add(0, 7, 0), Vec3.ZERO, 0, 0, size * 1.3, (int) speed, pal));
 			case "bolt" -> {
-				Vec3 top = pos.add(RANDOM.nextGaussian() * 0.6, range, RANDOM.nextGaussian() * 0.6);
-				GrandLineFx.add(new SwordShapes.Lightning(top, pos, 0.7, 3, 0.16, 8, pal));
-				GrandLineFx.add(new SwordShapes.Lightning(top, pos, 0.5, 1, 0.08, 6, pal));
+				Vec3 top = pos.add(RANDOM.nextGaussian() * 0.6, range - 2, RANDOM.nextGaussian() * 0.6);
+				GrandLineFx.add(new SwordShapes.Lightning(top, pos, 0.7, 3, 0.3, 9, pal));
+				GrandLineFx.add(new SwordShapes.Lightning(top, pos, 0.5, 1, 0.14, 7, pal));
 				GrandLineFx.add(new SwordShapes.Flash(pos.add(0, 0.6, 0), 2.4, 7, pal.edge(), pal.core()));
 				GrandLineFx.add(new SwordShapes.Shockwave(pos.add(0, 0.05, 0), 0.6, size, 0.7, pal));
 				SwordShapes.sparks(pos.add(0, 0.2, 0), UP, 18, 0.5, pal);
@@ -377,11 +378,11 @@ final class SwordFx {
 			double reveal = Math.min(1, t * 4);
 			Vec3 end = a.add(b.subtract(a).scale(reveal));
 			List<Vec3> pts = List.of(a, a.add(end.subtract(a).scale(0.5)), end);
-			if (pal.darkCore()) {
-				d.ribbonSoft(FxDraw.GLOW, pts, new double[]{width * 2.2, width * 2.6, width * 2.2}, rgb(pal.dark()),
-						new float[]{0.5f * alpha, 0.7f * alpha, 0.5f * alpha}, 0);
-			}
 			d.ribbon(FxDraw.GLOW, pts, new double[]{width * 2.5, width * 3, width * 2.5}, rgb(pal.core()), new float[]{0.4f * alpha, 0.6f * alpha, 0.4f * alpha}, 0);
+			if (pal.darkCore()) {
+				d.ribbonSoft(FxDraw.GLOW, pts, new double[]{width * 1.2, width * 1.5, width * 1.2}, rgb(pal.dark()),
+						new float[]{0.6f * alpha, 0.8f * alpha, 0.6f * alpha}, 0);
+			}
 			d.ribbon(FxDraw.STREAK, pts, new double[]{width * 0.3, width, width * 0.3}, rgb(pal.edge()), new float[]{alpha, alpha, alpha}, 0);
 		}
 	}
@@ -423,7 +424,7 @@ final class SwordFx {
 		}
 
 		int life() {
-			return (int) (length / speed) + (variant == 2 ? 26 : 12);
+			return (int) (length / speed) + (variant == 2 ? 30 : 18);
 		}
 
 		@Override
@@ -458,7 +459,7 @@ final class SwordFx {
 				Vec3 a = start.add(off).add(dir.scale(tail));
 				Vec3 b = start.add(off).add(dir.scale(head));
 				List<Vec3> pts = List.of(b, b.add(a.subtract(b).scale(0.5)), a);
-				double w = variant == 1 ? 0.05 : variant == 2 ? 0.16 : 0.09;
+				double w = variant == 1 ? 0.08 : variant == 2 ? 0.2 : 0.13;
 				d.ribbon(FxDraw.GLOW, pts, new double[]{w * 4, w * 3, w}, rgb(pal.core()), new float[]{0.5f * fade, 0.35f * fade, 0}, 0);
 				d.ribbon(FxDraw.STREAK, pts, new double[]{w, w * 0.8, w * 0.2}, rgb(pal.edge()), new float[]{fade, 0.7f * fade, 0}, 0);
 			}
@@ -586,7 +587,11 @@ final class SwordFx {
 				d.ribbon(FxDraw.GLOW, pts, w, rgb(pal.core()), al, (float) (time * 0.05));
 				d.ribbon(FxDraw.STREAK, pts, thin, rgb(pal.edge()), al2, 0);
 			}
-			d.billboard(FxDraw.GLOW, true, c.add(0, height * 0.35, 0), radius * 0.8, 0, FxDraw.rgba(pal.core(), 0.25f * fade));
+			// A soft glowing core column gives the funnel a body.
+			for (int k = 0; k < 4; k++) {
+				double y = height * (0.12 + 0.25 * k);
+				d.billboard(FxDraw.GLOW, true, c.add(0, y, 0), radius * (0.55 + 0.35 * k), time * 0.1 + k, FxDraw.rgba(pal.core(), 0.3f * fade));
+			}
 		}
 	}
 
@@ -635,15 +640,15 @@ final class SwordFx {
 					double a = base - t * 2.0;
 					pts.add(c.add(Math.cos(a) * r, Math.sin(a * 2 + k) * 0.25 + tilt * Math.sin(a) * r, Math.sin(a) * r));
 					double taper = Math.sin(Math.PI * Math.min(1, (1 - t) * 1.1 + 0.02));
-					w[i] = 0.55 * taper;
+					w[i] = 0.85 * taper;
 					dark[i] = 0.5 * taper;
-					thin[i] = 0.1 * taper;
-					al[i] = (float) (0.5 * fade * (1 - t));
-					al2[i] = (float) (0.95 * fade * (1 - t));
-					al3[i] = (float) (0.7 * fade * (1 - t * 0.8));
+					thin[i] = 0.14 * taper;
+					al[i] = (float) (0.75 * fade * (1 - t));
+					al2[i] = (float) (fade * (1 - t));
+					al3[i] = (float) (0.9 * fade * (1 - t * 0.8));
 				}
-				d.ribbonSoft(FxDraw.GLOW, pts, dark, rgb(pal.dark()), al3, 0);
 				d.ribbon(FxDraw.GLOW, pts, w, rgb(pal.core()), al, 0);
+				d.ribbonSoft(FxDraw.GLOW, pts, dark, rgb(pal.dark()), al3, 0);
 				d.ribbon(FxDraw.STREAK, pts, thin, rgb(pal.edge()), al2, 0);
 			}
 			d.groundRing(c.subtract(0, 0.95, 0), radius, 0.4, 32, FxDraw.rgba(pal.core(), 0.4f * fade));
@@ -680,7 +685,7 @@ final class SwordFx {
 					double a = RANDOM.nextDouble() * Math.PI * 2;
 					Vec3 off = SwordShapes.rotate(right(f), f, a).scale(size * 0.4);
 					GrandLineFx.add(new SwordShapes.Trail(-1, e.position().add(0, 1.0, 0).add(off), e.position().add(off), SwordShapes.rotate(f, UP, RANDOM.nextGaussian() * 0.6),
-							size * 0.7, RANDOM.nextInt(3), pal, 0.7));
+							size * 0.8, RANDOM.nextInt(3), pal, 1.0));
 				}
 			}
 			while (path.size() > 18) {
@@ -764,19 +769,57 @@ final class SwordFx {
 				double along = 1 - grow + s * grow; // body unfurls from the tail end
 				pts.add(spine(1 - along, time));
 				double body = 0.55 * Math.sin(Math.PI * Math.min(1, s * 1.25 + 0.05)) + 0.2 * (1 - s);
-				w[i] = body * 1.4;
-				core[i] = body * 0.5;
+				w[i] = body * 2.6;
+				core[i] = body * 0.8;
 				al[i] = (float) (0.7 * fade * (1 - s * 0.6));
 				al2[i] = (float) (0.95 * fade * (1 - s * 0.5));
 			}
 			d.ribbon(FxDraw.GLOW, pts, w, rgb(pal.core()), al, (float) (time * 0.1));
 			d.ribbon(FxDraw.STREAK, pts, core, rgb(pal.edge()), al2, 0);
-			// The head: a bright flame mass with two horn tongues.
+			// Flame tongues licking off the body, then the head: a big flame mass with two horns and a jaw.
+			for (int i = 2; i < n; i += 3) {
+				d.flame(pts.get(i), w[i] * 0.55, FlameFx.rollToward(d, UP), age + i, FxDraw.rgba(pal.core(), 0.85f * fade * al[i]));
+			}
 			Vec3 head = pts.get(0);
-			d.flame(head, 0.6, 0, age, FxDraw.rgba(pal.core(), fade));
-			d.flame(head.add(0, 0.3, 0), 0.45, 0.6, age + 1, FxDraw.rgba(pal.edge(), fade));
-			d.flame(head.add(0, 0.3, 0), 0.45, -0.6, age + 2, FxDraw.rgba(pal.edge(), fade));
+			d.flame(head, 0.95, 0, age, FxDraw.rgba(pal.core(), fade));
+			d.flame(head.add(0, 0.45, 0), 0.6, 0.7, age + 1, FxDraw.rgba(pal.edge(), fade));
+			d.flame(head.add(0, 0.45, 0), 0.6, -0.7, age + 2, FxDraw.rgba(pal.edge(), fade));
+			d.flame(head.add(0, -0.3, 0), 0.5, Math.PI, age + 3, FxDraw.rgba(pal.core(), 0.8f * fade));
+			d.billboard(FxDraw.GLOW, true, head, 0.9, 0, FxDraw.rgba(pal.edge(), 0.7f * fade));
 			d.billboard(FxDraw.GLOW, true, c, 1.4, 0, FxDraw.rgba(pal.core(), 0.3f * fade));
+		}
+	}
+
+	/** A fireball bursting outward: flame tongues racing out from the centre over a hot core, then smoke. */
+	static final class Fireball extends GrandLineFx.Effect {
+		final Vec3 c;
+		final double radius;
+		final Vec3[] dirs = new Vec3[14];
+
+		Fireball(Vec3 c, double radius) {
+			super(-1);
+			this.c = c;
+			this.radius = radius;
+			for (int i = 0; i < dirs.length; i++) {
+				dirs[i] = new Vec3(RANDOM.nextGaussian(), RANDOM.nextGaussian() * 0.6 + 0.2, RANDOM.nextGaussian()).normalize();
+			}
+		}
+
+		@Override
+		boolean tick(ClientLevel level) {
+			return ++age < 12;
+		}
+
+		@Override
+		void render(FxDraw d, ClientLevel level) {
+			float t = (age + d.partial) / 12f;
+			float fade = (float) Math.pow(1 - t, 1.2);
+			double r = radius * (0.25 + 0.75 * (1 - (1 - t) * (1 - t)));
+			d.billboard(FxDraw.GLOW, true, c, r * 0.9, 0, FxDraw.rgba(0xFFE48A, 0.9f * fade));
+			for (int i = 0; i < dirs.length; i++) {
+				Vec3 p = c.add(dirs[i].scale(r * 0.75));
+				d.flame(p, radius * 0.45 * (1 - t * 0.4), FlameFx.rollToward(d, dirs[i]), age + i, FxDraw.rgba(i % 2 == 0 ? 0xFF6A10 : 0xFFB03A, fade));
+			}
 		}
 	}
 
@@ -1333,12 +1376,12 @@ final class SwordFx {
 			if (e != null && age <= life) {
 				Vec3 f = flat(e.getLookAngle());
 				Vec3 base = e.position().add(0, 1.1, 0);
-				for (int i = 0; i < 3; i++) {
+				for (int i = 0; i < 5; i++) {
 					Vec3 at = base.add(f.scale(1.2 + RANDOM.nextDouble() * (reach - 1.2))).add(right(f).scale(RANDOM.nextGaussian() * width * 0.3))
 							.add(0, RANDOM.nextGaussian() * 0.5, 0);
 					double a = RANDOM.nextDouble() * Math.PI;
 					Vec3 axis = right(f).scale(Math.cos(a)).add(UP.scale(Math.sin(a)));
-					GrandLineFx.add(new Streak(at.subtract(axis.scale(1.4)), at.add(axis.scale(1.4)), 0.2, pal, 5));
+					GrandLineFx.add(new Streak(at.subtract(axis.scale(2.2)), at.add(axis.scale(2.2)), 0.32, pal, 6));
 				}
 				SwordShapes.sparks(base.add(f.scale(reach * 0.5)), f, 4, 0.35, pal);
 			}

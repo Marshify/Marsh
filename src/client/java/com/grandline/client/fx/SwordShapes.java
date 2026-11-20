@@ -186,20 +186,21 @@ final class SwordShapes {
 				double k = i / (double) (n - 1);
 				pts.add(point(c, Mth.lerp(k, head, tail), s));
 				double taper = Math.sin(Math.PI * Math.min(1, (1 - k) * 1.15)) * 0.6 + (1 - k) * 0.4;
-				wide[i] = 0.7 * scale * taper;
-				thin[i] = 0.16 * scale * taper;
-				a1[i] = (float) (0.5 * fade * (1 - k * 0.85));
-				a2[i] = (float) (0.95 * fade * (1 - k));
-				a3[i] = (float) (0.65 * fade * (1 - k * 0.7));
+				wide[i] = 1.0 * scale * taper;
+				thin[i] = 0.22 * scale * taper;
+				a1[i] = (float) (0.7 * fade * (1 - k * 0.85));
+				a2[i] = (float) (fade * (1 - k));
+				a3[i] = (float) (0.85 * fade * (1 - k * 0.7));
 			}
+			d.ribbon(FxDraw.GLOW, pts, wide, rgb(pal.core()), a1, 0);
 			if (pal.darkCore()) {
+				// A dark blade body over the glow: black/crimson core with glowing edges.
 				double[] dark = new double[n];
 				for (int i = 0; i < n; i++) {
-					dark[i] = wide[i] * 0.75;
+					dark[i] = wide[i] * 0.55;
 				}
 				d.ribbonSoft(FxDraw.GLOW, pts, dark, rgb(pal.dark()), a3, 0);
 			}
-			d.ribbon(FxDraw.GLOW, pts, wide, rgb(pal.core()), a1, 0);
 			d.ribbon(FxDraw.STREAK, pts, thin, rgb(pal.edge()), a2, 0);
 		}
 	}
@@ -282,9 +283,17 @@ final class SwordShapes {
 				double r = roll + (blades > 1 ? b * Math.PI / blades : 0);
 				Vec3 w = side.scale(Math.cos(r)).add(up.scale(Math.sin(r)));
 				crescent(d, pos, dir, w, size * grow, size * 0.95 * grow, pal, fade);
-				// A fading echo just behind it reads as the blade's trail.
-				crescent(d, pos.subtract(dir.scale(speed * 0.9)), dir, w, size * 0.92 * grow, size * 0.85 * grow, pal, fade * 0.35f);
+				if (blades == 1) {
+					// A second, shallower plane gives the blade body so it never vanishes edge-on.
+					double r2 = r + 0.55;
+					Vec3 w2 = side.scale(Math.cos(r2)).add(up.scale(Math.sin(r2)));
+					crescent(d, pos.subtract(dir.scale(0.05)), dir, w2, size * 0.94 * grow, size * 0.8 * grow, pal, fade * 0.55f);
+				}
+				// Fading echoes just behind it read as the blade's trail.
+				crescent(d, pos.subtract(dir.scale(speed * 0.9)), dir, w, size * 0.92 * grow, size * 0.85 * grow, pal, fade * 0.4f);
+				crescent(d, pos.subtract(dir.scale(speed * 1.8)), dir, w, size * 0.84 * grow, size * 0.75 * grow, pal, fade * 0.18f);
 			}
+			d.billboard(FxDraw.GLOW, true, pos, size * 0.55 * grow, 0, FxDraw.rgba(pal.core(), 0.3f * fade));
 		}
 	}
 
@@ -731,7 +740,7 @@ final class SwordShapes {
 				float[] a = new float[n], a2 = new float[n];
 				double scale = b == 0 ? 1 : 0.55;
 				for (int i = 0; i < n; i++) {
-					w[i] = width * 3 * scale;
+					w[i] = width * 4 * scale;
 					core[i] = width * scale;
 					a[i] = 0.5f * flicker;
 					a2[i] = flicker;

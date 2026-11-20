@@ -418,6 +418,12 @@ public final class GrandLineCommands {
 										.then(Commands.argument("amount", LongArgumentType.longArg())
 												.executes(context -> modify(context, "addcurrency",
 														(player, ctx) -> PlayerProfileService.addCurrency(player, LongArgumentType.getLong(ctx, "amount")))))))
+						.then(Commands.literal("cast")
+								.then(Commands.argument("player", EntityArgument.player())
+										.then(Commands.argument("slot", IntegerArgumentType.integer(0, 4))
+												.executes(context -> cast(context, 0))
+												.then(Commands.argument("charge", com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg(0, 1))
+														.executes(context -> cast(context, com.mojang.brigadier.arguments.DoubleArgumentType.getDouble(context, "charge")))))))
 						.then(Commands.literal("setlevel")
 								.then(Commands.argument("players", EntityArgument.players())
 										.then(Commands.argument("level", IntegerArgumentType.integer(PlayerProfile.MIN_LEVEL))
@@ -502,6 +508,26 @@ public final class GrandLineCommands {
 					profile.stats().get(stat), rules.maxPointsPerStat(), effect), false);
 		}
 		return (int) profile.stats().total();
+	}
+
+	/**
+	 * Casts a move of the weapon in the player's hand straight away (no energy, mastery or cooldown checks): for testing
+	 * moves and recording them from another viewpoint.
+	 */
+	private static int cast(com.mojang.brigadier.context.CommandContext<CommandSourceStack> context, double charge)
+			throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+		var player = EntityArgument.getPlayer(context, "player");
+		int slot = IntegerArgumentType.getInteger(context, "slot");
+		Power power = com.grandline.gear.Gear.powerFor(player.getMainHandItem().getItem());
+		if (power == null || slot >= power.abilities().size()) {
+			context.getSource().sendFailure(Component.literal("No such move on the held weapon"));
+			return 0;
+		}
+		var ability = power.abilities().get(slot);
+		double multiplier = PlayerProfileService.statRules().abilityMultiplier(PlayerProfileService.get(player).stats(), power.scalingStat());
+		ability.action().execute(new com.grandline.combat.ability.AbilityContext(player, power, ability, multiplier, charge));
+		context.getSource().sendSuccess(() -> Component.literal("Cast " + ability.key()), false);
+		return 1;
 	}
 
 	private static String format(double value) {
