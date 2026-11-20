@@ -63,6 +63,18 @@ public final class GrandLineAbilityGameTests implements FabricGameTest {
 		});
 	}
 
+	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_6")
+	public void styleIsPutAwayWhileHoldingAnItemFromSlotsFiveToNine(GameTestHelper helper) {
+		ServerPlayer player = helper.makeMockServerPlayerInLevel();
+		player.getInventory().selected = 5; // key 6
+		eq(helper, use(player, PowerSource.STYLE, 0), Outcome.NOT_ALLOWED, "no Brawler jab with an item slot selected");
+		helper.runAfterDelay(gap(), () -> {
+			player.getInventory().selected = 0; // key 1: back on the loadout
+			eq(helper, use(player, PowerSource.STYLE, 0), Outcome.USED, "jab works again from the loadout");
+			helper.succeed();
+		});
+	}
+
 	@GameTest(template = EMPTY_STRUCTURE, batch = "ability_2")
 	public void lockedMovesAndMissingFruitAreRejected(GameTestHelper helper) {
 		ServerPlayer player = helper.makeMockServerPlayerInLevel();

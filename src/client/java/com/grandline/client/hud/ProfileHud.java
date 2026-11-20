@@ -166,6 +166,9 @@ public final class ProfileHud {
 	private static void renderPowerPanel(GuiGraphics graphics, Minecraft client, ProfileSyncPayload view) {
 		Font font = client.font;
 		PlayerProfile profile = view.profile();
+		if (!GrandLineKeys.movesReady()) {
+			return; // an item from slots 5-9 is in hand: the style and fruit are put away
+		}
 		PowerSource source = GrandLineKeys.activeSource();
 		Power power = source == PowerSource.WEAPON ? GrandLineKeys.activePower()
 				: source == PowerSource.FRUIT ? Powers.get(profile.powers().fruit()) : Powers.get(profile.powers().fightingStyle());

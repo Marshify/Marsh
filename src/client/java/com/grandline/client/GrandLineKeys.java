@@ -57,6 +57,19 @@ public final class GrandLineKeys {
 		};
 	}
 
+	/**
+	 * Whether the move keys do anything right now: a sword or gun in hand, or a loadout entry (keys 1-4) selected. With an
+	 * item from hotbar slots 5-9 in hand the fighting style and fruit are put away.
+	 */
+	public static boolean movesReady() {
+		var player = net.minecraft.client.Minecraft.getInstance().player;
+		if (player == null) {
+			return false;
+		}
+		return com.grandline.gear.Gear.powerFor(player.getMainHandItem().getItem()) != null
+				|| player.getInventory().selected < com.grandline.player.loadout.LoadoutOrder.SIZE;
+	}
+
 	public static PowerSource activeSource() {
 		// Holding a sword or gun puts its moves on the keys; switching back to empty hands restores the choice.
 		var player = net.minecraft.client.Minecraft.getInstance().player;
@@ -188,7 +201,7 @@ public final class GrandLineKeys {
 			while (MOVES[slot].consumeClick()) {
 				down = true; // also honour clicks if we do own the key (e.g. after rebinding to a free key)
 			}
-			if (down && !moveKeyWasDown[slot] && client.player != null && client.screen == null) {
+			if (down && !moveKeyWasDown[slot] && client.player != null && client.screen == null && movesReady()) {
 				ClientNetworking.requestAbilityActivation(activeSource(), slot);
 				heldSource[slot] = activeSource();
 			}

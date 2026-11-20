@@ -49,6 +49,11 @@ public final class AbilityActivationHandler {
 			return Outcome.NOT_ALLOWED;
 		}
 
+		// Style and fruit moves need an empty loadout hand (hotbar keys 1-4); holding an item from slots 5-9 puts them away.
+		if (source != PowerSource.WEAPON && player.getInventory().selected >= com.grandline.player.loadout.LoadoutOrder.SIZE) {
+			return Outcome.NOT_ALLOWED;
+		}
+
 		PlayerProfile profile = PlayerProfileService.get(player);
 		Power power = resolve(player, profile, source);
 		if (power == null) {
