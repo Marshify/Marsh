@@ -203,7 +203,9 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 		ServerPlayer good = survivor(helper);
 		ServerPlayer idle = survivor(helper);
 		for (ServerPlayer p : new ServerPlayer[]{good, idle}) {
-			p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD));
+			// The rod is owned equipment: owned and equipped (put in the hotbar), then taken in hand.
+			com.grandline.gear.EquipmentOwnership.grant(p, com.grandline.registry.ModItems.STARTER_FISHING_ROD);
+			p.getInventory().selected = p.getInventory().findSlotMatchingItem(new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD));
 			p.setAttached(ModAttachments.FISHING_MASTERY, com.grandline.fishing.FishingMastery.START);
 		}
 		var silverfin = com.grandline.fishing.FishingRules.byItem(com.grandline.npc.FishingService.SILVERFIN);

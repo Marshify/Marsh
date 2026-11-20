@@ -49,7 +49,7 @@ public final class NpcService {
 		}
 		if (npc.role() == Islander.Role.FISHERMAN) {
 			stock.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(com.grandline.registry.ModItems.STARTER_FISHING_ROD).toString());
-			prices.add(GrandLineMod.config().fishingRodPrice);
+			prices.add(com.grandline.gear.EquipmentOwnership.owns(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD) ? -1L : GrandLineMod.config().fishingRodPrice);
 		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
 			stock.addAll(SwordShop.ids());
@@ -146,14 +146,14 @@ public final class NpcService {
 	/** Sells a Starter Fishing Rod for Grand Line money (checked and taken here, before the rod is handed over). */
 	public static String buyRod(ServerPlayer player) {
 		long price = GrandLineMod.config().fishingRodPrice;
+		if (com.grandline.gear.EquipmentOwnership.owns(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD)) {
+			return "rod_owned"; // owned equipment: one for good, kept in the Backpack when not equipped
+		}
 		if (com.grandline.player.PlayerProfileService.get(player).currency() < price) {
 			return "rod_money";
 		}
 		com.grandline.player.PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price));
-		net.minecraft.world.item.ItemStack rod = new net.minecraft.world.item.ItemStack(com.grandline.registry.ModItems.STARTER_FISHING_ROD);
-		if (!player.getInventory().add(rod)) {
-			player.drop(rod, false);
-		}
+		com.grandline.gear.EquipmentOwnership.grant(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD);
 		return "rod_bought";
 	}
 

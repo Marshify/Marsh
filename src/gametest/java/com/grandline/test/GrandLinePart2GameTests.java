@@ -151,7 +151,9 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		PlayerProfileService.update(p, pr -> pr.withCurrency(katana + cutlass + 5));
 		helper.assertTrue(SwordShop.buy(p, 0).equals("sword_bought") && SwordShop.buy(p, 1).equals("sword_bought"), "both bought");
 		helper.assertTrue(PlayerProfileService.get(p).currency() == 5, "exact price taken: " + PlayerProfileService.get(p).currency());
-		helper.assertTrue(p.getInventory().countItem(Gear.KATANA) == 1 && p.getInventory().countItem(Gear.CUTLASS) == 1, "one of each delivered");
+		// Both owned; the first is equipped (held), the second waits in the Backpack (one sword equipped at a time).
+		helper.assertTrue(p.getInventory().countItem(Gear.KATANA) == 1 && p.getInventory().countItem(Gear.CUTLASS) == 0
+				&& com.grandline.gear.EquipmentOwnership.owns(p, Gear.CUTLASS), "katana equipped, cutlass in the Backpack");
 		helper.assertTrue(SwordShop.buy(p, SwordShop.STOCK.size()).equals("too_far") && SwordShop.buy(p, -1).equals("too_far"), "no such sword");
 		helper.assertTrue(SwordShop.buy(p, 0).equals("already_owned") && p.getInventory().countItem(Gear.KATANA) == 1
 				&& PlayerProfileService.get(p).currency() == 5, "an owned sword cannot be bought again");

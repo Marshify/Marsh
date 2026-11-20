@@ -53,6 +53,9 @@ public final class GrandLineNetworking {
 		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.TechniqueActionPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.technique.TechniqueService.handle(player, packet.action(), packet.forward(), packet.strafe()));
 
+		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.EquipWeaponPayload.TYPE,
+				(packet, player, responseSender) -> handleEquipWeapon(player, packet));
+
 		ServerPlayNetworking.registerGlobalReceiver(AllocateStatPayload.TYPE,
 				(packet, player, responseSender) -> handleAllocateStat(player, packet));
 
@@ -61,6 +64,27 @@ public final class GrandLineNetworking {
 
 		ServerPlayNetworking.registerGlobalReceiver(FruitActionPayload.TYPE,
 				(packet, player, responseSender) -> handleFruitAction(player, packet));
+	}
+
+	/** The Backpack's Equip / Unequip for a weapon: rate limited, then checked and done by EquipmentOwnership. */
+	public static com.grandline.gear.EquipmentOwnership.Change handleEquipWeapon(ServerPlayer player,
+			com.grandline.network.payload.EquipWeaponPayload packet) {
+		if (ServerRequestGuard.check(player, com.grandline.network.payload.EquipWeaponPayload.TYPE) != ServerRequestGuard.Result.ACCEPTED) {
+			return null;
+		}
+		net.minecraft.world.item.Item item = com.grandline.gear.EquipmentOwnership.item(packet.itemId());
+		var change = com.grandline.gear.EquipmentOwnership.setEquipped(player, item, packet.equip());
+		if (change == com.grandline.gear.EquipmentOwnership.Change.NOT_WEAPON || change == com.grandline.gear.EquipmentOwnership.Change.NOT_OWNED) {
+			ServerRequestGuard.reject(player, com.grandline.network.payload.EquipWeaponPayload.TYPE, ServerRequestGuard.Result.REJECTED_INVALID);
+		}
+		if (change != com.grandline.gear.EquipmentOwnership.Change.ALREADY) {
+			net.minecraft.network.chat.Component name = new net.minecraft.world.item.ItemStack(item).getHoverName();
+			player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+					"message.grandline.equipment." + change.name().toLowerCase(java.util.Locale.ROOT), name)
+					.withStyle(change.done() ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED), true);
+		}
+		com.grandline.gear.EquipmentOwnership.sync(player);
+		return change;
 	}
 
 	/** Validates and runs a fruit / shop / gacha / stash / refund request. Returns the result (exposed for tests). */

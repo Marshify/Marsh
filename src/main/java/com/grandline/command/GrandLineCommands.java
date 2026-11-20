@@ -238,7 +238,7 @@ public final class GrandLineCommands {
 													context.getSource().sendSuccess(() -> Component.literal("Grant " + ResourceLocationArgument.getId(context, "item")
 															+ " to " + p.getGameProfile().getName() + ": " + result), true);
 													return result == com.grandline.gear.EquipmentOwnership.Grant.GRANTED
-															|| result == com.grandline.gear.EquipmentOwnership.Grant.GRANTED_NO_ROOM ? 1 : 0;
+															|| result == com.grandline.gear.EquipmentOwnership.Grant.GRANTED_NO_ROOM || result == com.grandline.gear.EquipmentOwnership.Grant.STORED ? 1 : 0;
 												}))))
 						.then(Commands.literal("revoke")
 								.then(Commands.argument("player", EntityArgument.player())
