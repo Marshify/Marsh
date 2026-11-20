@@ -79,6 +79,14 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("owned_equipment"));
 
+	/** Flash Step, Aura and Instinct: ownership and progression (persistent, survives death). See TechniqueService. */
+	public static final AttachmentType<com.grandline.technique.Techniques> TECHNIQUES =
+			AttachmentRegistry.<com.grandline.technique.Techniques>builder()
+					.persistent(com.grandline.technique.Techniques.CODEC)
+					.copyOnDeath()
+					.initializer(() -> com.grandline.technique.Techniques.NONE)
+					.buildAndRegister(GrandLineMod.id("techniques"));
+
 	/** Chosen side: "pirates", "marines" or "" (persistent, survives death). */
 	public static final AttachmentType<String> TEAM = AttachmentRegistry.<String>builder()
 			.persistent(com.mojang.serialization.Codec.STRING)

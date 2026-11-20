@@ -32,6 +32,10 @@ public final class NpcScreens {
 			case INNKEEPER -> innkeeper(data);
 			case SWORDSMITH -> swordsmith(data);
 			case RACE_MYSTIC, TINKERER, GRAVEKEEPER, TRIAL_KEEPER -> new com.grandline.client.race.RaceScreen(null); // normally opened by the race sync
+			case MOVEMENT_INSTRUCTOR -> TrainerScreens.movementInstructor(data);
+			case FLASH_STEP_MASTER -> TrainerScreens.flashStepMaster(data);
+			case AURA_MASTER -> TrainerScreens.auraMaster(data);
+			case INSTINCT_SAGE -> TrainerScreens.instinctSage(data);
 		});
 	}
 

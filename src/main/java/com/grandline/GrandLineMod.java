@@ -75,6 +75,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.combat.ability.ChargeService.register();
 		com.grandline.gear.sword.Stuns.register();
 		com.grandline.gear.sword.SwordCombos.register();
+		com.grandline.technique.TechniqueService.register();
 		com.grandline.combat.ability.FlightService.register();
 		com.grandline.combat.CombatCredit.register();
 		MobKillRewards.register();

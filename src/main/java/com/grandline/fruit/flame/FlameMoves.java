@@ -85,7 +85,7 @@ public final class FlameMoves {
 	}
 
 	public static List<AbilityDef> moves() {
-		AbilityDef nova = new AbilityDef("flame_destroyer", 100, 300, 0.30, AbilityDef.Activation.CHARGED, FlameMoves::infernoNova);
+		AbilityDef nova = new AbilityDef("flame_destroyer", 100, 300, 0.30, AbilityDef.Activation.CHARGED, FlameMoves::infernoNova).breaksInstinct();
 		ChargeService.visual(nova, FlameMoves::chargingNova);
 		return List.of(
 				new AbilityDef("flame_bullets", 1, 50, 0.07, FlameMoves::cinderShots),

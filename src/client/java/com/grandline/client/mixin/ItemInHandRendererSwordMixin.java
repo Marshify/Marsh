@@ -15,6 +15,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererSwordMixin {
 	@ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true)
+	private MultiBufferSource grandline$auraWeapon(MultiBufferSource buffers, AbstractClientPlayer player) {
+		return com.grandline.client.render.aura.CoatedBuffers.forHolder(player, buffers);
+	}
+
+	@ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true)
 	private ItemStack grandline$secondBlade(ItemStack stack, AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand) {
 		if (hand != InteractionHand.OFF_HAND || !stack.isEmpty()) {
 			return stack;

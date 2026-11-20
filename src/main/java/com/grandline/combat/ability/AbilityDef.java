@@ -9,8 +9,10 @@ package com.grandline.combat.ability;
  * @param energyCost      fraction of the player's max energy consumed (0.1 = 10%)
  * @param activation      how the key is used: tap, hold-and-release, or on/off
  * @param action          what happens
+ * @param instinctBreaking hits from this move cannot be evaded by Instinct
  */
-public record AbilityDef(String key, int requiredMastery, int cooldownTicks, double energyCost, Activation activation, AbilityAction action) {
+public record AbilityDef(String key, int requiredMastery, int cooldownTicks, double energyCost, Activation activation, AbilityAction action,
+		boolean instinctBreaking) {
 	/** How a move is triggered. */
 	public enum Activation {
 		/** Fires immediately on key press. */
@@ -22,7 +24,16 @@ public record AbilityDef(String key, int requiredMastery, int cooldownTicks, dou
 	}
 
 	public AbilityDef(String key, int requiredMastery, int cooldownTicks, double energyCost, AbilityAction action) {
-		this(key, requiredMastery, cooldownTicks, energyCost, Activation.INSTANT, action);
+		this(key, requiredMastery, cooldownTicks, energyCost, Activation.INSTANT, action, false);
+	}
+
+	public AbilityDef(String key, int requiredMastery, int cooldownTicks, double energyCost, Activation activation, AbilityAction action) {
+		this(key, requiredMastery, cooldownTicks, energyCost, activation, action, false);
+	}
+
+	/** This move, but its hits break through Instinct. */
+	public AbilityDef breaksInstinct() {
+		return new AbilityDef(key, requiredMastery, cooldownTicks, energyCost, activation, action, true);
 	}
 
 	public String translationKey() {

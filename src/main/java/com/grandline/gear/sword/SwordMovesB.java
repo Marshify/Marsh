@@ -159,7 +159,7 @@ final class SwordMovesB extends SwordMoveBase {
 
 	static List<AbilityDef> bisento() {
 		return List.of(def("bisento_atmospheric_cleave", 50, 9, 20, SwordMovesB::atmosphericCleave),
-				def("bisento_seismic_core", 150, 13.5, 30, SwordMovesB::seismicCore));
+				def("bisento_seismic_core", 150, 13.5, 30, SwordMovesB::seismicCore).breaksInstinct());
 	}
 
 	static final int CLEAVE_WINDUP = 7;
@@ -386,7 +386,7 @@ final class SwordMovesB extends SwordMoveBase {
 
 	static List<AbilityDef> stormstaff() {
 		return List.of(def("stormstaff_storm_detonation", 80, 7.5, 15, SwordMovesB::stormDetonation),
-				def("stormstaff_thunderfall", 180, 10.5, 25, SwordMovesB::thunderfall));
+				def("stormstaff_thunderfall", 180, 10.5, 25, SwordMovesB::thunderfall).breaksInstinct());
 	}
 
 	/** Z: an overhead swing throws a compact thundercloud that bursts into branching lightning on impact, pinning enemies. */
@@ -449,7 +449,7 @@ final class SwordMovesB extends SwordMoveBase {
 
 	static List<AbilityDef> saber() {
 		return List.of(def("saber_crimson_onslaught", 50, 7.5, 15, SwordMovesB::crimsonOnslaught),
-				def("saber_scarlet_crossfire", 125, 14, 30, SwordMovesB::scarletCrossfire));
+				def("saber_scarlet_crossfire", 125, 14, 30, SwordMovesB::scarletCrossfire).breaksInstinct());
 	}
 
 	/** A Saber move's base damage times {@code saberMoveDamageMultiplier} (read when the move is used). */
@@ -533,7 +533,7 @@ final class SwordMovesB extends SwordMoveBase {
 
 	static List<AbilityDef> eclipseBlade() {
 		AbilityDef storm = charged("eclipse_blade_emerald_storm", 1, 8.5, 20, SwordMovesB::emeraldStorm);
-		AbilityDef cleaver = charged("eclipse_blade_eclipse_cleaver", 50, 13, 40, SwordMovesB::eclipseCleaver);
+		AbilityDef cleaver = charged("eclipse_blade_eclipse_cleaver", 50, 13, 40, SwordMovesB::eclipseCleaver).breaksInstinct();
 		// Only the upgraded blade charges: otherwise both fire the moment the key goes down.
 		ChargeService.chargeIf(storm, SwordUpgrades::upgraded);
 		ChargeService.chargeIf(cleaver, SwordUpgrades::upgraded);

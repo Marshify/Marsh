@@ -14,6 +14,8 @@ public abstract class NavigationGlowColorMixin {
 	private void grandline$goldOutline(CallbackInfoReturnable<Integer> cir) {
 		if (((Entity) (Object) this).level().isClientSide && ClientNavigation.highlighted((Entity) (Object) this)) {
 			cir.setReturnValue(0xFFD866);
+		} else if (((Entity) (Object) this).level().isClientSide && com.grandline.client.technique.InstinctSense.marked((Entity) (Object) this)) {
+			cir.setReturnValue(com.grandline.client.technique.InstinctSense.color((Entity) (Object) this)); // Instinct's marks
 		}
 	}
 }

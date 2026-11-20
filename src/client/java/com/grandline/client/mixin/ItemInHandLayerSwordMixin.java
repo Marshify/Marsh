@@ -26,6 +26,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandLayer.class)
 public abstract class ItemInHandLayerSwordMixin {
 	@ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true)
+	private MultiBufferSource grandline$auraWeapon(MultiBufferSource buffers, LivingEntity entity) {
+		return com.grandline.client.render.aura.CoatedBuffers.forHolder(entity, buffers);
+	}
+
+	@ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true)
 	private ItemStack grandline$secondBlade(ItemStack stack, LivingEntity entity, ItemStack same, ItemDisplayContext context, HumanoidArm arm) {
 		return HeldSwords.offHand(entity, stack, arm);
 	}

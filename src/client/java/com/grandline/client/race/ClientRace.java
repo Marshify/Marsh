@@ -25,7 +25,7 @@ import java.util.Map;
  * (all rebindable in Controls).
  */
 public final class ClientRace {
-	public static final KeyMapping ABILITY = new KeyMapping("key.grandline.race_ability", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.categories.grandline");
+	public static final KeyMapping ABILITY = new KeyMapping("key.grandline.race_ability", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, "key.categories.grandline");
 	public static final KeyMapping AWAKEN = new KeyMapping("key.grandline.race_awaken", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Y, "key.categories.grandline");
 	public static final KeyMapping MENU = new KeyMapping("key.grandline.race_menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, "key.categories.grandline");
 

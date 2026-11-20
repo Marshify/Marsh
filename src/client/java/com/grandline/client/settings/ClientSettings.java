@@ -50,6 +50,8 @@ public final class ClientSettings {
 	public boolean showMenuButton = true;
 	/** Set once the vanilla player list has been moved off Tab for the loadout editor (only done once). */
 	public boolean playerListKeyMoved = false;
+	/** Set once the controls have been moved for Dash, Flash Step, Aura and Instinct (only done once; see TechniqueKeys). */
+	public boolean techniqueKeysMoved = false;
 	/** HUD element offsets from their default positions, by element id ("status", "moves", "quest"). */
 	public Map<String, int[]> hudOffsets = new HashMap<>();
 

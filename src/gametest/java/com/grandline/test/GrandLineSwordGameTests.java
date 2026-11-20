@@ -297,6 +297,23 @@ public final class GrandLineSwordGameTests implements FabricGameTest {
 		});
 	}
 
+	@GameTest(template = EMPTY_STRUCTURE, batch = "swords_creative")
+	public void creativeMenuSwordsAreKept(GameTestHelper helper) {
+		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		p.getInventory().clearContent();
+		p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+		p.getInventory().setItem(5, new ItemStack(Gear.REEFSAW));
+		com.grandline.gear.EquipmentOwnership.reconcile(p);
+		helper.assertTrue(com.grandline.gear.EquipmentOwnership.owns(p, Gear.REEFSAW), "a creative-menu sword becomes owned");
+		helper.assertTrue(p.getInventory().countItem(Gear.REEFSAW) == 1, "and stays in the inventory");
+		p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+		p.getInventory().setItem(6, new ItemStack(Gear.BISENTO));
+		com.grandline.gear.EquipmentOwnership.reconcile(p);
+		helper.assertTrue(p.getInventory().countItem(Gear.BISENTO) == 0, "outside creative an unowned sword is still removed");
+		p.discard();
+		helper.succeed();
+	}
+
 	@GameTest(template = EMPTY_STRUCTURE, batch = "swords_rules")
 	public void oldSwordPricesAreKept(GameTestHelper helper) {
 		var config = new com.grandline.config.GrandLineConfig();

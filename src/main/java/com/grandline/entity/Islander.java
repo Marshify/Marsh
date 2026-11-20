@@ -42,7 +42,15 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Ghoul unlock (Stonewall Prison). */
 		GRAVEKEEPER,
 		/** Awakening trials and V4 (Saltmarket Docks). */
-		TRIAL_KEEPER;
+		TRIAL_KEEPER,
+		/** Teaches Dash (free tutorial): Millbrook Village and the Marines' island. */
+		MOVEMENT_INSTRUCTOR,
+		/** Sells Flash Step (Frostpeak Isle's village). */
+		FLASH_STEP_MASTER,
+		/** Sells Aura (Frostpeak Isle's village). */
+		AURA_MASTER,
+		/** Sells Instinct (the upper Cloudtop Isles). */
+		INSTINCT_SAGE;
 
 		public static Role byId(int id) {
 			Role[] values = values();

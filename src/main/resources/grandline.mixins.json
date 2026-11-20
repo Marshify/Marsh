@@ -21,7 +21,11 @@
     "PlayerLavaHurtMixin",
     "MagmaBlockMixin",
     "BiomeFreezeMixin",
-    "ItemStackRenameMixin"
+    "ItemStackRenameMixin",
+    "TechniqueDamageMixin",
+    "EvadedEffectsMixin",
+    "EvadedFireMixin",
+    "ServerPlayerSpawnAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

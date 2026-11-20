@@ -24,7 +24,8 @@
     "GuiHealthBarsMixin",
     "ItemRendererHeldSwordMixin",
     "ItemInHandLayerSwordMixin",
-    "ItemInHandRendererSwordMixin"
+    "ItemInHandRendererSwordMixin",
+    "PlayerHandAuraMixin"
   ],
   "injectors": {
     "defaultRequire": 1

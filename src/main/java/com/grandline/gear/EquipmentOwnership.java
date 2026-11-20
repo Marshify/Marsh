@@ -27,7 +27,8 @@ import java.util.Set;
  *
  * <p>The reconciler (each second, and on join and respawn) keeps that true whatever happened to the stacks (pickups,
  * containers, the crafting grid, dragging, commands): each owned item is held exactly once (extra copies are removed; a
- * lost one comes back when there is room), and equipment the player does not own is removed. Equipment cannot be
+ * lost one comes back when there is room), and equipment the player does not own is removed (in creative mode, taking
+ * it from the creative menu makes it owned instead). Equipment cannot be
  * dropped. It also mends any damaged item (durability is off in Grand Line; see ItemStackNoDurabilityMixin).
  *
  * <p>Saves from before this system are migrated once: everything the player holds or wears is counted as owned, and
@@ -245,6 +246,12 @@ public final class EquipmentOwnership {
 			}
 			List<Holder> copies = new ArrayList<>(holders.stream().filter(h -> h.stack().is(item) && !h.stack().isEmpty()).toList());
 			copies.sort((a, b) -> Integer.compare(a.priority(), b.priority()));
+			if (!owned && !copies.isEmpty() && player.gameMode.getGameModeForPlayer() == net.minecraft.world.level.GameType.CREATIVE) {
+				// Creative mode: taking equipment from the creative menu makes it yours instead of removing it.
+				own = own.with(id);
+				player.setAttached(ModAttachments.OWNED_EQUIPMENT, own);
+				owned = true;
+			}
 			for (Holder h : copies) {
 				if (owned && !kept) {
 					kept = true;

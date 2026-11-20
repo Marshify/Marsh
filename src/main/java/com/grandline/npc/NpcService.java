@@ -102,13 +102,22 @@ public final class NpcService {
 					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
 			case NpcActionPayload.BUY_ROD -> npc.role() == Islander.Role.FISHERMAN ? buyRod(player) : "too_far";
 			case NpcActionPayload.SET_HOME -> npc.role() == Islander.Role.INNKEEPER ? setHome(player, npc) : "too_far";
+			case NpcActionPayload.TRAIN -> npc.role() == Islander.Role.FLASH_STEP_MASTER
+					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.FLASH_STEP) : "too_far";
+			case NpcActionPayload.TRAIN + 1 -> npc.role() == Islander.Role.AURA_MASTER
+					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.AURA) : "too_far";
+			case NpcActionPayload.TRAIN + 2 -> npc.role() == Islander.Role.INSTINCT_SAGE
+					? com.grandline.technique.TechniqueTrainers.buy(player, com.grandline.technique.TechniqueTrainers.INSTINCT) : "too_far";
+			case NpcActionPayload.TRAIN + 3 -> npc.role() == Islander.Role.MOVEMENT_INSTRUCTOR
+					? com.grandline.technique.TechniqueTrainers.startTutorial(player) : "too_far";
 			default -> packet.action() >= NpcActionPayload.BUY_SWORD && packet.action() < NpcActionPayload.BUY_SWORD + SwordShop.STOCK.size()
 					? npc.role() == Islander.Role.SWORDSMITH ? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
 					: "too_far";
 		};
 		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
-				|| result.equals("sword_bought") || result.equals("rod_bought");
+				|| result.equals("sword_bought") || result.equals("rod_bought") || result.equals("technique_learned")
+				|| result.equals("tutorial_started");
 		if (result.equals("home_set")) {
 			return result; // the confirmation names the island (see setHome)
 		}

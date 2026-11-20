@@ -70,6 +70,9 @@ public final class AbilityHelpers {
 
 	/** Knocks {@code target} away from {@code from}. */
 	public static void knockAway(LivingEntity target, Vec3 from, double strength, double lift) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return; // Instinct evaded the hit
+		}
 		Vec3 away = target.position().subtract(from);
 		Vec3 horizontal = new Vec3(away.x, 0, away.z);
 		horizontal = horizontal.lengthSqr() < 1.0e-4 ? new Vec3(0, 0, 0) : horizontal.normalize().scale(strength);

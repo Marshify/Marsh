@@ -37,6 +37,10 @@ import java.util.Map;
  */
 public final class KeeperNpcs {
 	public static final String SWORD_ISLAND = "Millbrook Village";
+	/** The cold island whose village hosts the Flash Step and Aura masters. */
+	public static final String FROST_ISLAND = "Frostpeak Isle";
+	/** The island whose upper region hosts the Instinct Sage. */
+	public static final String SKY_ISLAND = "Cloudtop Isles";
 	static final int CHECK_TICKS = 40;
 	static final int NEAR = 160;
 
@@ -57,6 +61,14 @@ public final class KeeperNpcs {
 		roles.add(Islander.Role.INNKEEPER);
 		if (SWORD_ISLAND.equals(island.name()) || com.grandline.GrandLineMod.config().marineSpawnIsland.equals(island.name())) {
 			roles.add(Islander.Role.SWORDSMITH);
+			roles.add(Islander.Role.MOVEMENT_INSTRUCTOR);
+		}
+		if (FROST_ISLAND.equals(island.name())) {
+			roles.add(Islander.Role.FLASH_STEP_MASTER);
+			roles.add(Islander.Role.AURA_MASTER);
+		}
+		if (SKY_ISLAND.equals(island.name())) {
+			roles.add(Islander.Role.INSTINCT_SAGE);
 		}
 		switch (island.name()) {
 			case com.grandline.race.RaceProgress.MYSTIC_ISLAND -> roles.add(Islander.Role.RACE_MYSTIC);
@@ -191,8 +203,8 @@ public final class KeeperNpcs {
 	}
 
 	private static Anchor plannedAnchor(Island island, Islander.Role role) {
-		if (com.grandline.race.RaceNpcs.isRaceNpc(role)) {
-			return null; // placed beside the island's main NPCs
+		if (role != Islander.Role.INNKEEPER && role != Islander.Role.SWORDSMITH) {
+			return null; // race NPCs and trainers stand beside the island's main NPCs
 		}
 		Anchor.Type type = role == Islander.Role.SWORDSMITH ? Anchor.Type.SWORDSMITH : Anchor.Type.HOME;
 		List<Anchor> anchors = IslandPlans.anchors(island, type);
@@ -204,6 +216,9 @@ public final class KeeperNpcs {
 	 * NPC (quest giver, gunsmith or arrival point), clear of the other NPCs, else near the centre.
 	 */
 	static BlockPos chooseSpot(ServerLevel level, Island island, Islander.Role role, Data data) {
+		if (role == Islander.Role.INSTINCT_SAGE) {
+			return upperSpot(level, island);
+		}
 		Anchor planned = plannedAnchor(island, role);
 		if (planned != null) {
 			int x = island.x() + planned.x(), z = island.z() + planned.z();
@@ -245,6 +260,44 @@ public final class KeeperNpcs {
 			BlockPos found = nearestSafe(level, base.getX(), base.getZ(), 8, island, taken);
 			if (found != null) {
 				return found;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The Instinct Sage's spot: a few steps from the upper region's quest giver, on that region's own ground (high above
+	 * the lower island), so it is found in existing worlds without touching any building.
+	 */
+	private static BlockPos upperSpot(ServerLevel level, Island island) {
+		IslandPlan plan = IslandPlans.get(island);
+		if (plan == null) {
+			return null;
+		}
+		for (Anchor a : IslandPlans.anchors(island, Anchor.Type.QUEST)) {
+			if (a.region() == com.grandline.world.FirstSeaProgression.LOWER) {
+				continue;
+			}
+			int bx = island.x() + a.x(), bz = island.z() + a.z();
+			int by = a.y() != Anchor.SURFACE ? a.y() : plan.terrain().ground(a.x(), a.z()) + 1;
+			level.getChunk(bx >> 4, bz >> 4);
+			for (int r = 3; r <= 7; r++) {
+				for (int dx = -r; dx <= r; dx++) {
+					for (int dz = -r; dz <= r; dz++) {
+						if (Math.max(Math.abs(dx), Math.abs(dz)) != r) {
+							continue;
+						}
+						for (int dy = 0; dy <= 2; dy++) {
+							for (int sign : new int[]{1, -1}) {
+								BlockPos p = new BlockPos(bx + dx, by + dy * sign, bz + dz);
+								level.getChunk(p.getX() >> 4, p.getZ() >> 4);
+								if (IslandSpawns.isSafe(level, p)) {
+									return p;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		return null;

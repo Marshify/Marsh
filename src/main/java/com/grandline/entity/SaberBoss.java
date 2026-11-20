@@ -393,7 +393,16 @@ public class SaberBoss extends GrandLineEnemy {
 						swing(i == 1 ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 						boolean last = i == COMBO_HITS.length - 1;
 						float dmg = (float) (last ? config.saberBossComboFinisherDamage : config.saberBossComboDamage);
-						cut(3.5, 110, dmg, last ? 1.3 : 0.4, "boss_slash", i + 1);
+						if (last) {
+							// The combo's finisher cannot be read: it breaks through Instinct.
+							int style = i + 1;
+							com.grandline.technique.CombatContext.breaking(() -> {
+								cut(3.5, 110, dmg, 1.3, "boss_slash", style);
+								return true;
+							});
+						} else {
+							cut(3.5, 110, dmg, 0.4, "boss_slash", i + 1);
+						}
 					}
 				}
 				if (attackTick >= COMBO_END) {

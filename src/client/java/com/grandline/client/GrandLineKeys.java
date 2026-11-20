@@ -23,7 +23,7 @@ public final class GrandLineKeys {
 	public static final KeyMapping EDIT_LOADOUT = new KeyMapping("key.grandline.edit_loadout", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
 	/** Where the player list goes when it would share Tab with the loadout editor. */
 	public static final int PLAYER_LIST_KEY = GLFW.GLFW_KEY_GRAVE_ACCENT;
-	public static final KeyMapping CALL_SHIP = new KeyMapping("key.grandline.call_ship", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
+	public static final KeyMapping CALL_SHIP = new KeyMapping("key.grandline.call_ship", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_P, CATEGORY);
 	public static final KeyMapping MENU = new KeyMapping("key.grandline.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, CATEGORY);
 	public static final KeyMapping ITEMS = new KeyMapping("key.grandline.items", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, CATEGORY);
 	public static final KeyMapping SWITCH_POWER = new KeyMapping("key.grandline.switch_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, CATEGORY);

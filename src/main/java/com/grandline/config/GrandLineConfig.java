@@ -278,6 +278,36 @@ public final class GrandLineConfig {
 	/** Sword mastery at which the Bisento and the Eclipse Blade switch to their upgraded moves. */
 	public int swordUpgradeMastery = 300;
 
+	// ---- Techniques: Dash, Flash Step, Aura, Instinct ----
+	/** Dash: distance in blocks, duration in ticks, cooldown in ticks, energy (percent of max energy). */
+	public double dashDistance = 4.0;
+	public int dashTicks = 4;
+	public int dashCooldownTicks = 16;
+	public double dashEnergy = 10;
+	/** Flash Step: level, price, range in blocks, cooldown in ticks, energy (percent of max energy). */
+	public int flashStepLevel = 100;
+	public long flashStepPrice = 100_000;
+	public double flashStepRange = 20.0;
+	public int flashStepCooldownTicks = 300;
+	public double flashStepEnergy = 10;
+	/** Aura: price; XP needed for stages 1-5; physical damage bonus and damage reduction (percent) for stages 0-5. */
+	public long auraPrice = 25_000;
+	public long[] auraStageXp = {4_000, 12_000, 24_000, 48_000, 60_000};
+	public double[] auraDamageBonus = {10, 10, 10, 10, 10, 10};
+	public double[] auraDamageReduction = {0, 5, 10, 15, 20, 30};
+	/** Most Aura XP one hit can give, and the shortest gap between two XP-giving hits (ticks). */
+	public int auraXpPerHitCap = 25;
+	public int auraXpHitGapTicks = 4;
+	/** Instinct: level, price, XP for 3-8 dodge charges, seconds to regenerate one charge, detection radius. */
+	public int instinctLevel = 300;
+	public long instinctPrice = 750_000;
+	public long[] instinctChargeXp = {50, 350, 850, 1_400, 2_100, 2_800};
+	public int instinctBaseCharges = 2;
+	public int instinctRegenSeconds = 30;
+	public double instinctDetectRadius = 32;
+	/** Players holding an elemental fruit cannot be hurt by other players' physical attacks unless the attacker uses Aura. */
+	public boolean elementalImmunity = true;
+
 	// ---- Ships ----
 	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
 	public long[] shipPrices = {5_000, 60_000, 300_000};
@@ -512,6 +542,39 @@ public final class GrandLineConfig {
 			swordPrices = fresh;
 		}
 		swordUpgradeMastery = clamp(swordUpgradeMastery, 1, 100_000);
+		dashDistance = clamp(dashDistance, 0.5, 32);
+		dashTicks = clamp(dashTicks, 1, 40);
+		dashCooldownTicks = clamp(dashCooldownTicks, 0, 1200);
+		dashEnergy = clamp(dashEnergy, 0, 100);
+		flashStepLevel = clamp(flashStepLevel, 1, 100_000);
+		flashStepPrice = clamp(flashStepPrice, 0, maxCurrency);
+		flashStepRange = clamp(flashStepRange, 1, 64);
+		flashStepCooldownTicks = clamp(flashStepCooldownTicks, 0, 72_000);
+		flashStepEnergy = clamp(flashStepEnergy, 0, 100);
+		auraPrice = clamp(auraPrice, 0, maxCurrency);
+		if (auraStageXp == null || auraStageXp.length != 5) {
+			auraStageXp = defaults().auraStageXp;
+		}
+		if (auraDamageBonus == null || auraDamageBonus.length != 6) {
+			auraDamageBonus = defaults().auraDamageBonus;
+		}
+		if (auraDamageReduction == null || auraDamageReduction.length != 6) {
+			auraDamageReduction = defaults().auraDamageReduction;
+		}
+		for (int i = 0; i < 6; i++) {
+			auraDamageBonus[i] = clamp(auraDamageBonus[i], 0, 500);
+			auraDamageReduction[i] = clamp(auraDamageReduction[i], 0, 90);
+		}
+		auraXpPerHitCap = clamp(auraXpPerHitCap, 1, 100_000);
+		auraXpHitGapTicks = clamp(auraXpHitGapTicks, 0, 200);
+		instinctLevel = clamp(instinctLevel, 1, 100_000);
+		instinctPrice = clamp(instinctPrice, 0, maxCurrency);
+		if (instinctChargeXp == null || instinctChargeXp.length != 6) {
+			instinctChargeXp = defaults().instinctChargeXp;
+		}
+		instinctBaseCharges = clamp(instinctBaseCharges, 1, 20);
+		instinctRegenSeconds = clamp(instinctRegenSeconds, 1, 3600);
+		instinctDetectRadius = clamp(instinctDetectRadius, 4, 128);
 		for (int i = 0; i < swordPrices.length; i++) {
 			swordPrices[i] = clamp(swordPrices[i], 0, maxCurrency);
 		}

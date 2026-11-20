@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class NavigationGlowMixin {
 	@Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
 	private void grandline$navigationOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-		if (ClientNavigation.highlighted(entity)) {
+		if (ClientNavigation.highlighted(entity) || com.grandline.client.technique.InstinctSense.marked(entity)) {
 			cir.setReturnValue(true);
 		}
 	}

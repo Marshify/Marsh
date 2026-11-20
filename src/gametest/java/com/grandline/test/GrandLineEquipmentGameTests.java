@@ -16,6 +16,7 @@ import net.minecraft.world.item.Items;
 public final class GrandLineEquipmentGameTests implements FabricGameTest {
 	private static ServerPlayer player(GameTestHelper helper) {
 		ServerPlayer p = helper.makeMockServerPlayerInLevel();
+		p.setGameMode(net.minecraft.world.level.GameType.SURVIVAL); // creative keeps creative-menu equipment
 		GrandLineRaceGameTests.neutral(p);
 		return p;
 	}

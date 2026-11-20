@@ -35,6 +35,7 @@
       "com.grandline.test.GrandLineRedbrickGameTests",
       "com.grandline.test.GrandLineLotusGameTests",
       "com.grandline.test.GrandLineSwordGameTests",
+      "com.grandline.test.GrandLineTechniqueGameTests",
       "com.grandline.test.GrandLineIslandBiomeGameTests",
       "com.grandline.test.GrandLineStatsGameTests",
       "com.grandline.test.GrandLineAbilityGameTests",

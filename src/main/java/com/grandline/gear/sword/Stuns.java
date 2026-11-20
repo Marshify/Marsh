@@ -35,7 +35,7 @@ public final class Stuns {
 
 	/** Stuns {@code target} for {@code ticks}; {@code knockTicks} lets a knockback from the same hit carry first. */
 	public static void apply(LivingEntity target, int ticks, int knockTicks) {
-		if (!(target.level() instanceof ServerLevel level) || !target.isAlive()) {
+		if (!(target.level() instanceof ServerLevel level) || !target.isAlive() || com.grandline.technique.Dodges.justEvaded(target)) {
 			return;
 		}
 		long now = level.getGameTime();

@@ -13,13 +13,13 @@ import net.minecraft.world.level.GameType;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The camera's keys (Shift Lock on Left Shift, zoom on = and -), the reticle, and crouching: there is no player-made
- * crouching in Grand Line play. Vanilla's Sneak key is unbound once (so Left Shift is Shift Lock's, with no conflict in
- * Controls); riding still gets off with the Shift Lock key, creative flight and spectator still fly down with it.
+ * The camera's keys (Shift Lock on Left Alt, zoom on = and -), the reticle, and crouching: there is no player-made
+ * crouching in Grand Line play. Vanilla's Sneak key gives Left Shift up to Dash (it can be bound to another key in
+ * Controls); riding still gets off with Left Shift, creative flight and spectator still fly down with it.
  */
 public final class ShiftLockKeys {
 	private static final String CATEGORY = "key.categories.grandline";
-	public static final KeyMapping SHIFT_LOCK = new KeyMapping("key.grandline.shift_lock", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_SHIFT, CATEGORY);
+	public static final KeyMapping SHIFT_LOCK = new KeyMapping("key.grandline.shift_lock", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
 	public static final KeyMapping ZOOM_IN = new KeyMapping("key.grandline.zoom_in", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_EQUAL, CATEGORY);
 	public static final KeyMapping ZOOM_OUT = new KeyMapping("key.grandline.zoom_out", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_MINUS, CATEGORY);
 
@@ -51,12 +51,12 @@ public final class ShiftLockKeys {
 		HudRenderCallback.EVENT.register(ShiftLockKeys::reticle);
 	}
 
-	/** Vanilla Sneak gives Left Shift up to Shift Lock (players can rebind Shift Lock in Controls). */
+	/** Vanilla Sneak gives Left Shift up to Dash (players can bind Sneak to any other key in Controls). */
 	private static void freeLeftShift(Minecraft mc) {
 		ClientSettings s = ClientSettings.get();
 		// Checked on every join: if Sneak shares Shift Lock's key (Controls reset, an old options file), only one of the
 		// two would ever work, so Sneak gives the key up again.
-		if (mc.options.keyShift.same(SHIFT_LOCK)) {
+		if (mc.options.keyShift.same(SHIFT_LOCK) || mc.options.keyShift.same(com.grandline.client.technique.TechniqueKeys.DASH)) {
 			mc.options.keyShift.setKey(InputConstants.UNKNOWN);
 			KeyMapping.resetMapping();
 			mc.options.save();
@@ -74,13 +74,13 @@ public final class ShiftLockKeys {
 		if (mc.player == null || mc.gameMode == null) {
 			return false;
 		}
-		boolean held = SHIFT_LOCK.isDown() || mc.options.keyShift.isDown();
+		boolean held = com.grandline.client.technique.TechniqueKeys.DASH.isDown() || mc.options.keyShift.isDown();
 		GameType mode = mc.gameMode.getPlayerMode();
 		if (mode == GameType.SPECTATOR) {
 			return held;
 		}
 		if (mode == GameType.CREATIVE) {
-			return held && mc.player.getAbilities().flying; // fly down; on the ground Shift is Shift Lock
+			return held && mc.player.getAbilities().flying; // fly down; on the ground Shift is Dash
 		}
 		return mc.player.isPassenger() && held;
 	}

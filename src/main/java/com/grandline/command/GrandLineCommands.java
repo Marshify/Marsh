@@ -418,6 +418,48 @@ public final class GrandLineCommands {
 										.then(Commands.argument("amount", LongArgumentType.longArg())
 												.executes(context -> modify(context, "addcurrency",
 														(player, ctx) -> PlayerProfileService.addCurrency(player, LongArgumentType.getLong(ctx, "amount")))))))
+						.then(Commands.literal("technique")
+								.then(Commands.argument("player", EntityArgument.player())
+										.then(Commands.literal("grant")
+												.then(Commands.argument("name", com.mojang.brigadier.arguments.StringArgumentType.word())
+														.suggests((c, b) -> SharedSuggestionProvider.suggest(java.util.List.of("flash_step", "aura", "instinct"), b))
+														.executes(ctx -> {
+															var p = EntityArgument.getPlayer(ctx, "player");
+															String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "name");
+															com.grandline.technique.TechniqueService.grant(p, name);
+															ctx.getSource().sendSuccess(() -> Component.literal("Granted " + name), true);
+															return 1;
+														})))
+										.then(Commands.literal("reset")
+												.executes(ctx -> {
+													var p = EntityArgument.getPlayer(ctx, "player");
+													com.grandline.technique.TechniqueService.reset(p);
+													com.grandline.technique.TechniqueService.sync(p);
+													ctx.getSource().sendSuccess(() -> Component.literal("Techniques reset"), true);
+													return 1;
+												}))
+										.then(Commands.literal("auraxp")
+												.then(Commands.argument("amount", LongArgumentType.longArg(0))
+														.executes(ctx -> {
+															var p = EntityArgument.getPlayer(ctx, "player");
+															long xp = LongArgumentType.getLong(ctx, "amount");
+															com.grandline.technique.TechniqueService.update(p, t -> t.withAuraXp(xp));
+															com.grandline.technique.TechniqueService.broadcastLook(p);
+															com.grandline.technique.TechniqueService.sync(p);
+															ctx.getSource().sendSuccess(() -> Component.literal("Aura XP " + xp), true);
+															return 1;
+														})))
+										.then(Commands.literal("instinctxp")
+												.then(Commands.argument("amount", LongArgumentType.longArg(0))
+														.executes(ctx -> {
+															var p = EntityArgument.getPlayer(ctx, "player");
+															long xp = LongArgumentType.getLong(ctx, "amount");
+															com.grandline.technique.TechniqueService.update(p, t -> t.withInstinctXp(xp)
+																	.withDodges(com.grandline.technique.TechniqueRules.maxDodges(xp), 0));
+															com.grandline.technique.TechniqueService.sync(p);
+															ctx.getSource().sendSuccess(() -> Component.literal("Instinct XP " + xp), true);
+															return 1;
+														})))))
 						.then(Commands.literal("cast")
 								.then(Commands.argument("player", EntityArgument.player())
 										.then(Commands.argument("slot", IntegerArgumentType.integer(0, 4))

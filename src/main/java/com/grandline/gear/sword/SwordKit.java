@@ -210,6 +210,9 @@ public final class SwordKit {
 
 	/** Sets {@code target}'s motion (a launch, a push), synced to clients. */
 	public static void launch(LivingEntity target, Vec3 velocity) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return; // Instinct evaded the hit: nothing else lands either
+		}
 		target.setDeltaMovement(velocity);
 		target.hurtMarked = true;
 		target.fallDistance = 0;
@@ -217,11 +220,17 @@ public final class SwordKit {
 
 	/** Pushes {@code target} away from {@code from} horizontally with some lift. */
 	public static void push(LivingEntity target, Vec3 from, double strength, double lift) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return; // Instinct evaded the hit: nothing else lands either
+		}
 		AbilityHelpers.knockAway(target, from, strength, lift);
 	}
 
 	/** Pulls {@code target} toward {@code to}: its motion becomes a step of {@code strength} toward the point. */
 	public static void pull(LivingEntity target, Vec3 to, double strength) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return; // Instinct evaded the hit: nothing else lands either
+		}
 		Vec3 d = to.subtract(target.position());
 		double len = d.length();
 		if (len < 0.3) {
@@ -234,6 +243,9 @@ public final class SwordKit {
 
 	/** Moves {@code target} to {@code at} (carried by a vortex or a projectile), keeping it out of walls. */
 	public static void carry(LivingEntity target, Vec3 at) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return; // Instinct evaded the hit: nothing else lands either
+		}
 		ServerLevel level = (ServerLevel) target.level();
 		if (solid(level, at) || solid(level, at.add(0, target.getBbHeight() * 0.9, 0))) {
 			return;
