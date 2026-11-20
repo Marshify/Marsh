@@ -24,7 +24,6 @@ import java.util.Locale;
  */
 public final class ProfileHud {
 	private static final int NAVY = 0xE6101C2E;
-	private static final int NAVY_LIGHT = 0xE0233A57;
 	private static final int GOLD = 0xFFE8B84A;
 	private static final int PANEL_BORDER = 0xFF0A1220;
 	private static final NumberFormat NUMBERS = NumberFormat.getIntegerInstance(Locale.US);
@@ -162,7 +161,21 @@ public final class ProfileHud {
 		com.grandline.client.ui.MarshUi.outlined(graphics, font, Component.literal(value), x + width - font.width(value) - 4, y + 3, 0xFFFFFF);
 	}
 
-	/** Bottom-right power panel. */
+	/** Bottom-right power panel: translucent backing, opaque text, so the held item stays visible through it. */
+	private static final int PANEL_BACK = 0x400B1422;  // 25% opaque dark navy
+	private static final int LOCKED_NAME = 0xFF8D96A3;
+	private static final int COOLING_NAME = 0xFFB9C4D2;
+
+	/**
+	 * The panel's scale: about 75% of the normal GUI size, rounded so the pixel font lands on half-pixel steps (sharp
+	 * at every GUI scale); never below the normal size at GUI scale 1, where smaller text would be unreadable.
+	 */
+	private static float panelScale(Minecraft client) {
+		double gui = client.getWindow().getGuiScale();
+		double pixels = Math.max(1.0, Math.round(gui * 0.75 * 2) / 2.0);
+		return (float) Math.min(1.0, pixels / gui);
+	}
+
 	private static void renderPowerPanel(GuiGraphics graphics, Minecraft client, ProfileSyncPayload view) {
 		Font font = client.font;
 		PlayerProfile profile = view.profile();
@@ -176,32 +189,41 @@ public final class ProfileHud {
 			return;
 		}
 
-		int width = sideWidth(graphics, 132);
-		int rowHeight = 17;
-		int x = graphics.guiWidth() - width - 6;
+		// Laid out in the panel's own units with the origin at its bottom-right corner, then scaled down as a whole.
+		float scale = panelScale(client);
+		int right = graphics.guiWidth() - 6, bottom = graphics.guiHeight() - 6;
+		int width = Math.max(80, Math.min(128, (int) ((graphics.guiWidth() / 2 - 91 - 12) / scale)));
+		int rowHeight = 12;
 		int movesHeight = rowHeight * power.abilities().size();
-		int bottom = graphics.guiHeight() - 6;
-		int movesTop = bottom - movesHeight;
-		int titleTop = movesTop - 16;
-		int masteryTop = titleTop - 20;
-		BOUNDS.put("moves", new int[]{x, masteryTop, width, bottom - masteryTop});
+		int movesTop = -movesHeight;
+		int titleTop = movesTop - 13;
+		int barTop = titleTop - 4;
+		int masteryTop = barTop - 9;
+		int x = -width;
+		BOUNDS.put("moves", new int[]{right - Math.round(width * scale), bottom + Math.round(masteryTop * scale),
+				Math.round(width * scale), Math.round(-masteryTop * scale)});
 
 		long masteryXp = profile.powers().masteryXp(power.id().toString());
 		int masteryLevel = view.masteryExperiencePerLevel() <= 0 ? 1 : (int) Math.min(view.maxMastery(), 1 + masteryXp / view.masteryExperiencePerLevel());
 		double masteryProgress = masteryLevel >= view.maxMastery() ? 1.0
 				: (double) (masteryXp % view.masteryExperiencePerLevel()) / view.masteryExperiencePerLevel();
 
-		Component masteryText = Component.translatable("hud.grandline.mastery", masteryLevel);
-		drawScaled(graphics, font, masteryText, x + width / 2f - font.width(masteryText) * 0.75f, masteryTop, 1.5f, 0xFFFFFF);
-		bar(graphics, x, masteryTop + 13, width, 4, masteryProgress, power.color() | 0xFF000000, 0xFF1A1A1A);
+		graphics.pose().pushPose();
+		graphics.pose().translate(right, bottom, 0);
+		graphics.pose().scale(scale, scale, 1);
 
-		// Title plate with the power name and a hint for switching.
-		graphics.fill(x - 1, titleTop - 1, x + width + 1, movesTop + movesHeight + 1, PANEL_BORDER);
-		graphics.fill(x, titleTop, x + width, titleTop + 15, NAVY_LIGHT);
-		graphics.fill(x, titleTop + 14, x + width, titleTop + 15, power.color() | 0xFF000000);
-		graphics.drawString(font, Component.translatable(power.translationKey()), x + 4, titleTop + 4, GOLD);
+		// Mastery: small label over a thin, softened bar.
+		Component masteryText = Component.translatable("hud.grandline.mastery", masteryLevel);
+		graphics.drawString(font, masteryText, x + width - font.width(masteryText), masteryTop, 0xFFE8ECF2);
+		graphics.fill(x, barTop, x + width, barTop + 2, 0x50000000);
+		graphics.fill(x, barTop, x + (int) Math.round(width * Math.max(0, Math.min(1, masteryProgress))), barTop + 2, soften(power.color()));
+
+		// Title: power name in gold, the switch key on the right, a faint accent line underneath.
+		graphics.fill(x, titleTop, x + width, titleTop + 12, PANEL_BACK);
+		graphics.fill(x, titleTop + 11, x + width, titleTop + 12, (power.color() & 0xFFFFFF) | 0x80000000);
+		graphics.drawString(font, Component.translatable(power.translationKey()), x + 3, titleTop + 2, GOLD);
 		Component switchHint = Component.literal("[" + GrandLineKeys.SWITCH_POWER.getTranslatedKeyMessage().getString() + "]");
-		graphics.drawString(font, switchHint, x + width - font.width(switchHint) - 3, titleTop + 4, 0x8FA6C1);
+		graphics.drawString(font, switchHint, x + width - font.width(switchHint) - 2, titleTop + 2, 0xFFA9BCD3);
 
 		for (int slot = 0; slot < power.abilities().size(); slot++) {
 			AbilityDef ability = power.abilities().get(slot);
@@ -209,24 +231,34 @@ public final class ProfileHud {
 			boolean unlocked = masteryLevel >= ability.requiredMastery();
 			int cooldown = ClientProfileCache.remainingCooldownTicks(power.abilityId(ability));
 
-			graphics.fill(x, y, x + width, y + rowHeight - 1, NAVY);
+			graphics.fill(x, y + 1, x + width, y + rowHeight, PANEL_BACK);
 			if (cooldown > 0 && ability.cooldownTicks() > 0) {
 				int filled = (int) Math.round(width * (double) cooldown / ability.cooldownTicks());
-				graphics.fill(x, y, x + filled, y + rowHeight - 1, 0x90000000);
+				graphics.fill(x, y + 1, x + filled, y + rowHeight, 0x50000000);
 			}
 
-			int nameColor = !unlocked ? 0x6E7785 : cooldown > 0 ? 0x9AA7B8 : 0xFFFFFF;
-			graphics.drawString(font, Component.translatable(ability.translationKey()), x + 4, y + 4, nameColor);
+			int nameColor = !unlocked ? LOCKED_NAME : cooldown > 0 ? COOLING_NAME : 0xFFFFFFFF;
+			graphics.drawString(font, Component.translatable(ability.translationKey()), x + 3, y + 3, nameColor);
 
 			String key = "[" + GrandLineKeys.MOVES[slot].getTranslatedKeyMessage().getString() + "]";
-			String right = cooldown > 0 ? String.format(Locale.ROOT, "%.1fs", cooldown / 20.0) : key;
-			graphics.drawString(font, right, x + width - font.width(right) - 3, y + 4, cooldown > 0 ? 0xFF8A65 : GOLD);
+			String rightText = cooldown > 0 ? String.format(Locale.ROOT, "%.1fs", cooldown / 20.0) : key;
+			graphics.drawString(font, rightText, x + width - font.width(rightText) - 2, y + 3, cooldown > 0 ? 0xFFFF8A65 : GOLD);
 
 			if (!unlocked) {
 				Component mastery = Component.translatable("hud.grandline.move_mastery", ability.requiredMastery());
-				drawScaled(graphics, font, mastery, x + width - 3 - font.width(mastery) * 0.6f - font.width(right) - 4, y + 5, 0.6f, 0xD46A6A);
+				drawScaled(graphics, font, mastery, x + width - 2 - font.width(mastery) * 0.75f - font.width(rightText) - 4, y + 4, 0.75f, 0xFFE07A7A);
 			}
 		}
+		graphics.pose().popPose();
+	}
+
+	/** The power's colour, a little less vivid (blended toward grey) for the mastery bar. */
+	private static int soften(int color) {
+		int r = (color >> 16) & 0xFF, g = (color >> 8) & 0xFF, b = color & 0xFF;
+		r = (r * 7 + 0x90 * 3) / 10;
+		g = (g * 7 + 0x90 * 3) / 10;
+		b = (b * 7 + 0x90 * 3) / 10;
+		return 0xE6000000 | r << 16 | g << 8 | b;
 	}
 
 	/** Hull bar above the hotbar while riding a ship. */

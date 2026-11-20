@@ -24,14 +24,20 @@ A key rebound afterwards in Controls is never moved again.
 
 ## Trainers
 - **Movement Instructor** (Millbrook Village, Redbrick Port): explains Dash, free tutorial.
-- **Ability Master** (custom skin `textures/entity/ability_master.png`, player model): on Frostpeak Isle's village square
-  he teaches Flash Step and Aura (first page: Flash Step / Aura / Leave, each with its own page and Back); on the upper
+- **Ability Master** (custom skin `textures/entity/ability_master.png`, player model): on Frostpeak Isle, in the ice
+  cavern a few steps east of the campsite's campfire (beside the barrels, facing the fire;
+  `FrostpeakIsle.ABILITY_MASTER_SPOT`), he teaches Flash Step and Aura (first page: Flash Step / Aura / Leave, each with its own page and Back); on the upper
   Cloudtop Isles, beside that region's quest giver, he teaches Instinct. Internally these are the roles
   `FLASH_STEP_MASTER` and `INSTINCT_SAGE` (`AURA_MASTER` is kept unused so saved role ids never shift).
-- Placed by `KeeperNpcs` in new and existing worlds alike (never twice). On a built terrace (Frostpeak's village) the
+- Placed by `KeeperNpcs` in new and existing worlds alike (never twice). A keeper whose spot changes (the Ability Master,
+  first placed on the village square) is walked over to the new spot, not doubled. On a built terrace (Frostpeak's village) the
   free spot is searched at the anchor's own height.
 
 ## HUD
+The move panel (bottom right, every power: fighting style, fruit, sword, gun) is drawn at ~75% size (rounded to
+half-pixel steps per GUI scale, full size at GUI scale 1), on 25%-opaque backing with no borders, so the held item shows
+through. Names, keys (gold) and cooldowns stay opaque with shadows; the mastery bar is thin and softened.
+
 Tiles just right of the hotbar's centre (the chat box covers the left): Dash, Flash Step (locked until bought), Aura
 (stage number while on), Instinct (charges, a bar for the next one). Raised a row while the air bubbles show. Key names
 come from Controls. The Stats screen (K) has a Techniques panel with Aura stage/XP/bonus and Instinct charges/XP.

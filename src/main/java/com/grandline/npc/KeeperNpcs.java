@@ -143,10 +143,29 @@ public final class KeeperNpcs {
 		GrandLineMod.LOGGER.info("Placed the region {} quest giver on {} at {}", a.region(), island.name(), spot);
 	}
 
+	/**
+	 * A keeper with a hand-picked spot that overrides the saved one (also in existing worlds): the Ability Master by
+	 * the campfire in Frostpeak's ice cavern. Only where the island has that build (older worlds keep the old Frostpeak).
+	 */
+	static BlockPos fixedSpot(Island island, Islander.Role role) {
+		if (role == Islander.Role.FLASH_STEP_MASTER && FROST_ISLAND.equals(island.name())
+				&& IslandPlans.get(island) instanceof com.grandline.world.plan.FrostpeakIsle) {
+			int[] o = com.grandline.world.plan.FrostpeakIsle.ABILITY_MASTER_SPOT;
+			return new BlockPos(island.x() + o[0], o[1], island.z() + o[2]);
+		}
+		return null;
+	}
+
 	private static void ensure(ServerLevel level, Island island, Islander.Role role) {
 		Data data = Data.get(level);
 		String key = island.id() + ":" + role.name();
 		BlockPos spot = data.spots.get(key);
+		BlockPos fixed = fixedSpot(island, role);
+		if (fixed != null && !fixed.equals(spot)) {
+			spot = fixed; // moved: the keeper already standing at the old spot walks over below
+			data.spots.put(key, spot);
+			data.setDirty();
+		}
 		if (spot == null) {
 			if (!level.isPositionEntityTicking(new BlockPos(island.x(), 64, island.z()))) {
 				return; // choose the spot once the island is loaded
@@ -161,11 +180,22 @@ public final class KeeperNpcs {
 		if (!level.isPositionEntityTicking(spot)) {
 			return;
 		}
-		List<Islander> present = level.getEntitiesOfClass(Islander.class, new AABB(spot).inflate(12),
-				npc -> npc.isAlive() && npc.role() == role && npc.islandId() == island.id());
+		// Searched well beyond the spot (any height), so a keeper whose spot has moved is brought over, not doubled.
+		BlockPos at = spot;
+		List<Islander> present = new ArrayList<>(level.getEntitiesOfClass(Islander.class, new AABB(spot).inflate(48),
+				npc -> npc.isAlive() && npc.role() == role && npc.islandId() == island.id()));
 		if (!present.isEmpty()) {
+			present.sort(java.util.Comparator.comparingDouble(npc -> npc.distanceToSqr(at.getX() + 0.5, at.getY(), at.getZ() + 0.5)));
 			for (int i = 1; i < present.size(); i++) {
 				present.get(i).discard(); // never two of the same keeper
+			}
+			Islander keeper = present.get(0);
+			if (keeper.distanceToSqr(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5) > 64) {
+				float yaw = yawFor(island, role, spot);
+				keeper.moveTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, yaw, 0);
+				keeper.setYHeadRot(yaw);
+				keeper.setYBodyRot(yaw);
+				GrandLineMod.LOGGER.info("Moved {} on {} to {}", role, island.name(), spot);
 			}
 			return;
 		}
@@ -193,6 +223,9 @@ public final class KeeperNpcs {
 
 	/** Faces the planned yaw, else toward the island centre. */
 	private static float yawFor(Island island, Islander.Role role, BlockPos at) {
+		if (fixedSpot(island, role) != null) {
+			return com.grandline.world.plan.FrostpeakIsle.ABILITY_MASTER_YAW;
+		}
 		Anchor anchor = plannedAnchor(island, role);
 		if (anchor != null && !Float.isNaN(anchor.yaw())) {
 			return anchor.yaw();

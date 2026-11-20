@@ -1013,6 +1013,13 @@ public final class FrostpeakIsle extends BasePlan {
 		}
 	}
 
+	/**
+	 * Where the Ability Master stands (x, y, z from the island centre): on the cavern floor a few steps east of the
+	 * campsite's firepit (16, 9), beside the barrels, facing the fire (yaw 90 = west).
+	 */
+	public static final int[] ABILITY_MASTER_SPOT = {19, CAVE_FLOOR + 1, 9};
+	public static final float ABILITY_MASTER_YAW = 90;
+
 	/** A small campsite: a green ridge tent (5 x 4), a stone firepit, two bedrolls, barrels and a crate. */
 	private void campsite(Canvas c) {
 		int y = CAVE_FLOOR + 1;
