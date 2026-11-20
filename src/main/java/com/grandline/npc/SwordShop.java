@@ -13,7 +13,9 @@ import java.util.List;
 /** The Swordsmith's shop (Millbrook Village): a fixed stock of swords bought with Grand Line money. Prices are checked and
  * taken on the server; the sword is only handed over after the money is gone. */
 public final class SwordShop {
-	public static final List<Item> STOCK = List.of(Gear.KATANA, Gear.CUTLASS);
+	public static final List<Item> STOCK = List.of(Gear.KATANA, Gear.CUTLASS, Gear.DUAL_KATANA, Gear.IRON_MACE, Gear.REEFSAW,
+			Gear.TRIPLE_KATANA, Gear.BOILER_PIPE, Gear.STONEWALL_BLADE, Gear.TWINFANG_GLAIVE, Gear.WRAITH_CANE, Gear.TRIDENT,
+			Gear.BISENTO, Gear.STORMSTAFF, Gear.ECLIPSE_BLADE);
 
 	private SwordShop() {
 	}

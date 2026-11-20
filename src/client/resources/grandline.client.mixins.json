@@ -21,7 +21,10 @@
     "ModelBlockRendererAoMixin",
     "IndigoBlockInfoMixin",
     "IndigoAoLightMixin",
-    "GuiHealthBarsMixin"
+    "GuiHealthBarsMixin",
+    "ItemRendererHeldSwordMixin",
+    "ItemInHandLayerSwordMixin",
+    "ItemInHandRendererSwordMixin"
   ],
   "injectors": {
     "defaultRequire": 1

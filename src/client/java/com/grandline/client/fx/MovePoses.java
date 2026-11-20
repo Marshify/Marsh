@@ -28,7 +28,23 @@ public final class MovePoses {
 		/** Fishing cast: rod drawn back over the shoulder, then whipped forward. */
 		CAST,
 		/** Reeling a fish in: rod held out in front, bobbing with the fight (held until cleared). */
-		REEL
+		REEL,
+		/** Sword: a forehand cut, from high on the right across to the left. */
+		SLASH_R,
+		/** Sword: a backhand cut, from the left across to the right. */
+		SLASH_L,
+		/** Sword: raised overhead, then brought straight down. */
+		OVERHEAD,
+		/** Sword: drawn back, then driven straight forward with a lean. */
+		THRUST,
+		/** Sword: arms out, a full turn of the body. */
+		SPIN,
+		/** Sword: weapon raised high and held (charging), then thrust forward. */
+		RAISE,
+		/** Sword: both hands up, then the weapon driven into the ground. */
+		GROUND,
+		/** A throw: arm back over the shoulder, then whipped forward. */
+		THROW
 	}
 
 	private record Anim(Kind kind, float start, float release, boolean left) {
@@ -84,7 +100,7 @@ public final class MovePoses {
 		return switch (kind) {
 			case HEAVY -> 70;
 			case FLIGHT, REEL -> Float.MAX_VALUE;
-			case READY -> 24;
+			case READY, RAISE -> 30;
 			default -> 14;
 		};
 	}
@@ -162,6 +178,50 @@ public final class MovePoses {
 				float bob = Mth.sin(age * 0.9f) * 0.08f;
 				blend(rightArm, w, forward * 0.7f + bob, -0.25f, 0.05f);
 				blend(leftArm, w * 0.8f, forward * 0.55f, 0.45f, 0);
+			}
+			case SLASH_R, SLASH_L -> {
+				float s = a.kind() == Kind.SLASH_R ? 1 : -1;
+				float k = w * (1 - back);
+				float y = Mth.lerp(r, 1.0f * s, -1.0f * s);
+				float x = Mth.lerp(r, -2.2f, -1.2f);
+				blend(rightArm, k, x, y, 0);
+				turn(body, rightArm, leftArm, Mth.lerp(r, 0.45f * s, -0.5f * s) * (1 - back));
+			}
+			case OVERHEAD -> {
+				float k = w * (1 - back);
+				blend(rightArm, k, Mth.lerp(r, -Mth.PI + 0.2f, -0.9f), 0, 0);
+				blend(leftArm, k * 0.8f, Mth.lerp(r, -Mth.PI + 0.35f, -0.9f), 0, 0);
+				body.xRot += 0.35f * r * k;
+			}
+			case THRUST -> {
+				float k = w * (1 - back);
+				blend(rightArm, k, Mth.lerp(r, forward * 0.4f + 0.4f, forward), Mth.lerp(r, 0.5f, -0.05f), 0);
+				body.xRot += 0.25f * r * k;
+				turn(body, rightArm, leftArm, Mth.lerp(r, 0.35f, -0.2f) * (1 - back));
+			}
+			case SPIN -> {
+				float k = w * (1 - back * 0.4f);
+				float spin = (r * 0.35f + back * 0.65f) * Mth.TWO_PI;
+				blend(rightArm, k, -Mth.HALF_PI, 0, 0.35f);
+				blend(leftArm, k, -Mth.HALF_PI, 0, -0.35f);
+				body.yRot = spin;
+			}
+			case RAISE -> {
+				float k = w * (1 - back);
+				blend(rightArm, k, Mth.lerp(r, -Mth.PI + 0.15f, forward), Mth.lerp(r, -0.1f, 0), 0);
+				body.xRot += 0.2f * r * k;
+			}
+			case GROUND -> {
+				float k = w * (1 - back);
+				float x = Mth.lerp(r, -Mth.PI + 0.25f, -0.35f);
+				blend(rightArm, k, x, 0, 0);
+				blend(leftArm, k, x, 0, 0);
+				body.xRot += 0.5f * r * k;
+			}
+			case THROW -> {
+				float k = w * (1 - back);
+				blend(rightArm, k, Mth.lerp(r, -Mth.PI + 0.5f, forward * 0.9f), -0.1f, 0);
+				turn(body, rightArm, leftArm, Mth.lerp(r, 0.4f, -0.3f) * (1 - back));
 			}
 			case FLIGHT -> {
 				blend(rightArm, w, 0.55f, 0, 0.35f);

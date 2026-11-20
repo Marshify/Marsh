@@ -37,6 +37,7 @@ public final class ChargeService {
 
 	private static final Map<UUID, Charging> CHARGING = new HashMap<>();
 	private static final Map<AbilityDef, ChargeVisual> VISUALS = new HashMap<>();
+	private static final Map<AbilityDef, java.util.function.BiPredicate<ServerPlayer, Power>> CHARGE_IF = new HashMap<>();
 
 	private ChargeService() {
 	}
@@ -50,6 +51,17 @@ public final class ChargeService {
 	/** Registers the charging visual for a charged move. */
 	public static void visual(AbilityDef ability, ChargeVisual visual) {
 		VISUALS.put(ability, visual);
+	}
+
+	/** A charged move that only charges when {@code test} passes (e.g. an upgraded weapon); otherwise it fires on press. */
+	public static void chargeIf(AbilityDef ability, java.util.function.BiPredicate<ServerPlayer, Power> test) {
+		CHARGE_IF.put(ability, test);
+	}
+
+	/** Whether pressing {@code ability} starts a charge for this player (true for every plain charged move). */
+	public static boolean charges(ServerPlayer player, Power power, AbilityDef ability) {
+		var test = CHARGE_IF.get(ability);
+		return test == null || test.test(player, power);
 	}
 
 	public static boolean isCharging(ServerPlayer player) {

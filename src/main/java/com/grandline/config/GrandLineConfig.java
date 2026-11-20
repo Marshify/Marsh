@@ -268,8 +268,15 @@ public final class GrandLineConfig {
 	public double saberBossRespawnSeconds = 600.0;
 
 	// ---- Swordsmith (Millbrook Village) ----
-	/** Sword prices at the Swordsmith: Katana, Cutlass. */
-	public long[] swordPrices = {500, 300};
+	/**
+	 * Sword prices at the Swordsmith, in SwordShop.STOCK order: Katana, Cutlass, Dual Katana, Iron Mace, Reefsaw, Triple
+	 * Katana, Boiler Pipe, Stonewall Blade, Twinfang Glaive, Wraith Cane, Trident, Bisento, Stormstaff, Eclipse Blade.
+	 * (The Saber is not sold: it drops from the Saber Warden.)
+	 */
+	public long[] swordPrices = {500, 300, 1_200, 8_000, 15_000, 40_000, 100_000, 150_000, 200_000, 250_000, 300_000,
+			1_000_000, 1_500_000, 4_000_000};
+	/** Sword mastery at which the Bisento and the Eclipse Blade switch to their upgraded moves. */
+	public int swordUpgradeMastery = 300;
 
 	// ---- Ships ----
 	/** Ship prices: Driftwood Sloop, Corsair Brig, Stormbreaker Galleon. */
@@ -496,9 +503,15 @@ public final class GrandLineConfig {
 		if (gunPrices != null && java.util.Arrays.equals(gunPrices, new long[]{1_500, 12_000})) {
 			gunPrices = defaults().gunPrices;
 		}
-		if (swordPrices == null || swordPrices.length != 2) {
-			swordPrices = defaults().swordPrices;
+		if (swordPrices == null || swordPrices.length != defaults().swordPrices.length) {
+			// Older configs listed only the Katana and Cutlass: keep their prices, add the new swords at their defaults.
+			long[] fresh = defaults().swordPrices;
+			if (swordPrices != null) {
+				System.arraycopy(swordPrices, 0, fresh, 0, Math.min(swordPrices.length, fresh.length));
+			}
+			swordPrices = fresh;
 		}
+		swordUpgradeMastery = clamp(swordUpgradeMastery, 1, 100_000);
 		for (int i = 0; i < swordPrices.length; i++) {
 			swordPrices[i] = clamp(swordPrices[i], 0, maxCurrency);
 		}

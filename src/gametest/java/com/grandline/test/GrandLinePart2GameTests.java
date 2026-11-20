@@ -143,7 +143,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 	public void swordsmithSellsKatanaAndCutlass(GameTestHelper helper) {
 		ServerPlayer p = survivor(helper);
 		long katana = SwordShop.price(0), cutlass = SwordShop.price(1);
-		helper.assertTrue(SwordShop.STOCK.equals(List.of(Gear.KATANA, Gear.CUTLASS)), "stock is Katana and Cutlass");
+		helper.assertTrue(SwordShop.STOCK.subList(0, 2).equals(List.of(Gear.KATANA, Gear.CUTLASS)), "stock starts with the Katana and Cutlass");
 		PlayerProfileService.update(p, pr -> pr.withCurrency(cutlass - 1));
 		helper.assertTrue(SwordShop.buy(p, 1).equals("sword_money"), "too poor for the Cutlass");
 		helper.assertTrue(PlayerProfileService.get(p).currency() == cutlass - 1 && !p.getInventory().contains(new ItemStack(Gear.CUTLASS)),
@@ -152,7 +152,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		helper.assertTrue(SwordShop.buy(p, 0).equals("sword_bought") && SwordShop.buy(p, 1).equals("sword_bought"), "both bought");
 		helper.assertTrue(PlayerProfileService.get(p).currency() == 5, "exact price taken: " + PlayerProfileService.get(p).currency());
 		helper.assertTrue(p.getInventory().countItem(Gear.KATANA) == 1 && p.getInventory().countItem(Gear.CUTLASS) == 1, "one of each delivered");
-		helper.assertTrue(SwordShop.buy(p, 2).equals("too_far") && SwordShop.buy(p, -1).equals("too_far"), "no such sword");
+		helper.assertTrue(SwordShop.buy(p, SwordShop.STOCK.size()).equals("too_far") && SwordShop.buy(p, -1).equals("too_far"), "no such sword");
 		helper.assertTrue(SwordShop.buy(p, 0).equals("already_owned") && p.getInventory().countItem(Gear.KATANA) == 1
 				&& PlayerProfileService.get(p).currency() == 5, "an owned sword cannot be bought again");
 		remove(helper, p);
@@ -174,7 +174,7 @@ public final class GrandLinePart2GameTests implements FabricGameTest {
 		helper.assertTrue(Math.abs(speed[0] - GrandLineMod.config().saberAttackSpeed) < 1e-6, "saber speed from config: " + speed[0]);
 		helper.assertTrue(dmg[0] > dmg[1] + 2 && dmg[0] > dmg[2] + 2, "saber hits harder: " + dmg[0] + " vs " + dmg[1] + "/" + dmg[2]);
 		helper.assertTrue(dmg[0] * speed[0] > dmg[1] * speed[1] * 1.4, "saber out-damages the katana per second");
-		helper.assertTrue(Gear.powerFor(Gear.SABER) != null && Gear.powerFor(Gear.SABER).abilities().size() == 3, "saber keeps its three moves");
+		helper.assertTrue(Gear.powerFor(Gear.SABER) != null && Gear.powerFor(Gear.SABER).abilities().size() == 2, "saber has its two moves");
 		remove(helper, p);
 		helper.succeed();
 	}

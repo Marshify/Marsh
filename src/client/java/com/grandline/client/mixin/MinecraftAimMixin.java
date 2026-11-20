@@ -14,6 +14,12 @@ public abstract class MinecraftAimMixin {
 	@Inject(method = "startAttack", at = @At("HEAD"))
 	private void grandline$aimAttack(CallbackInfoReturnable<Boolean> cir) {
 		GrandLineCamera.faceCamera(true);
+		// Sword combos: the server counts every swing (hit or miss) and plays the combo step.
+		Minecraft mc = (Minecraft) (Object) this;
+		if (mc.player != null && mc.screen == null && com.grandline.gear.sword.Swords.spec(mc.player.getMainHandItem().getItem()) != null
+				&& net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(com.grandline.network.payload.SwordSwingPayload.TYPE)) {
+			net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.grandline.network.payload.SwordSwingPayload());
+		}
 	}
 
 	@Inject(method = "startUseItem", at = @At("HEAD"))

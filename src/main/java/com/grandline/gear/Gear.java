@@ -8,6 +8,7 @@ import com.grandline.combat.ability.PowerSource;
 import com.grandline.combat.ability.Powers;
 import com.grandline.fruit.Element;
 import com.grandline.fruit.FruitMoves;
+import com.grandline.gear.sword.Swords;
 import com.grandline.player.StatType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,32 +36,25 @@ public final class Gear {
 	private static final int[] COOLDOWN = {60, 140, 240};
 	private static final double[] ENERGY = {0.05, 0.1, 0.16};
 
-	// Swords: tier sets durability, the int is bonus attack damage, the float attack speed modifier.
-	public static final Item KATANA = sword("katana", Tiers.IRON, 3, -2.2F, Rarity.UNCOMMON, 0xB8C4D6,
-			move("katana_draw", FruitMoves.dash(Element.METAL, 2.2, 9f)),
-			move("katana_crescent", FruitMoves.bolt(Element.METAL, 10, 2.2, 11f)),
-			move("katana_flurry", FruitMoves.lingering(Element.METAL, 6, 3.5, 6f, 3f, 3)));
-	public static final Item CUTLASS = sword("cutlass", Tiers.IRON, 2, -2.0F, Rarity.COMMON, 0xD8C08A,
-			move("cutlass_plunder", FruitMoves.burst(Element.METAL, 4, 8f)),
-			move("cutlass_lunge", FruitMoves.dash(Element.METAL, 2.4, 10f)));
+	// Swords (First Sea sword overhaul): bonus attack damage over the tier, attack speed modifier, rarity, colour, and
+	// the hand-made Z/X moves from gear.sword. Ids of the four older swords (katana, cutlass, saber, trident) are kept,
+	// so ownership and mastery carry over.
+	public static final Item KATANA = sword("katana", Tiers.IRON, 3, -2.2F, Rarity.COMMON, 0xE8EEF5, Swords.katana());
+	public static final Item CUTLASS = sword("cutlass", Tiers.IRON, 3, -2.0F, Rarity.COMMON, 0xD8C08A, Swords.cutlass());
+	public static final Item DUAL_KATANA = sword("dual_katana", Tiers.IRON, 3, -1.9F, Rarity.COMMON, 0x8FE3D2, Swords.dualKatana());
+	public static final Item IRON_MACE = sword("iron_mace", Tiers.IRON, 5, -2.8F, Rarity.UNCOMMON, 0x9A9A9A, Swords.ironMace());
+	public static final Item REEFSAW = sword("reefsaw", Tiers.IRON, 5, -2.6F, Rarity.UNCOMMON, 0xA4161A, Swords.reefsaw());
+	public static final Item TRIPLE_KATANA = sword("triple_katana", Tiers.IRON, 4, -2.0F, Rarity.UNCOMMON, 0x3FA8FF, Swords.tripleKatana());
+	public static final Item BOILER_PIPE = sword("boiler_pipe", Tiers.DIAMOND, 5, -2.4F, Rarity.RARE, 0xFF7A1A, Swords.boilerPipe());
+	public static final Item STONEWALL_BLADE = sword("stonewall_blade", Tiers.DIAMOND, 6, -2.4F, Rarity.RARE, 0x2F7BFF, Swords.stonewallBlade());
+	public static final Item TWINFANG_GLAIVE = sword("twinfang_glaive", Tiers.DIAMOND, 5, -2.2F, Rarity.RARE, 0x9EE8FF, Swords.twinfangGlaive());
+	public static final Item WRAITH_CANE = sword("wraith_cane", Tiers.DIAMOND, 5, -2.0F, Rarity.RARE, 0xB7D8FF, Swords.wraithCane());
+	public static final Item TRIDENT = sword("trident", Tiers.DIAMOND, 6, -2.5F, Rarity.RARE, 0x1E7FD6, Swords.trident());
+	public static final Item BISENTO = sword("bisento", Tiers.NETHERITE, 7, -2.7F, Rarity.EPIC, 0xF4F6FF, Swords.bisento());
+	public static final Item STORMSTAFF = sword("stormstaff", Tiers.NETHERITE, 6, -2.3F, Rarity.EPIC, 0xFFE14A, Swords.stormstaff());
 	// The Saber (Verdant Wilds' temple boss drop): melee damage, attack speed and move damage come from the config.
-	public static final Item SABER = sword("saber", new SaberItem(new Item.Properties().rarity(Rarity.RARE)), Rarity.RARE, 0xC9D3E0,
-			move("saber_thrust", ctx -> {
-				saberArcs(ctx, 3.2, 0);
-				return FruitMoves.strike(Element.METAL, 6, saberMove(10f)).execute(ctx);
-			}),
-			move("saber_twin_arc", ctx -> {
-				saberArcs(ctx, 3.6, 1, 2);
-				return FruitMoves.bolt(Element.METAL, 12, 2, saberMove(12f)).execute(ctx);
-			}),
-			move("saber_flourish", ctx -> {
-				saberArcs(ctx, 4.2, 3, 1, 2);
-				return FruitMoves.burst(Element.METAL, 5, saberMove(14f)).execute(ctx);
-			}));
-	public static final Item TRIDENT = sword("trident", Tiers.DIAMOND, 4, -2.8F, Rarity.RARE, 0x7FB7C9,
-			move("trident_thrust", FruitMoves.strike(Element.WATER, 8, 12f)),
-			move("trident_riptide", FruitMoves.vortex(Element.WATER, 8, 5, 12f)),
-			move("trident_throw", FruitMoves.bolt(Element.WATER, 18, 1.4, 16f)));
+	public static final Item SABER = sword("saber", new SaberItem(new Item.Properties().rarity(Rarity.EPIC)), Rarity.EPIC, 0xE0142A, Swords.saber());
+	public static final Item ECLIPSE_BLADE = sword("eclipse_blade", Tiers.NETHERITE, 8, -2.3F, Rarity.EPIC, 0x2BFF6A, Swords.eclipseBlade());
 
 	// Guns: damage, shot speed, reload ticks, knockback for right-click; moves on Z/X/C.
 	public static final Item SLINGSHOT = gun("slingshot", 4, 2.0F, 12, 0, Rarity.COMMON, 0xB07A3A,
@@ -96,32 +90,16 @@ public final class Gear {
 		return new Move(key, action);
 	}
 
-	private static Item sword(String name, Tiers tier, int damage, float speed, Rarity rarity, int color, Move... moves) {
-		return sword(name, new GearSwordItem(tier, damage, speed, new Item.Properties().rarity(rarity)), rarity, color, moves);
+	private static Item sword(String name, Tiers tier, int damage, float speed, Rarity rarity, int color, Swords.Spec spec) {
+		return sword(name, new GearSwordItem(tier, damage, speed, new Item.Properties().rarity(rarity)), rarity, color, spec);
 	}
 
-	private static Item sword(String name, Item sword, Rarity rarity, int color, Move... moves) {
+	private static Item sword(String name, Item sword, Rarity rarity, int color, Swords.Spec spec) {
 		Item item = register(name, sword);
-		weaponPower(item, name, StatType.SWORD, rarity, color, moves);
+		Power power = Powers.register(new Power(GrandLineMod.id(name), PowerSource.WEAPON, StatType.SWORD, spec.rarity(), color, spec.moves()));
+		WEAPON_POWERS.put(item, power);
+		Swords.SPECS.put(item, spec);
 		return item;
-	}
-
-	/**
-	 * The Saber boss's sword arcs, drawn for the player's Saber moves so they look like the boss's cuts. Styles as the
-	 * boss uses them: 0 slash, 1 left-to-right, 2 right-to-left, 3 overhead.
-	 */
-	static void saberArcs(com.grandline.combat.ability.AbilityContext ctx, double range, int... styles) {
-		var player = ctx.player();
-		net.minecraft.world.phys.Vec3 look = player.getLookAngle().multiply(1, 0, 1);
-		net.minecraft.world.phys.Vec3 forward = look.lengthSqr() < 1e-6 ? new net.minecraft.world.phys.Vec3(0, 0, 1) : look.normalize();
-		for (int style : styles) {
-			com.grandline.combat.fx.FxEvents.send(player, "boss_slash", player.position().add(0, 1.0, 0), forward, 0, range, style);
-		}
-	}
-
-	/** A Saber move's base damage times {@code saberMoveDamageMultiplier} (read when the move is used). */
-	static float saberMove(float base) {
-		return (float) (base * GrandLineMod.config().saberMoveDamageMultiplier);
 	}
 
 	private static Item gun(String name, double damage, float velocity, int reload, int knockback, Rarity rarity, int color, Move... moves) {

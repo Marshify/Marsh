@@ -106,23 +106,11 @@ public final class NpcScreens {
 	}
 
 	private static DialogScreen swordsmith(OpenNpcPayload data) {
-		List<DialogScreen.Option> options = new ArrayList<>();
-		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
-		for (int i = 0; i < data.stock().size() && i < data.prices().size(); i++) {
-			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
-			int index = i;
-			if (data.prices().get(i) < 0) {
-				// Already owned (the server checks too): shown as Owned, with nothing to buy.
-				options.add(new DialogScreen.Option(Component.translatable("npc.grandline.shop.owned", item.getDescription())
-						.withStyle(net.minecraft.ChatFormatting.DARK_GRAY), () -> { }, true));
-				continue;
-			}
-			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.swordsmith.buy", item.getDescription(),
-					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_SWORD + index)));
-		}
-		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
 		return new DialogScreen(Component.translatable("entity.grandline.islander.swordsmith"),
-				List.of(Component.translatable("npc.grandline.swordsmith.greeting")), options);
+				List.of(Component.translatable("npc.grandline.swordsmith.greeting")), List.of(
+				new DialogScreen.Option(Component.translatable("npc.grandline.swordsmith.browse"),
+						() -> Minecraft.getInstance().setScreen(new SwordShopScreen(data)), true),
+				DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
 	}
 
 	private static DialogScreen fisherman(OpenNpcPayload data) {

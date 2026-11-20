@@ -100,11 +100,11 @@ public final class NpcService {
 					: "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
 					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
-			case NpcActionPayload.BUY_SWORD, NpcActionPayload.BUY_SWORD + 1 -> npc.role() == Islander.Role.SWORDSMITH
-					? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far";
 			case NpcActionPayload.BUY_ROD -> npc.role() == Islander.Role.FISHERMAN ? buyRod(player) : "too_far";
 			case NpcActionPayload.SET_HOME -> npc.role() == Islander.Role.INNKEEPER ? setHome(player, npc) : "too_far";
-			default -> "too_far";
+			default -> packet.action() >= NpcActionPayload.BUY_SWORD && packet.action() < NpcActionPayload.BUY_SWORD + SwordShop.STOCK.size()
+					? npc.role() == Islander.Role.SWORDSMITH ? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
+					: "too_far";
 		};
 		boolean success = result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")

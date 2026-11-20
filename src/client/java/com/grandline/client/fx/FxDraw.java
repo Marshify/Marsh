@@ -19,11 +19,16 @@ public final class FxDraw {
 	public static final ResourceLocation BAND = GrandLineMod.id("textures/fx/band.png");
 	public static final ResourceLocation STREAK = GrandLineMod.id("textures/fx/streak.png");
 	public static final ResourceLocation SPARK = GrandLineMod.id("textures/fx/spark.png");
+	public static final ResourceLocation CRESCENT_EDGE = GrandLineMod.id("textures/fx/crescent_edge.png");
+	public static final ResourceLocation CRESCENT_FILL = GrandLineMod.id("textures/fx/crescent_fill.png");
+	public static final ResourceLocation SHELL = GrandLineMod.id("textures/fx/shell.png");
+	public static final ResourceLocation CLOUD = GrandLineMod.id("textures/fx/cloud.png");
 
 	public final float partial;
 	public final Vec3 camPos;
 	private final Matrix4f matrix;
-	private final MultiBufferSource buffers;
+	final MultiBufferSource buffers;
+	final PoseStack pose;
 	private final Vec3 right;
 	private final Vec3 up;
 
@@ -32,6 +37,7 @@ public final class FxDraw {
 		this.camPos = camera.getPosition();
 		this.matrix = pose.last().pose();
 		this.buffers = buffers;
+		this.pose = pose;
 		Vector3f l = camera.getLeftVector();
 		Vector3f u = camera.getUpVector();
 		this.right = new Vec3(-l.x(), -l.y(), -l.z());
@@ -106,6 +112,25 @@ public final class FxDraw {
 	 * {@code widths} and {@code alphas} are per point.
 	 */
 	public void ribbon(ResourceLocation tex, List<Vec3> points, double[] widths, float[] rgb, float[] alphas, float vScroll) {
+		ribbon(tex, true, points, widths, rgb, alphas, vScroll);
+	}
+
+	/** {@link #ribbon} with ordinary transparency (dark trails that should darken, not brighten). */
+	public void ribbonSoft(ResourceLocation tex, List<Vec3> points, double[] widths, float[] rgb, float[] alphas, float vScroll) {
+		ribbon(tex, false, points, widths, rgb, alphas, vScroll);
+	}
+
+	/** A quad with ordinary transparency. */
+	public void quadSoft(ResourceLocation tex, Vec3 bl, Vec3 br, Vec3 tr, Vec3 tl, float[] rgba) {
+		quad(tex, false, bl, br, tr, tl, rgba, 0, 1, 0, 1);
+	}
+
+	/** A camera-facing square with ordinary transparency. */
+	public void billboardSoft(ResourceLocation tex, Vec3 p, double half, double roll, float[] rgba) {
+		billboard(tex, false, p, half, roll, rgba, 0, 1, 0, 1);
+	}
+
+	private void ribbon(ResourceLocation tex, boolean glow, List<Vec3> points, double[] widths, float[] rgb, float[] alphas, float vScroll) {
 		int n = points.size();
 		for (int i = 0; i + 1 < n; i++) {
 			Vec3 a = points.get(i), b = points.get(i + 1);
@@ -125,7 +150,7 @@ public final class FxDraw {
 			float aa = alphas[i] * (da < 3 ? nearFade(da) : 1), ab = alphas[i + 1] * (db < 3 ? nearFade(db) : 1);
 			Vec3 sa = side.scale(wa / 2), sb = side.scale(wb / 2);
 			float va = vScroll + i / (float) (n - 1), vb = vScroll + (i + 1) / (float) (n - 1);
-			VertexConsumer c = consumer(tex, true);
+			VertexConsumer c = consumer(tex, glow);
 			v(c, a.subtract(sa), rgb[0], rgb[1], rgb[2], aa, 0, va);
 			v(c, a.add(sa), rgb[0], rgb[1], rgb[2], aa, 1, va);
 			v(c, b.add(sb), rgb[0], rgb[1], rgb[2], ab, 1, vb);

@@ -47,6 +47,9 @@ public final class GrandLineNetworking {
 		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.AbilityReleasePayload.TYPE,
 				(packet, player, responseSender) -> AbilityActivationHandler.release(player, packet));
 
+		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.SwordSwingPayload.TYPE,
+				(packet, player, responseSender) -> com.grandline.gear.sword.SwordCombos.swing(player));
+
 		ServerPlayNetworking.registerGlobalReceiver(AllocateStatPayload.TYPE,
 				(packet, player, responseSender) -> handleAllocateStat(player, packet));
 

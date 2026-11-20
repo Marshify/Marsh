@@ -59,6 +59,12 @@ public final class FxSprites {
 		add(FxDraw.GLOW, false, pos, vel, size, size / life * 1.2, -0.006, 0.9, life, color, color, 0.45f);
 	}
 
+	/** A free-form sprite (wisps, bubbles, dust, motes): texture, blend, motion, growth per tick, gravity, drag, life, colours. */
+	public static void sprite(ResourceLocation tex, boolean glow, Vec3 pos, Vec3 vel, double size, double growth, double gravity, double drag,
+			int life, int colorFrom, int colorTo, float alpha) {
+		add(tex, glow, pos, vel, size, growth, gravity, drag, life, colorFrom, colorTo, alpha);
+	}
+
 	private static Sprite add(ResourceLocation tex, boolean glow, Vec3 pos, Vec3 vel, double size, double growth, double gravity, double drag,
 			int life, int colorFrom, int colorTo, float alpha) {
 		if (SPRITES.size() >= MAX) {

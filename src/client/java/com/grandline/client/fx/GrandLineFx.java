@@ -167,6 +167,8 @@ public final class GrandLineFx {
 			VolcanoFx.handle(packet);
 		} else if (RaceFx.handles(packet.effect())) {
 			RaceFx.handle(packet, level, caster);
+		} else if (SwordFx.handles(packet.effect())) {
+			SwordFx.handle(packet, level, caster, own);
 		} else if (SaberFx.handles(packet.effect())) {
 			SaberFx.handle(packet, level, caster, own);
 		}

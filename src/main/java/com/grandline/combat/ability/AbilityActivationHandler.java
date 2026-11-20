@@ -88,7 +88,8 @@ public final class AbilityActivationHandler {
 
 		double multiplier = PlayerProfileService.statRules().abilityMultiplier(profile.stats(), power.scalingStat());
 
-		if (ability.activation() == AbilityDef.Activation.CHARGED) {
+		boolean charges = ability.activation() == AbilityDef.Activation.CHARGED && ChargeService.charges(player, power, ability);
+		if (charges) {
 			// Energy is checked now and spent on release; the server times the charge itself.
 			if (!EnergyService.canAfford(player, ability.energyCost())) {
 				tell(player, "message.grandline.ability.no_energy");
@@ -103,7 +104,7 @@ public final class AbilityActivationHandler {
 			return Outcome.NO_ENERGY;
 		}
 		ability.action().execute(new AbilityContext(player, power, ability, multiplier));
-		if (ability.activation() == AbilityDef.Activation.INSTANT) {
+		if (ability.activation() != AbilityDef.Activation.TOGGLE) {
 			AbilityCooldownService.start(player, abilityId, ability.cooldownTicks()); // toggles start theirs when switched off
 		}
 
