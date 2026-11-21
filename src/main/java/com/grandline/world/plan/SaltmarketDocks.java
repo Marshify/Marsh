@@ -293,14 +293,15 @@ public final class SaltmarketDocks extends BasePlan {
 		c.set(ax + 1, y0 + 9, HZ2, s(Blocks.SMOOTH_QUARTZ));
 		c.set(ax, y0 + 9, HZ2, s(Blocks.CHISELED_QUARTZ_BLOCK));
 		if (gate) {
-			// steps up from the promenade (y 64) to the town (y 67) inside the passage
+			// steps up from the promenade (y 64) to the town (y 67) inside the passage: they climb north (towards the
+			// town), so each step faces north (its tall half on the town side)
 			for (int dx = -2; dx <= 2; dx++) {
-				c.set(ax + dx, PROM + 1, HZ1 + 2, stair(Blocks.SANDSTONE_STAIRS, Direction.SOUTH, false));
+				c.set(ax + dx, PROM + 1, HZ1 + 2, stair(Blocks.SANDSTONE_STAIRS, Direction.NORTH, false));
 				c.set(ax + dx, PROM + 1, HZ1 + 1, s(Blocks.SMOOTH_SANDSTONE));
-				c.set(ax + dx, PROM + 2, HZ1 + 1, stair(Blocks.SANDSTONE_STAIRS, Direction.SOUTH, false));
+				c.set(ax + dx, PROM + 2, HZ1 + 1, stair(Blocks.SANDSTONE_STAIRS, Direction.NORTH, false));
 				c.set(ax + dx, PROM + 1, HZ1, s(Blocks.SMOOTH_SANDSTONE));
 				c.set(ax + dx, PROM + 2, HZ1, s(Blocks.SMOOTH_SANDSTONE));
-				c.set(ax + dx, PROM + 3, HZ1, stair(Blocks.SANDSTONE_STAIRS, Direction.SOUTH, false));
+				c.set(ax + dx, PROM + 3, HZ1, stair(Blocks.SANDSTONE_STAIRS, Direction.NORTH, false));
 				for (int y = PROM + 4; y < y0 + 8; y++) {
 					c.set(ax + dx, y, HZ1, s(Blocks.AIR));
 				}
@@ -1479,5 +1480,30 @@ public final class SaltmarketDocks extends BasePlan {
 
 	private static int tz(int z, int dz) {
 		return z + dz;
+	}
+
+	/**
+	 * Worlds built before the fix had the gateway steps facing south (back to front). Turns exactly those blocks (bottom
+	 * sandstone stairs facing south at the 15 step positions, inside chunk {@code cp}) to face north. Returns how many.
+	 */
+	public static int repairGateSteps(net.minecraft.server.level.ServerLevel level, com.grandline.world.Island island,
+			net.minecraft.world.level.ChunkPos cp) {
+		int fixed = 0;
+		int[][] steps = {{PROM + 1, HZ1 + 2}, {PROM + 2, HZ1 + 1}, {PROM + 3, HZ1}};
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int[] st : steps) {
+				net.minecraft.core.BlockPos p = new net.minecraft.core.BlockPos(island.x() + dx, st[0], island.z() + st[1]);
+				if (p.getX() >> 4 != cp.x || p.getZ() >> 4 != cp.z) {
+					continue;
+				}
+				var state = level.getBlockState(p);
+				if (state.is(Blocks.SANDSTONE_STAIRS) && state.getValue(net.minecraft.world.level.block.StairBlock.FACING) == Direction.SOUTH
+						&& state.getValue(net.minecraft.world.level.block.StairBlock.HALF) == net.minecraft.world.level.block.state.properties.Half.BOTTOM) {
+					level.setBlock(p, state.setValue(net.minecraft.world.level.block.StairBlock.FACING, Direction.NORTH), 2);
+					fixed++;
+				}
+			}
+		}
+		return fixed;
 	}
 }

@@ -46,11 +46,12 @@ import java.util.Set;
  * <li>loose snow layers with nothing full under them are removed;</li>
  * <li>plants and vines that cannot grow where they are (grass on stone, a dead bush on planks) are removed; a dirt path
  * under a block turns back to dirt.</li>
+ * <li>known build mistakes in already generated islands are corrected ({@link #repairs}).</li>
  * </ul>
  * Nothing else is touched. {@link #VERSION} is bumped when the rules change so every chunk is checked again.
  */
 public final class IslandTidy {
-	public static final int VERSION = 2;
+	public static final int VERSION = 3; // 3: Saltmarket Docks' gateway steps face the right way
 	private static final int MIN_Y = 55, MAX_Y = 260;
 	private static final Queue<Long> PENDING = new ArrayDeque<>();
 	private static final Set<Long> QUEUED = new HashSet<>();
@@ -165,7 +166,7 @@ public final class IslandTidy {
 
 	/** Tidies one chunk; returns how many blocks were fixed or removed. */
 	public static int tidy(ServerLevel level, ChunkPos cp) {
-		int fixed = 0;
+		int fixed = repairs(level, cp);
 		BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
 		for (int x = cp.getMinBlockX(); x <= cp.getMaxBlockX(); x++) {
 			for (int z = cp.getMinBlockZ(); z <= cp.getMaxBlockZ(); z++) {
@@ -178,6 +179,17 @@ public final class IslandTidy {
 						fixed++;
 					}
 				}
+			}
+		}
+		return fixed;
+	}
+
+	/** Fixes for build mistakes in already generated islands (version 3: Saltmarket Docks' gateway steps). */
+	private static int repairs(ServerLevel level, ChunkPos cp) {
+		int fixed = 0;
+		for (Island island : IslandRegistry.get(level.getServer()).all()) {
+			if (island.name().equals("Saltmarket Docks") && IslandPlans.get(island) instanceof com.grandline.world.plan.SaltmarketDocks) {
+				fixed += com.grandline.world.plan.SaltmarketDocks.repairGateSteps(level, island, cp);
 			}
 		}
 		return fixed;
