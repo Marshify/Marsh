@@ -19,18 +19,29 @@ public final class SeaLayout {
 	public static final int[] SEA_MIN_LEVEL = {1, 700, 1500};
 
 	private static final List<Spec> ISLANDS = new ArrayList<>();
+	/** The layout in which the three islands moved; worlds created before it keep {@link #LEGACY_POSITIONS}. */
+	public static final int SWAP_LAYOUT = 19;
+	/** First Sea island centres (x, z) before layout 19, for worlds that were generated with them. */
+	public static final java.util.Map<String, int[]> LEGACY_POSITIONS = java.util.Map.of(
+			"Redbrick Port", new int[]{-630, 120},
+			"Ironhold Bastion", new int[]{1380, 0},
+			"Stonewall Prison", new int[]{-1170, 270});
+	private static final List<Spec> LEGACY = new ArrayList<>();
 
 	static {
 		// --- Sea 1 (levels 1-700). Layout follows a classic first-sea chart around a central starter town. ---
 		s1("Dawnreach Harbor", IslandTheme.TOWN, 0, 0, 40, 1, true);
 		s1("Verdant Wilds", IslandTheme.JUNGLE, -60, -400, 36, 15, false);
 		s1("Millbrook Village", IslandTheme.VILLAGE, 630, 120, 34, 1, false); // the starting island: the weakest enemies
-		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -630, 120, 34, 1, false); // the Marines' starting island
+		// Layout 19 corrected three islands' places (a three-way swap): Redbrick Port went to Stonewall Prison's old spot,
+		// Stonewall Prison to Ironhold Bastion's, Ironhold Bastion to Redbrick Port's. Each island keeps its own build,
+		// radius and level. Older worlds keep the places they were generated with (see LEGACY_POSITIONS).
+		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -1170, 270, 34, 1, false); // the Marines' starting island
 		s1("Sunscorch Dunes", IslandTheme.DESERT, 570, 540, 36, 75, false);
 		s1("Frostpeak Isle", IslandTheme.SNOW, 630, -420, 38, 90, false);
-		s1("Ironhold Bastion", IslandTheme.FORTRESS, 1380, 0, 38, 120, false);
+		s1("Ironhold Bastion", IslandTheme.FORTRESS, -630, 120, 38, 120, false);
 		s1("Cloudtop Isles", IslandTheme.SKY, -1500, -540, 30, 150, false);
-		s1("Stonewall Prison", IslandTheme.PRISON, -1170, 270, 32, 190, false);
+		s1("Stonewall Prison", IslandTheme.PRISON, 1380, 0, 32, 190, false);
 		s1("Gladiator's Ring", IslandTheme.COLOSSEUM, -630, -540, 38, 225, false);
 		s1("Emberfall Isle", IslandTheme.VOLCANO, -1380, 660, 38, 300, false);
 		s1("Saltmarket Docks", IslandTheme.HARBOR, -30, 540, 40, 375, false);
@@ -62,6 +73,14 @@ public final class SeaLayout {
 		s3("The Last Bastion", IslandTheme.FORTRESS, -400, 1200, 40, 2750, false);
 	}
 
+	static {
+		for (Spec spec : ISLANDS) {
+			int[] old = spec.sea() == 1 ? LEGACY_POSITIONS.get(spec.name()) : null;
+			LEGACY.add(old == null ? spec
+					: new Spec(spec.sea(), spec.name(), spec.theme(), old[0], old[1], spec.radius(), spec.level(), spec.starter()));
+		}
+	}
+
 	private SeaLayout() {
 	}
 
@@ -81,12 +100,23 @@ public final class SeaLayout {
 		add(3, n, t, x, z, r, l, s);
 	}
 
+	/**
+	 * Every designed island, placed as the running world generates them: worlds created before layout
+	 * {@value #SWAP_LAYOUT} keep the old places of Redbrick Port, Ironhold Bastion and Stonewall Prison (their islands
+	 * are already built there); new worlds (and anything with no world loaded) get the current places.
+	 */
 	public static List<Spec> all() {
-		return Collections.unmodifiableList(ISLANDS);
+		IslandRegistry registry = IslandRegistry.current();
+		return all(registry == null ? IslandRegistry.CURRENT_LAYOUT : registry.layout());
+	}
+
+	/** The designed islands of a world with island layout {@code layout}. */
+	public static List<Spec> all(int layout) {
+		return Collections.unmodifiableList(layout < SWAP_LAYOUT ? LEGACY : ISLANDS);
 	}
 
 	public static Spec starter(int sea) {
-		for (Spec spec : ISLANDS) {
+		for (Spec spec : all()) {
 			if (spec.sea() == sea && spec.starter()) {
 				return spec;
 			}
