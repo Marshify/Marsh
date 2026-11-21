@@ -85,7 +85,7 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("Stonewall Prison", islandArt("prison", 640, 457, 180, 0.57)),
 			Map.entry("Gladiator's Ring", islandArt("colosseum", 640, 434, 200, 0.55)),
 			Map.entry("Emberfall Isle", islandArt("magma_village", 640, 424, 215, 0.6)),
-			Map.entry("Saltmarket Docks", islandArt("marine_starter", 640, 319, 227, 0.5)),
+			Map.entry("Saltmarket Docks", islandArt("saltmarket_docks", 640, 405, 227, 0.5)),
 			Map.entry("Lotus Palace", islandArt("underwater_city", 640, 312, 205, 0.5)),
 			Map.entry("Crystal Fountain", islandArt("fountain_city", 640, 328, 223, 0.5)));
 
