@@ -38,7 +38,7 @@ The move panel (bottom right, every power: fighting style, fruit, sword, gun) is
 half-pixel steps per GUI scale, full size at GUI scale 1), on 25%-opaque backing with no borders, so the held item shows
 through. Names, keys (gold) and cooldowns stay opaque with shadows; the mastery bar is thin and softened.
 
-Tiles just right of the hotbar's centre (the chat box covers the left): Dash, Flash Step (locked until bought), Aura
+Tiles just right of the hotbar's centre (the chat box covers the left): Dash, Flash Step (hidden until bought), Aura
 (stage number while on), Instinct (charges, a bar for the next one). Raised a row while the air bubbles show. Key names
 come from Controls. The Stats screen (K) has a Techniques panel with Aura stage/XP/bonus and Instinct charges/XP.
 

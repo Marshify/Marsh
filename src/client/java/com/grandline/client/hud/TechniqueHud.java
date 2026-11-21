@@ -15,9 +15,9 @@ import net.minecraft.util.Mth;
 
 /**
  * A compact row of technique tiles above the left end of the hotbar: Dash (its cooldown, only while it runs), Flash Step
- * (key, cooldown, or a lock until bought), Aura (lit while on, with its stage) and Instinct (lit while on, dodge charges
+ * (key and cooldown, once bought), Aura (lit while on, with its stage) and Instinct (lit while on, dodge charges
  * and the next charge's progress). Locked Aura and Instinct tiles only appear once the technique is owned, so a new
- * player sees just Dash and the locked Flash Step.
+ * player sees just Dash (Flash Step appears once bought).
  */
 public final class TechniqueHud {
 	private static final int TILE = 16;
@@ -49,9 +49,11 @@ public final class TechniqueHud {
 		int x = g.guiWidth() / 2 + 14; // right of centre: the chat box covers the left side above the hotbar
 		// Dash: always available; the tile only shows a sweep while it recharges.
 		x = tile(g, font, x, y, DASH, true, false, TechniqueKeys.DASH, ClientTechniques.dashCooldown(), GrandLineMod.config().dashCooldownTicks, null);
-		// Flash Step: locked until bought.
-		x = tile(g, font, x, y, FLASH, own.flashStep(), false, TechniqueKeys.FLASH_STEP, ClientTechniques.flashCooldown(),
-				GrandLineMod.config().flashStepCooldownTicks, null);
+		// Flash Step: hidden until bought (like Aura and Instinct).
+		if (own.flashStep()) {
+			x = tile(g, font, x, y, FLASH, true, false, TechniqueKeys.FLASH_STEP, ClientTechniques.flashCooldown(),
+					GrandLineMod.config().flashStepCooldownTicks, null);
+		}
 		if (own.aura()) {
 			x = tile(g, font, x, y, AURA, true, ClientTechniques.auraOn(), TechniqueKeys.AURA, 0, 1,
 					ClientTechniques.auraOn() ? String.valueOf(ClientTechniques.auraStage()) : null);
