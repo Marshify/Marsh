@@ -564,6 +564,7 @@
   "screen.grandline.items.loadout.sword": "Sword",
   "screen.grandline.side.title": "Pick a Side!",
   "screen.grandline.side.current": "Current side: %s (click a side to change)",
+  "screen.grandline.side.selected": "Selected",
   "screen.grandline.side.pirates.line1": "Fight anyone at sea",
   "screen.grandline.side.pirates.line2": "Pirates can battle other pirates",
   "screen.grandline.side.pirates.line3": "Red name tag",
