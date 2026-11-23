@@ -571,6 +571,16 @@ final class CloudtopIsles extends BasePlan {
 		// Translucent arches hanging in the sky.
 		skyArch(c, 66, 76, -6, 15, false);
 		skyArch(c, -86, 108, -50, 12, false);
+		// Accessibility: half-steps up the beach terraces from the dock and on the way to the village (no jumping).
+		Kit.stepsUp(c, 20, 40, 20, 46, Direction.WEST, Blocks.SANDSTONE_STAIRS);
+		Kit.stepsUp(c, 17, 40, 17, 46, Direction.WEST, Blocks.SANDSTONE_STAIRS);
+		Kit.stepsUp(c, 13, 40, 13, 46, Direction.WEST, Blocks.SANDSTONE_STAIRS);
+		for (int x = -17; x <= -11; x++) { // onto the first sky bridge from the hilltop
+			Kit.entryStep(c, x, SEA_G + 1, 27, Direction.NORTH, Blocks.QUARTZ_STAIRS);
+		}
+		for (int z = 6; z <= 10; z++) { // onto the second sky bridge from the platform between them
+			Kit.entryStep(c, -29, 80, z, Direction.WEST, Blocks.QUARTZ_STAIRS);
+		}
 	}
 
 	// ---------------------------------------------------------------------------------------------------- cove

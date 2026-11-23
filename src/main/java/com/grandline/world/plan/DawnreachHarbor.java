@@ -442,7 +442,8 @@ public final class DawnreachHarbor extends BasePlan {
 					p.fill(x, DECK + 1, z, x, DECK + 3, z, s(Blocks.AIR));
 					if (side || end) {
 						boolean post = (side && end) || Math.floorMod(x, 4) == 0;
-						p.set(x, DECK + 1, z, post ? s(Blocks.SPRUCE_FENCE) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
+						boolean boarding = side && !end && Math.floorMod(x, 4) == 2; // gaps to step on and off boats
+						p.set(x, DECK + 1, z, post ? s(Blocks.SPRUCE_FENCE) : boarding ? s(Blocks.AIR) : Kit.slab(Blocks.STONE_BRICK_SLAB, false));
 					}
 				}
 			}

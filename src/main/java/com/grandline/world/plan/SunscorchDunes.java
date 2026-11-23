@@ -566,6 +566,10 @@ final class SunscorchDunes extends BasePlan {
 		c.set(DOCK_X - 6, 66, PLAZA_Z + 1, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		c.set(DOCK_X - 5, 66, PLAZA_Z + 2, s(Blocks.DECORATED_POT));
 		c.set(DOCK_X - 6, 67, PLAZA_Z + 2, s(Blocks.DECORATED_POT));
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.stepsUp(c, DOCK_X - 7, PLAZA_Z - 6, DOCK_X + 7, PLAZA_Z - 6, Direction.NORTH, Blocks.SANDSTONE_STAIRS); // plaza up to the town
+		Kit.boatLanding(c, DOCK_X + 2, DOCK_LAND_Z + 22, Direction.EAST, 0, 1, DOCK_Y, Blocks.JUNGLE_STAIRS,
+				s(Blocks.JUNGLE_PLANKS), s(Blocks.JUNGLE_LOG), Blocks.JUNGLE_FENCE);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- market

@@ -204,6 +204,11 @@ final class VerdantWilds extends BasePlan {
 		enemyCamp(c);
 		bossClearing(c);
 		treasure(c);
+		// Accessibility: stone half-steps where the path from the dock climbs the jungle terraces (no jumping).
+		Kit.stepsUp(c, -2, 42, 4, 42, Direction.NORTH, Blocks.MOSSY_COBBLESTONE_STAIRS);
+		Kit.stepsUp(c, -1, 38, 5, 38, Direction.NORTH, Blocks.MOSSY_COBBLESTONE_STAIRS);
+		Kit.stepsUp(c, -1, 35, 5, 35, Direction.NORTH, Blocks.MOSSY_COBBLESTONE_STAIRS);
+		Kit.stepsUp(c, 0, 33, 6, 33, Direction.NORTH, Blocks.MOSSY_COBBLESTONE_STAIRS);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- nature

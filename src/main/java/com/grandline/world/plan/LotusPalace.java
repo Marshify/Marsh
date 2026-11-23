@@ -154,6 +154,9 @@ public class LotusPalace extends BasePlan {
 		corals(p);
 		jellyfish(p);
 		pathLights(p);
+		// Accessibility: sandstone half-steps up the north islet from its landing toward the whirlpool (no jumping).
+		Kit.stepsUp(c, 14, -33, 14, -27, Direction.WEST, Blocks.SANDSTONE_STAIRS);
+		Kit.stepsUp(c, 11, -31, 11, -25, Direction.WEST, Blocks.SANDSTONE_STAIRS);
 	}
 
 	/**

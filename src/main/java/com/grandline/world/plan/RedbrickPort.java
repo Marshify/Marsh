@@ -325,6 +325,9 @@ public final class RedbrickPort extends BasePlan {
 			c.set(-3, G, z, Kit.slab(Blocks.DARK_OAK_SLAB, true));
 			c.set(3, G, z, Kit.slab(Blocks.DARK_OAK_SLAB, true));
 		}
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.boatLanding(c, 0, 46, Direction.SOUTH, 1, 2, G, Blocks.DARK_OAK_STAIRS,
+				s(Blocks.DARK_OAK_PLANKS), s(Blocks.DARK_OAK_LOG), Blocks.DARK_OAK_FENCE);
 	}
 
 	// -------------------------------------------------------------------------------------------------- headquarters

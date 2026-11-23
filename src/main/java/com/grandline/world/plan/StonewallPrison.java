@@ -417,6 +417,9 @@ final class StonewallPrison extends BasePlan {
 				}
 			}
 		}
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.boatLanding(c, 0, 74, Direction.SOUTH, 1, 2, 64, Blocks.SPRUCE_STAIRS, s(Blocks.SPRUCE_PLANKS),
+				s(Blocks.SPRUCE_LOG), Blocks.DARK_OAK_FENCE);
 		// Inside: the moat (open sea water) and the wooden bridge over it, the barred checkpoint at its inner end.
 		for (int x = -6; x <= 6; x++) {
 			for (int z = 33; z <= GATE_Z - 3; z++) {

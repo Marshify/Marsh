@@ -276,6 +276,83 @@ public final class Kit {
 		door(c, cx + ddx, y + 1, cz + ddz, Blocks.SPRUCE_DOOR, doorSide.getOpposite());
 	}
 
+	/**
+	 * A boat landing off a raised deck: from the deck's edge ({@code edgeX}, {@code edgeZ}, the last deck block) stairs go
+	 * down along {@code out}, one per block of height, to a stage one block above the water (top at y 64). A ship's deck
+	 * floats level with the stage, so a player steps straight off a ship onto it and walks up to the deck; no jump, no
+	 * movement ability. The stairs are {@code 2 * stairHalf + 1} wide (a rail at the edge is opened there), the stage
+	 * {@code 2 * stageHalf + 1} wide and two deep, on posts down to the sea floor, with a lantern post at each outer corner.
+	 * Returns the water spot beyond the stage, where a boat lies alongside.
+	 */
+	public static int[] boatLanding(Canvas c, int edgeX, int edgeZ, Direction out, int stairHalf, int stageHalf, int deckY,
+			Block stairs, BlockState stage, BlockState post, Block fence) {
+		int stageY = Terrain.WATER_TOP + 1; // 63: its top is one above the water's surface
+		int steps = Math.max(0, deckY - stageY);
+		Direction side = out.getClockWise();
+		java.util.function.BiFunction<Integer, Integer, int[]> at = (along, across) -> new int[]{
+				edgeX + out.getStepX() * along + side.getStepX() * across, edgeZ + out.getStepZ() * along + side.getStepZ() * across};
+		for (int w = -stairHalf; w <= stairHalf; w++) {
+			int[] e = at.apply(0, w);
+			c.fill(e[0], deckY + 1, e[1], e[0], deckY + 3, e[1], Blocks.AIR.defaultBlockState()); // open the rail
+			for (int i = 1; i <= steps; i++) {
+				int[] p = at.apply(i, w);
+				int y = deckY - i + 1;
+				c.fill(p[0], stageY, p[1], p[0], y - 1, p[1], stage);
+				c.set(p[0], y, p[1], stairs(stairs, out.getOpposite(), false));
+				c.fill(p[0], y + 1, p[1], p[0], y + 3, p[1], Blocks.AIR.defaultBlockState());
+			}
+		}
+		for (int i = steps + 1; i <= steps + 2; i++) {
+			for (int w = -stageHalf; w <= stageHalf; w++) {
+				int[] p = at.apply(i, w);
+				c.set(p[0], stageY, p[1], stage);
+				c.fill(p[0], stageY + 1, p[1], p[0], stageY + 3, p[1], Blocks.AIR.defaultBlockState());
+				if (i == steps + 2 && Math.abs(w) == stageHalf) {
+					c.fill(p[0], Math.min(c.ground(p[0], p[1]), Terrain.WATER_TOP - 1), p[1], p[0], stageY - 1, p[1], post);
+					c.set(p[0], stageY + 1, p[1], fence.defaultBlockState());
+					c.set(p[0], stageY + 2, p[1], Blocks.LANTERN.defaultBlockState());
+				}
+			}
+		}
+		return at.apply(steps + 4, 0);
+	}
+
+	/**
+	 * Half-steps on a path: in the box (x1..x2, z1..z2), wherever the ground of the next cell along {@code up} is exactly
+	 * one block higher, a stair on the lower ground climbs it, so a player walks up without jumping. Other columns are
+	 * left alone, so it can be laid across a whole path.
+	 */
+	public static void stepsUp(Canvas c, int x1, int z1, int x2, int z2, Direction up, Block stairs) {
+		for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+			for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
+				if (!c.inChunk(x, z)) {
+					continue;
+				}
+				int g = c.ground(x, z), gn = c.ground(x + up.getStepX(), z + up.getStepZ());
+				if (gn == g + 1 && g >= Terrain.WATER_TOP) {
+					c.set(x, g + 1, z, stairs(stairs, up, false));
+					c.fill(x, g + 2, z, x, g + 3, z, Blocks.AIR.defaultBlockState());
+				}
+			}
+		}
+	}
+
+	/**
+	 * An entry step: a stair at (x, y, z) facing {@code up}, only where that cell is empty and stands on solid ground, so a
+	 * walkway one block above the ground (a bridge's first block) can be walked onto. Reads this chunk's blocks.
+	 */
+	public static void entryStep(Canvas c, int x, int y, int z, Direction up, Block stairs) {
+		if (!c.inChunk(x, z)) {
+			return;
+		}
+		var level = c.level();
+		var here = level.getBlockState(c.world(x, y, z));
+		var below = level.getBlockState(c.world(x, y - 1, z));
+		if ((here.isAir() || here.canBeReplaced()) && below.isSolid() && level.getFluidState(c.world(x, y, z)).isEmpty()) {
+			c.set(x, y, z, stairs(stairs, up, false));
+		}
+	}
+
 	/** Wooden pier from land out to sea along {@code direction}, with posts, rails and lanterns. */
 	public static void pier(Canvas c, int x, int z, Direction direction, int length, int halfWidth) {
 		int y = Terrain.WATER_TOP + 1;

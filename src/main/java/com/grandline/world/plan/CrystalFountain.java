@@ -1234,6 +1234,13 @@ public final class CrystalFountain extends BasePlan {
 			}
 		}
 		pier(c, -5, 10, 55);
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		for (int x = -4; x <= 3; x++) { // the pier's first row steps up to the plaza
+			c.set(x, PIER_Y + 1, PLAZA_Z2 + 1, Kit.stairs(Blocks.STONE_BRICK_STAIRS, Direction.NORTH, false));
+			c.fill(x, PIER_Y + 2, PLAZA_Z2 + 1, x, PIER_Y + 4, PLAZA_Z2 + 1, s(Blocks.AIR));
+		}
+		Kit.boatLanding(c, -1, PLAZA_Z2 + 55, Direction.SOUTH, 2, 3, PIER_Y, Blocks.STONE_BRICK_STAIRS, s(Blocks.SMOOTH_STONE),
+				s(Blocks.STONE_BRICKS), Blocks.STONE_BRICK_WALL);
 		pier(c, -34, 8, 48);
 		pier(c, 27, 8, 48);
 		harbourTower(c, -57); // flush with the plaza's edges (x -45..45): no strip of water between

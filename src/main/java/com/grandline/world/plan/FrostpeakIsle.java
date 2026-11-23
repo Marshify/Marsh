@@ -156,6 +156,11 @@ public final class FrostpeakIsle extends BasePlan {
 		staircase(c);
 		trees(c);
 		cavern(c);
+		// Accessibility: deepslate half-steps over the little rises on the way up from the coast (no jumping).
+		Kit.stepsUp(c, -11, 32, -7, 32, Direction.NORTH, Blocks.COBBLED_DEEPSLATE_STAIRS);
+		Kit.stepsUp(c, -9, 30, -9, 32, Direction.EAST, Blocks.COBBLED_DEEPSLATE_STAIRS);
+		Kit.stepsUp(c, -8, 30, -8, 32, Direction.EAST, Blocks.COBBLED_DEEPSLATE_STAIRS);
+		Kit.stepsUp(c, -8, 31, -6, 31, Direction.NORTH, Blocks.COBBLED_DEEPSLATE_STAIRS);
 	}
 
 	/**
@@ -691,6 +696,9 @@ public final class FrostpeakIsle extends BasePlan {
 		}
 		dock(c, -14, 17, 1);
 		dock(c, -1, 15, 2);
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.boatLanding(c, 2, 61, Direction.EAST, 0, 1, DOCK, Blocks.DARK_OAK_STAIRS, s(Blocks.DARK_OAK_PLANKS),
+				log(Blocks.DARK_OAK_LOG, Direction.Axis.Y), Blocks.DARK_OAK_FENCE);
 		stall(c, -14);
 		stall(c, -6);
 		// steps from the dock landing (64) up to the lower coast (66), across the whole landing
@@ -790,6 +798,11 @@ public final class FrostpeakIsle extends BasePlan {
 			return;
 		}
 		int z1 = 21, z2 = 23;
+		// a step from the first terrace onto the walkway (accessibility: no jump)
+		for (int z = z1; z <= z2; z++) {
+			c.set(-5, 70, z, stair(Blocks.DARK_OAK_STAIRS, Direction.EAST, false));
+			c.fill(-5, 71, z, -5, 73, z, s(Blocks.AIR));
+		}
 		// lower scaffold walkway x -4..-1 at y 70
 		for (int x = -4; x <= -1; x++) {
 			for (int z = z1; z <= z2; z++) {

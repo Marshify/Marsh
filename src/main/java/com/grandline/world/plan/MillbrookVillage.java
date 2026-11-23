@@ -444,6 +444,10 @@ final class MillbrookVillage extends BasePlan {
 		c.set(DOCK_X - 4, 66, 45, Kit.stairs(Blocks.SPRUCE_STAIRS, Direction.SOUTH, false));
 		c.set(DOCK_X + 5, 66, 46, s(Blocks.HAY_BLOCK));
 		c.set(DOCK_X + 5, 66, 45, s(Blocks.COMPOSTER));
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.stepsUp(c, DOCK_X - 6, 41, DOCK_X + 6, 41, Direction.NORTH, Blocks.COBBLESTONE_STAIRS); // plaza edge up to the village path
+		Kit.boatLanding(c, DOCK_X + 2, DOCK_LAND_Z + 20, Direction.EAST, 0, 1, DOCK_Y, Blocks.SPRUCE_STAIRS,
+				s(Blocks.SPRUCE_PLANKS), s(Blocks.SPRUCE_LOG), Blocks.SPRUCE_FENCE);
 	}
 
 	/** A small landing: a short plank jetty from the shore, a mooring post with a lantern and a barrel. */

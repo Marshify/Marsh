@@ -812,6 +812,12 @@ final class GladiatorsRing extends BasePlan {
 		c.set(7, g + 3, sz, lantern(true));
 		c.set(8, g + 1, sz + 1, stair(Blocks.SPRUCE_STAIRS, Direction.EAST, false));
 		c.set(9, g + 1, sz, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		for (int x = -1; x <= 1; x++) { // the dock's first boards step up to the shore
+			c.set(x, DOCK_Y + 1, DOCK_LAND_Z, Kit.stairs(Blocks.DARK_OAK_STAIRS, Direction.NORTH, false));
+		}
+		Kit.boatLanding(c, 2, DOCK_LAND_Z + 22, Direction.EAST, 0, 1, DOCK_Y, Blocks.DARK_OAK_STAIRS,
+				s(Blocks.DARK_OAK_PLANKS), s(Blocks.STONE_BRICKS), Blocks.DARK_OAK_FENCE);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- settlement

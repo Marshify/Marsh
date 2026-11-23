@@ -544,6 +544,9 @@ public final class SaltmarketDocks extends BasePlan {
 		deck(c, 15, 92, 20, 98);
 		deck(c, -27, 84, -23, 90);
 		crane(c, 16, 95);
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.boatLanding(c, 12, 110, Direction.SOUTH, 1, 2, PROM, Blocks.SPRUCE_STAIRS, s(Blocks.SPRUCE_PLANKS),
+				log(Blocks.SPRUCE_LOG, Direction.Axis.Y), Blocks.SPRUCE_FENCE);
 		// mooring bollards along the quay edge
 		for (int x = -76; x <= 66; x += 12) {
 			c.set(x, PROM + 1, PZ2, s(Blocks.POLISHED_BLACKSTONE_WALL));

@@ -154,6 +154,48 @@ public class PirateShip extends Boat {
 		passenger.setYHeadRot(passenger.getYHeadRot() + turned);
 	}
 
+	/**
+	 * Stepping off: the nearest dry spot within three blocks of the hull where the rider fits (a dock, a boat landing, a
+	 * beach), lowest climb first. Vanilla boats try one point only and leave you standing on the hull when it misses,
+	 * which is easily the case beside a dock with a ship this wide. On open water there is no such spot and the rider
+	 * stays on the deck as before.
+	 */
+	@Override
+	public Vec3 getDismountLocationForPassenger(LivingEntity passenger) {
+		Vec3 best = dismountSpot(passenger);
+		return best != null ? best : super.getDismountLocationForPassenger(passenger);
+	}
+
+	Vec3 dismountSpot(LivingEntity passenger) {
+		double inner = getBbWidth() / 2 + 0.2, outer = inner + 3;
+		BlockPos centre = blockPosition();
+		int r = (int) Math.ceil(outer);
+		Vec3 best = null;
+		double bestScore = Double.MAX_VALUE;
+		for (BlockPos p : BlockPos.betweenClosed(centre.offset(-r, -1, -r), centre.offset(r, 3, r))) {
+			double dx = p.getX() + 0.5 - getX(), dz = p.getZ() + 0.5 - getZ();
+			double dist = Math.sqrt(dx * dx + dz * dz);
+			if (dist < inner || dist > outer || !level().getFluidState(p).isEmpty()) {
+				continue;
+			}
+			double floor = level().getBlockFloorHeight(p);
+			if (!net.minecraft.world.entity.vehicle.DismountHelper.isBlockFloorValid(floor) || floor < 0) {
+				continue; // nothing solid to stand on in this cell
+			}
+			Vec3 at = new Vec3(p.getX() + 0.5, p.getY() + floor, p.getZ() + 0.5);
+			if (!net.minecraft.world.entity.vehicle.DismountHelper.canDismountTo(level(), passenger,
+					passenger.getDimensions(net.minecraft.world.entity.Pose.STANDING).makeBoundingBox(at))) {
+				continue;
+			}
+			double score = dist + Math.abs(at.y - getY()) * 2;
+			if (score < bestScore) {
+				bestScore = score;
+				best = at;
+			}
+		}
+		return best;
+	}
+
 	@Override
 	public double getPassengersRidingOffset() {
 		return shipClass().deck;

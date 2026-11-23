@@ -656,6 +656,13 @@ final class EmberfallIsle extends BasePlan {
 		c.set(-6, DOCK_Y + 1, DOCK_END_Z - 3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		c.set(-5, DOCK_Y + 1, DOCK_END_Z - 3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
 		c.set(-6, DOCK_Y + 2, DOCK_END_Z - 3, Canvas.facing(s(Blocks.BARREL), Direction.UP));
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		for (int x = -1; x <= 1; x++) { // the dock's first boards step up to the shore
+			c.set(x, DOCK_Y + 1, DOCK_LAND_Z, Kit.stairs(Blocks.DARK_OAK_STAIRS, Direction.NORTH, false));
+		}
+		Kit.stepsUp(c, -5, DOCK_LAND_Z - 6, 5, DOCK_LAND_Z - 6, Direction.NORTH, Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS);
+		Kit.boatLanding(c, 2, DOCK_LAND_Z + 14, Direction.EAST, 0, 1, DOCK_Y, Blocks.DARK_OAK_STAIRS,
+				s(Blocks.DARK_OAK_PLANKS), s(Blocks.POLISHED_BLACKSTONE_BRICKS), Blocks.DARK_OAK_FENCE);
 	}
 
 	// ---------------------------------------------------------------------------------------------------- combat areas

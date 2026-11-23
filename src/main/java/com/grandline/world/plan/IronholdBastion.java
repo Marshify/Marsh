@@ -967,6 +967,9 @@ public final class IronholdBastion extends BasePlan {
 		// The gap between the prongs stays open water.
 		c.fill(-2, T - 1, 61, 2, T, 62, s(Blocks.AIR));
 		c.fill(-2, T - 1, 61, 2, T - 1, 62, s(Blocks.AIR));
+		// Accessibility: a boat landing one block above the water, with stairs up to the deck (see Kit.boatLanding).
+		Kit.boatLanding(c, 5, 59, Direction.EAST, 0, 1, T, Blocks.STONE_BRICK_STAIRS,
+				s(Blocks.SMOOTH_STONE), s(Blocks.STONE_BRICKS), Blocks.STONE_BRICK_WALL);
 	}
 
 	/** A dark wooden lookout (6 x 6, 15 tall): corner posts, fence cross-bracing, a railed deck and a slab roof. */

@@ -400,6 +400,10 @@ public final class GrandLineCommands {
 										.executes(GrandLineCommands::allocate))))
 				.then(Commands.literal("admin")
 						.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+						// Accessibility check: /grandline admin access <island name | all>
+						.then(Commands.literal("access")
+								.then(Commands.argument("island", com.mojang.brigadier.arguments.StringArgumentType.greedyString())
+										.executes(GrandLineCommands::access)))
 						.then(Commands.literal("addxp")
 								.then(Commands.argument("players", EntityArgument.players())
 										.then(Commands.argument("amount", LongArgumentType.longArg(0))
@@ -509,6 +513,31 @@ public final class GrandLineCommands {
 		}
 		int level = IntegerArgumentType.getInteger(context, "level");
 		return modify(context, "mastery", (player, ctx) -> PlayerProfileService.setMasteryLevel(player, power, level));
+	}
+
+	private static int access(com.mojang.brigadier.context.CommandContext<CommandSourceStack> ctx) {
+		String name = com.mojang.brigadier.arguments.StringArgumentType.getString(ctx, "island");
+		var level = ctx.getSource().getServer().overworld();
+		int bad = 0;
+		for (com.grandline.world.Island island : com.grandline.world.IslandRegistry.get(ctx.getSource().getServer()).all()) {
+			if (!island.designed() || island.sea() != 1 || (!"all".equals(name) && !island.name().equalsIgnoreCase(name))) {
+				continue;
+			}
+			var r = com.grandline.world.IslandAccess.check(level, island);
+			if (!r.ok()) {
+				bad++;
+			}
+			String line = String.format(java.util.Locale.ROOT, "%s %s: boat %s, deck %+.1f above water, walk there %s (%d), back %s; %s%s",
+					r.ok() ? "OK " : "FIX", r.island(), r.boatRoute() ? "yes" : "NO", r.deckAboveWater(), r.walkThere() ? "yes" : "NO",
+					r.pathLength(), r.walkBack() ? "yes" : "NO", r.note(),
+					r.jumpSpots().isEmpty() ? "" : "; jumps at " + r.jumpSpots().stream().map(j -> {
+						var d = com.grandline.world.IslandAccess.CLIMB.get(j);
+						return "(" + (j.getX() - island.x()) + "," + j.getY() + "," + (j.getZ() - island.z()) + (d == null ? "" : " " + d.getName()) + ")";
+					}).toList());
+			ctx.getSource().sendSuccess(() -> Component.literal(line), false);
+			com.grandline.GrandLineMod.LOGGER.info("ACCESS {}", line);
+		}
+		return bad;
 	}
 
 	private static int allocate(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
