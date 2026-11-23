@@ -95,8 +95,8 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("Crystal Fountain", islandArt("fountain_city", 640, 328, 223, 0.5)));
 
 	/** The Upper Cloudtop Isles: their own art, beside the Cloudtop Isles (offset from Cloudtop's point, chart units). */
-	private static final IslandArt UPPER_ART = pixelArt("upper_cloudtop", 642, 424, 150, 0.5);
-	private static final double UPPER_DX = 150, UPPER_DY = 124;
+	private static final IslandArt UPPER_ART = pixelArt("upper_cloudtop", 642, 424, 140, 0.5);
+	private static final double UPPER_DX = 158, UPPER_DY = -84;
 
 	private static final ResourceLocation UNDERWATER_SURFACE = tex("first_sea/underwater_surface");
 	private static final ResourceLocation PALACE_SUBMERGED = tex("first_sea/palace_submerged");
