@@ -66,11 +66,16 @@ public final class WorldMapScreen extends Screen {
 	 * chart units, and the fraction of the sprite's height (from the top) that sits on the island's world position.
 	 * Sizes follow the reference chart and keep neighbours, the compass and the frame clear.
 	 */
-	private record IslandArt(ResourceLocation texture, int w, int h, double chartWidth, double anchorY) {
+	private record IslandArt(ResourceLocation texture, int w, int h, double chartWidth, double anchorY, boolean crisp) {
 	}
 
 	private static IslandArt islandArt(String file, int w, int h, double chartWidth, double anchorY) {
-		return new IslandArt(tex("first_sea/islands/" + file), w, h, chartWidth, anchorY);
+		return new IslandArt(tex("first_sea/islands/" + file), w, h, chartWidth, anchorY, false);
+	}
+
+	/** Art the owner supplied as pixel art: drawn nearest-pixel so its edges stay crisp. */
+	private static IslandArt pixelArt(String file, int w, int h, double chartWidth, double anchorY) {
+		return new IslandArt(tex("first_sea/islands/" + file), w, h, chartWidth, anchorY, true);
 	}
 
 	private static final Map<String, IslandArt> ISLAND_ART = Map.ofEntries(
@@ -81,7 +86,7 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("Sunscorch Dunes", islandArt("desert", 640, 418, 212, 0.55)),
 			Map.entry("Frostpeak Isle", islandArt("frozen_village", 640, 415, 220, 0.55)),
 			Map.entry("Ironhold Bastion", islandArt("ironhold_bastion", 640, 447, 223, 0.55)),
-			Map.entry("Cloudtop Isles", islandArt("lower_skylands", 640, 331, 212, 0.5)),
+			Map.entry("Cloudtop Isles", pixelArt("upper_cloudtop", 642, 424, 212, 0.5)),
 			Map.entry("Stonewall Prison", islandArt("prison", 640, 457, 180, 0.57)),
 			Map.entry("Gladiator's Ring", islandArt("colosseum", 640, 434, 200, 0.55)),
 			Map.entry("Emberfall Isle", islandArt("magma_village", 640, 424, 215, 0.6)),
@@ -301,8 +306,12 @@ public final class WorldMapScreen extends Screen {
 				double scale = newArt.chartWidth() / newArt.w();
 				w = newArt.chartWidth();
 				h = newArt.h() * scale;
-				blitChart(graphics, art(island, newArt.texture()), ax - w * grow / 2, ay - h * grow * newArt.anchorY() - rise,
-						scale * grow, newArt.w(), newArt.h());
+				ResourceLocation drawn = art(island, newArt.texture());
+				if (newArt.crisp()) {
+					blitCrisp(graphics, drawn, ax - w * grow / 2, ay - h * grow * newArt.anchorY() - rise, scale * grow, newArt.w(), newArt.h());
+				} else {
+					blitChart(graphics, drawn, ax - w * grow / 2, ay - h * grow * newArt.anchorY() - rise, scale * grow, newArt.w(), newArt.h());
+				}
 				placed.add(new Placed(island, ax, ay, screenX(ax - w * 0.42), screenY(ay - h * newArt.anchorY() + h * 0.1),
 						screenX(ax + w * 0.42), screenY(ay + h * (1 - newArt.anchorY()) - h * 0.1)));
 				continue;
