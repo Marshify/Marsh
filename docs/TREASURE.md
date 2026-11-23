@@ -1,17 +1,29 @@
-# Treasure chests (0.39.0)
+# Treasure chests (0.39.0; rewards 0.65.0)
 
 Three kinds of treasure chest are hidden around every First Sea island: 56 in all. Each one is **per player**: opening
 it pays you Beli and starts *your* refill timer for that chest; other players still find it full.
 
-| Chest | Pays (x the island's quest reward, +/-15%) | Refills after |
-|---|---|---|
-| Common | 1x | 15 minutes |
-| Rare | 3x | 45 minutes |
-| Legendary | 8x | 3 hours |
+## Rewards (0.65.0): by sea and rarity only
 
-The island's quest reward is `40 + 20 x the island's quest level` (Dawnreach Harbor, the hub, pays like the first
-island), so a chest stays worth finding all the way up the ladder. All numbers are in the config:
-`treasureRewardMultipliers`, `treasureRewardSpread`, `treasureRefillMinutes`.
+A chest pays a random amount of Beli within a fixed range (every value in the range equally likely, both ends
+included). The range depends **only on the chest's sea and rarity**. Island level, player level and enemy levels play
+no part, so a common chest on Crystal Fountain (Lv 625) pays exactly what a common chest on Millbrook Village (Lv 1)
+does.
+
+| Rarity | First Sea | Second Sea | Third Sea | Refills after |
+|---|---|---|---|---|
+| Common | 250–600 | 2,500–5,000 | 8,000–15,000 | 15 minutes |
+| Rare | 1,500–3,000 | 10,000–20,000 | 30,000–60,000 | 45 minutes |
+| Legendary | 6,000–12,000 | 40,000–80,000 | 120,000–240,000 | 3 hours |
+
+- **Where the values live:** one table, `treasureRewards` in `config/grandline.json`, laid out as `[sea][common, rare, legendary][min, max]`. It is read in one place, `TreasureService.rewardRange`. Refill times are in `treasureRefillMinutes`. A malformed table falls back to these defaults.
+- **Sea of a chest:** the sea of its island, or of the sea column it stands in. Seas beyond the table use its last row.
+- **Old worlds:** the reward is rolled when a chest is opened, not stored in the chest, so chests in existing worlds pay from this table straight away. Locations, textures, rarities and refill timers are unchanged.
+- **Balance (First Sea):**
+  - A common chest is worth about 2–4 early quests (a Millbrook quest pays 140), but little next to late quests (Crystal Fountain pays 13,280).
+  - A legendary chest (6,000–12,000) is a big early boost, enough for the Iron Mace (8,000), without rivalling late-game quest income.
+  - The old formula paid 13,280 for a common and about 106,000 for a legendary chest on Crystal Fountain.
+- **What was removed:** the old formula (island quest reward × a rarity multiplier, ±15%) and its settings `treasureRewardMultipliers` and `treasureRewardSpread`.
 
 ## How it works
 

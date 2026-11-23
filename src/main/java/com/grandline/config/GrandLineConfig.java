@@ -220,11 +220,11 @@ public final class GrandLineConfig {
 	public long fishingRodPrice = 150;
 
 	/**
-	 * Treasure chests: Beli reward as a multiple of the island's quest reward (common, rare, legendary), give or take
-	 * {@code treasureRewardSpread}, and minutes before the same chest can be opened again by the same player.
+	 * Treasure chest Beli, the one place chest rewards are set: [sea 1-3][common, rare, legendary][min, max]. A chest pays a
+	 * random amount in its range, the same on every island of its sea (island level, player level and enemy levels
+	 * play no part). Then minutes before the same chest can be opened again by the same player (common, rare, legendary).
 	 */
-	public double[] treasureRewardMultipliers = {1.0, 3.0, 8.0};
-	public double treasureRewardSpread = 0.15;
+	public long[][][] treasureRewards = defaultTreasureRewards();
 	public int[] treasureRefillMinutes = {15, 45, 180};
 	/** Seconds before a bite (before mastery shortens it). */
 	public double fishingBiteMinSeconds = 4.0;
@@ -403,6 +403,13 @@ public final class GrandLineConfig {
 		return config;
 	}
 
+	static long[][][] defaultTreasureRewards() {
+		return new long[][][]{
+				{{250, 600}, {1_500, 3_000}, {6_000, 12_000}},            // First Sea
+				{{2_500, 5_000}, {10_000, 20_000}, {40_000, 80_000}},     // Second Sea
+				{{8_000, 15_000}, {30_000, 60_000}, {120_000, 240_000}}}; // Third Sea
+	}
+
 	/** Upgrades values written by an older version of the mod. */
 	void migrateFrom(int fileVersion) {
 		if (fileVersion < 2) {
@@ -424,6 +431,26 @@ public final class GrandLineConfig {
 			marineSpawnIsland = "Ironhold Bastion"; // the Marines' starting island moved (it took Redbrick Port's Lv 1-10 stage)
 		}
 		configVersion = CURRENT_CONFIG_VERSION;
+	}
+
+	/** A well-formed reward table (3 seas x 3 rarities x {min, max}, min <= max); anything malformed falls back to the defaults. */
+	static long[][][] validTreasureRewards(long[][][] table, long maxCurrency) {
+		if (table == null || table.length != 3) {
+			return defaultTreasureRewards();
+		}
+		for (long[][] sea : table) {
+			if (sea == null || sea.length != 3) {
+				return defaultTreasureRewards();
+			}
+			for (long[] range : sea) {
+				if (range == null || range.length != 2) {
+					return defaultTreasureRewards();
+				}
+				range[0] = clamp(range[0], 0, maxCurrency);
+				range[1] = clamp(Math.max(range[0], range[1]), 0, maxCurrency);
+			}
+		}
+		return table;
 	}
 
 	/** Clamps every value into a safe range. */
@@ -474,13 +501,7 @@ public final class GrandLineConfig {
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);
-		if (treasureRewardMultipliers == null || treasureRewardMultipliers.length != 3) {
-			treasureRewardMultipliers = new double[]{1.0, 3.0, 8.0};
-		}
-		for (int i = 0; i < 3; i++) {
-			treasureRewardMultipliers[i] = clamp(treasureRewardMultipliers[i], 0, 1000);
-		}
-		treasureRewardSpread = clamp(treasureRewardSpread, 0, 0.9);
+		treasureRewards = validTreasureRewards(treasureRewards, maxCurrency);
 		if (treasureRefillMinutes == null || treasureRefillMinutes.length != 3) {
 			treasureRefillMinutes = new int[]{15, 45, 180};
 		}

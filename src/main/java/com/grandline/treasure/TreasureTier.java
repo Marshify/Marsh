@@ -2,7 +2,7 @@ package com.grandline.treasure;
 
 import net.minecraft.ChatFormatting;
 
-/** The three kinds of treasure chest. Rewards and refill times are in the config (see TreasureService). */
+/** The three kinds of treasure chest. Reward ranges (per sea) and refill times are in the config (see TreasureService). */
 public enum TreasureTier {
 	COMMON(ChatFormatting.WHITE),
 	RARE(ChatFormatting.AQUA),

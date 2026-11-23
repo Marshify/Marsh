@@ -3,7 +3,6 @@ package com.grandline.treasure;
 import com.grandline.GrandLineMod;
 import com.grandline.data.ModAttachments;
 import com.grandline.player.PlayerProfileService;
-import com.grandline.world.FirstSeaProgression;
 import com.grandline.world.Island;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -23,9 +22,10 @@ import java.util.Map;
 
 /**
  * Opening treasure chests. Each chest is per player: opening it pays that player Beli and starts that player's refill
- * timer for that chest; everyone else can still open it. The reward follows the island's quest reward (so chests stay
- * worth finding all the way up the ladder) times the tier's multiplier; timers use the world's game time, saved with
- * the player. All of it is decided on the server.
+ * timer for that chest; everyone else can still open it. The Beli is random within a fixed range set only by the chest's
+ * sea and rarity (config treasureRewards): island level, player level and enemy levels play no part, so a common chest
+ * pays the same anywhere in its sea. Rewards are rolled when a chest is opened, so chests already placed in old worlds
+ * follow the same table. Timers use the world's game time, saved with the player. All of it is decided on the server.
  */
 public final class TreasureService {
 	private TreasureService() {
@@ -40,14 +40,25 @@ public final class TreasureService {
 		return player.getAttachedOrElse(ModAttachments.TREASURE_REFILLS, Map.of()).getOrDefault(key(pos), 0L);
 	}
 
-	/** The Beli a chest of {@code tier} on {@code island} pays before the random spread. */
-	public static long baseReward(Island island, TreasureTier tier) {
-		FirstSeaProgression.Stage stage = island == null ? null : FirstSeaProgression.stage(island.name(), FirstSeaProgression.LOWER);
-		if (stage == null) {
-			stage = FirstSeaProgression.STAGES.get(0); // the hub and anything off the ladder pay like the first island
-		}
-		double mult = GrandLineMod.config().treasureRewardMultipliers[tier.ordinal()];
-		return Math.max(1, Math.round(FirstSeaProgression.questCurrency(stage) * mult));
+	/**
+	 * The Beli range {min, max} of a chest: set only by its sea and rarity (config treasureRewards), so every chest of the
+	 * same rarity in the same sea can pay exactly the same amounts. Seas past the table use its last sea.
+	 */
+	public static long[] rewardRange(int sea, TreasureTier tier) {
+		long[][][] table = GrandLineMod.config().treasureRewards;
+		long[] range = table[Math.max(0, Math.min(table.length - 1, sea - 1))][tier.ordinal()];
+		return new long[]{range[0], range[1]};
+	}
+
+	/** A random payout for a chest of {@code tier} in {@code sea}: uniform over its range, both ends included. */
+	public static long rollReward(int sea, TreasureTier tier, net.minecraft.util.RandomSource random) {
+		long[] r = rewardRange(sea, tier);
+		return r[0] + (long) Math.floor(random.nextDouble() * (r[1] - r[0] + 1));
+	}
+
+	/** The sea a chest is in: its island's sea, else the sea of the column it stands in. */
+	public static int seaOf(Island island, BlockPos pos) {
+		return island != null ? island.sea() : com.grandline.world.SeaLayout.seaAt(pos.getX());
 	}
 
 	/** Opens the chest for this player if it is ready; returns the Beli paid (0 when it was still refilling). */
@@ -69,9 +80,7 @@ public final class TreasureService {
 			return 0;
 		}
 		Island island = com.grandline.npc.EnemyRespawns.islandAt(level, pos);
-		long base = baseReward(island, tier);
-		double spread = GrandLineMod.config().treasureRewardSpread;
-		long reward = Math.max(1, Math.round(base * (1 - spread + level.getRandom().nextDouble() * 2 * spread)));
+		long reward = rollReward(seaOf(island, pos), tier, level.getRandom());
 		PlayerProfileService.addCurrency(player, reward);
 		Map<String, Long> refills = new HashMap<>(player.getAttachedOrElse(ModAttachments.TREASURE_REFILLS, Map.of()));
 		refills.values().removeIf(t -> t <= now); // forget timers that have run out
