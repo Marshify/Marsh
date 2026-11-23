@@ -9,5 +9,11 @@
   "npcs": {},
   "items": {},
   "abilities": {},
-  "island_npcs": {}
+  "island_npcs": {
+    "Millbrook Village": {
+      "Quest Giver": "Bandit Quest Giver",
+      "Innkeeper": "Set Home Point",
+      "Swordsmith": "Sword Dealer"
+    }
+  }
 }

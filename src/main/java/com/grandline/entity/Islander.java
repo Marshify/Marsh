@@ -50,7 +50,13 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Unused (Aura is sold by the Ability Master); kept so saved roles keep their index. */
 		AURA_MASTER,
 		/** The Ability Master on the upper Cloudtop Isles: sells Instinct. */
-		INSTINCT_SAGE;
+		INSTINCT_SAGE,
+		/** Sells and launches the everyday ships (Sloop, Brig): Millbrook's landings. */
+		BOAT_DEALER,
+		/** Sells and launches the Galleon: Millbrook's main dock. */
+		LUXURY_BOAT_DEALER,
+		/** Signs players up with the Marines (Millbrook's village). */
+		MARINE_RECRUITER;
 
 		public static Role byId(int id) {
 			Role[] values = values();
@@ -109,7 +115,7 @@ public class Islander extends PathfinderMob implements FruitDealer {
 	}
 
 	/** Its role's name, or the name it has on its island (see GrandLineNames). */
-	private void updateName() {
+	public void updateName() {
 		setCustomName(com.grandline.names.GrandLineNames.npc("entity.grandline.islander." + role().name().toLowerCase(java.util.Locale.ROOT),
 				com.grandline.names.GrandLineNames.islandNameOf(islandId)));
 		setCustomNameVisible(true);

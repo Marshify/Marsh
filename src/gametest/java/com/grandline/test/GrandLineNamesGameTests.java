@@ -52,7 +52,7 @@ public final class GrandLineNamesGameTests implements FabricGameTest {
 					instanceof net.minecraft.network.chat.contents.TranslatableContents t && t.getKey().equals("entity.grandline.bandit"),
 					"and bandits elsewhere");
 			GrandLineNames.resetOnIsland("Verdant Wilds", "Bandit");
-			helper.assertTrue(GrandLineNames.islandNpcRenames().isEmpty(), "reset on the island");
+			helper.assertTrue(!GrandLineNames.islandNpcRenames().containsKey("Verdant Wilds"), "reset on the island");
 			// A rename whose original no longer exists (the mod renamed it later) is kept, not used, never lost.
 			GrandLineNames.rename(Category.ITEM, "A Sword That Was Renamed Later", "Whatever");
 			helper.assertTrue(GrandLineNames.renames(Category.ITEM).containsKey("A Sword That Was Renamed Later"), "kept in the file");

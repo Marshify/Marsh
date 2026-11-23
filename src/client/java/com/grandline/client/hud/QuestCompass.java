@@ -60,7 +60,7 @@ public final class QuestCompass {
 		g.pose().popPose();
 		disc(g, cx, cy, 2, 0xFFFFFFFF);
 		// Labels.
-		Component name = Component.translatable(t.name());
+		Component name = com.grandline.names.GrandLineNames.npc(t.name(), t.island()); // the island's own name for it (names.json)
 		String meters = dist < 6 ? Component.translatable("hud.grandline.nav.here").getString() : Math.round(dist) + " m";
 		int ly = cy + r + 6;
 		right(g, font, name, cx + r, ly, 0xFFD866);

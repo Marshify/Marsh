@@ -24,6 +24,8 @@ import net.minecraft.world.level.levelgen.Heightmap;
 /** Island quests: offers scaled to the island level, kill tracking, rewards. One active quest per player. */
 public final class QuestService {
 	public static final int KILL_COUNT = 6;
+	/** Millbrook's Bandit Quest Giver: defeat 5 Bandits (either field counts). */
+	public static final int MILLBROOK_KILL_COUNT = 5;
 	/** Boss quests are offered on islands of at least this level. */
 	public static final int BOSS_MIN_ISLAND_LEVEL = 10; // Verdant Wilds (Lv 10-30) is the first island with a boss
 
@@ -56,7 +58,8 @@ public final class QuestService {
 		if (boss) {
 			return new QuestState(EnemyKind.CAPTAIN.name(), name, 1, 0, xp * 5, currency * 5, x, z, true);
 		}
-		return new QuestState(EnemyKind.forLevel(level).name(), name, KILL_COUNT, 0, xp, currency, x, z, false);
+		int count = MillbrookNpcs.manages(island) ? MILLBROOK_KILL_COUNT : KILL_COUNT;
+		return new QuestState(EnemyKind.forLevel(level).name(), name, count, 0, xp, currency, x, z, false);
 	}
 
 	/**

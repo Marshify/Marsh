@@ -21,6 +21,8 @@ public record NpcActionPayload(int entityId, int action) implements FabricPacket
 	public static final int BUY_GUN = 40;
 	/** Make the Innkeeper's island your home. */
 	public static final int SET_HOME = 50;
+	/** Marine Recruiter: join the Marines. */
+	public static final int JOIN_MARINES = 60;
 	/** Buy sword {@code BUY_SWORD + i} from the Swordsmith's stock ({@link com.grandline.npc.SwordShop#STOCK}). */
 	public static final int BUY_SWORD = 100;
 	/** Technique trainers: buy {@code TRAIN + TechniqueTrainers.FLASH_STEP/AURA/INSTINCT}; {@code TRAIN + 3} starts the Dash tutorial. */

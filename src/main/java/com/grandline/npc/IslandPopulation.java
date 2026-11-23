@@ -119,6 +119,9 @@ public final class IslandPopulation {
 			if (role == Islander.Role.QUEST_GIVER && anchor.region() != FirstSeaProgression.LOWER) {
 				continue; // a region's own quest giver is kept in place by KeeperNpcs (also in worlds already populated)
 			}
+			if (role != null && MillbrookNpcs.manages(island)) {
+				continue; // Millbrook's NPCs follow its roster (MillbrookNpcs)
+			}
 			if (role != null) {
 				spawnNpcAt(level, island, role, anchor);
 			} else if (anchor.type() == com.grandline.world.plan.Anchor.Type.DOCK) {
@@ -304,8 +307,8 @@ public final class IslandPopulation {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			for (Island island : IslandRegistry.reaching(server, player.getBlockX(), player.getBlockZ(), 0)) {
-				if (island.starter()) {
-					continue; // safe zone
+				if (island.starter() || MillbrookNpcs.manages(island)) {
+					continue; // safe zone, or Millbrook (fixed Bandit spots: MillbrookNpcs)
 				}
 				boolean nearCentre = Math.hypot(island.x() - player.getX(), island.z() - player.getZ()) <= 64;
 				int x;

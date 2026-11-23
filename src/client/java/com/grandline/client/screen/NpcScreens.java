@@ -35,6 +35,8 @@ public final class NpcScreens {
 			case MOVEMENT_INSTRUCTOR -> TrainerScreens.movementInstructor(data);
 			case FLASH_STEP_MASTER, AURA_MASTER -> TrainerScreens.abilityMaster(data);
 			case INSTINCT_SAGE -> TrainerScreens.instinctSage(data);
+			case BOAT_DEALER, LUXURY_BOAT_DEALER -> boatDealer(data);
+			case MARINE_RECRUITER -> recruiter(data);
 		});
 	}
 
@@ -62,7 +64,7 @@ public final class NpcScreens {
 							.withStyle(ChatFormatting.RED), () -> send(data, NpcActionPayload.ACCEPT_BOSS))));
 		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
-		return new DialogScreen(Component.translatable("entity.grandline.islander.quest_giver"), lines, options);
+		return new DialogScreen(title(data, "entity.grandline.islander.quest_giver"), lines, options);
 	}
 
 	private static DialogScreen fruitDealer(OpenNpcPayload data) {
@@ -74,7 +76,7 @@ public final class NpcScreens {
 				: data.gachaRemainingMillis() > 0
 				? Component.translatable("npc.grandline.dealer.gacha_wait", data.gachaRemainingMillis() / 60_000 + 1)
 				: Component.translatable("npc.grandline.dealer.gacha", java.text.NumberFormat.getIntegerInstance(java.util.Locale.US).format(data.gachaCost()));
-		return new DialogScreen(Component.translatable("entity.grandline.islander.fruit_dealer"), lines, List.of(
+		return new DialogScreen(title(data, "entity.grandline.islander.fruit_dealer"), lines, List.of(
 				new DialogScreen.Option(Component.translatable("npc.grandline.dealer.browse"),
 						() -> Minecraft.getInstance().setScreen(new FruitShopScreen(data)), true),
 				new DialogScreen.Option(gacha, () -> Minecraft.getInstance().setScreen(new GachaScreen(data)), true),
@@ -97,19 +99,19 @@ public final class NpcScreens {
 					numbers.format(data.prices().get(i))), () -> send(data, NpcActionPayload.BUY_GUN + index)));
 		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
-		return new DialogScreen(Component.translatable("entity.grandline.islander.gunsmith"),
+		return new DialogScreen(title(data, "entity.grandline.islander.gunsmith"),
 				List.of(Component.translatable("npc.grandline.gunsmith.greeting")), options);
 	}
 
 	private static DialogScreen innkeeper(OpenNpcPayload data) {
-		return new DialogScreen(Component.translatable("entity.grandline.islander.innkeeper"),
+		return new DialogScreen(title(data, "entity.grandline.islander.innkeeper"),
 				List.of(Component.translatable("npc.grandline.innkeeper.ask")), List.of(
 				DialogScreen.Option.of(Component.translatable("npc.grandline.innkeeper.set_home"), () -> send(data, NpcActionPayload.SET_HOME)),
 				DialogScreen.Option.of(Component.translatable("npc.grandline.innkeeper.cancel"), () -> { })));
 	}
 
 	private static DialogScreen swordsmith(OpenNpcPayload data) {
-		return new DialogScreen(Component.translatable("entity.grandline.islander.swordsmith"),
+		return new DialogScreen(title(data, "entity.grandline.islander.swordsmith"),
 				List.of(Component.translatable("npc.grandline.swordsmith.greeting")), List.of(
 				new DialogScreen.Option(Component.translatable("npc.grandline.swordsmith.browse"),
 						() -> Minecraft.getInstance().setScreen(new SwordShopScreen(data)), true),
@@ -122,7 +124,7 @@ public final class NpcScreens {
 		lines = new ArrayList<>(lines);
 		lines.add(Component.translatable("npc.grandline.fisher.mastery", com.grandline.client.ClientFishing.level()).withStyle(ChatFormatting.AQUA));
 		long rodPrice = data.prices().isEmpty() ? 0 : data.prices().get(0);
-		return new DialogScreen(Component.translatable("entity.grandline.islander.fisherman"), lines, List.of(
+		return new DialogScreen(title(data, "entity.grandline.islander.fisherman"), lines, List.of(
 				DialogScreen.Option.of(Component.translatable("npc.grandline.fisher.sell", data.fishValue()),
 						() -> send(data, NpcActionPayload.SELL_FISH)),
 				DialogScreen.Option.of(Component.translatable("npc.grandline.fisher.buy_rod",
@@ -158,8 +160,60 @@ public final class NpcScreens {
 			options.add(DialogScreen.Option.of(label, () -> send(data, action)));
 		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
-		return new DialogScreen(Component.translatable("entity.grandline.islander.navigator"),
+		return new DialogScreen(title(data, "entity.grandline.islander.navigator"),
 				List.of(Component.translatable("npc.grandline.navigator.greeting")), options);
+	}
+
+	/** An NPC's name as its island shows it (names.json), for dialog titles. */
+	static Component title(OpenNpcPayload data, String key) {
+		return com.grandline.names.GrandLineNames.npc(key, data.islandName());
+	}
+
+	/** One ship's option: launch it if owned, else buy it (greyed out below its level). */
+	private static DialogScreen.Option shipOption(OpenNpcPayload data, com.grandline.ship.ShipClass ship, int level) {
+		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
+		Component label;
+		int action;
+		if (com.grandline.client.ClientShips.owns(ship)) {
+			label = Component.translatable("npc.grandline.navigator.launch_ship", ship.displayName());
+			action = NpcActionPayload.LAUNCH_SHIP + ship.ordinal();
+		} else if (level < ship.minLevel()) {
+			label = Component.translatable("npc.grandline.navigator.ship_locked", ship.displayName(), ship.minLevel()).withStyle(ChatFormatting.GRAY);
+			action = NpcActionPayload.BUY_SHIP + ship.ordinal();
+		} else {
+			label = Component.translatable("npc.grandline.navigator.buy_ship", ship.displayName(), numbers.format(ship.price()));
+			action = NpcActionPayload.BUY_SHIP + ship.ordinal();
+		}
+		return DialogScreen.Option.of(label, () -> send(data, action));
+	}
+
+	/** Boat Dealer (Sloop, Brig) and Luxury Boat Dealer (Galleon). */
+	private static DialogScreen boatDealer(OpenNpcPayload data) {
+		int level = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
+		boolean luxury = data.role() == com.grandline.entity.Islander.Role.LUXURY_BOAT_DEALER.ordinal();
+		List<DialogScreen.Option> options = new ArrayList<>();
+		for (com.grandline.ship.ShipClass ship : com.grandline.ship.ShipClass.values()) {
+			if (luxury == (ship == com.grandline.ship.ShipClass.GALLEON)) {
+				options.add(shipOption(data, ship, level));
+			}
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		String role = luxury ? "luxury_boat_dealer" : "boat_dealer";
+		return new DialogScreen(title(data, "entity.grandline.islander." + role), List.of(Component.translatable("npc.grandline." + role + ".greeting")), options);
+	}
+
+	/** Marine Recruiter: join the Marines. */
+	private static DialogScreen recruiter(OpenNpcPayload data) {
+		var self = net.minecraft.client.Minecraft.getInstance().player;
+		boolean marine = self != null && self.getTeam() != null && "grandline_marines".equals(self.getTeam().getName());
+		List<DialogScreen.Option> options = new ArrayList<>();
+		if (!marine) {
+			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.recruiter.join").withStyle(ChatFormatting.BLUE),
+					() -> send(data, NpcActionPayload.JOIN_MARINES)));
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		return new DialogScreen(title(data, "entity.grandline.islander.marine_recruiter"),
+				List.of(Component.translatable(marine ? "npc.grandline.recruiter.already" : "npc.grandline.recruiter.greeting")), options);
 	}
 
 	static void send(OpenNpcPayload data, int action) {

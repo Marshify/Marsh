@@ -121,11 +121,10 @@ final class MillbrookVillage extends BasePlan {
 		anchor(new Anchor(Type.ARRIVAL, DOCK_X, Anchor.SURFACE, 46, 0, 180));    // the dock's arrival plaza, facing the village
 		anchor(Anchor.at(Type.HOME, -6, Anchor.SURFACE, -19, 0));                 // the Innkeeper, outside the inn
 		anchor(Anchor.at(Type.SWORDSMITH, 14, Anchor.SURFACE, 16, 180));          // the Swordsmith, outside the smithy
-		anchor(Anchor.at(Type.FISHERMAN, 1, DOCK_Y + 1, 72, 90));                 // on the dock's T-head
 		anchor(Anchor.at(Type.DOCK, -11, 63, 74));
 		anchor(Anchor.area(Type.ENEMY_CAMP, FIELD_A_X, FIELD_A_Z, 6));
 		anchor(Anchor.area(Type.ENEMY_CAMP, FIELD_B_X, FIELD_B_Z, 6));
-		anchor(Anchor.area(Type.BOSS_ARENA, FIELD_B_X, FIELD_B_Z, 6));            // quest bosses appear in the bandit camp
+		// No boss arena: Millbrook has no bosses. Its NPCs and Bandits follow MillbrookRoster.
 		anchor(Anchor.of(Type.TREASURE, -42, 32));
 		placeNature();
 	}

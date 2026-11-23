@@ -56,7 +56,7 @@ public final class EnemyRespawns {
 	}
 
 	static void onDeath(ServerLevel level, GrandLineEnemy enemy) {
-		if (!respawns(enemy)) {
+		if (!respawns(enemy) || MillbrookNpcs.spotOf(enemy) >= 0) { // Millbrook's Bandits respawn on their own timers
 			return;
 		}
 		BlockPos origin = enemy.origin();
@@ -154,6 +154,14 @@ public final class EnemyRespawns {
 	private static BlockPos surface(ServerLevel level, BlockPos pos) {
 		BlockPos top = new BlockPos(pos.getX(), level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ()), pos.getZ());
 		return IslandSpawns.isSafe(level, top) ? top : pos;
+	}
+
+	/** Drops the island's queued respawns (an island whose enemies are managed elsewhere: Millbrook). */
+	public static void forget(ServerLevel level, long islandId) {
+		Data data = Data.get(level);
+		if (data.pending.removeIf(p -> p.islandId() == islandId)) {
+			data.setDirty();
+		}
 	}
 
 	/** Queued respawns, for tests. */

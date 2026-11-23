@@ -36,6 +36,7 @@
       "com.grandline.test.GrandLineSoundtrackGameTests",
       "com.grandline.test.GrandLineNaturalCropsGameTests",
       "com.grandline.test.GrandLineDisembarkGameTests",
+      "com.grandline.test.GrandLineMillbrookNpcGameTests",
       "com.grandline.test.GrandLineCrystalFountainGameTests",
       "com.grandline.test.GrandLineRedbrickGameTests",
       "com.grandline.test.GrandLineIslandSwapGameTests",
