@@ -79,6 +79,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.technique.TechniqueService.register();
 		com.grandline.combat.ability.FlightService.register();
 		com.grandline.combat.CombatCredit.register();
+		com.grandline.audio.BossEncounters.register();
 		MobKillRewards.register();
 		LingeringAreas.register();
 		FruitService.register();

@@ -128,3 +128,8 @@ a malformed file is renamed to `grandline.json.broken` and replaced with default
 - [ARCHITECTURE.md](ARCHITECTURE.md) — packages, data flow, networking & persistence design
 - [ROADMAP.md](ROADMAP.md) — milestones
 - [DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md) — what was done, verified and left open
+
+## Credits
+
+- Soundtrack created in collaboration with ElevenLabs (Eleven Music). The music ships inside the mod: players need no
+  ElevenLabs account, key or internet connection. See [docs/SOUNDTRACK.md](docs/SOUNDTRACK.md).

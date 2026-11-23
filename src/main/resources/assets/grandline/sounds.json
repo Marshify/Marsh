@@ -182,5 +182,13 @@
         "attenuation_distance": 24
       }
     ]
+  },
+  "music.island.millbrook_village": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/millbrook_village",
+        "stream": true
+      }
+    ]
   }
 }

@@ -24,6 +24,7 @@ public final class GrandLineClient implements ClientModInitializer {
 			}
 		});
 		ClientNetworking.register();
+		com.grandline.client.audio.MusicController.register();
 		GrandLineClientCommands.register();
 		GrandLineKeys.register();
 		ProfileHud.register();

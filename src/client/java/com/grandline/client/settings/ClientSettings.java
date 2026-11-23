@@ -36,6 +36,8 @@ public final class ClientSettings {
 	public int weaponSfx = 3;
 	public int movementSfx = 3;
 	public int environmentSfx = 3;
+	/** Grand Line soundtrack volume, 0-100% (the music plays in the Master category, so only Master also applies). */
+	public int soundtrackVolume = 100;
 	/** Shake the camera on nearby move impacts. */
 	public boolean cameraShake = true;
 	/** Stylized world lighting: no black shadows under floating islands (see StylizedLighting). */

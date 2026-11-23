@@ -68,6 +68,10 @@ def build():
     problems = []
     for f in sorted(SOUNDS.rglob("*.ogg")):
         rel = f.relative_to(SOUNDS).with_suffix("").as_posix()
+        if rel.startswith("music/"):
+            # Soundtrack (tools/music/prepare.py): stereo, streamed from disk, one file per event.
+            events["music." + rel[len("music/"):].replace("/", ".")] = {"sounds": [{"name": "grandline:" + rel, "stream": True}]}
+            continue
         cue = re.sub(r"_\d+$", "", rel).replace("/", ".")
         stage = cue.rsplit(".", 1)[-1]
         ch = channels(f)
@@ -86,10 +90,11 @@ def main():
         (ASSETS / "sounds.json").write_text(json.dumps(events, indent=2) + "\n")
     ids = cue_ids()
     missing = [c for c in ids if c not in events]
-    unknown = [c for c in events if c not in ids]
+    music = [c for c in events if c.startswith("music.")]
+    unknown = [c for c in events if c not in ids and not c.startswith("music.")]
     for c in converted:
         print("converted", c)
-    print(f"{len(ids) - len(missing)}/{len(ids)} cues have audio" + ("" if check else "; sounds.json written"))
+    print(f"{len(ids) - len(missing)}/{len(ids)} cues have audio, {len(music)} soundtrack track(s)" + ("" if check else "; sounds.json written"))
     for c in missing:
         print("  placeholder:", c, "->", "sounds/" + c.replace(".", "/") + ".ogg")
     for c in unknown:

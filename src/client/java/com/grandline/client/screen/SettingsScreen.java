@@ -29,6 +29,10 @@ public final class SettingsScreen extends Screen {
 
 	private static final String[] VOLUME = {"vol_off", "low", "medium", "vol_full"};
 
+	/** A 0-100% slider (applied as it moves, saved when released). */
+	private record Slider(String key, Supplier<Integer> get, Consumer<Integer> set) {
+	}
+
 	private final List<MarshButton[]> choiceButtons = new ArrayList<>();
 	private final List<Choice> choiceOf = new ArrayList<>();
 
@@ -40,7 +44,7 @@ public final class SettingsScreen extends Screen {
 	/** The scrolling list: everything below the title bar. */
 	private int viewTop, viewBottom, contentHeight, scroll;
 	private boolean draggingBar;
-	private final List<MarshButton> scrolled = new ArrayList<>();
+	private final List<net.minecraft.client.gui.components.AbstractWidget> scrolled = new ArrayList<>();
 	private final List<Integer> baseY = new ArrayList<>();
 
 	public SettingsScreen(Screen parent) {
@@ -67,6 +71,7 @@ public final class SettingsScreen extends Screen {
 		rows.add(new Choice("weapon_sfx", () -> s.weaponSfx, v -> s.weaponSfx = v, VOLUME));
 		rows.add(new Choice("movement_sfx", () -> s.movementSfx, v -> s.movementSfx = v, VOLUME));
 		rows.add(new Choice("environment_sfx", () -> s.environmentSfx, v -> s.environmentSfx = v, VOLUME));
+		rows.add(new Slider("soundtrack_volume", () -> s.soundtrackVolume, v -> s.soundtrackVolume = v));
 		rows.add("screen.grandline.settings.section.hud");
 		rows.add(new Toggle("move_list", () -> s.showMoveList, v -> s.showMoveList = v));
 		rows.add(new Toggle("quest_tracker", () -> s.showQuestTracker, v -> s.showQuestTracker = v));
@@ -118,6 +123,30 @@ public final class SettingsScreen extends Screen {
 				choiceButtons.add(buttons);
 				choiceOf.add(choice);
 				y += ROW;
+			} else if (row instanceof Slider slider) {
+				add(new net.minecraft.client.gui.components.AbstractSliderButton(left + WIDTH - 120, y + 7, 110, 20,
+						Component.empty(), slider.get().get() / 100.0) {
+					{
+						updateMessage();
+					}
+
+					@Override
+					protected void updateMessage() {
+						setMessage(Component.literal(Math.round(value * 100) + "%"));
+					}
+
+					@Override
+					protected void applyValue() {
+						slider.set().accept((int) Math.round(value * 100)); // the music follows at once
+					}
+
+					@Override
+					public void onRelease(double mouseX, double mouseY) {
+						super.onRelease(mouseX, mouseY);
+						ClientSettings.get().save();
+					}
+				});
+				y += ROW;
 			} else {
 				y += 14;
 			}
@@ -133,7 +162,7 @@ public final class SettingsScreen extends Screen {
 		setScroll(scroll); // keeps the position when the window is resized
 	}
 
-	private MarshButton add(MarshButton button) {
+	private <T extends net.minecraft.client.gui.components.AbstractWidget> T add(T button) {
 		scrolled.add(button);
 		baseY.add(button.getY());
 		return addRenderableWidget(button);
@@ -146,7 +175,7 @@ public final class SettingsScreen extends Screen {
 	private void setScroll(int value) {
 		scroll = Math.max(0, Math.min(maxScroll(), value));
 		for (int i = 0; i < scrolled.size(); i++) {
-			MarshButton b = scrolled.get(i);
+			var b = scrolled.get(i);
 			b.setY(baseY.get(i) - scroll);
 			// Only buttons fully inside the list can be seen or clicked.
 			b.visible = b.getY() >= viewTop && b.getY() + b.getHeight() <= viewBottom;
@@ -221,8 +250,8 @@ public final class SettingsScreen extends Screen {
 			if (row instanceof String section) {
 				g.drawString(font, Component.translatable(section), left + 10, y + 3, 0xA9B2C0);
 				y += 14;
-			} else if (row instanceof Toggle || row instanceof Choice) {
-				String key = row instanceof Toggle toggle ? toggle.key() : ((Choice) row).key();
+			} else if (row instanceof Toggle || row instanceof Choice || row instanceof Slider) {
+				String key = row instanceof Toggle toggle ? toggle.key() : row instanceof Choice choice ? choice.key() : ((Slider) row).key();
 				MarshUi.row(g, left + 6, y, WIDTH - 12, ROW - 2, MarshUi.Row.DARK);
 				MarshUi.outlined(g, font, Component.translatable("setting.grandline." + key), left + 14, y + 6, 0xFFFFFF);
 				// Description at 75% size, wrapped to stay clear of the On/Off buttons.
@@ -268,6 +297,7 @@ public final class SettingsScreen extends Screen {
 
 	@Override
 	public void onClose() {
+		ClientSettings.get().save(); // keeps a slider value changed with the keyboard
 		minecraft.setScreen(parent instanceof MenuScreen ? null : parent);
 	}
 

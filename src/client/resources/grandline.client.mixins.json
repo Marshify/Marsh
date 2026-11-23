@@ -25,7 +25,8 @@
     "ItemRendererHeldSwordMixin",
     "ItemInHandLayerSwordMixin",
     "ItemInHandRendererSwordMixin",
-    "PlayerHandAuraMixin"
+    "PlayerHandAuraMixin",
+    "MusicManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

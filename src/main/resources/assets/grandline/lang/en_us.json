@@ -925,6 +925,8 @@
   "setting.grandline.movement_sfx.desc": "Dashes, flash steps and flight.",
   "setting.grandline.environment_sfx": "World sounds",
   "setting.grandline.environment_sfx.desc": "Volcanoes, islands and other ambience.",
+  "setting.grandline.soundtrack_volume": "Soundtrack",
+  "setting.grandline.soundtrack_volume.desc": "Island, ocean and boss music. Changes apply at once.",
   "npc.grandline.shop.owned": "%s — Owned",
   "npc.grandline.result.already_owned": "You already own that one. Equipment is yours for good, so there's no need to buy it again.",
   "message.grandline.enemy.safe_area": "You can't attack from a safe area.",
