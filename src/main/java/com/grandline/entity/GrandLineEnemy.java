@@ -68,6 +68,7 @@ public class GrandLineEnemy extends Monster {
 	public void setOrigin(net.minecraft.core.BlockPos origin, long islandId) {
 		this.origin = origin;
 		this.islandId = islandId;
+		updateName();
 	}
 
 	public net.minecraft.core.BlockPos origin() {
@@ -79,7 +80,9 @@ public class GrandLineEnemy extends Monster {
 	}
 
 	protected void updateName() {
-		setCustomName(Component.translatable("entity.grandline." + kind().id()).append(" [Lv. " + grandLineLevel + "]"));
+		// The name on its island (an island can give it its own name; see GrandLineNames), then the level.
+		setCustomName(com.grandline.names.GrandLineNames.npc("entity.grandline." + kind().id(), com.grandline.names.GrandLineNames.islandNameOf(islandId))
+				.append(" [Lv. " + grandLineLevel + "]"));
 		setCustomNameVisible(true);
 	}
 
@@ -145,6 +148,7 @@ public class GrandLineEnemy extends Monster {
 		if (tag.contains("GrandLineLeash")) {
 			restrictTo(origin != null ? origin : blockPosition(), tag.getInt("GrandLineLeash"));
 		}
+		updateName(); // picks up the mod's current names
 	}
 
 	@Override

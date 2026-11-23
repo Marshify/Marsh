@@ -1,0 +1,13 @@
+{
+  "_help": [
+    "Grand Line's renamed names. Part of the mod: every player of every later version sees them.",
+    "Each section maps an ORIGINAL name to the name shown. Delete a line to give the original name back.",
+    "island_npcs renames an NPC or enemy on one island only: { \"Verdant Wilds\": { \"Bandit\": \"Lion\" } }.",
+    "Only what players see changes: saves, quests and the mod's ids keep the original names."
+  ],
+  "islands": {},
+  "npcs": {},
+  "items": {},
+  "abilities": {},
+  "island_npcs": {}
+}

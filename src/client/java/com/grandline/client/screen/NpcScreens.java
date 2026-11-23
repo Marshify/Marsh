@@ -39,7 +39,7 @@ public final class NpcScreens {
 	}
 
 	static Component quest(QuestState q) {
-		Component target = Component.translatable("entity.grandline." + EnemyKind.valueOf(q.target()).id());
+		Component target = com.grandline.names.GrandLineNames.npc("entity.grandline." + EnemyKind.valueOf(q.target()).id(), q.islandName());
 		return Component.translatable(q.boss() ? "quest.grandline.boss" : "quest.grandline.kill", q.required(), target, com.grandline.names.GrandLineNames.island(q.islandName()));
 	}
 

@@ -15,12 +15,16 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Renaming in game (operators):
+ * The mod author's renaming tool. It exists only when the game runs from the mod's source folder (development), where it
+ * writes the mod's own names file (src/main/resources/assets/grandline/names.json, built into every jar); release jars
+ * have no such command, so nobody else can rename anything. Commands:
  * <pre>
  * /grandline names set &lt;island|npc|item|ability&gt; "&lt;name&gt;" &lt;new name&gt;   rename (tab completes the names)
  * /grandline names reset &lt;island|npc|item|ability&gt; "&lt;name&gt;"           give it its own name back
  * /grandline names list &lt;island|npc|item|ability&gt;                      the renames of that kind
- * /grandline names reload                                               after editing config/grandline-names.json
+ * /grandline names set island_npc "&lt;island&gt;" "&lt;npc&gt;" &lt;new name&gt;   an NPC or enemy on one island only
+ * /grandline names reset island_npc "&lt;island&gt;" "&lt;npc&gt;"
+ * /grandline names reload                                               after editing the names file by hand
  * </pre>
  * Names with spaces go in quotes. Either the original name or its current new name can be used.
  */
@@ -31,6 +35,9 @@ public final class NamesCommand {
 	}
 
 	public static void register() {
+		if (!net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			return; // release jars: the names are part of the mod and only its author changes them
+		}
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
 			LiteralArgumentBuilder<CommandSourceStack> names = Commands.literal("names").requires(s -> s.hasPermission(2));
 			LiteralArgumentBuilder<CommandSourceStack> set = Commands.literal("set");
@@ -49,6 +56,16 @@ public final class NamesCommand {
 						.executes(ctx -> reset(ctx, category))));
 				list.then(Commands.literal(word).executes(ctx -> list(ctx, category)));
 			}
+			SuggestionProvider<CommandSourceStack> islands = (ctx, builder) -> SharedSuggestionProvider.suggest(
+					GrandLineNames.namesOf(GrandLineNames.Category.ISLAND).stream().map(StringArgumentType::escapeIfRequired), builder);
+			SuggestionProvider<CommandSourceStack> npcs = (ctx, builder) -> SharedSuggestionProvider.suggest(
+					GrandLineNames.namesOf(GrandLineNames.Category.NPC).stream().map(StringArgumentType::escapeIfRequired), builder);
+			set.then(Commands.literal("island_npc").then(Commands.argument("island", StringArgumentType.string()).suggests(islands)
+					.then(Commands.argument("name", StringArgumentType.string()).suggests(npcs)
+							.then(Commands.argument("new_name", StringArgumentType.greedyString()).executes(NamesCommand::setOnIsland)))));
+			reset.then(Commands.literal("island_npc").then(Commands.argument("island", StringArgumentType.string()).suggests(islands)
+					.then(Commands.argument("name", StringArgumentType.string()).suggests(npcs).executes(NamesCommand::resetOnIsland))));
+			list.then(Commands.literal("island_npc").executes(NamesCommand::listOnIslands));
 			names.then(set).then(reset).then(list).then(Commands.literal("reload").executes(NamesCommand::reload));
 			dispatcher.register(Commands.literal("grandline").then(names));
 		});
@@ -62,7 +79,7 @@ public final class NamesCommand {
 			ctx.getSource().sendFailure(Component.literal("No " + label(category) + " is called \"" + typed + "\". Press Tab after the kind to see the names."));
 			return 0;
 		}
-		if (newName.isEmpty() || newName.length() > MAX_LENGTH || newName.chars().anyMatch(c -> c < 32 || c == '§')) {
+		if (newName.isEmpty() || newName.length() > MAX_LENGTH || newName.chars().anyMatch(c -> c < 32 || c == '\u00a7')) {
 			ctx.getSource().sendFailure(Component.literal("The new name must be 1-" + MAX_LENGTH + " characters, without colour codes."));
 			return 0;
 		}
@@ -102,9 +119,51 @@ public final class NamesCommand {
 		return renames.size();
 	}
 
+	private static int setOnIsland(CommandContext<CommandSourceStack> ctx) {
+		String island = GrandLineNames.resolve(GrandLineNames.Category.ISLAND, StringArgumentType.getString(ctx, "island"));
+		String typed = StringArgumentType.getString(ctx, "name");
+		String original = GrandLineNames.resolve(GrandLineNames.Category.NPC, typed);
+		String newName = StringArgumentType.getString(ctx, "new_name").trim();
+		if (island == null || original == null) {
+			ctx.getSource().sendFailure(Component.literal(island == null ? "No island is called \"" + StringArgumentType.getString(ctx, "island") + "\"."
+					: "No NPC is called \"" + typed + "\". Press Tab to see the names."));
+			return 0;
+		}
+		if (newName.isEmpty() || newName.length() > MAX_LENGTH || newName.chars().anyMatch(c -> c < 32 || c == '\u00a7')) {
+			ctx.getSource().sendFailure(Component.literal("The new name must be 1-" + MAX_LENGTH + " characters, without colour codes."));
+			return 0;
+		}
+		GrandLineNames.renameOnIsland(island, original, newName);
+		ctx.getSource().sendSuccess(() -> Component.literal("On " + island + ", \"" + original + "\" is now \"" + newName
+				+ "\" (new and reloaded NPCs; others on their next load).").withStyle(ChatFormatting.GREEN), true);
+		return 1;
+	}
+
+	private static int resetOnIsland(CommandContext<CommandSourceStack> ctx) {
+		String island = GrandLineNames.resolve(GrandLineNames.Category.ISLAND, StringArgumentType.getString(ctx, "island"));
+		String original = GrandLineNames.resolve(GrandLineNames.Category.NPC, StringArgumentType.getString(ctx, "name"));
+		if (island == null || original == null || !GrandLineNames.resetOnIsland(island, original)) {
+			ctx.getSource().sendFailure(Component.literal("That NPC isn't renamed on that island."));
+			return 0;
+		}
+		ctx.getSource().sendSuccess(() -> Component.literal("On " + island + ", \"" + original + "\" has its usual name again."), true);
+		return 1;
+	}
+
+	private static int listOnIslands(CommandContext<CommandSourceStack> ctx) {
+		var all = GrandLineNames.islandNpcRenames();
+		if (all.isEmpty()) {
+			ctx.getSource().sendSuccess(() -> Component.literal("No NPCs renamed on single islands."), false);
+			return 0;
+		}
+		all.forEach((island, names) -> names.forEach((from, to) ->
+				ctx.getSource().sendSuccess(() -> Component.literal("  " + island + ": " + from + " → " + to), false)));
+		return all.size();
+	}
+
 	private static int reload(CommandContext<CommandSourceStack> ctx) {
 		GrandLineNames.reload();
-		ctx.getSource().sendSuccess(() -> Component.literal("Names reloaded from " + GrandLineNames.file().getFileName() + "."), true);
+		ctx.getSource().sendSuccess(() -> Component.literal("Names reloaded from the mod's names file."), true);
 		return 1;
 	}
 

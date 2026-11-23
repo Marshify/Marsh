@@ -197,7 +197,7 @@ public final class QuestService {
 	}
 
 	public static Component describe(QuestState quest) {
-		Component target = Component.translatable("entity.grandline." + EnemyKind.valueOf(quest.target()).id());
+		Component target = com.grandline.names.GrandLineNames.npc("entity.grandline." + EnemyKind.valueOf(quest.target()).id(), quest.islandName());
 		return Component.translatable(quest.boss() ? "quest.grandline.boss" : "quest.grandline.kill", quest.required(), target, com.grandline.names.GrandLineNames.island(quest.islandName()));
 	}
 

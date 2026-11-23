@@ -105,7 +105,13 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		entityData.set(ROLE, role.ordinal());
 		this.islandId = islandId;
 		this.islandLevel = islandLevel;
-		setCustomName(Component.translatable("entity.grandline.islander." + role.name().toLowerCase(java.util.Locale.ROOT)));
+		updateName();
+	}
+
+	/** Its role's name, or the name it has on its island (see GrandLineNames). */
+	private void updateName() {
+		setCustomName(com.grandline.names.GrandLineNames.npc("entity.grandline.islander." + role().name().toLowerCase(java.util.Locale.ROOT),
+				com.grandline.names.GrandLineNames.islandNameOf(islandId)));
 		setCustomNameVisible(true);
 	}
 
@@ -169,5 +175,6 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		islandId = tag.getLong("GrandLineIsland");
 		islandLevel = Math.max(1, tag.getInt("GrandLineIslandLevel"));
 		region = tag.getInt("GrandLineRegion");
+		updateName(); // picks up the mod's current names
 	}
 }
