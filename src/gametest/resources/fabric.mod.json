@@ -34,6 +34,7 @@
       "com.grandline.test.GrandLineIronholdGameTests",
       "com.grandline.test.GrandLineMarineStartGameTests",
       "com.grandline.test.GrandLineSoundtrackGameTests",
+      "com.grandline.test.GrandLineNaturalCropsGameTests",
       "com.grandline.test.GrandLineCrystalFountainGameTests",
       "com.grandline.test.GrandLineRedbrickGameTests",
       "com.grandline.test.GrandLineIslandSwapGameTests",
