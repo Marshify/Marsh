@@ -131,5 +131,6 @@ a malformed file is renamed to `grandline.json.broken` and replaced with default
 
 ## Credits
 
-- Soundtrack created in collaboration with ElevenLabs (Eleven Music). The music ships inside the mod: players need no
-  ElevenLabs account, key or internet connection. See [docs/SOUNDTRACK.md](docs/SOUNDTRACK.md).
+- **Soundtrack:** Music by **Jonathan Shaw** (www.jshaw.co.uk, "RPG Orchestral Essentials", CC-BY 3.0) and **Matthew Pablo** (www.matthewpablo.com, CC-BY 3.0). Further tracks by Tausdei (CC-BY 3.0), PolygonDan, NBJDLukasAbsolute and Indieteur (CC0), all from OpenGameArt.org.
+  - The music ships inside the mod: players need no account or internet connection.
+  - Every track's title, licence and source is listed in [docs/SOUNDTRACK_CREDITS.md](docs/SOUNDTRACK_CREDITS.md) and in the mod at `assets/grandline/music/CREDITS.txt`. See also [docs/SOUNDTRACK.md](docs/SOUNDTRACK.md).

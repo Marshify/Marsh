@@ -183,10 +183,154 @@
       }
     ]
   },
+  "music.boss.final": {
+    "sounds": [
+      {
+        "name": "grandline:music/boss/final",
+        "stream": true
+      }
+    ]
+  },
+  "music.boss.major": {
+    "sounds": [
+      {
+        "name": "grandline:music/boss/major",
+        "stream": true
+      }
+    ]
+  },
+  "music.boss.standard": {
+    "sounds": [
+      {
+        "name": "grandline:music/boss/standard",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.cloudtop_isles": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/cloudtop_isles",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.crystal_fountain": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/crystal_fountain",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.dawnreach_harbor": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/dawnreach_harbor",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.emberfall_isle": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/emberfall_isle",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.frostpeak_isle": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/frostpeak_isle",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.gladiators_ring": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/gladiators_ring",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.ironhold_bastion": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/ironhold_bastion",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.lotus_palace": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/lotus_palace",
+        "stream": true
+      }
+    ]
+  },
   "music.island.millbrook_village": {
     "sounds": [
       {
         "name": "grandline:music/island/millbrook_village",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.redbrick_port": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/redbrick_port",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.saltmarket_docks": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/saltmarket_docks",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.stonewall_prison": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/stonewall_prison",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.sunscorch_dunes": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/sunscorch_dunes",
+        "stream": true
+      }
+    ]
+  },
+  "music.island.verdant_wilds": {
+    "sounds": [
+      {
+        "name": "grandline:music/island/verdant_wilds",
+        "stream": true
+      }
+    ]
+  },
+  "music.ocean.first_sea": {
+    "sounds": [
+      {
+        "name": "grandline:music/ocean/first_sea",
+        "stream": true
+      }
+    ]
+  },
+  "music.region.cloudtop_isles_upper": {
+    "sounds": [
+      {
+        "name": "grandline:music/region/cloudtop_isles_upper",
         "stream": true
       }
     ]

@@ -1,5 +1,5 @@
 {
-  "_doc": "Grand Line soundtrack manifest. Edit prompts or assignments here, then run tools/music/generate.py and tools/music/prepare.py (see docs/SOUNDTRACK.md). status: planned -> review (generated, waiting for approval) -> approved (shipped in the mod). Only review and approved tracks with a prepared file are used in game.",
+  "_doc": "Grand Line soundtrack manifest. Every track names its audio source (open-licence music from OpenGameArt, with composer, licence and credit) or an ElevenLabs prompt to generate it. Raw files go in tools/music/raw/<id>.mp3|wav|flac; run tools/music/prepare.py (see docs/SOUNDTRACK.md). status: planned -> review -> approved; only review/approved tracks with a prepared file play in game.",
   "model_id": "music_v2_5",
   "identity": "Shared Grand Line motif: a hopeful rising four-note phrase (1-2-3-5 of the major scale). Islands state it in their own instruments and keys; boss themes turn it heroic or dark.",
   "loop_rules": "Every prompt asks for a steady tempo and even energy from the first bar to the last, no intro from silence, no fade-out and no final ending, so the preparer can join the end back to the start.",
@@ -9,153 +9,317 @@
       "island": "Millbrook Village",
       "notes": "Pirate starting village, Lv 1-10: farms, windmills, wooden houses and the first quest giver.",
       "duration_s": 150,
-      "status": "review",
-      "prompt": "Warm, cheerful folk-orchestral video game exploration theme, instrumental only. Fingerpicked acoustic guitar and a wooden flute carry a simple, singable major-key melody built on a hopeful rising four-note phrase, supported by light pizzicato and legato strings, soft hand percussion and gentle shaker at a relaxed walking tempo around 96 BPM. Innocent, sunny and optimistic, like the first morning of a grand sea adventure. The arrangement grows gently from guitar and flute to fuller strings in the middle, then settles back to the opening texture, keeping a steady tempo and even energy throughout with no fade-out and no big ending, so it loops seamlessly. Crisp, natural, warm acoustic production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "In Tranquil Spring",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/in-tranquil-spring-rpg-orchestral-essentials",
+        "license": "CC-BY 3.0",
+        "credit": "\"In Tranquil Spring\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Warm, cheerful folk-orchestral video game exploration theme, instrumental only. Fingerpicked acoustic guitar and a wooden flute carry a simple, singable major-key melody built on a hopeful rising four-note phrase, supported by light pizzicato and legato strings, soft hand percussion and gentle shaker at a relaxed walking tempo around 96 BPM. Innocent, sunny and optimistic, like the first morning of a grand sea adventure. The arrangement grows gently from guitar and flute to fuller strings in the middle, then settles back to the opening texture, keeping a steady tempo and even energy throughout with no fade-out and no big ending, so it loops seamlessly. Crisp, natural, warm acoustic production, no vocals."
     },
     {
       "id": "island.ironhold_bastion",
       "island": "Ironhold Bastion",
       "notes": "Marine starting island, Lv 1-10: white fortress with three domed towers, gates, courtyard and a timber-framed town with an octagon plaza.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Optimistic orchestral naval academy theme for a video game, instrumental only. Crisp military snare drum cadence, warm French horns and trumpets stating a hopeful rising four-note fanfare motif, clarinet and flute countermelodies, and uplifting legato strings at a brisk, proud marching tempo around 108 BPM in a bright major key. Disciplined, ambitious and full of camaraderie, like young recruits starting a naval career, but light enough for long exploration rather than a battle. Even energy from start to end with no fade-out and no final cadence so it loops seamlessly. Clean, natural orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Dream of First Flight",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-dream-of-first-flight-rpg-orchestral-essentials-title-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Dream of First Flight\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Optimistic orchestral naval academy theme for a video game, instrumental only. Crisp military snare drum cadence, warm French horns and trumpets stating a hopeful rising four-note fanfare motif, clarinet and flute countermelodies, and uplifting legato strings at a brisk, proud marching tempo around 108 BPM in a bright major key. Disciplined, ambitious and full of camaraderie, like young recruits starting a naval career, but light enough for long exploration rather than a battle. Even energy from start to end with no fade-out and no final cadence so it loops seamlessly. Clean, natural orchestral production, no vocals."
     },
     {
       "id": "island.dawnreach_harbor",
       "island": "Dawnreach Harbor",
       "notes": "Central Lv 1 hub town and trading harbour; no quests.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Relaxed seaside town music for a video game, instrumental only. Accordion and mandolin share a lilting, friendly major-key melody that echoes a hopeful rising four-note phrase, over strummed acoustic guitar, upright bass and gentle hand percussion with a light shuffling groove around 100 BPM. Welcoming, sunny and unhurried, the sound of a bustling coastal trading harbour. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Warm, natural acoustic production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Market on the Sea",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/market-on-the-sea-rpg-orchestral-essentials-village-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"Market on the Sea\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Relaxed seaside town music for a video game, instrumental only. Accordion and mandolin share a lilting, friendly major-key melody that echoes a hopeful rising four-note phrase, over strummed acoustic guitar, upright bass and gentle hand percussion with a light shuffling groove around 100 BPM. Welcoming, sunny and unhurried, the sound of a bustling coastal trading harbour. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Warm, natural acoustic production, no vocals."
     },
     {
       "id": "island.verdant_wilds",
       "island": "Verdant Wilds",
       "notes": "Lv 10-30 jungle island with a hidden temple (the Saber Warden).",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Mysterious tropical jungle exploration music for a video game, instrumental only. Rolling marimba ostinato and a breathy bamboo flute melody in a minor-tinged mode, layered with wooden percussion, low tribal drums and atmospheric sustained strings at a moderate tempo around 92 BPM. Curious and adventurous with a hint of hidden danger in the dense undergrowth, never frantic. Steady groove and even energy throughout, no fade-out and no final ending so it loops seamlessly. Organic, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Chill Jungle Ambient",
+        "composer": "Tausdei",
+        "uploader": "Tausdei",
+        "url": "https://opengameart.org/content/chill-jungle-ambient",
+        "license": "CC-BY 3.0",
+        "credit": "\"Chill Jungle Ambient\" By Tausdei (opengameart.org/users/tausdei)"
+      },
+      "elevenlabs_prompt": "Mysterious tropical jungle exploration music for a video game, instrumental only. Rolling marimba ostinato and a breathy bamboo flute melody in a minor-tinged mode, layered with wooden percussion, low tribal drums and atmospheric sustained strings at a moderate tempo around 92 BPM. Curious and adventurous with a hint of hidden danger in the dense undergrowth, never frantic. Steady groove and even energy throughout, no fade-out and no final ending so it loops seamlessly. Organic, natural production, no vocals."
     },
     {
       "id": "island.saltmarket_docks",
       "island": "Saltmarket Docks",
       "notes": "Lv 30-60 rugged pirate harbour: lighthouse, windmill, warehouses, piers.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Playful, energetic nautical folk music for a video game, instrumental only. Lively fiddle and accordion trade a catchy, slightly mischievous major-key tune in a bouncy 6/8 jig feel around 116 BPM, driven by strummed acoustic guitar, upright bass, bodhran and rhythmic hand percussion. The rowdy, good-humoured atmosphere of a rugged, lawless coastal port full of sailors and traders. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Natural, live-sounding acoustic production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Merchants and Sea Salt",
+        "composer": "NBJDLukasAbsolute",
+        "uploader": "NBJDLukasAbsolute",
+        "url": "https://opengameart.org/content/merchants-and-sea-salt",
+        "license": "CC0",
+        "credit": "\"Merchants and Sea Salt\" By NBJDLukasAbsolute (CC0, no credit required)"
+      },
+      "elevenlabs_prompt": "Playful, energetic nautical folk music for a video game, instrumental only. Lively fiddle and accordion trade a catchy, slightly mischievous major-key tune in a bouncy 6/8 jig feel around 116 BPM, driven by strummed acoustic guitar, upright bass, bodhran and rhythmic hand percussion. The rowdy, good-humoured atmosphere of a rugged, lawless coastal port full of sailors and traders. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Natural, live-sounding acoustic production, no vocals."
     },
     {
       "id": "island.sunscorch_dunes",
       "island": "Sunscorch Dunes",
       "notes": "Lv 60-90 desert island with ruins and a pyramid.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Atmospheric desert adventure music for a video game, instrumental only. Expressive oud and ney flute phrases in a Middle Eastern-inspired minor mode, over frame drum and darbuka hand drums, plucked qanun-like strings and a subtle, warm orchestral string bed at a moderate, hypnotic tempo around 88 BPM. Ancient mystery, scorching sunlight, isolation and exploration among ruins, calm rather than dramatic. Steady pulse and even energy throughout, no fade-out and no final ending so it loops seamlessly. Rich, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Desert Mystic 2",
+        "composer": "PolygonDan",
+        "uploader": "PolygonDan",
+        "url": "https://opengameart.org/content/desertmystic-dynastic-egyptian-theme-cc0",
+        "license": "CC0",
+        "credit": "\"Desert Mystic 2\" By PolygonDan (CC0, no credit required; opengameart.org/users/polygondan)"
+      },
+      "elevenlabs_prompt": "Atmospheric desert adventure music for a video game, instrumental only. Expressive oud and ney flute phrases in a Middle Eastern-inspired minor mode, over frame drum and darbuka hand drums, plucked qanun-like strings and a subtle, warm orchestral string bed at a moderate, hypnotic tempo around 88 BPM. Ancient mystery, scorching sunlight, isolation and exploration among ruins, calm rather than dramatic. Steady pulse and even energy throughout, no fade-out and no final ending so it loops seamlessly. Rich, natural production, no vocals."
     },
     {
       "id": "island.frostpeak_isle",
       "island": "Frostpeak Isle",
       "notes": "Lv 90-120 snow island: layered terraces, a village plateau and an ice cavern.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Beautiful, gentle winter music for a video game, instrumental only. Celesta and soft felt piano carry a tender melody that hints at a hopeful rising four-note phrase, with glistening bells, delicate high strings and soft ambient woodwinds at a slow, floating tempo around 72 BPM in a major key with wistful minor colours. Peaceful falling snow over frozen landscapes with a quiet undercurrent of mystery. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Intimate, natural production with soft reverb, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Morning Frost",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/morning-frost-rpg-orchestral-essentials-village-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"Morning Frost\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Beautiful, gentle winter music for a video game, instrumental only. Celesta and soft felt piano carry a tender melody that hints at a hopeful rising four-note phrase, with glistening bells, delicate high strings and soft ambient woodwinds at a slow, floating tempo around 72 BPM in a major key with wistful minor colours. Peaceful falling snow over frozen landscapes with a quiet undercurrent of mystery. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Intimate, natural production with soft reverb, no vocals."
     },
     {
       "id": "island.redbrick_port",
       "island": "Redbrick Port",
       "notes": "Lv 120-150 naval fortress city: red brick walls, the headquarters tower, watchtowers, quays and field cannons.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Imposing orchestral naval fortress theme for a video game, instrumental only. Powerful low brass and dramatic horns state a stately minor-key theme over steady marching snare and timpani, driving low strings and cellos at a firm, measured tempo around 96 BPM. Military authority, strength and grandeur, but restrained enough to accompany exploration rather than battle. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Full, clean orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "The Tread of War",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/the-tread-of-war-rpg-orchestral-essentials-military-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"The Tread of War\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Imposing orchestral naval fortress theme for a video game, instrumental only. Powerful low brass and dramatic horns state a stately minor-key theme over steady marching snare and timpani, driving low strings and cellos at a firm, measured tempo around 96 BPM. Military authority, strength and grandeur, but restrained enough to accompany exploration rather than battle. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Full, clean orchestral production, no vocals."
     },
     {
       "id": "island.cloudtop_isles",
       "island": "Cloudtop Isles",
       "notes": "Lv 150-190 floating sky islands with a sky temple (lower region).",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Dreamlike celestial music for a video game, instrumental only. Flowing harp arpeggios, airy flute and clarinet melodies, shimmering bells and soft floating strings over gentle ambient pads at a slow, weightless tempo around 76 BPM in a bright major key. Freedom, wonder and tranquillity high above the clouds. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Spacious, natural production with airy reverb, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Tale of Wind",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-tale-of-wind-and-water-rpg-orchestral-essentials-peace-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Tale of Wind\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Dreamlike celestial music for a video game, instrumental only. Flowing harp arpeggios, airy flute and clarinet melodies, shimmering bells and soft floating strings over gentle ambient pads at a slow, weightless tempo around 76 BPM in a bright major key. Freedom, wonder and tranquillity high above the clouds. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Spacious, natural production with airy reverb, no vocals."
     },
     {
       "id": "region.cloudtop_isles_upper",
       "island": "Cloudtop Isles",
-      "region": {"min_y": 170},
+      "region": {
+        "min_y": 170
+      },
       "notes": "Lv 450-625 Upper Cloudtop: the Ancient Tree landmass and the Grand Sanctuary temple on the cloud banks (ground y 200+).",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Grand celestial orchestral music for a video game, instrumental only. Majestic choir-like synth pads without words, sweeping strings, harp, glockenspiel and noble horns build a broad, awe-struck major-key theme around a hopeful rising four-note phrase, at a stately tempo around 80 BPM. Celestial beauty, discovery and ancient mystery at the top of the sky, grander than the lower sky islands but still calm enough for exploration. Even energy throughout, no fade-out and no final ending so it loops seamlessly. Lush, natural orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Tale of Peace",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-tale-of-peace-rpg-orchestral-essentials-peace-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Tale of Peace\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Grand celestial orchestral music for a video game, instrumental only. Majestic choir-like synth pads without words, sweeping strings, harp, glockenspiel and noble horns build a broad, awe-struck major-key theme around a hopeful rising four-note phrase, at a stately tempo around 80 BPM. Celestial beauty, discovery and ancient mystery at the top of the sky, grander than the lower sky islands but still calm enough for exploration. Even energy throughout, no fade-out and no final ending so it loops seamlessly. Lush, natural orchestral production, no vocals."
     },
     {
       "id": "island.stonewall_prison",
       "island": "Stonewall Prison",
       "notes": "Lv 190-250 island prison fortress: cell blocks, walls and watchtowers.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Dark, suspenseful exploration music for a video game, instrumental only. Low cello and double bass ostinatos in a minor key, restrained muffled percussion, ominous bass clarinet and low flute phrases, with subtle metallic textures like distant chains and resonant metal, at a slow, uneasy tempo around 70 BPM. Isolation, confinement and quiet danger inside a prison fortress, tense but not loud. Even, restrained energy throughout, no fade-out and no final ending so it loops seamlessly. Dark, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Bitter Hope",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-bitter-hope-rpg-orchestral-essentials-dungeon-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Bitter Hope\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Dark, suspenseful exploration music for a video game, instrumental only. Low cello and double bass ostinatos in a minor key, restrained muffled percussion, ominous bass clarinet and low flute phrases, with subtle metallic textures like distant chains and resonant metal, at a slow, uneasy tempo around 70 BPM. Isolation, confinement and quiet danger inside a prison fortress, tense but not loud. Even, restrained energy throughout, no fade-out and no final ending so it loops seamlessly. Dark, natural production, no vocals."
     },
     {
       "id": "island.gladiators_ring",
       "island": "Gladiator's Ring",
       "notes": "Lv 250-300 colosseum island.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Ancient arena music for a video game, instrumental only. Powerful frame drums and hand drums drive a rhythmic Mediterranean-inspired groove around 112 BPM, with heroic trumpet and horn calls, rhythmic staccato strings, bouzouki-like plucked strings and a proud modal melody. Competition, honour, strength and anticipation before a contest, energetic but not a full battle. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Big, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Fight in the Fields",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-fight-in-the-fields-rpg-orchestral-essentials-combat-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Fight in the Fields\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Ancient arena music for a video game, instrumental only. Powerful frame drums and hand drums drive a rhythmic Mediterranean-inspired groove around 112 BPM, with heroic trumpet and horn calls, rhythmic staccato strings, bouzouki-like plucked strings and a proud modal melody. Competition, honour, strength and anticipation before a contest, energetic but not a full battle. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Big, natural production, no vocals."
     },
     {
       "id": "island.emberfall_isle",
       "island": "Emberfall Isle",
       "notes": "Lv 300-375 volcano island (the Volcano Island of the design): magma village, lava and ash.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Intense atmospheric volcanic exploration music for a video game, instrumental only. Deep taiko-like drums and low toms in a slow, heavy pulse around 84 BPM, sustained low brass, dramatic tremolo strings and dark minor-key motifs, with subtle rumbling low textures like distant magma. Volcanic instability, extreme heat and environmental danger, brooding rather than full battle music. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Weighty, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Heated Lands",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/heated-lands-rpg-orchestral-essentials-dungeon-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"Heated Lands\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Intense atmospheric volcanic exploration music for a video game, instrumental only. Deep taiko-like drums and low toms in a slow, heavy pulse around 84 BPM, sustained low brass, dramatic tremolo strings and dark minor-key motifs, with subtle rumbling low textures like distant magma. Volcanic instability, extreme heat and environmental danger, brooding rather than full battle music. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Weighty, natural production, no vocals."
     },
     {
       "id": "island.lotus_palace",
       "island": "Lotus Palace",
       "notes": "Lv 375-450 submerged palace city reached through whirlpools: lotus islets above, a vast underwater cavern below.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Magical underwater music for a video game, instrumental only. Rippling harp and soft piano, glass-like bells and celesta, flowing legato strings and gentle aquatic ambient textures at a slow, floating tempo around 70 BPM in a serene major key with modal colours. The beauty, tranquillity and mystery of an ancient submerged palace civilisation. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Delicate, spacious, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Underwater World",
+        "composer": "Indieteur",
+        "uploader": "Indieteur",
+        "url": "https://opengameart.org/content/underwater-world",
+        "license": "CC0",
+        "credit": "\"Underwater World\" By Indieteur (CC0, no credit required)"
+      },
+      "elevenlabs_prompt": "Magical underwater music for a video game, instrumental only. Rippling harp and soft piano, glass-like bells and celesta, flowing legato strings and gentle aquatic ambient textures at a slow, floating tempo around 70 BPM in a serene major key with modal colours. The beauty, tranquillity and mystery of an ancient submerged palace civilisation. Calm, even energy throughout, no fade-out and no final ending so it loops seamlessly. Delicate, spacious, natural production, no vocals."
     },
     {
       "id": "island.crystal_fountain",
       "island": "Crystal Fountain",
       "notes": "Lv 625-700 crystal city with the grand fountain: the last First Sea destination.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Majestic, elegant orchestral music for a video game, instrumental only. Sweeping strings, graceful piano, harp, noble brass and delicate woodwinds develop a radiant major-key theme that grows out of a hopeful rising four-note phrase, at a moderate tempo around 90 BPM. Grandeur, accomplishment and arrival at one of the most advanced destinations of the first sea, refined rather than bombastic. Even energy throughout, no fade-out and no final ending so it loops seamlessly. Polished, natural orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Treading The Unknown",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/treading-the-unknown-rpg-orchestral-essentials",
+        "license": "CC-BY 3.0",
+        "credit": "\"Treading The Unknown\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Majestic, elegant orchestral music for a video game, instrumental only. Sweeping strings, graceful piano, harp, noble brass and delicate woodwinds develop a radiant major-key theme that grows out of a hopeful rising four-note phrase, at a moderate tempo around 90 BPM. Grandeur, accomplishment and arrival at one of the most advanced destinations of the first sea, refined rather than bombastic. Even energy throughout, no fade-out and no final ending so it loops seamlessly. Polished, natural orchestral production, no vocals."
     },
     {
       "id": "ocean.first_sea",
       "ocean": 1,
       "notes": "Open water between First Sea islands, swimming or sailing.",
       "duration_s": 180,
-      "status": "planned",
-      "prompt": "Peaceful nautical adventure music for a video game, instrumental only. Acoustic guitar and a warm wooden flute share an open, singable major-key melody built on a hopeful rising four-note phrase, with soft orchestral strings swelling like waves and gentle percussion at a relaxed, rolling tempo around 90 BPM in a lilting 6/8 feel. Freedom, exploration, discovery and the vastness of the open sea. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Warm, natural production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "The World At Your Door",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/the-world-at-your-door-rpg-orchestral-essentials-overworld-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"The World At Your Door\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Peaceful nautical adventure music for a video game, instrumental only. Acoustic guitar and a warm wooden flute share an open, singable major-key melody built on a hopeful rising four-note phrase, with soft orchestral strings swelling like waves and gentle percussion at a relaxed, rolling tempo around 90 BPM in a lilting 6/8 feel. Freedom, exploration, discovery and the vastness of the open sea. Steady tempo and even energy throughout, no fade-out and no final ending so it loops seamlessly. Warm, natural production, no vocals."
     },
     {
       "id": "boss.standard",
-      "boss": {"sea": 1, "tier": "standard"},
+      "boss": {
+        "sea": 1,
+        "tier": "standard"
+      },
       "notes": "Quest bosses (island captains) on First Sea islands.",
       "duration_s": 120,
-      "status": "planned",
-      "prompt": "Energetic orchestral boss battle music for a video game, instrumental only. Driving staccato strings, pounding toms and snare, bold brass stabs and a memorable minor-key heroic theme that turns a rising four-note phrase into a fighting call, at a fast tempo around 150 BPM. Dramatic, urgent and exciting, clearly a fight. Constant high energy from the first bar to the last, no intro from silence, no fade-out and no final ending so it loops seamlessly. Punchy, clean orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Showdown of Misdeeds",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/showdown-of-misdeeds-rpg-orchestral-essentials-boss-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"Showdown of Misdeeds\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Energetic orchestral boss battle music for a video game, instrumental only. Driving staccato strings, pounding toms and snare, bold brass stabs and a memorable minor-key heroic theme that turns a rising four-note phrase into a fighting call, at a fast tempo around 150 BPM. Dramatic, urgent and exciting, clearly a fight. Constant high energy from the first bar to the last, no intro from silence, no fade-out and no final ending so it loops seamlessly. Punchy, clean orchestral production, no vocals."
     },
     {
       "id": "boss.major",
-      "boss": {"sea": 1, "tier": "major"},
+      "boss": {
+        "sea": 1,
+        "tier": "major"
+      },
       "notes": "Major First Sea bosses: temple bosses such as the Saber Warden.",
       "duration_s": 120,
-      "status": "planned",
-      "prompt": "Epic orchestral boss battle music for a video game, instrumental only. Thunderous taiko and timpani, relentless driving low strings, soaring horns and trumpets, dark choir-like pads without words and a powerful minor-key theme at a fast tempo around 156 BPM, with exotic percussion accents. Fierce, menacing and heroic, a guardian of an ancient temple. Constant high energy throughout, no intro from silence, no fade-out and no final ending so it loops seamlessly. Big, clean orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "A Slave To No One",
+        "composer": "Jonathan Shaw",
+        "uploader": "InspectorJ",
+        "url": "https://opengameart.org/content/a-slave-to-no-one-rpg-orchestral-essentials-boss-music",
+        "license": "CC-BY 3.0",
+        "credit": "\"A Slave To No One\" Composed by Jonathan Shaw (www.jshaw.co.uk)"
+      },
+      "elevenlabs_prompt": "Epic orchestral boss battle music for a video game, instrumental only. Thunderous taiko and timpani, relentless driving low strings, soaring horns and trumpets, dark choir-like pads without words and a powerful minor-key theme at a fast tempo around 156 BPM, with exotic percussion accents. Fierce, menacing and heroic, a guardian of an ancient temple. Constant high energy throughout, no intro from silence, no fade-out and no final ending so it loops seamlessly. Big, clean orchestral production, no vocals."
     },
     {
       "id": "boss.final",
-      "boss": {"sea": 1, "tier": "final"},
+      "boss": {
+        "sea": 1,
+        "tier": "final"
+      },
       "notes": "The First Sea's final boss: the Crystal Fountain quest boss.",
       "duration_s": 150,
-      "status": "planned",
-      "prompt": "Climactic final boss battle music for a video game, instrumental only. Full symphony orchestra with massive brass, choir-like synth pads without words, furious string runs, pounding timpani and taiko and a grand, memorable minor-key theme that transforms a hopeful rising four-note phrase into a triumphant, desperate battle anthem, at a fast tempo around 160 BPM. The ultimate challenge of the first sea, epic and emotional. Constant high energy throughout, no intro from silence, no fade-out and no final ending so it loops seamlessly. Huge, clean orchestral production, no vocals."
+      "status": "approved",
+      "source": {
+        "title": "Blackmoor Tides (Loop, No Chants)",
+        "composer": "Matthew Pablo",
+        "uploader": "Matthew Pablo",
+        "url": "https://opengameart.org/content/blackmoor-tides-epic-pirate-battle-theme",
+        "license": "CC-BY 3.0",
+        "credit": "\"Blackmoor Tides (Loop, No Chants)\" Music by Matthew Pablo (www.matthewpablo.com)"
+      },
+      "loop": "as_is",
+      "elevenlabs_prompt": "Climactic final boss battle music for a video game, instrumental only. Full symphony orchestra with massive brass, choir-like synth pads without words, furious string runs, pounding timpani and taiko and a grand, memorable minor-key theme that transforms a hopeful rising four-note phrase into a triumphant, desperate battle anthem, at a fast tempo around 160 BPM. The ultimate challenge of the first sea, epic and emotional. Constant high energy throughout, no intro from silence, no fade-out and no final ending so it loops seamlessly. Huge, clean orchestral production, no vocals."
     }
   ]
 }

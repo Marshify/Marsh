@@ -1,4 +1,4 @@
-# Grand Line soundtrack (0.63.0)
+# Grand Line soundtrack (0.63.0 system, 0.64.0 music)
 
 ## Status
 
@@ -6,8 +6,8 @@
 |---|---|
 | Music system (island, region, ocean and boss music; crossfades; looping; vanilla music off in Grand Line worlds; Soundtrack volume slider) | **Done**, tested in game |
 | Boss fight detection (server) | **Done**, game-tested |
-| Tooling (manifest, generator, loop/level/encode preparer) | **Done** |
-| Tracks | **1 of 19**: Millbrook Village (test track, waiting for approval). The other 18 are written and priced, and are generated only once the test track is approved. |
+| Tooling (manifest, generator, loop/level/encode preparer, credits) | **Done** |
+| Tracks | **Done in 0.64.0: all 19**, open-licence music from OpenGameArt (16 CC-BY 3.0, 3 CC0); credits in [SOUNDTRACK_CREDITS.md](SOUNDTRACK_CREDITS.md) |
 
 ## How it works in game
 
@@ -34,12 +34,13 @@
 
 | File | What |
 |---|---|
-| `tools/music/soundtrack.json` | The manifest: every track's id, prompt, length, assignment (island, region, ocean or boss tier) and status (`planned` → `review` → `approved`). |
+| `tools/music/soundtrack.json` | The manifest: every track's id, assignment (island, region, ocean or boss tier), status (`planned` → `review` → `approved`), its `source` (title, composer, licence, credit, URL) and an `elevenlabs_prompt` kept in case it is ever generated instead. |
 | `tools/music/generate.py` | Calls the ElevenLabs Music API. The key comes from `ELEVENLABS_API_KEY` only and is never stored. |
 | `tools/music/prepare.py` | Loops, levels and encodes the raw files, writes the game data file and rebuilds `sounds.json`. |
 | `tools/music/raw/` | Raw downloads (not committed). |
 | `src/main/resources/assets/grandline/sounds/music/**.ogg` | The game's tracks: stereo OGG Vorbis, about 128 kbps. |
 | `src/main/resources/assets/grandline/music/soundtrack.json` | The game's assignments (generated; do not edit by hand). |
+| `src/main/resources/assets/grandline/music/CREDITS.txt`, `docs/SOUNDTRACK_CREDITS.md` | Credits for every shipped track (generated from the manifest). |
 
 ## Making or replacing a track (no Java changes)
 
@@ -58,55 +59,54 @@ python3 tools/music/prepare.py                             # loop + level + enco
 
 ### What prepare.py does to each track
 
-1. **Loop.** It compares the spectrum of the opening 3 s with every point in the last 45 s and cuts at the latest of the near-best matches. That is usually a bar line.
-   - It fine-aligns the waveform there (±10 ms).
-   - It crossfades the 1.5 s after the cut into the opening (equal power).
-   - Played on repeat, the end runs straight into the start.
+1. **Loop.** Library tracks usually play their loop twice and then stop with a reverb tail. The preparer finds the music's stop and checks whether the 8 s before it match the same 8 s one cycle earlier (score ≥ 0.95).
+   - If they match, the track becomes exactly that last cycle, aligned to the sample, with a 40 ms join. It ends on the composer's own loop point.
+   - If not, it compares the opening 3 s with the last 60% of the track and cuts at the latest of the near-best matches, usually a bar line. It fine-aligns there (±10 ms) and crossfades the 1.5 s after the cut into the opening.
+   - `"loop": "as_is"` keeps a file that is already a seamless loop untouched.
 2. **Level.** Plain gain to **-18 LUFS** integrated, a music bed under the -16 LUFS sound effects. The gain is lowered if needed to keep true peaks under -1.5 dBTP. No compression or limiting.
 3. **Encode.** Stereo OGG Vorbis, 48 kHz, quality 4.
+4. **Write.** The game data file, `sounds.json` and the credits.
 
 ## Cost
 
-- **Millbrook test:** ElevenLabs quoted 3,750 credits for 150 s (25 credits/s) and charged 2,250 (15 credits/s).
-- **Remaining 18 tracks:** 2,670 s, so about **40,050 credits** at the charged rate and up to **66,750** at the quoted rate.
-- **Prepared size:** about 1.9 MB per 125 s track, so about 40 MB for all 19.
+- **0.64.0 soundtrack:** $0. Every track is free, open-licence music.
+- **Spent:** the only money spent was the ElevenLabs Millbrook test (2,250 credits, about $0.45). That track is no longer shipped; its raw file stays in `tools/music/raw/elevenlabs/` (not committed).
+- **Size:** about 30 MB of music for 19 tracks.
 
-## Licence
+## Licences
 
-From ElevenLabs' Music Terms (elevenlabs.io/music-terms, checked 2026-11-23):
+| Licence | What it requires | Tracks |
+|---|---|---|
+| **CC-BY 3.0** | Credit the composer in the project's credits and say the files were changed. Commercial use is allowed. | Jonathan Shaw's "RPG Orchestral Essentials" (15 tracks), Matthew Pablo, Tausdei |
+| **CC0** | Nothing. Credit is appreciated, so they are credited anyway. | PolygonDan, NBJDLukasAbsolute, Indieteur |
 
-- **Paid plans:** allow "all online and offline commercial use … except film, TV, radio, and Studio Games".
-  - A Studio Game is a monetised game that is not an *Indie Game*.
-  - An Indie Game has earned under $500,000 since release, from a publisher earning under $1,000,000 a year from games.
-  - A free mod is not monetised and is an Indie Game in any case, so bundling the music in Grand Line is allowed.
-- **Free plan:** no commercial licence, and output must credit Eleven Music.
-- **Attribution:** some plans require crediting ElevenLabs ("Created in collaboration with ElevenLabs"). The mod's description and the README carry that line on every plan.
-- **Plan check:** these rights depend on the plan the music was generated on. Confirm the account generating the tracks is on a paid plan.
+- **Jonathan Shaw:** his library's own EULA (bundled with each download) allows commercial and non-commercial use with credit in the credits list. The required form is: "Track" / Composed by Jonathan Shaw / (www.jshaw.co.uk).
+- **Matthew Pablo:** the required form is "Music by Matthew Pablo, www.matthewpablo.com".
+- **Where the credits appear:** `CREDITS.txt` in the jar, `docs/SOUNDTRACK_CREDITS.md`, the README and the mod's description.
+- **Checked:** every licence was read from the track's own OpenGameArt page on 2026-11-23.
 
 ## Tracks
 
-| Id | For | Length | Status |
-|---|---|---|---|
-| island.millbrook_village | Millbrook Village | 150 s (loop 125 s) | review |
-| island.ironhold_bastion | Ironhold Bastion | 150 s | planned |
-| island.dawnreach_harbor | Dawnreach Harbor | 150 s | planned |
-| island.verdant_wilds | Verdant Wilds | 150 s | planned |
-| island.saltmarket_docks | Saltmarket Docks | 150 s | planned |
-| island.sunscorch_dunes | Sunscorch Dunes | 150 s | planned |
-| island.frostpeak_isle | Frostpeak Isle | 150 s | planned |
-| island.redbrick_port | Redbrick Port | 150 s | planned |
-| island.cloudtop_isles | Cloudtop Isles | 150 s | planned |
-| region.cloudtop_isles_upper | Upper Cloudtop Isles | 150 s | planned |
-| island.stonewall_prison | Stonewall Prison | 150 s | planned |
-| island.gladiators_ring | Gladiator's Ring | 150 s | planned |
-| island.emberfall_isle | Emberfall Isle (the volcano island) | 150 s | planned |
-| island.lotus_palace | Lotus Palace | 150 s | planned |
-| island.crystal_fountain | Crystal Fountain | 150 s | planned |
-| ocean.first_sea | Open ocean, First Sea | 180 s | planned |
-| boss.standard | Quest captains | 120 s | planned |
-| boss.major | Temple bosses | 120 s | planned |
-| boss.final | Crystal Fountain's quest boss | 150 s | planned |
+| Id | Plays on | Track | Composer | Loop |
+|---|---|---|---|---|
+| island.millbrook_village | Millbrook Village | In Tranquil Spring | Jonathan Shaw | 75.6 s cycle |
+| island.ironhold_bastion | Ironhold Bastion | A Dream of First Flight | Jonathan Shaw | 125.5 s cycle |
+| island.dawnreach_harbor | Dawnreach Harbor | Market on the Sea | Jonathan Shaw | 70.0 s cycle |
+| island.verdant_wilds | Verdant Wilds | Chill Jungle Ambient | Tausdei | 169.1 s crossfade |
+| island.saltmarket_docks | Saltmarket Docks | Merchants and Sea Salt | NBJDLukasAbsolute | 97.7 s crossfade |
+| island.sunscorch_dunes | Sunscorch Dunes | Desert Mystic 2 | PolygonDan | 36.0 s crossfade (a short piece) |
+| island.frostpeak_isle | Frostpeak Isle | Morning Frost | Jonathan Shaw | 64.0 s cycle |
+| island.redbrick_port | Redbrick Port | The Tread of War | Jonathan Shaw | 104.0 s cycle |
+| island.cloudtop_isles | Cloudtop Isles | A Tale of Wind | Jonathan Shaw | 106.3 s cycle |
+| region.cloudtop_isles_upper | Upper Cloudtop Isles | A Tale of Peace | Jonathan Shaw | 103.7 s cycle |
+| island.stonewall_prison | Stonewall Prison | A Bitter Hope | Jonathan Shaw | 68.4 s cycle |
+| island.gladiators_ring | Gladiator's Ring | A Fight in the Fields | Jonathan Shaw | 103.2 s cycle |
+| island.emberfall_isle | Emberfall Isle | Heated Lands | Jonathan Shaw | 88.6 s cycle |
+| island.lotus_palace | Lotus Palace | Underwater World | Indieteur | 80.7 s crossfade |
+| island.crystal_fountain | Crystal Fountain | Treading The Unknown | Jonathan Shaw | 90.5 s cycle |
+| ocean.first_sea | Open ocean | The World At Your Door | Jonathan Shaw | 74.7 s cycle |
+| boss.standard | Quest captains | Showdown of Misdeeds | Jonathan Shaw | 104.0 s cycle |
+| boss.major | Temple bosses | A Slave To No One | Jonathan Shaw | 162.7 s cycle |
+| boss.final | Crystal Fountain's quest boss | Blackmoor Tides (loop, no chants) | Matthew Pablo | 136.0 s, the composer's loop file |
 
-The prompts are in the manifest.
-
-**Shared identity:** several prompts ask for a "hopeful rising four-note phrase". A text prompt cannot guarantee the same melody across tracks, so the shared motif is an aim, not a guarantee. Each track is checked by ear before approval.
+- **Weak fits:** Gladiator's Ring and Crystal Fountain were the weakest matches when the tracks were chosen. Either can be replaced by dropping a new raw file in and rerunning `prepare.py`, or generated with ElevenLabs (its prompt is kept in the manifest).

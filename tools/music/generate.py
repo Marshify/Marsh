@@ -47,7 +47,7 @@ def estimate(tracks):
 
 
 def generate(track, model, key):
-    body = json.dumps({"prompt": track["prompt"], "music_length_ms": track["duration_s"] * 1000,
+    body = json.dumps({"prompt": track["elevenlabs_prompt"], "music_length_ms": track["duration_s"] * 1000,
                        "model_id": model, "force_instrumental": True}).encode()
     req = urllib.request.Request(API + "?output_format=mp3_48000_192", data=body, method="POST",
                                  headers={"xi-api-key": key, "Content-Type": "application/json"})

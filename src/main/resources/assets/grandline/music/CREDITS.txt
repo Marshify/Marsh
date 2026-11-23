@@ -1,0 +1,81 @@
+GRAND LINE SOUNDTRACK CREDITS
+
+All music is used under the licence named for each track; the files were
+trimmed to a loop, levelled and re-encoded (OGG Vorbis) for the game.
+
+Millbrook Village:
+  "In Tranquil Spring" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/in-tranquil-spring-rpg-orchestral-essentials
+
+Ironhold Bastion:
+  "A Dream of First Flight" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-dream-of-first-flight-rpg-orchestral-essentials-title-music
+
+Dawnreach Harbor:
+  "Market on the Sea" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/market-on-the-sea-rpg-orchestral-essentials-village-music
+
+Verdant Wilds:
+  "Chill Jungle Ambient" By Tausdei (opengameart.org/users/tausdei)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/chill-jungle-ambient
+
+Saltmarket Docks:
+  "Merchants and Sea Salt" By NBJDLukasAbsolute (CC0, no credit required)
+  Licence: CC0  Source: https://opengameart.org/content/merchants-and-sea-salt
+
+Sunscorch Dunes:
+  "Desert Mystic 2" By PolygonDan (CC0, no credit required; opengameart.org/users/polygondan)
+  Licence: CC0  Source: https://opengameart.org/content/desertmystic-dynastic-egyptian-theme-cc0
+
+Frostpeak Isle:
+  "Morning Frost" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/morning-frost-rpg-orchestral-essentials-village-music
+
+Redbrick Port:
+  "The Tread of War" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/the-tread-of-war-rpg-orchestral-essentials-military-music
+
+Cloudtop Isles:
+  "A Tale of Wind" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-tale-of-wind-and-water-rpg-orchestral-essentials-peace-music
+
+Cloudtop Isles (upper region):
+  "A Tale of Peace" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-tale-of-peace-rpg-orchestral-essentials-peace-music
+
+Stonewall Prison:
+  "A Bitter Hope" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-bitter-hope-rpg-orchestral-essentials-dungeon-music
+
+Gladiator's Ring:
+  "A Fight in the Fields" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-fight-in-the-fields-rpg-orchestral-essentials-combat-music
+
+Emberfall Isle:
+  "Heated Lands" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/heated-lands-rpg-orchestral-essentials-dungeon-music
+
+Lotus Palace:
+  "Underwater World" By Indieteur (CC0, no credit required)
+  Licence: CC0  Source: https://opengameart.org/content/underwater-world
+
+Crystal Fountain:
+  "Treading The Unknown" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/treading-the-unknown-rpg-orchestral-essentials
+
+Open ocean (sea 1):
+  "The World At Your Door" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/the-world-at-your-door-rpg-orchestral-essentials-overworld-music
+
+Boss fights (standard):
+  "Showdown of Misdeeds" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/showdown-of-misdeeds-rpg-orchestral-essentials-boss-music
+
+Boss fights (major):
+  "A Slave To No One" Composed by Jonathan Shaw (www.jshaw.co.uk)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/a-slave-to-no-one-rpg-orchestral-essentials-boss-music
+
+Boss fights (final):
+  "Blackmoor Tides (Loop, No Chants)" Music by Matthew Pablo (www.matthewpablo.com)
+  Licence: CC-BY 3.0  Source: https://opengameart.org/content/blackmoor-tides-epic-pirate-battle-theme
+

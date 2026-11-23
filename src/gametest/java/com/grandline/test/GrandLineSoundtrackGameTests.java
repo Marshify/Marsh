@@ -63,10 +63,18 @@ public final class GrandLineSoundtrackGameTests implements FabricGameTest {
 				String file = "/assets/grandline/sounds/" + entry.get("name").getAsString().substring("grandline:".length()) + ".ogg";
 				helper.assertTrue(GrandLineSoundtrackGameTests.class.getResource(file) != null, e.getKey() + " file " + file);
 			}
-			// Every First Sea island has a track assigned (shipped or still to come).
+			// The open ocean and every boss tier of the First Sea have their music.
+			helper.assertTrue(tracks.has(data.getAsJsonObject("ocean").get("1").getAsString()), "the ocean has its music");
+			for (String tier : new String[]{"standard", "major", "final"}) {
+				helper.assertTrue(tracks.has(data.getAsJsonObject("bosses").getAsJsonObject("1").get(tier).getAsString()), tier + " boss music ships");
+			}
+			helper.assertTrue(GrandLineSoundtrackGameTests.class.getResource("/assets/grandline/music/CREDITS.txt") != null, "the music credits ship too");
+			// Every First Sea island has its track.
 			for (var spec : com.grandline.world.SeaLayout.all()) {
 				if (spec.sea() == 1) {
 					helper.assertTrue(data.getAsJsonObject("islands").has(spec.name()), spec.name() + " has a soundtrack assignment");
+					String track = data.getAsJsonObject("islands").get(spec.name()).getAsString();
+					helper.assertTrue(tracks.has(track), spec.name() + "'s track " + track + " ships with the mod");
 				}
 			}
 		} catch (java.io.IOException e) {

@@ -3,7 +3,7 @@
 	"id": "grandline",
 	"version": "${version}",
 	"name": "Grand Line",
-	"description": "A multiplayer RPG mod built around ocean exploration, progression, combat and fruit abilities. Soundtrack created in collaboration with ElevenLabs (Eleven Music).",
+	"description": "A multiplayer RPG mod built around ocean exploration, progression, combat and fruit abilities. Music by Jonathan Shaw (www.jshaw.co.uk), Matthew Pablo (www.matthewpablo.com), Tausdei, PolygonDan, NBJDLukasAbsolute and Indieteur: see assets/grandline/music/CREDITS.txt.",
 	"authors": [
 		"Grand Line Team"
 	],
