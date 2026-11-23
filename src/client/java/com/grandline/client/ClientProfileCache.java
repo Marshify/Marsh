@@ -64,6 +64,11 @@ public final class ClientProfileCache {
 		return discovered.contains(island.id());
 	}
 
+	/** Whether a discovery id (an island's, or the Upper Cloudtop Isles') is known to this player. */
+	public static boolean discoveredId(long id) {
+		return discovered.contains(id);
+	}
+
 	public static void acceptIslands(List<com.grandline.world.Island> list, List<Long> discoveredIds) {
 		islands = List.copyOf(list);
 		com.grandline.world.AdventureRules.GrandLineWorldClientFlag.grandLineWorld = islands.stream().anyMatch(com.grandline.world.Island::designed);

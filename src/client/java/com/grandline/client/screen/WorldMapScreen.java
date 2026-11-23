@@ -86,13 +86,17 @@ public final class WorldMapScreen extends Screen {
 			Map.entry("Sunscorch Dunes", islandArt("desert", 640, 418, 212, 0.55)),
 			Map.entry("Frostpeak Isle", islandArt("frozen_village", 640, 415, 220, 0.55)),
 			Map.entry("Ironhold Bastion", islandArt("ironhold_bastion", 640, 447, 223, 0.55)),
-			Map.entry("Cloudtop Isles", pixelArt("upper_cloudtop", 642, 424, 212, 0.5)),
+			Map.entry("Cloudtop Isles", islandArt("lower_skylands", 640, 331, 212, 0.5)),
 			Map.entry("Stonewall Prison", islandArt("prison", 640, 457, 180, 0.57)),
 			Map.entry("Gladiator's Ring", islandArt("colosseum", 640, 434, 200, 0.55)),
 			Map.entry("Emberfall Isle", islandArt("magma_village", 640, 424, 215, 0.6)),
 			Map.entry("Saltmarket Docks", islandArt("saltmarket_docks", 640, 405, 227, 0.5)),
 			Map.entry("Lotus Palace", islandArt("underwater_city", 640, 312, 205, 0.5)),
 			Map.entry("Crystal Fountain", islandArt("fountain_city", 640, 328, 223, 0.5)));
+
+	/** The Upper Cloudtop Isles: their own art, beside the Cloudtop Isles (offset from Cloudtop's point, chart units). */
+	private static final IslandArt UPPER_ART = pixelArt("upper_cloudtop", 642, 424, 150, 0.5);
+	private static final double UPPER_DX = 150, UPPER_DY = 124;
 
 	private static final ResourceLocation UNDERWATER_SURFACE = tex("first_sea/underwater_surface");
 	private static final ResourceLocation PALACE_SUBMERGED = tex("first_sea/palace_submerged");
@@ -314,6 +318,13 @@ public final class WorldMapScreen extends Screen {
 				}
 				placed.add(new Placed(island, ax, ay, screenX(ax - w * 0.42), screenY(ay - h * newArt.anchorY() + h * 0.1),
 						screenX(ax + w * 0.42), screenY(ay + h * (1 - newArt.anchorY()) - h * 0.1)));
+				if (com.grandline.world.UpperIsles.hosts(island) && exists(UPPER_ART.texture())) {
+					double us = UPPER_ART.chartWidth() / UPPER_ART.w();
+					double uw = UPPER_ART.chartWidth(), uh = UPPER_ART.h() * us;
+					ResourceLocation upper = ClientProfileCache.discoveredId(com.grandline.world.UpperIsles.id(island))
+							? UPPER_ART.texture() : gray(UPPER_ART.texture());
+					blitCrisp(graphics, upper, ax + UPPER_DX - uw / 2, ay + UPPER_DY - uh * UPPER_ART.anchorY(), us, UPPER_ART.w(), UPPER_ART.h());
+				}
 				continue;
 			} else if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
 				// Lotus Palace lies under the sea: the submerged rendering, then the water surface over it.

@@ -217,6 +217,25 @@ public final class ModWorld {
 				discover(player, island, true);
 			}
 		}
+		// The Upper Cloudtop Isles lie beyond the usual range of Cloudtop's centre, so they are looked up by plan reach.
+		for (Island island : IslandRegistry.reaching(player.server, player.getBlockX(), player.getBlockZ(), 0)) {
+			if (UpperIsles.hosts(island) && UpperIsles.inArea(player, island)) {
+				discoverUpper(player, island);
+			}
+		}
+	}
+
+	/** Marks the Upper Cloudtop Isles above {@code cloudtop} as discovered (they have their own chart entry). */
+	public static boolean discoverUpper(ServerPlayer player, Island cloudtop) {
+		Set<Long> known = discovered(player);
+		if (!known.add(UpperIsles.id(cloudtop))) {
+			return false;
+		}
+		player.setAttached(ModAttachments.DISCOVERED_ISLANDS, List.copyOf(known));
+		player.sendSystemMessage(Component.translatable("message.grandline.island.discovered", com.grandline.names.GrandLineNames.island(UpperIsles.NAME),
+				UpperIsles.LEVEL, cloudtop.sea()).withStyle(ChatFormatting.AQUA));
+		sync(player);
+		return true;
 	}
 
 	/** Marks {@code island} as discovered. Returns true if it was new. */
@@ -251,6 +270,9 @@ public final class ModWorld {
 		for (Island island : visible) {
 			if (known.contains(island.id())) {
 				discoveredIds.add(island.id());
+			}
+			if (UpperIsles.hosts(island) && known.contains(UpperIsles.id(island))) {
+				discoveredIds.add(UpperIsles.id(island));
 			}
 		}
 		ServerPlayNetworking.send(player, new IslandListPayload(visible, discoveredIds));
