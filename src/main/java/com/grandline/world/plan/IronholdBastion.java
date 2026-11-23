@@ -677,10 +677,15 @@ public final class IronholdBastion extends BasePlan {
 		int ix = wx - 2 * side;
 		doorLeaf(c, ix, -12, Direction.NORTH, 3, 7, inward);
 		doorLeaf(c, ix, -6, Direction.SOUTH, 3, 7, inward);
-		// Stone steps down from the terrace edge to the landform outside.
-		for (int k = 1; k <= 4; k++) {
+		// Stone steps down from the terrace edge to the landform outside, only where the ground actually falls away
+		// (each step sits on the ground or above it; where the hill is as high as the step, the steps end).
+		for (int k = 1; k <= 8; k++) {
 			int x = (44 + k) * side;
 			int y = F - k + 1;
+			int top = Math.max(c.ground(x, -10), Math.max(c.ground(x, -9), c.ground(x, -8)));
+			if (top >= y) {
+				break;
+			}
 			for (int z = -10; z <= -8; z++) {
 				c.foundation(x, z, x, z, y - 1, s(Blocks.STONE_BRICKS));
 				c.set(x, y, z, Kit.stairs(Blocks.STONE_BRICK_STAIRS, inward, false));
