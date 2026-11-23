@@ -15,7 +15,7 @@ import java.util.List;
 /** The First Sea ladder (Lv 1-700): ranges, island levels, enemy and boss levels, rewards, navigation targets. */
 public final class GrandLineProgressionGameTests implements FabricGameTest {
 	private static final List<String> ORDER = List.of("Verdant Wilds", "Saltmarket Docks", "Sunscorch Dunes", "Frostpeak Isle",
-			"Ironhold Bastion", "Cloudtop Isles", "Stonewall Prison", "Gladiator's Ring", "Emberfall Isle", "Lotus Palace", "Cloudtop Isles",
+			"Redbrick Port", "Cloudtop Isles", "Stonewall Prison", "Gladiator's Ring", "Emberfall Isle", "Lotus Palace", "Cloudtop Isles",
 			"Crystal Fountain");
 	private static final int[] MINS = {10, 30, 60, 90, 120, 150, 190, 250, 300, 375, 450, 625};
 
@@ -30,8 +30,11 @@ public final class GrandLineProgressionGameTests implements FabricGameTest {
 			helper.assertTrue(s.max() == next, s.label() + " ends where the next begins: " + s.max() + " vs " + next);
 		}
 		helper.assertTrue(FirstSeaProgression.stage("Cloudtop Isles", FirstSeaProgression.UPPER).min() == 450, "upper Cloudtop is its own stage");
-		Stage mill = FirstSeaProgression.stage("Millbrook Village", 0), red = FirstSeaProgression.stage("Redbrick Port", 0);
-		helper.assertTrue(mill.min() == 1 && mill.max() == 10 && red.min() == 1 && red.max() == 10, "both starters are Lv 1-10");
+		Stage mill = FirstSeaProgression.stage("Millbrook Village", 0), iron = FirstSeaProgression.stage("Ironhold Bastion", 0);
+		helper.assertTrue(mill.min() == 1 && mill.max() == 10 && iron.min() == 1 && iron.max() == 10, "both starters are Lv 1-10");
+		helper.assertTrue(Boolean.FALSE.equals(mill.marine()) && Boolean.TRUE.equals(iron.marine()), "Millbrook for Pirates, Ironhold for Marines");
+		Stage red = FirstSeaProgression.stage("Redbrick Port", 0);
+		helper.assertTrue(red.min() == 120 && red.max() == 150 && red.marine() == null, "Redbrick Port took Ironhold's old Lv 120-150 stage");
 		// The island layout uses the same levels (and every name exists: no renames, no new islands).
 		for (Stage s : FirstSeaProgression.STAGES) {
 			SeaLayout.Spec spec = SeaLayout.all().stream().filter(x -> x.name().equals(s.island())).findFirst().orElse(null);
@@ -47,7 +50,7 @@ public final class GrandLineProgressionGameTests implements FabricGameTest {
 
 	@GameTest(template = EMPTY_STRUCTURE, batch = "progression")
 	public void boundariesSendPlayersToTheRightIsland(GameTestHelper helper) {
-		Object[][] cases = {{1, false, "Millbrook Village", 0}, {1, true, "Redbrick Port", 0}, {9, false, "Millbrook Village", 0},
+		Object[][] cases = {{1, false, "Millbrook Village", 0}, {1, true, "Ironhold Bastion", 0}, {9, true, "Ironhold Bastion", 0}, {120, false, "Redbrick Port", 0}, {149, true, "Redbrick Port", 0}, {9, false, "Millbrook Village", 0},
 				{10, false, "Verdant Wilds", 0}, {10, true, "Verdant Wilds", 0}, {29, false, "Verdant Wilds", 0}, {30, false, "Saltmarket Docks", 0},
 				{60, false, "Sunscorch Dunes", 0}, {150, false, "Cloudtop Isles", 0}, {189, false, "Cloudtop Isles", 0},
 				{190, false, "Stonewall Prison", 0}, {250, false, "Gladiator's Ring", 0}, {300, false, "Emberfall Isle", 0},

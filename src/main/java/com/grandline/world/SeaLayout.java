@@ -36,10 +36,10 @@ public final class SeaLayout {
 		// Layout 19 corrected three islands' places (a three-way swap): Redbrick Port went to Stonewall Prison's old spot,
 		// Stonewall Prison to Ironhold Bastion's, Ironhold Bastion to Redbrick Port's. Each island keeps its own build,
 		// radius and level. Older worlds keep the places they were generated with (see LEGACY_POSITIONS).
-		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -1170, 270, 34, 1, false); // the Marines' starting island
+		s1("Redbrick Port", IslandTheme.BRICK_TOWN, -1170, 270, 34, 120, false); // Lv 120-150 (swapped with Ironhold Bastion)
 		s1("Sunscorch Dunes", IslandTheme.DESERT, 570, 540, 36, 75, false);
 		s1("Frostpeak Isle", IslandTheme.SNOW, 630, -420, 38, 90, false);
-		s1("Ironhold Bastion", IslandTheme.FORTRESS, -630, 120, 38, 120, false);
+		s1("Ironhold Bastion", IslandTheme.FORTRESS, -630, 120, 38, 1, false); // the Marines' starting island (Lv 1-10)
 		s1("Cloudtop Isles", IslandTheme.SKY, -1500, -540, 30, 150, false);
 		s1("Stonewall Prison", IslandTheme.PRISON, 1380, 0, 32, 190, false);
 		s1("Gladiator's Ring", IslandTheme.COLOSSEUM, -630, -540, 38, 225, false);

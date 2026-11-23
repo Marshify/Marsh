@@ -6,12 +6,12 @@ One table, `world/FirstSeaProgression.java`, now drives every First Sea level: i
 
 | Stage | Island | Levels | Enemy | 1st camp (basic) | 2nd camp (stronger) | Quest boss | Quest XP | Quest $ | Boss quest XP / $ | Quests to clear* |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 1 | Millbrook Village / Redbrick Port (Marines) | 1–10 | Bandit | 1–5 | 4–8 | 9 | 480 | 140 | 2,400 / 700 | ~5 |
+| 1 | Millbrook Village / Ironhold Bastion (Marines) | 1–10 | Bandit | 1–5 | 4–8 | 9 | 480 | 140 | 2,400 / 700 | ~5 |
 | 2 | Verdant Wilds | 10–30 | Bandit | 10–18 | 17–25 | 28 | 1,680 | 440 | 8,400 / 2,200 | ~12 |
 | 3 | Saltmarket Docks | 30–60 | Bandit | 30–42 | 40–52 | 57 | 3,680 | 940 | 18,400 / 4,700 | ~18 |
 | 4 | Sunscorch Dunes | 60–90 | Bandit | 60–72 | 70–82 | 87 | 6,080 | 1,540 | 30,400 / 7,700 | ~18 |
 | 5 | Frostpeak Isle | 90–120 | Bandit | 90–102 | 100–112 | 117 | 8,480 | 2,140 | 42,400 / 10,700 | ~18 |
-| 6 | Ironhold Bastion | 120–150 | Bandit | 120–132 | 130–142 | 147 | 10,880 | 2,740 | 54,400 / 13,700 | ~18 |
+| 6 | Redbrick Port | 120–150 | Bandit | 120–132 | 130–142 | 147 | 10,880 | 2,740 | 54,400 / 13,700 | ~18 |
 | 7 | Cloudtop Isles (lower) | 150–190 | Bandit | 150–166 | 164–180 | 186 | 13,680 | 3,440 | 68,400 / 17,200 | ~24 |
 | 8 | Stonewall Prison | 190–250 | Bandit | 190–214 | 211–235 | 244 | 17,680 | 4,440 | 88,400 / 22,200 | ~37 |
 | 9 | Gladiator's Ring | 250–300 | Raider | 250–270 | 268–288 | 295 | 22,080 | 5,540 | 110,400 / 27,700 | ~31 |
@@ -40,7 +40,7 @@ Cloudtop Isles keeps one island (same id and coordinates) with two regions. The 
 
 ## Navigation and cards
 
-- The compass follows the ladder in the First Sea: Lv 1 Pirates go to Millbrook Village, Marines to Redbrick Port, Lv 10 to Verdant Wilds, ... Lv 450 to the upper Cloudtop quest giver, Lv 625 to Crystal Fountain. An active quest still leads to its island. Other seas unchanged.
+- The compass follows the ladder in the First Sea: Lv 1 Pirates go to Millbrook Village, Marines to Ironhold Bastion, Lv 10 to Verdant Wilds, ... Lv 450 to the upper Cloudtop quest giver, Lv 625 to Crystal Fountain. An active quest still leads to its island. Other seas unchanged.
 - Cards at Lv 10, 30, 60, 90, 120, 150, 190, 250, 300, 375, 450 ("Cloudtop Isles (Upper)") and 625, once each.
 
 ## Existing saves
@@ -56,3 +56,10 @@ Cloudtop Isles keeps one island (same id and coordinates) with two regions. The 
 - `GrandLineProgressionGameTests`: the 13 stages and their ranges (contiguous, both starters 1-10, upper Cloudtop separate); island levels match the table; every island name exists and Dawnreach stays a Lv 1 hub; boundary targets at Lv 1 (each side), 9, 10, 29, 30, 60, 150, 189, 190, 250, 300, 375, 449, 450, 624, 625, 700, 1200; enemy levels in range and the second camp stronger; Millbrook's first camp stays Lv 1-5; bosses near the top; rewards and boss levels rise along the ladder; quest pacing at both ends of every stage.
 - Updated: the navigation and unlock-card tests (Verdant Wilds is now Lv 10).
 - Existing world loaded: levels migrated, no errors. Full suite: 107 / 107 pass.
+
+## 0.62.0: Ironhold Bastion and Redbrick Port swapped stages
+
+Ironhold Bastion is now the Marines' starting island (stage 1, Lv 1–10) and Redbrick Port took Ironhold's old stage 6
+(Lv 120–150). Only the ladder entries changed: neither island moved or was rebuilt, and both keep their Bandits.
+Existing worlds follow on load: the saved island levels are updated, and enemies saved with the old levels are
+re-levelled when they load.

@@ -23,7 +23,7 @@ All four are handled on the server (`technique/`); clients only send key presses
 A key rebound afterwards in Controls is never moved again.
 
 ## Trainers
-- **Movement Instructor** (Millbrook Village, Redbrick Port): explains Dash, free tutorial.
+- **Movement Instructor** (Millbrook Village, Ironhold Bastion: the two starting islands): explains Dash, free tutorial.
 - **Ability Master** (custom skin `textures/entity/ability_master.png`, player model): on Frostpeak Isle, in the ice
   cavern a few steps east of the campsite's campfire (beside the barrels, facing the fire;
   `FrostpeakIsle.ABILITY_MASTER_SPOT`), he teaches Flash Step and Aura (first page: Flash Step / Aura / Leave, each with its own page and Back); on the upper

@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * NPCs that must always be on their island: the Innkeeper (on every island, sets your home) and a Swordsmith on both
- * starting islands (Millbrook for Pirates, the Marines' island).
+ * NPCs that must always be on their island: the Innkeeper (on every island, sets your home) and a Swordsmith and
+ * Movement Instructor on both starting islands (Millbrook for Pirates, the Marines' island: Ironhold Bastion).
  * Unlike the NPCs placed once when an island first loads, these are checked while players are near: if the spot's
  * chunk is loaded and the NPC is not there, it is (re)placed. That puts them on islands of existing worlds too, and
  * an NPC removed by any means comes back. Each NPC's spot is chosen once and saved, so the check always looks in the
@@ -41,6 +41,8 @@ public final class KeeperNpcs {
 	public static final String FROST_ISLAND = "Frostpeak Isle";
 	/** The island whose upper region hosts the Instinct Sage. */
 	public static final String SKY_ISLAND = "Cloudtop Isles";
+	/** Keepers only the starting islands have: they follow the Marines' island when it changes (see {@link #retire}). */
+	static final List<Islander.Role> STARTING_ISLAND_ROLES = List.of(Islander.Role.SWORDSMITH, Islander.Role.MOVEMENT_INSTRUCTOR);
 	static final int CHECK_TICKS = 40;
 	static final int NEAR = 160;
 
@@ -96,14 +98,40 @@ public final class KeeperNpcs {
 
 	/** Places any of the island's keepers that are missing (only where their spot is loaded). Exposed for tests. */
 	public static void ensure(ServerLevel level, Island island) {
-		for (Islander.Role role : rolesFor(island)) {
+		List<Islander.Role> roles = rolesFor(island);
+		for (Islander.Role role : roles) {
 			ensure(level, island, role);
+		}
+		for (Islander.Role role : STARTING_ISLAND_ROLES) {
+			if (!roles.contains(role)) {
+				retire(level, island, role);
+			}
 		}
 		for (Anchor a : IslandPlans.anchors(island, Anchor.Type.QUEST)) {
 			if (a.region() != com.grandline.world.FirstSeaProgression.LOWER) {
 				ensureRegionQuestGiver(level, island, a);
 			}
 		}
+	}
+
+	/**
+	 * A keeper this island placed but no longer has (it stopped being the Marines' starting island): the NPC is removed
+	 * once its spot is loaded, and its saved spot forgotten, so it is not left behind next to the new starting island's.
+	 */
+	private static void retire(ServerLevel level, Island island, Islander.Role role) {
+		Data data = Data.get(level);
+		String key = island.id() + ":" + role.name();
+		BlockPos spot = data.spots.get(key);
+		if (spot == null || !level.isPositionEntityTicking(spot)) {
+			return;
+		}
+		for (Islander npc : level.getEntitiesOfClass(Islander.class, new AABB(spot).inflate(48),
+				n -> n.isAlive() && n.role() == role && n.islandId() == island.id())) {
+			npc.discard();
+		}
+		data.spots.remove(key);
+		data.setDirty();
+		GrandLineMod.LOGGER.info("Removed the {} from {} (no longer a starting island)", role, island.name());
 	}
 
 	/**

@@ -174,5 +174,5 @@ Older Gear, Reputation and Core-rules tests now give their mock players Rabbit, 
 
 - Rabbit's Velocity has speed and leaps but no separate dash move.
 - Cosmetics follow the body and head angles but not limb animation. They are hidden while swimming, gliding with an elytra or sleeping, and in your own first-person view.
-- The Trial Keeper is on Saltmarket Docks (Lv 375) and the V4 level is 400. Ironhold (Lv 120) and Stonewall (Lv 190) are where Cyborg and Ghoul parts drop.
+- The Trial Keeper is on Saltmarket Docks (Lv 375) and the V4 level is 400. Stonewall (Lv 190) is where Ghoul parts drop. Cyborg parts drop on Ironhold Bastion, which is the Lv 1–10 Marine starting island since 0.62.0 (the $150,000 price and the boss kill still apply).
 - The side-choice screen reappears on every join. This is existing behaviour, unchanged here.

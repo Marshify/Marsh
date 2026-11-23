@@ -29,7 +29,7 @@ public final class GrandLineConfig {
 	 * Config schema version. 1 = milestone 1/2 values; 2 = rebalanced stats with diminishing returns and ability
 	 * settings. Older files have balance keys reset to the new defaults once, other keys are kept.
 	 */
-	public static final int CURRENT_CONFIG_VERSION = 4;
+	public static final int CURRENT_CONFIG_VERSION = 5;
 
 	public int configVersion = CURRENT_CONFIG_VERSION;
 
@@ -152,7 +152,7 @@ public final class GrandLineConfig {
 	/** Island new players start on and the final respawn fallback. */
 	public String spawnIsland = "Millbrook Village";
 	/** Starting island for players who join the Marines (new players start on spawnIsland until they pick a side). */
-	public String marineSpawnIsland = "Redbrick Port";
+	public String marineSpawnIsland = "Ironhold Bastion";
 	/** Respawn on the island where the player died (else their home island, else the spawn island). */
 	public boolean islandRespawn = true;
 
@@ -419,6 +419,9 @@ public final class GrandLineConfig {
 		}
 		if (fileVersion < 4) {
 			naturalFruitSpawnMinutes = 0; // fruits now come from buried treasure instead
+		}
+		if (fileVersion < 5 && "Redbrick Port".equals(marineSpawnIsland)) {
+			marineSpawnIsland = "Ironhold Bastion"; // the Marines' starting island moved (it took Redbrick Port's Lv 1-10 stage)
 		}
 		configVersion = CURRENT_CONFIG_VERSION;
 	}

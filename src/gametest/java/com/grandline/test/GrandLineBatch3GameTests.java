@@ -148,6 +148,8 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 			helper.assertTrue(Math.abs(marine.getX() - marines.x()) < 80 && Math.abs(marine.getZ() - marines.z()) < 80,
 					"a new Marine starts on the Marines' island: " + marine.blockPosition());
 			helper.assertTrue(Math.abs(pirate.getX() - pirates.x()) < 80, "a new Pirate starts on the Pirates' island: " + pirate.blockPosition());
+			helper.assertTrue(com.grandline.world.ModWorld.discovered(marine).contains(marines.id())
+					&& com.grandline.world.ModWorld.discovered(pirate).contains(pirates.id()), "the starting island is discovered on arrival");
 			helper.assertTrue(Math.abs(veteran.getX() - marines.x()) > 1000, "an established player is never moved by picking a side");
 			helper.assertTrue(com.grandline.world.IslandSpawns.respawnIsland(veteran, com.grandline.world.IslandSpawns.NO_ISLAND).id() == marines.id(),
 					"a Marine without a home who dies at sea returns to the Marines' island");
@@ -331,7 +333,7 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 	public void navigationPointsEachPlayerToTheirQuestGiver(GameTestHelper helper) {
 		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
 		List<Long> added = new java.util.ArrayList<>();
-		for (String name : new String[]{"Millbrook Village", "Redbrick Port", "Verdant Wilds"}) {
+		for (String name : new String[]{"Millbrook Village", "Ironhold Bastion", "Verdant Wilds"}) {
 			SeaLayout.Spec spec = SeaLayout.all().stream().filter(sp -> sp.name().equals(name)).findFirst().orElseThrow();
 			long id = SeaLayout.idOf(spec);
 			if (registry.get(id) == null) {
@@ -345,7 +347,7 @@ public final class GrandLineBatch3GameTests implements FabricGameTest {
 			com.grandline.player.TeamService.choose(pirate, com.grandline.player.TeamService.Side.PIRATES);
 			com.grandline.player.TeamService.choose(marine, com.grandline.player.TeamService.Side.MARINES);
 			helper.assertTrue("Millbrook Village".equals(com.grandline.quest.QuestNavigation.targetIsland(pirate).name()), "Lv 1 Pirate -> Millbrook");
-			helper.assertTrue("Redbrick Port".equals(com.grandline.quest.QuestNavigation.targetIsland(marine).name()), "Lv 1 Marine -> Redbrick Port");
+			helper.assertTrue("Ironhold Bastion".equals(com.grandline.quest.QuestNavigation.targetIsland(marine).name()), "Lv 1 Marine -> Ironhold Bastion");
 			for (ServerPlayer p : new ServerPlayer[]{pirate, marine}) {
 				PlayerProfileService.addExperience(p, 1_000_000);
 			}

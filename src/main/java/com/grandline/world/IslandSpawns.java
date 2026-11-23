@@ -109,7 +109,9 @@ public final class IslandSpawns {
 		boolean brandNew = player.getStats().getValue(Stats.CUSTOM.get(Stats.PLAY_TIME)) < 40;
 		Island island = spawnIslandFor(player);
 		if (brandNew && island != null) {
-			moveTo(player, island);
+			if (moveTo(player, island)) {
+				ModWorld.discover(player, island, false);
+			}
 			player.setAttached(ModAttachments.TEAM_SPAWN_PENDING, true); // picking a side next decides the starting island
 		}
 	}
@@ -125,7 +127,9 @@ public final class IslandSpawns {
 		Island island = spawnIslandFor(player);
 		Island here = islandAt(player.serverLevel(), player.getBlockX(), player.getBlockZ());
 		if (player.getAttached(ModAttachments.HOME_ISLAND) == null && island != null && (here == null || here.id() != island.id())) {
-			moveTo(player, island);
+			if (moveTo(player, island)) {
+				ModWorld.discover(player, island, true); // the starting island is on their chart straight away
+			}
 		}
 	}
 

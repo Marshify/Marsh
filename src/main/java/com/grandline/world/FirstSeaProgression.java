@@ -47,12 +47,12 @@ public final class FirstSeaProgression {
 
 	public static final List<Stage> STAGES = List.of(
 			new Stage(1, "Millbrook Village", LOWER, 1, 10, false),
-			new Stage(1, "Redbrick Port", LOWER, 1, 10, true),
+			new Stage(1, "Ironhold Bastion", LOWER, 1, 10, true), // the Marines' starting island (was Redbrick Port's stage)
 			new Stage(2, "Verdant Wilds", LOWER, 10, 30, null),
 			new Stage(3, "Saltmarket Docks", LOWER, 30, 60, null),
 			new Stage(4, "Sunscorch Dunes", LOWER, 60, 90, null),
 			new Stage(5, "Frostpeak Isle", LOWER, 90, 120, null),
-			new Stage(6, "Ironhold Bastion", LOWER, 120, 150, null),
+			new Stage(6, "Redbrick Port", LOWER, 120, 150, null), // was Ironhold Bastion's stage
 			new Stage(7, "Cloudtop Isles", LOWER, 150, 190, null),
 			new Stage(8, "Stonewall Prison", LOWER, 190, 250, null),
 			new Stage(9, "Gladiator's Ring", LOWER, 250, 300, null),

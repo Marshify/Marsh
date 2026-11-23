@@ -51,10 +51,16 @@ public final class TeamService {
 			if (side != null) {
 				applyScoreboard(player, side);
 			}
-			if (ServerPlayNetworking.canSend(player, TeamPromptPayload.TYPE)) {
-				ServerPlayNetworking.send(player, new TeamPromptPayload(side == null ? -1 : side.ordinal()));
+			if (side == null) {
+				prompt(player); // only until a side is chosen; afterwards /grandline team opens the menu on request
 			}
 		});
+		net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) ->
+				dispatcher.register(net.minecraft.commands.Commands.literal("grandline").then(net.minecraft.commands.Commands.literal("team")
+						.executes(ctx -> {
+							prompt(ctx.getSource().getPlayerOrException());
+							return 1;
+						}))));
 		ServerPlayNetworking.registerGlobalReceiver(ChooseTeamPayload.TYPE, (packet, player, sender) -> {
 			if (ServerRequestGuard.check(player, ChooseTeamPayload.TYPE) != ServerRequestGuard.Result.ACCEPTED) {
 				return;
@@ -66,6 +72,14 @@ public final class TeamService {
 			}
 			choose(player, side);
 		});
+	}
+
+	/** Opens the Pick a Side menu on the player's screen (it cannot be closed without picking until a side is chosen). */
+	public static void prompt(ServerPlayer player) {
+		if (ServerPlayNetworking.canSend(player, TeamPromptPayload.TYPE)) {
+			Side side = get(player);
+			ServerPlayNetworking.send(player, new TeamPromptPayload(side == null ? -1 : side.ordinal()));
+		}
 	}
 
 	public static Side get(ServerPlayer player) {

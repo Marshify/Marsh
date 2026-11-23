@@ -16,7 +16,7 @@
 | Side | Starting island |
 | --- | --- |
 | Pirates (and anyone who hasn't picked a side) | `spawnIsland` (Millbrook Village) |
-| Marines | `marineSpawnIsland` (Redbrick Port) |
+| Marines | `marineSpawnIsland` (Ironhold Bastion since 0.62.0; Redbrick Port before) |
 
 - **Redbrick Port is now Lv. 1**, with Lv. 1–2 enemies and beginner quests. It has an Innkeeper, a Swordsmith, a Fisherman and an arrival spot on the quay.
 - A brand-new player is moved to the Marines' island when they first pick the Marines.
@@ -102,7 +102,7 @@ NPCs, shops, quests, combat, fishing and every Grand Line screen still work. **B
 | --- | --- |
 | `killCreditSeconds` | 15 |
 | `keepInventoryOnDeath` | true |
-| `marineSpawnIsland` | "Redbrick Port" |
+| `marineSpawnIsland` | "Ironhold Bastion" (0.62.0; configs with the old "Redbrick Port" default move over once) |
 | `fishingRodPrice` | 150 |
 | `fishingBiteMinSeconds` / `fishingBiteMaxSeconds` | 4 / 12 |
 | `fishingMasteryXpMultiplier` | 1.0 |
