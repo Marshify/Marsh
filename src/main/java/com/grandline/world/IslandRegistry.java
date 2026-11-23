@@ -28,7 +28,7 @@ public final class IslandRegistry extends SavedData {
 	 * Island layout version the world was created with. Worlds saved before versioning load as 1 and keep generating
 	 * the islands they started with (no half-old, half-new islands); new worlds get {@link #CURRENT_LAYOUT}.
 	 */
-	public static final int CURRENT_LAYOUT = 19; // 19: Redbrick Port, Ironhold Bastion and Stonewall Prison moved (SeaLayout)
+	public static final int CURRENT_LAYOUT = 20; // 19: three islands moved (SeaLayout); 20: Ironhold Bastion rebuilt
 	private int layout = CURRENT_LAYOUT;
 
 	/**

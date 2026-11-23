@@ -41,7 +41,7 @@ public final class FirstSeaPlans {
 
 	/** Pre-redesign plans, for worlds created before each island's redesign (see IslandPlans.REDESIGNED_IN). */
 	public static List<IslandPlan> legacy() {
-		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy(), new RedbrickPortLegacy(), new LotusPalaceLegacy());
+		return List.of(new VerdantWildsLegacy(), new DawnreachHarborLegacy(), new MillbrookVillageLegacy(), new SunscorchDunesLegacy(), new GladiatorsRingLegacy(), new CloudtopIslesLegacy(), new EmberfallIsleLegacy(), new StonewallPrisonLegacy(), new SaltmarketDocksLegacy(), new FrostpeakIsleLegacy(), new CrystalFountainLegacy(), new RedbrickPortLegacy(), new LotusPalaceLegacy(), new IronholdBastionLegacy());
 	}
 
 	/** First redesigns of islands redesigned again, for worlds made between the two (see IslandPlans.INTERIM). */
@@ -51,7 +51,7 @@ public final class FirstSeaPlans {
 
 	public static List<IslandPlan> all() {
 		return List.of(new com.grandline.world.plan.DawnreachHarbor(), new VerdantWilds(), new com.grandline.world.plan.MillbrookVillage(), new com.grandline.world.plan.RedbrickPort(), new com.grandline.world.plan.SunscorchDunes(),
-				new com.grandline.world.plan.FrostpeakIsle(), new IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
+				new com.grandline.world.plan.FrostpeakIsle(), new com.grandline.world.plan.IronholdBastion(), new com.grandline.world.plan.CloudtopIsles(), new com.grandline.world.plan.StonewallPrison(), new com.grandline.world.plan.GladiatorsRing(),
 				new com.grandline.world.plan.EmberfallIsle(), new com.grandline.world.plan.SaltmarketDocks(), new com.grandline.world.plan.LotusPalace(), new com.grandline.world.plan.CrystalFountain());
 	}
 
@@ -423,8 +423,9 @@ public final class FirstSeaPlans {
 	// ==================================================================================================== Lv 120
 
 	/** Fortress on a rock plateau: curtain walls, four corner towers, a gatehouse, barracks and a central keep. */
-	static final class IronholdBastion extends BasePlan {
-		IronholdBastion() {
+	/** The original Ironhold Bastion. Kept for worlds created before the rebuild; new worlds use {@link com.grandline.world.plan.IronholdBastion}. */
+	static final class IronholdBastionLegacy extends BasePlan {
+		IronholdBastionLegacy() {
 			super("Ironhold Bastion", 0.06);
 			terrain.mass(0, 0, 40, 40, 5, 3.0, Ground.STONE)
 					.flat(0, 0, 23, 23, 66, 4, s(Blocks.POLISHED_ANDESITE))

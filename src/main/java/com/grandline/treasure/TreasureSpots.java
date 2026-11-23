@@ -36,11 +36,6 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.RARE, 40, 66, -45, Direction.EAST, "by crates, indoors, walls w"),
 				new TreasureSpot(TreasureTier.COMMON, 23, 67, 55, Direction.EAST, "by crates, walls w"),
 				new TreasureSpot(TreasureTier.COMMON, -62, 68, -22, Direction.WEST, "by crates, walls e"))),
-			Map.entry("Ironhold Bastion", List.of(
-				new TreasureSpot(TreasureTier.LEGENDARY, 19, 66, -24, Direction.NORTH, "back corner of the bastion"),
-				new TreasureSpot(TreasureTier.RARE, -7, 67, -8, Direction.EAST, "indoors in the keep"),
-				new TreasureSpot(TreasureTier.COMMON, -13, 67, 21, Direction.NORTH, "walls s"),
-				new TreasureSpot(TreasureTier.COMMON, -23, 65, -26, Direction.NORTH, "rocky back corner"))),
 			Map.entry("Lotus Palace", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, 22, 12, -134, Direction.WEST, "in the palace hall, north-east, behind the column rows"),
 				new TreasureSpot(TreasureTier.RARE, -31, 12, -58, Direction.EAST, "inside the tall shell house by the south-west path"),
@@ -80,6 +75,11 @@ public final class TreasureSpots {
 
 	/** Spots on islands that older worlds still have in their pre-rebuild layout (see IslandPlans.REDESIGNED_IN). */
 	private static final Map<String, List<TreasureSpot>> LEGACY = Map.of(
+			"Ironhold Bastion", List.of(
+				new TreasureSpot(TreasureTier.LEGENDARY, 19, 66, -24, Direction.NORTH, "back corner of the bastion"),
+				new TreasureSpot(TreasureTier.RARE, -7, 67, -8, Direction.EAST, "indoors in the keep"),
+				new TreasureSpot(TreasureTier.COMMON, -13, 67, 21, Direction.NORTH, "walls s"),
+				new TreasureSpot(TreasureTier.COMMON, -23, 65, -26, Direction.NORTH, "rocky back corner")),
 			"Lotus Palace", List.of(
 				new TreasureSpot(TreasureTier.LEGENDARY, 1, 70, -26, Direction.EAST, "raised garden behind the palace"),
 				new TreasureSpot(TreasureTier.RARE, -33, 64, 24, Direction.SOUTH, "by crates at the west camp, guarded"),
@@ -130,7 +130,7 @@ public final class TreasureSpots {
 				new TreasureSpot(TreasureTier.COMMON, 6, 123, -37, Direction.SOUTH, "walls nw")));
 
 	/** Islands that, by their owner's design, have no treasure chests. */
-	public static final java.util.Set<String> NONE_BY_DESIGN = java.util.Set.of("Frostpeak Isle");
+	public static final java.util.Set<String> NONE_BY_DESIGN = java.util.Set.of("Frostpeak Isle", "Ironhold Bastion");
 
 	private TreasureSpots() {
 	}

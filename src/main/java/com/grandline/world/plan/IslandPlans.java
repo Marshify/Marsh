@@ -19,7 +19,8 @@ public final class IslandPlans {
 	private static final Map<String, Integer> REDESIGNED_IN = Map.ofEntries(Map.entry("Verdant Wilds", 2), Map.entry("Dawnreach Harbor", 3),
 			Map.entry("Millbrook Village", 4), Map.entry("Sunscorch Dunes", 5), Map.entry("Gladiator's Ring", 6), Map.entry("Cloudtop Isles", 7),
 			Map.entry("Emberfall Isle", 8), Map.entry("Stonewall Prison", 9), Map.entry("Saltmarket Docks", 10), Map.entry("Frostpeak Isle", 11),
-			Map.entry("Crystal Fountain", 14), Map.entry("Redbrick Port", 16), Map.entry("Lotus Palace", 17));
+			Map.entry("Crystal Fountain", 14), Map.entry("Redbrick Port", 16), Map.entry("Lotus Palace", 17),
+			Map.entry("Ironhold Bastion", 20));
 	/**
 	 * Redesigns in between, for islands rebuilt more than once: by island name, each kept plan with the layout version
 	 * from which worlds no longer use it (e.g. Cloudtop Isles: the layout-7 rebuild until 12, the layout-12 one until 13).
