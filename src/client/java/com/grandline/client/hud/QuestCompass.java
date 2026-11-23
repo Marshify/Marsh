@@ -64,7 +64,7 @@ public final class QuestCompass {
 		String meters = dist < 6 ? Component.translatable("hud.grandline.nav.here").getString() : Math.round(dist) + " m";
 		int ly = cy + r + 6;
 		right(g, font, name, cx + r, ly, 0xFFD866);
-		right(g, font, Component.literal(t.island()), cx + r, ly + 10, 0xFFFFFF);
+		right(g, font, Component.literal(com.grandline.names.GrandLineNames.islandText(t.island())), cx + r, ly + 10, 0xFFFFFF);
 		right(g, font, Component.literal(meters + "   [N]"), cx + r, ly + 20, 0xA8B4C8);
 	}
 

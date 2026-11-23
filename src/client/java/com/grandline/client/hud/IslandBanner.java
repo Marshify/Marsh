@@ -65,7 +65,7 @@ public final class IslandBanner {
 		Font font = mc.font;
 		int cx = g.guiWidth() / 2;
 		float scale = 1.8f;
-		Component name = Component.literal(current.name());
+		Component name = Component.literal(com.grandline.names.GrandLineNames.island(current.name()));
 		int nameW = Math.round(font.width(name) * scale);
 		int top = 7;
 		// Slight drop-in as it fades in.

@@ -64,7 +64,7 @@ public final class QuestUnlockBanner {
 		}
 		Font font = mc.font;
 		Component title = Component.translatable("hud.grandline.quest_unlock.title");
-		Component where = Component.translatable("hud.grandline.quest_unlock.where", current.name());
+		Component where = Component.translatable("hud.grandline.quest_unlock.where", com.grandline.names.GrandLineNames.islandText(current.name()));
 		Component level = Component.translatable("hud.grandline.quest_unlock.level", current.level(),
 				Component.translatable("screen.grandline.map.sea_name." + current.sea()));
 		float titleScale = 1.4f;

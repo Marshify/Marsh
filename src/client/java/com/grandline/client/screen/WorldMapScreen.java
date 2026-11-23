@@ -401,7 +401,7 @@ public final class WorldMapScreen extends Screen {
 			Island island = hovered.island();
 			int color = island.level() <= playerLevel ? 0x9CFF9C : island.level() <= playerLevel + 50 ? 0xFFE080 : 0xFF9C9C;
 			List<Component> lines = ClientProfileCache.discovered(island)
-					? new ArrayList<>(List.of(Component.literal(island.name()),
+					? new ArrayList<>(List.of(Component.literal(com.grandline.names.GrandLineNames.island(island.name())),
 							Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))))
 					: new ArrayList<>(List.of(Component.translatable("screen.grandline.map.undiscovered").withStyle(net.minecraft.ChatFormatting.GRAY)));
 			if (minecraft.player != null && minecraft.player.isCreative()) {

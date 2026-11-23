@@ -95,7 +95,7 @@ public final class QuestService {
 			if (island.starter() && island.name().equals(quest.islandName())) {
 				player.removeAttached(ModAttachments.ACTIVE_QUEST);
 				sync(player);
-				player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.grandline.quest.safe_zone", quest.islandName())
+				player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("message.grandline.quest.safe_zone", com.grandline.names.GrandLineNames.island(quest.islandName()))
 						.withStyle(net.minecraft.ChatFormatting.YELLOW));
 				return;
 			}
@@ -198,7 +198,7 @@ public final class QuestService {
 
 	public static Component describe(QuestState quest) {
 		Component target = Component.translatable("entity.grandline." + EnemyKind.valueOf(quest.target()).id());
-		return Component.translatable(quest.boss() ? "quest.grandline.boss" : "quest.grandline.kill", quest.required(), target, quest.islandName());
+		return Component.translatable(quest.boss() ? "quest.grandline.boss" : "quest.grandline.kill", quest.required(), target, com.grandline.names.GrandLineNames.island(quest.islandName()));
 	}
 
 	public static void sync(ServerPlayer player) {

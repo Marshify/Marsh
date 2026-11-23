@@ -134,7 +134,7 @@ public final class NpcService {
 			return "home_invalid";
 		}
 		player.setAttached(com.grandline.data.ModAttachments.HOME_ISLAND, island.id());
-		net.minecraft.network.chat.Component done = net.minecraft.network.chat.Component.translatable("message.grandline.home_set", island.name())
+		net.minecraft.network.chat.Component done = net.minecraft.network.chat.Component.translatable("message.grandline.home_set", com.grandline.names.GrandLineNames.island(island.name()))
 				.withStyle(net.minecraft.ChatFormatting.GREEN);
 		player.sendSystemMessage(done);
 		player.displayClientMessage(done, true);

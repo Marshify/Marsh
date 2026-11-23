@@ -25,7 +25,8 @@
     "TechniqueDamageMixin",
     "EvadedEffectsMixin",
     "EvadedFireMixin",
-    "ServerPlayerSpawnAccessor"
+    "ServerPlayerSpawnAccessor",
+    "LanguageNamesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

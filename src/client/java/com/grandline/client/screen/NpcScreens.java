@@ -40,12 +40,12 @@ public final class NpcScreens {
 
 	static Component quest(QuestState q) {
 		Component target = Component.translatable("entity.grandline." + EnemyKind.valueOf(q.target()).id());
-		return Component.translatable(q.boss() ? "quest.grandline.boss" : "quest.grandline.kill", q.required(), target, q.islandName());
+		return Component.translatable(q.boss() ? "quest.grandline.boss" : "quest.grandline.kill", q.required(), target, com.grandline.names.GrandLineNames.island(q.islandName()));
 	}
 
 	private static DialogScreen questGiver(OpenNpcPayload data) {
 		List<Component> lines = new ArrayList<>();
-		lines.add(Component.translatable("npc.grandline.quest.greeting", data.islandName(), data.islandLevel()));
+		lines.add(Component.translatable("npc.grandline.quest.greeting", com.grandline.names.GrandLineNames.island(data.islandName()), data.islandLevel()));
 		List<DialogScreen.Option> options = new ArrayList<>();
 		if (data.activeQuest().isPresent()) {
 			QuestState active = data.activeQuest().get();

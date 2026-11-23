@@ -155,7 +155,7 @@ public final class RaceProgress {
 				Island island = IslandSpawns.islandAt(player.serverLevel(), player.getBlockX(), player.getBlockZ());
 				if (island != null && !data.has("isl:" + island.id()) && visited(data) < config().raceV2Islands) {
 					RaceService.update(player, d -> d.withFlag("isl:" + island.id()));
-					player.displayClientMessage(Component.translatable("race.grandline.v2.island", island.name(),
+					player.displayClientMessage(Component.translatable("race.grandline.v2.island", com.grandline.names.GrandLineNames.island(island.name()),
 							visited(RaceService.get(player)), config().raceV2Islands).withStyle(ChatFormatting.GOLD), true);
 				}
 			}

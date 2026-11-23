@@ -227,7 +227,7 @@ public final class ModWorld {
 		}
 		player.setAttached(ModAttachments.DISCOVERED_ISLANDS, List.copyOf(known));
 		if (announce) {
-			player.sendSystemMessage(Component.translatable("message.grandline.island.discovered", island.name(), island.level(),
+			player.sendSystemMessage(Component.translatable("message.grandline.island.discovered", com.grandline.names.GrandLineNames.island(island.name()), island.level(),
 					island.sea()).withStyle(ChatFormatting.AQUA));
 		}
 		sync(player);
