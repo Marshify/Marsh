@@ -184,6 +184,9 @@ public final class GrandLineConfig {
 	// ---- Races ----
 	/** Starting race weights for new players (standard races only; Cyborg and Ghoul are unlocked). */
 	public java.util.Map<String, Integer> raceWeights = new java.util.LinkedHashMap<>(java.util.Map.of("human", 5, "shark", 1, "angel", 1, "rabbit", 1));
+	/** How each kind of hostile NPC fights: aggression, idle and pursuit distances, safe areas (see EnemyBehavior). */
+	public java.util.Map<String, EnemyBehavior> enemyBehavior = EnemyBehavior.defaults();
+
 	/** Per-race balance, per evolution stage (see RaceBalance). */
 	public java.util.Map<String, RaceBalance> races = RaceBalance.defaults();
 	/** Evolution requirements: player level and currency for V2, V3 and V4. */
@@ -484,6 +487,14 @@ public final class GrandLineConfig {
 		if (raceWeights == null || raceWeights.isEmpty()) {
 			raceWeights = defaults().raceWeights;
 		}
+		if (enemyBehavior == null) {
+			enemyBehavior = EnemyBehavior.defaults();
+		}
+		for (var e : EnemyBehavior.defaults().entrySet()) {
+			enemyBehavior.putIfAbsent(e.getKey(), e.getValue());
+		}
+		enemyBehavior.values().removeIf(java.util.Objects::isNull);
+		enemyBehavior.values().forEach(EnemyBehavior::validate);
 		if (races == null) {
 			races = RaceBalance.defaults();
 		}

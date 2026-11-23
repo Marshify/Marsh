@@ -165,8 +165,11 @@ public final class QuestService {
 			return;
 		}
 		double angle = player.getRandom().nextDouble() * Math.PI * 2;
-		int x = npc.getBlockX() + (int) Math.round(Math.cos(angle) * 8);
-		int z = npc.getBlockZ() + (int) Math.round(Math.sin(angle) * 8);
+		// Islands without a boss arena: clear of the quest giver's protected area (its radius plus room to move).
+		var captain = com.grandline.GrandLineMod.config().enemyBehavior.get("captain");
+		double away = (captain == null ? 8 : captain.protectionRadius) + 8;
+		int x = npc.getBlockX() + (int) Math.round(Math.cos(angle) * away);
+		int z = npc.getBlockZ() + (int) Math.round(Math.sin(angle) * away);
 		int y = Integer.MIN_VALUE;
 		// Planned islands have a boss arena: the boss waits there instead of next to the quest giver.
 		com.grandline.world.Island island = com.grandline.world.IslandRegistry.get(player.server).get(npc.islandId());

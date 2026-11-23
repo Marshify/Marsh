@@ -927,6 +927,7 @@
   "setting.grandline.environment_sfx.desc": "Volcanoes, islands and other ambience.",
   "npc.grandline.shop.owned": "%s — Owned",
   "npc.grandline.result.already_owned": "You already own that one. Equipment is yours for good, so there's no need to buy it again.",
+  "message.grandline.enemy.safe_area": "You can't attack from a safe area.",
   "message.grandline.equipment.no_drop": "Equipment can't be dropped; it stays yours.",
   "message.grandline.equipment.already_owned": "You already own the %s.",
   "message.grandline.equipment.stored": "%s was added to your Backpack. Equip it from Items → Backpack.",

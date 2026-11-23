@@ -130,6 +130,12 @@ public class SaberBoss extends GrandLineEnemy {
 		attackTick = 0;
 	}
 
+	/** The Saber Warden keeps its own arena rules (it fights whoever enters its temple hall; see the class notes). */
+	@Override
+	protected boolean territoryAi() {
+		return false;
+	}
+
 	@Override
 	public EnemyKind kind() {
 		return EnemyKind.CAPTAIN; // counts for the island's boss quest; never respawns as a regular enemy

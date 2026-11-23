@@ -244,17 +244,8 @@ public final class IslandPopulation {
 		return Math.abs(level - island.level()) > spread;
 	}
 
-	/** Keeps a camp enemy wandering inside its camp (it still chases anyone who comes for it). */
+	/** Kept for callers: an enemy's idle area and chase limit now come from its territory AI (GrandLineEnemy). */
 	static void leash(GrandLineEnemy enemy, Island island) {
-		java.util.List<com.grandline.world.plan.Anchor> camps = com.grandline.world.plan.IslandPlans.anchors(island,
-				com.grandline.world.plan.Anchor.Type.ENEMY_CAMP);
-		if (!camps.isEmpty() && enemy.origin() != null) {
-			int radius = 0;
-			for (com.grandline.world.plan.Anchor camp : camps) {
-				radius = Math.max(radius, camp.radius());
-			}
-			enemy.restrictTo(enemy.origin(), radius + 6);
-		}
 	}
 
 	/** A spot at one of the island's camps within 128 blocks of {@code near} (the closest region's), or null. */
@@ -356,6 +347,15 @@ public final class IslandPopulation {
 					continue;
 				}
 				EnemyKind kind = kindAt(island, new BlockPos(x, y, z));
+				if (!GrandLineEnemy.safeGround(level, new BlockPos(x, y, z))) {
+					continue; // never on a campfire, magma or the like
+				}
+				// Never a spawn spot whose idle area would reach into a protected area (quest givers, shops, docks).
+				var behavior = com.grandline.GrandLineMod.config().enemyBehavior.get(kind.id());
+				double keepOut = behavior == null ? 11 : behavior.protectionRadius + behavior.idleRadius;
+				if (com.grandline.entity.SafeZones.isProtected(level, net.minecraft.world.phys.Vec3.atBottomCenterOf(new BlockPos(x, y, z)), keepOut)) {
+					continue;
+				}
 				GrandLineEnemy enemy = GrandLineEntities.typeOf(kind).create(level);
 				if (enemy == null) {
 					continue;
