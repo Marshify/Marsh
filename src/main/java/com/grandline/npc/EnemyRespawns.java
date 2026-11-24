@@ -56,7 +56,7 @@ public final class EnemyRespawns {
 	}
 
 	static void onDeath(ServerLevel level, GrandLineEnemy enemy) {
-		if (!respawns(enemy) || MillbrookNpcs.spotOf(enemy) >= 0) { // Millbrook's Bandits respawn on their own timers
+		if (!respawns(enemy) || RosterNpcs.spotOf(enemy) >= 0) { // roster islands' enemies respawn on their own timers (RosterNpcs)
 			return;
 		}
 		BlockPos origin = enemy.origin();

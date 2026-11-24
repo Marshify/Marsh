@@ -8,7 +8,9 @@ public enum EnemyKind {
 	BANDIT("bandit", Items.IRON_SWORD, 1.0, 1.0),
 	RAIDER("raider", Items.IRON_AXE, 1.3, 1.2),
 	CORSAIR("corsair", Items.DIAMOND_SWORD, 1.7, 1.4),
-	CAPTAIN("captain", Items.NETHERITE_SWORD, 9.0, 1.8);
+	CAPTAIN("captain", Items.NETHERITE_SWORD, 9.0, 1.8),
+	/** Ironhold Bastion's training-field recruits: the Marines' counterpart of Millbrook's Bandits (same strength). */
+	MARINE_TRAINEE("marine_trainee", Items.IRON_SWORD, 1.0, 1.0);
 
 	private final String id;
 	private final Item weapon;

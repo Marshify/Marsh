@@ -119,8 +119,8 @@ public final class IslandPopulation {
 			if (role == Islander.Role.QUEST_GIVER && anchor.region() != FirstSeaProgression.LOWER) {
 				continue; // a region's own quest giver is kept in place by KeeperNpcs (also in worlds already populated)
 			}
-			if (role != null && MillbrookNpcs.manages(island)) {
-				continue; // Millbrook's NPCs follow its roster (MillbrookNpcs)
+			if (role != null && RosterNpcs.manages(island)) {
+				continue; // Millbrook's NPCs follow its roster (RosterNpcs)
 			}
 			if (role != null) {
 				spawnNpcAt(level, island, role, anchor);
@@ -233,6 +233,10 @@ public final class IslandPopulation {
 
 	/** The regular enemy kind for the camp nearest {@code at}: by its stage's level (quests ask for the same kind). */
 	public static EnemyKind kindAt(Island island, BlockPos at) {
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		if (roster != null) {
+			return roster.kind(); // an island with a fixed population (Ironhold's Marine Trainees)
+		}
 		FirstSeaProgression.Stage stage = FirstSeaProgression.stage(island.name(), regionAt(island, at));
 		return EnemyKind.forLevel(stage != null ? stage.min() : island.level());
 	}
@@ -307,8 +311,8 @@ public final class IslandPopulation {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			for (Island island : IslandRegistry.reaching(server, player.getBlockX(), player.getBlockZ(), 0)) {
-				if (island.starter() || MillbrookNpcs.manages(island)) {
-					continue; // safe zone, or Millbrook (fixed Bandit spots: MillbrookNpcs)
+				if (island.starter() || RosterNpcs.manages(island)) {
+					continue; // safe zone, or Millbrook (fixed Bandit spots: RosterNpcs)
 				}
 				boolean nearCentre = Math.hypot(island.x() - player.getX(), island.z() - player.getZ()) <= 64;
 				int x;

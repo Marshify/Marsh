@@ -56,7 +56,9 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Sells and launches the Galleon: Millbrook's main dock. */
 		LUXURY_BOAT_DEALER,
 		/** Signs players up with the Marines (Millbrook's village). */
-		MARINE_RECRUITER;
+		MARINE_RECRUITER,
+		/** Signs players up with the Pirates (Ironhold Bastion's town). */
+		PIRATE_RECRUITER;
 
 		public static Role byId(int id) {
 			Role[] values = values();

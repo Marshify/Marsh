@@ -41,11 +41,11 @@ public final class GrandLineIronholdGameTests implements FabricGameTest {
 			helper.assertTrue(t.ground(0, 75) < Terrain.WATER_TOP, "open water past the dock");
 			Anchor quest = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.QUEST).findFirst().orElseThrow();
 			Anchor arrival = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ARRIVAL).findFirst().orElseThrow();
-			Anchor boss = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.BOSS_ARENA).findFirst().orElseThrow();
-			helper.assertTrue(quest.z() > 7 && quest.z() < 48, "the quest giver is in the town plaza");
+			helper.assertTrue(plan.anchors().stream().noneMatch(a -> a.type() == Anchor.Type.BOSS_ARENA), "no bosses at Ironhold");
+			helper.assertTrue(quest.z() < 8 && quest.y() == 71, "the Marine Leader stands on the terrace at the training field's gate");
 			helper.assertTrue(arrival.z() > 48, "players arrive at the waterfront");
-			helper.assertTrue(boss.z() < 0 && Math.abs(boss.x()) < 10, "the boss fights in the courtyard");
-			helper.assertTrue(plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).count() >= 2, "enemy camps on both landforms");
+			Anchor camp = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).findFirst().orElseThrow();
+			helper.assertTrue(camp.z() < 0 && Math.abs(camp.x()) < 10, "the Marine Trainees train in the courtyard");
 		} finally {
 			setLayout(registry, before);
 		}

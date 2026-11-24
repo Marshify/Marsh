@@ -98,7 +98,8 @@ public final class NpcService {
 			case NpcActionPayload.LAUNCH_SHIP, NpcActionPayload.LAUNCH_SHIP + 1, NpcActionPayload.LAUNCH_SHIP + 2 -> sellsShip(npc, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP])
 					? com.grandline.ship.ShipService.launchFromNavigator(player, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP], npc)
 					: "too_far";
-			case NpcActionPayload.JOIN_MARINES -> npc.role() == Islander.Role.MARINE_RECRUITER ? joinMarines(player) : "too_far";
+			case NpcActionPayload.JOIN_MARINES -> npc.role() == Islander.Role.MARINE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.MARINES) : "too_far";
+			case NpcActionPayload.JOIN_PIRATES -> npc.role() == Islander.Role.PIRATE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.PIRATES) : "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
 					? GunShop.buy(player, packet.action() - NpcActionPayload.BUY_GUN) : "too_far";
 			case NpcActionPayload.BUY_ROD -> npc.role() == Islander.Role.FISHERMAN ? buyRod(player) : "too_far";
@@ -115,7 +116,7 @@ public final class NpcService {
 					? npc.role() == Islander.Role.SWORDSMITH ? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
 					: "too_far";
 		};
-		boolean success = result.equals("joined_marines") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
+		boolean success = result.equals("joined_marines") || result.equals("joined_pirates") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
 				|| result.equals("sword_bought") || result.equals("rod_bought") || result.equals("technique_learned")
 				|| result.equals("tutorial_started");
@@ -168,13 +169,14 @@ public final class NpcService {
 		};
 	}
 
-	/** The Marine Recruiter: signs the player up with the Marines (the usual side change, with its rules). */
-	public static String joinMarines(ServerPlayer player) {
-		if (com.grandline.player.TeamService.get(player) == com.grandline.player.TeamService.Side.MARINES) {
-			return "already_marine";
+	/** A recruiter: signs the player up with that side (the usual side change, with its rules). */
+	public static String join(ServerPlayer player, com.grandline.player.TeamService.Side side) {
+		String who = side == com.grandline.player.TeamService.Side.MARINES ? "marine" : "pirate";
+		if (com.grandline.player.TeamService.get(player) == side) {
+			return "already_" + who;
 		}
-		com.grandline.player.TeamService.choose(player, com.grandline.player.TeamService.Side.MARINES);
-		return com.grandline.player.TeamService.get(player) == com.grandline.player.TeamService.Side.MARINES ? "joined_marines" : "recruit_refused";
+		com.grandline.player.TeamService.choose(player, side);
+		return com.grandline.player.TeamService.get(player) == side ? "joined_" + (who.equals("marine") ? "marines" : "pirates") : "recruit_refused";
 	}
 
 	/** Buys a ship and launches it beside the Navigator (if that fails, the ship is still bought). */

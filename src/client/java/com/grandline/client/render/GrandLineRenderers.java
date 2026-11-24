@@ -44,13 +44,16 @@ public final class GrandLineRenderers {
 
 	/** Enemies drawn from a full 64 x 64 player skin: their own left limbs and the outer (hat, jacket, sleeve, pants) layer. */
 	private static final class SkinRenderer extends HumanoidMobRenderer<GrandLineEnemy, net.minecraft.client.model.PlayerModel<GrandLineEnemy>> {
-		SkinRenderer(EntityRendererProvider.Context context) {
+		private final ResourceLocation texture;
+
+		SkinRenderer(EntityRendererProvider.Context context, String skin) {
 			super(context, new net.minecraft.client.model.PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false), 0.5F);
+			this.texture = tex(skin);
 		}
 
 		@Override
 		public ResourceLocation getTextureLocation(GrandLineEnemy entity) {
-			return tex("bandit");
+			return texture;
 		}
 	}
 
@@ -87,7 +90,8 @@ public final class GrandLineRenderers {
 
 	public static void register() {
 		EntityRendererRegistry.register(GrandLineEntities.ISLANDER, IslanderRenderer::new);
-		EntityRendererRegistry.register(GrandLineEntities.BANDIT, SkinRenderer::new);
+		EntityRendererRegistry.register(GrandLineEntities.BANDIT, ctx -> new SkinRenderer(ctx, "bandit"));
+		EntityRendererRegistry.register(GrandLineEntities.MARINE_TRAINEE, ctx -> new SkinRenderer(ctx, "marine_trainee"));
 		EntityRendererRegistry.register(GrandLineEntities.RAIDER, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("raider"), 1.05F));
 		EntityRendererRegistry.register(GrandLineEntities.CORSAIR, ctx -> new Renderer<GrandLineEnemy>(ctx, e -> tex("corsair"), 1.1F));
 		EntityRendererRegistry.register(GrandLineEntities.CAPTAIN, ctx -> new Renderer<>(ctx, e -> tex("captain"), 1.35F));

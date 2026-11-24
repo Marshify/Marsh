@@ -36,7 +36,8 @@ public final class NpcScreens {
 			case FLASH_STEP_MASTER, AURA_MASTER -> TrainerScreens.abilityMaster(data);
 			case INSTINCT_SAGE -> TrainerScreens.instinctSage(data);
 			case BOAT_DEALER, LUXURY_BOAT_DEALER -> boatDealer(data);
-			case MARINE_RECRUITER -> recruiter(data);
+			case MARINE_RECRUITER -> recruiter(data, true);
+			case PIRATE_RECRUITER -> recruiter(data, false);
 		});
 	}
 
@@ -202,18 +203,20 @@ public final class NpcScreens {
 		return new DialogScreen(title(data, "entity.grandline.islander." + role), List.of(Component.translatable("npc.grandline." + role + ".greeting")), options);
 	}
 
-	/** Marine Recruiter: join the Marines. */
-	private static DialogScreen recruiter(OpenNpcPayload data) {
+	/** Marine or Pirate Recruiter: join that side. */
+	private static DialogScreen recruiter(OpenNpcPayload data, boolean marines) {
 		var self = net.minecraft.client.Minecraft.getInstance().player;
-		boolean marine = self != null && self.getTeam() != null && "grandline_marines".equals(self.getTeam().getName());
+		String team = marines ? "grandline_marines" : "grandline_pirates";
+		boolean member = self != null && self.getTeam() != null && team.equals(self.getTeam().getName());
+		String key = marines ? "recruiter" : "pirate_recruiter";
 		List<DialogScreen.Option> options = new ArrayList<>();
-		if (!marine) {
-			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.recruiter.join").withStyle(ChatFormatting.BLUE),
-					() -> send(data, NpcActionPayload.JOIN_MARINES)));
+		if (!member) {
+			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline." + key + ".join").withStyle(marines ? ChatFormatting.BLUE : ChatFormatting.RED),
+					() -> send(data, marines ? NpcActionPayload.JOIN_MARINES : NpcActionPayload.JOIN_PIRATES)));
 		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
-		return new DialogScreen(title(data, "entity.grandline.islander.marine_recruiter"),
-				List.of(Component.translatable(marine ? "npc.grandline.recruiter.already" : "npc.grandline.recruiter.greeting")), options);
+		return new DialogScreen(title(data, "entity.grandline.islander." + (marines ? "marine_recruiter" : "pirate_recruiter")),
+				List.of(Component.translatable("npc.grandline." + key + (member ? ".already" : ".greeting"))), options);
 	}
 
 	static void send(OpenNpcPayload data, int action) {

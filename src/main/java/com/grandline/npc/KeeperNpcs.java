@@ -98,8 +98,8 @@ public final class KeeperNpcs {
 
 	/** Places any of the island's keepers that are missing (only where their spot is loaded). Exposed for tests. */
 	public static void ensure(ServerLevel level, Island island) {
-		if (MillbrookNpcs.manages(island)) {
-			return; // Millbrook keeps its fixed roster (MillbrookNpcs)
+		if (RosterNpcs.manages(island)) {
+			return; // Millbrook keeps its fixed roster (RosterNpcs)
 		}
 		List<Islander.Role> roles = rolesFor(island);
 		for (Islander.Role role : roles) {

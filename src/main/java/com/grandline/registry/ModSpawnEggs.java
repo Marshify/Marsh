@@ -18,6 +18,7 @@ public final class ModSpawnEggs {
 
 	public static final Item ISLANDER = egg("islander", GrandLineEntities.ISLANDER, 0x284698, 0xE6BE50);
 	public static final Item BANDIT = egg("bandit", GrandLineEntities.BANDIT, 0x785032, 0xB42828);
+	public static final Item MARINE_TRAINEE = egg("marine_trainee", GrandLineEntities.MARINE_TRAINEE, 0xE8E8F0, 0x2A4A8C);
 	public static final Item RAIDER = egg("raider", GrandLineEntities.RAIDER, 0x3C3C46, 0x961E1E);
 	public static final Item CORSAIR = egg("corsair", GrandLineEntities.CORSAIR, 0x192346, 0xC82828);
 	public static final Item CAPTAIN = egg("captain", GrandLineEntities.CAPTAIN, 0x50141E, 0xF0C83C);

@@ -14,6 +14,13 @@
       "Quest Giver": "Bandit Quest Giver",
       "Innkeeper": "Set Home Point",
       "Swordsmith": "Sword Dealer"
+    },
+    "Ironhold Bastion": {
+      "Quest Giver": "Marine Leader",
+      "Swordsmith": "Sword Dealer",
+      "Boat Dealer": "Marine Boat Dealer",
+      "Luxury Boat Dealer": "Advanced Marine Boat Dealer",
+      "Innkeeper": "Set Home Point"
     }
   }
 }

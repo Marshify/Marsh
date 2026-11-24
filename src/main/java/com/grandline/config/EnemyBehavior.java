@@ -27,6 +27,9 @@ public final class EnemyBehavior {
 	public static Map<String, EnemyBehavior> defaults() {
 		Map<String, EnemyBehavior> map = new LinkedHashMap<>();
 		map.put("bandit", new EnemyBehavior());
+		EnemyBehavior trainee = new EnemyBehavior(); // Ironhold's training field: a short leash keeps them inside the courtyard
+		trainee.pursuitRadius = 12;
+		map.put("marine_trainee", trainee);
 		map.put("raider", new EnemyBehavior());
 		map.put("corsair", new EnemyBehavior());
 		EnemyBehavior captain = new EnemyBehavior(); // island bosses: a bigger presence in their arena

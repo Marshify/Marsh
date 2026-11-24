@@ -17,6 +17,7 @@ public final class GrandLineEntities {
 	public static final EntityType<GrandLineEnemy> BANDIT = enemy("bandit");
 	public static final EntityType<GrandLineEnemy> RAIDER = enemy("raider");
 	public static final EntityType<GrandLineEnemy> CORSAIR = enemy("corsair");
+	public static final EntityType<GrandLineEnemy> MARINE_TRAINEE = enemy("marine_trainee");
 	public static final EntityType<IslandBoss> CAPTAIN = Registry.register(BuiltInRegistries.ENTITY_TYPE, GrandLineMod.id("captain"),
 			FabricEntityTypeBuilder.<IslandBoss>create(MobCategory.MONSTER, IslandBoss::new).dimensions(EntityDimensions.fixed(0.8F, 2.6F)).build());
 
@@ -45,6 +46,7 @@ public final class GrandLineEntities {
 			case RAIDER -> RAIDER;
 			case CORSAIR -> CORSAIR;
 			case CAPTAIN -> CAPTAIN;
+			case MARINE_TRAINEE -> MARINE_TRAINEE;
 		};
 	}
 
@@ -54,6 +56,9 @@ public final class GrandLineEntities {
 		}
 		if (type == CORSAIR) {
 			return EnemyKind.CORSAIR;
+		}
+		if (type == MARINE_TRAINEE) {
+			return EnemyKind.MARINE_TRAINEE;
 		}
 		if (type == CAPTAIN || type == SABER_BOSS) {
 			return EnemyKind.CAPTAIN;
@@ -66,6 +71,7 @@ public final class GrandLineEntities {
 		FabricDefaultAttributeRegistry.register(BANDIT, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(RAIDER, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(CORSAIR, GrandLineEnemy.createAttributes());
+		FabricDefaultAttributeRegistry.register(MARINE_TRAINEE, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(CAPTAIN, GrandLineEnemy.createAttributes());
 		FabricDefaultAttributeRegistry.register(SABER_BOSS, SaberBoss.createAttributes());
 	}

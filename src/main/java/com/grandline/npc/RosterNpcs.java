@@ -1,14 +1,14 @@
 package com.grandline.npc;
 
 import com.grandline.GrandLineMod;
-import com.grandline.entity.EnemyKind;
 import com.grandline.entity.GrandLineEnemy;
 import com.grandline.entity.GrandLineEntities;
 import com.grandline.entity.Islander;
 import com.grandline.world.Island;
 import com.grandline.world.IslandRegistry;
 import com.grandline.world.IslandSpawns;
-import com.grandline.world.plan.MillbrookRoster;
+import com.grandline.world.plan.Anchor;
+import com.grandline.world.plan.IslandRoster;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
@@ -25,28 +25,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Keeps the rebuilt Millbrook Village to its fixed roster ({@link MillbrookRoster}), in new and existing worlds:
+ * Keeps islands with a fixed population ({@link IslandRoster}: Millbrook Village, Ironhold Bastion) to it, in new and
+ * existing worlds:
  * <ul>
- * <li>Eight friendly NPCs, each at its own spot. A missing one is placed, a misplaced one walked back, extras and NPCs
- * the island no longer has (the Fisherman, the Movement Instructor) removed.</li>
- * <li>Ten Bandits (Lv 1-2), one per spawn spot, five in each combat field. Each comes back {@link #RESPAWN_TICKS} after
- * it falls, at its own spot, on its own timer. Bandits from before this roster (no spot) are removed; a spot never has
- * two.</li>
+ * <li>Friendly NPCs, each at its own spot. A missing one is placed, a misplaced one walked back, extras and roles the
+ * island no longer has removed, and each carries the island's name for its role (names.json).</li>
+ * <li>Enemies (Lv per roster), one per spawn spot. Each comes back {@link #RESPAWN_TICKS} after it falls, at its own
+ * spot, on its own timer. Enemies from before the roster (no spot) and bosses are removed; a spot never has two.</li>
  * </ul>
  * Only while the whole island is loaded, so nothing standing in an unloaded chunk is doubled.
  */
-public final class MillbrookNpcs {
+public final class RosterNpcs {
 	public static final int RESPAWN_TICKS = 8 * 20;
-	/** Tag carrying a Bandit's spawn spot index. */
+	/** Tag carrying an enemy's spawn spot index (the name dates from Millbrook, the first roster island). */
 	public static final String SPOT_TAG = "grandline.millbrook_spot.";
-	static final int CHECK_TICKS = 20;
+	static final int CHECK_TICKS = 5; // a quarter second, so respawns land on time
 	/** How far around the island centre the roster is enforced (covers every spot and the landings). */
 	static final int REACH = 90;
 
-	/** Game time each spot's Bandit fell, per island (spots not listed have never lost theirs since the server started). */
+	/** Game time each spot's enemy fell, per island (spots not listed have not lost theirs since the server started). */
 	private static final Map<Long, Map<Integer, Long>> FALLEN = new HashMap<>();
 
-	private MillbrookNpcs() {
+	private RosterNpcs() {
 	}
 
 	public static void register() {
@@ -67,10 +67,10 @@ public final class MillbrookNpcs {
 
 	/** Whether this island's NPCs and enemies are managed here (other systems leave it alone). */
 	public static boolean manages(Island island) {
-		return MillbrookRoster.applies(island);
+		return IslandRoster.of(island) != null;
 	}
 
-	/** A Bandit's spawn spot index, or -1. */
+	/** An enemy's spawn spot index, or -1. */
 	public static int spotOf(GrandLineEnemy enemy) {
 		for (String tag : enemy.getTags()) {
 			if (tag.startsWith(SPOT_TAG)) {
@@ -90,8 +90,9 @@ public final class MillbrookNpcs {
 			return;
 		}
 		for (Island island : IslandRegistry.get(server).all()) {
-			if (manages(island) && loaded(level, island)) {
-				enforce(level, island);
+			IslandRoster roster = IslandRoster.of(island);
+			if (roster != null && loaded(level, island)) {
+				enforce(level, island, roster);
 			}
 		}
 	}
@@ -109,24 +110,23 @@ public final class MillbrookNpcs {
 	}
 
 	/** Brings the island to its roster now (exposed for tests). */
-	public static void enforce(ServerLevel level, Island island) {
+	public static void enforce(ServerLevel level, Island island, IslandRoster roster) {
 		EnemyRespawns.forget(level, island.id()); // the island's own timers replace the general respawn queue
 		AABB area = new AABB(island.x() - REACH - 16, level.getMinBuildHeight(), island.z() - REACH - 16,
 				island.x() + REACH + 16, level.getMaxBuildHeight(), island.z() + REACH + 16);
-		friendlies(level, island, area);
-		bandits(level, island, area);
+		friendlies(level, island, roster, area);
+		enemies(level, island, roster, area);
 	}
 
 	// ------------------------------------------------------------------------------------------------ friendly NPCs
 
-	private static void friendlies(ServerLevel level, Island island, AABB area) {
-		List<MillbrookRoster.Slot> slots = MillbrookRoster.slots(island);
+	private static void friendlies(ServerLevel level, Island island, IslandRoster roster, AABB area) {
 		List<Islander> npcs = new ArrayList<>(level.getEntitiesOfClass(Islander.class, area,
 				n -> n.isAlive() && n.islandId() == island.id()));
 		List<Islander> kept = new ArrayList<>();
-		for (MillbrookRoster.Slot slot : slots) {
+		for (IslandRoster.Slot slot : roster.slots().apply(island)) {
 			Islander.Role role = Islander.Role.valueOf(slot.role());
-			BlockPos spot = standAt(level, island, slot.x(), slot.z());
+			BlockPos spot = standAt(level, island, slot.x(), slot.y(), slot.z());
 			Islander best = null;
 			double bestD = Double.MAX_VALUE;
 			for (Islander npc : npcs) {
@@ -148,17 +148,17 @@ public final class MillbrookNpcs {
 				best.setPersistenceRequired();
 				place(best, spot, slot.yaw());
 				level.addFreshEntity(best);
-				GrandLineMod.LOGGER.info("Millbrook: placed {} at {}", role, spot);
+				GrandLineMod.LOGGER.info("{}: placed {} at {}", island.name(), role, spot);
 			} else if (bestD > 2.25) {
 				place(best, spot, slot.yaw());
-				GrandLineMod.LOGGER.info("Millbrook: moved {} to {}", role, spot);
+				GrandLineMod.LOGGER.info("{}: moved {} to {}", island.name(), role, spot);
 			}
 			best.updateName(); // the island's names (names.json), also on NPCs placed before they were renamed
 			kept.add(best);
 		}
 		for (Islander npc : npcs) {
 			if (!kept.contains(npc)) {
-				GrandLineMod.LOGGER.info("Millbrook: removed {} at {}", npc.role(), npc.blockPosition());
+				GrandLineMod.LOGGER.info("{}: removed {} at {}", island.name(), npc.role(), npc.blockPosition());
 				npc.discard(); // an extra, or a role the island no longer has
 			}
 		}
@@ -170,30 +170,31 @@ public final class MillbrookNpcs {
 		npc.setYBodyRot(yaw);
 	}
 
-	/** The standing spot at island-local (x, z): on top of whatever is built there. */
-	static BlockPos standAt(ServerLevel level, Island island, int x, int z) {
+	/** The standing spot at island-local (x, z): the given height, or on top of whatever is built there. */
+	static BlockPos standAt(ServerLevel level, Island island, int x, int y, int z) {
 		int wx = island.x() + x, wz = island.z() + z;
-		BlockPos top = new BlockPos(wx, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, wx, wz), wz);
-		return top;
+		return new BlockPos(wx, y != Anchor.SURFACE ? y : level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, wx, wz), wz);
 	}
 
-	// ------------------------------------------------------------------------------------------------------ bandits
+	// ------------------------------------------------------------------------------------------------------ enemies
 
-	private static void bandits(ServerLevel level, Island island, AABB area) {
-		List<GrandLineEnemy> enemies = level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> e.isAlive() && EnemyRespawns.respawns(e)
+	private static void enemies(ServerLevel level, Island island, IslandRoster roster, AABB area) {
+		// Every hostile on the island that is not one of its spot enemies goes: old camp enemies, other kinds, bosses.
+		List<GrandLineEnemy> enemies = level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> e.isAlive()
+				&& !e.getTags().contains(com.grandline.race.RaceTrials.TAG)
 				&& (e.islandId() == island.id() || e.islandId() == Long.MIN_VALUE));
 		Map<Integer, GrandLineEnemy> bySpot = new HashMap<>();
 		for (GrandLineEnemy enemy : enemies) {
 			int spot = spotOf(enemy);
-			if (spot < 0 || spot >= MillbrookRoster.BANDITS.size() || bySpot.containsKey(spot)) {
-				enemy.discard(); // from before the roster, or a second Bandit on one spot
+			if (spot < 0 || spot >= roster.spots().size() || enemy.kind() != roster.kind() || bySpot.containsKey(spot)) {
+				enemy.discard(); // from before the roster, the wrong kind, a boss, or a second enemy on one spot
 				continue;
 			}
 			bySpot.put(spot, enemy);
 		}
 		long now = level.getGameTime();
 		Map<Integer, Long> fallen = FALLEN.computeIfAbsent(island.id(), k -> new HashMap<>());
-		for (int i = 0; i < MillbrookRoster.BANDITS.size(); i++) {
+		for (int i = 0; i < roster.spots().size(); i++) {
 			if (bySpot.containsKey(i)) {
 				continue;
 			}
@@ -202,13 +203,13 @@ public final class MillbrookNpcs {
 				continue; // still on its own timer
 			}
 			fallen.remove(i);
-			spawnBandit(level, island, i);
+			spawn(level, island, roster, i);
 		}
 	}
 
-	private static void spawnBandit(ServerLevel level, Island island, int index) {
-		MillbrookRoster.Spot spot = MillbrookRoster.BANDITS.get(index);
-		BlockPos at = standAt(level, island, spot.x(), spot.z());
+	private static void spawn(ServerLevel level, Island island, IslandRoster roster, int index) {
+		IslandRoster.Spot spot = roster.spots().get(index);
+		BlockPos at = standAt(level, island, spot.x(), Anchor.SURFACE, spot.z());
 		if (!IslandSpawns.isSafe(level, at)) {
 			BlockPos near = nearestSafe(level, at);
 			if (near == null) {
@@ -216,18 +217,18 @@ public final class MillbrookNpcs {
 			}
 			at = near;
 		}
-		GrandLineEnemy bandit = GrandLineEntities.typeOf(EnemyKind.BANDIT).create(level);
-		if (bandit == null) {
+		GrandLineEnemy enemy = GrandLineEntities.typeOf(roster.kind()).create(level);
+		if (enemy == null) {
 			return;
 		}
-		bandit.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, level.getRandom().nextFloat() * 360, 0);
-		bandit.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
-		bandit.equip();
-		bandit.setGrandLineLevel(1 + level.getRandom().nextInt(2)); // Lv 1-2
-		bandit.setOrigin(at, island.id());
-		bandit.addTag(SPOT_TAG + index);
-		bandit.setPersistenceRequired();
-		level.addFreshEntity(bandit);
+		enemy.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, level.getRandom().nextFloat() * 360, 0);
+		enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
+		enemy.equip();
+		enemy.setGrandLineLevel(roster.minLevel() + level.getRandom().nextInt(roster.maxLevel() - roster.minLevel() + 1));
+		enemy.setOrigin(at, island.id());
+		enemy.addTag(SPOT_TAG + index);
+		enemy.setPersistenceRequired();
+		level.addFreshEntity(enemy);
 	}
 
 	private static BlockPos nearestSafe(ServerLevel level, BlockPos at) {

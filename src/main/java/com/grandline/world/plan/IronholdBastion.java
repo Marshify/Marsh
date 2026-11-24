@@ -72,13 +72,11 @@ public final class IronholdBastion extends BasePlan {
 				.shoreMix(s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.TUFF), s(Blocks.GRAVEL), s(Blocks.STONE))
 				.reach(66);
 		anchor(new Anchor(Type.ARRIVAL, 0, T + 1, 56, 0, 180));      // ships put players on the dock, facing the town
-		anchor(Anchor.at(Type.QUEST, 5, T + 1, 15, 0));              // at the foot of the staircase
-		anchor(Anchor.at(Type.HOME, -6, T + 1, 15, 0));
-		anchor(Anchor.at(Type.FISHERMAN, 5, T + 1, 59, 90));
+		// NPCs and Marine Trainees follow IronholdRoster; these anchors mark the same spots for navigation and safe zones.
+		anchor(Anchor.at(Type.QUEST, IronholdRoster.LEADER_X, F + 1, IronholdRoster.LEADER_Z, 0)); // the Marine Leader, at the gate
+		anchor(Anchor.at(Type.HOME, 4, T + 1, 57, 90));             // Set Home Point, by the arrival point
 		anchor(Anchor.at(Type.DOCK, 9, 63, 57));
-		anchor(Anchor.area(Type.ENEMY_CAMP, -51, -10, 6));           // west landform
-		anchor(Anchor.area(Type.ENEMY_CAMP, 51, -10, 6));            // east landform
-		anchor(Anchor.area(Type.BOSS_ARENA, 0, -9, 6));              // the fortress courtyard
+		anchor(new Anchor(Type.ENEMY_CAMP, 0, F, -10, 10));          // the training field: the fortress courtyard (no boss arena)
 	}
 
 	// ============================================================================================== geometry
