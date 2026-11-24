@@ -36,12 +36,18 @@ public class DialogScreen extends Screen {
 		for (Option option : options) {
 			longest = Math.max(longest, font.width(option.label()));
 		}
-		int buttonWidth = Math.max(Math.min(150, width / 3), Math.min(longest + 28, width / 2 - 12));
-		int buttonHeight = 20;
+		// As wide as the longest choice needs (up to the screen's width), and a choice still too long wraps onto more lines.
+		int buttonWidth = Math.max(Math.min(150, width / 3), Math.min(longest + 28, width - 24));
 		int x = width - buttonWidth - 12;
-		int total = options.size() * (buttonHeight + 4);
+		int textWidth = buttonWidth - 26;
+		int total = 0;
+		for (Option option : options) {
+			total += font.split(option.label(), textWidth).size() * 10 + 10 + 4;
+		}
 		int y = Math.max(8, Math.min(height - 140 - total, height / 2 - total / 2 - 30));
 		for (Option option : options) {
+			java.util.List<net.minecraft.util.FormattedCharSequence> lines = font.split(option.label(), textWidth);
+			int buttonHeight = lines.size() * 10 + 10;
 			addRenderableWidget(new GoldButton(x, y, buttonWidth, buttonHeight, option.label(), b -> {
 				option.action().run();
 				if (!option.keepOpen()) {
@@ -50,7 +56,7 @@ public class DialogScreen extends Screen {
 			}, 0xFF2C3A52) {
 				@Override
 				protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-					// Dialog choices: dark plate with gold text and a speech-bubble marker.
+					// Dialog choices: dark plate with gold text and a speech-bubble marker; long text wraps.
 					int bx = getX();
 					int by = getY();
 					int color = isHoveredOrFocused() ? 0xF03A4C6B : 0xF0202B3D;
@@ -58,7 +64,11 @@ public class DialogScreen extends Screen {
 					graphics.fill(bx, by, bx + width, by + height, color);
 					graphics.fill(bx, by, bx + 3, by + height, GrandLineUi.GOLD);
 					graphics.drawString(font, "»", bx + 8, by + 6, GrandLineUi.GOLD);
-					graphics.drawString(font, getMessage(), bx + 20, by + 6, 0xFFFFFF);
+					int ly = by + 6;
+					for (net.minecraft.util.FormattedCharSequence line : lines) {
+						graphics.drawString(font, line, bx + 20, ly, 0xFFFFFF);
+						ly += 10;
+					}
 				}
 			});
 			y += buttonHeight + 4;
