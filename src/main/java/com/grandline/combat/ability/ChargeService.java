@@ -37,6 +37,23 @@ public final class ChargeService {
 
 	private static final Map<UUID, Charging> CHARGING = new HashMap<>();
 	private static final Map<AbilityDef, ChargeVisual> VISUALS = new HashMap<>();
+	private static final Map<AbilityDef, HeldTick> HELD = new HashMap<>();
+
+	/** Called every server tick while a {@link AbilityDef.Activation#HELD} move is held (ticks from 0). */
+	@FunctionalInterface
+	public interface HeldTick {
+		void tick(AbilityContext ctx, int ticks);
+	}
+
+	/** Registers the per-tick behaviour of a held move. */
+	public static void held(AbilityDef ability, HeldTick tick) {
+		HELD.put(ability, tick);
+	}
+
+	/** Ends any hold without firing the move (death, dimension change, losing the power): no cooldown is set. */
+	public static void cancel(ServerPlayer player) {
+		CHARGING.remove(player.getUUID());
+	}
 	private static final Map<AbilityDef, java.util.function.BiPredicate<ServerPlayer, Power>> CHARGE_IF = new HashMap<>();
 
 	private ChargeService() {
@@ -97,8 +114,15 @@ public final class ChargeService {
 			}
 			int held = now - charging.startTick();
 			charging.visual().draw(player, charging.charge(now), held);
-			// Charging slows the caster down, like winding up a big attack.
-			player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, 1, false, false));
+			HeldTick tick = HELD.get(charging.ability());
+			if (tick != null) {
+				tick.tick(new AbilityContext(player, charging.power(), charging.ability(), charging.multiplier(), charging.charge(now)), held);
+				if (!CHARGING.containsKey(entry.getKey())) {
+					continue; // the move ended itself
+				}
+			}
+			// Charging slows the caster down, like winding up a big attack; a held move only a little (it can be steered).
+			player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, tick != null ? 0 : 1, false, false));
 			if (held >= MAX_CHARGE_TICKS) {
 				AbilityActivationHandler.releaseCharge(player, charging.slot());
 			}

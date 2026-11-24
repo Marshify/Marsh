@@ -148,8 +148,12 @@ public final class FruitService {
 		return true;
 	}
 
+	/** Fruits priced apart from their rarity's dealer price (by fruit id). */
+	public static final java.util.Map<String, Long> PRICE_OVERRIDES = java.util.Map.of("grandline:spin", 7_500L);
+
 	public static long price(Fruits.FruitDef fruit) {
-		return GrandLineMod.config().fruitPrices[fruit.rarity().ordinal()];
+		Long own = PRICE_OVERRIDES.get(fruit.id());
+		return own != null ? own : GrandLineMod.config().fruitPrices[fruit.rarity().ordinal()];
 	}
 
 	/** The dealer's current stock. Deterministic per rotation window and world seed, so it needs no saving. */

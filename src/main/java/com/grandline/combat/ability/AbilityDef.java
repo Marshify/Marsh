@@ -20,7 +20,13 @@ public record AbilityDef(String key, int requiredMastery, int cooldownTicks, dou
 		/** Starts charging on press, fires on release (or at full charge); {@link AbilityContext#charge()} is 0..1. */
 		CHARGED,
 		/** Press to switch on, press again (or run out of energy) to switch off. */
-		TOGGLE
+		TOGGLE,
+		/**
+		 * Active while the key is held: energy is spent on press, {@link ChargeService#held} ticks run every server tick
+		 * while held (server-timed, ending at {@link ChargeService#MAX_CHARGE_TICKS}), and the action runs on release
+		 * to finish the move; the cooldown starts then.
+		 */
+		HELD
 	}
 
 	public AbilityDef(String key, int requiredMastery, int cooldownTicks, double energyCost, AbilityAction action) {

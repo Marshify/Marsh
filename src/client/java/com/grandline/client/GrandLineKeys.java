@@ -231,6 +231,7 @@ public final class GrandLineKeys {
 		var power = source == PowerSource.WEAPON ? activePower()
 				: com.grandline.combat.ability.Powers.get(source == PowerSource.FRUIT ? profile.powers().fruit() : profile.powers().fightingStyle());
 		return power != null && slot < power.abilities().size()
-				&& power.abilities().get(slot).activation() == com.grandline.combat.ability.AbilityDef.Activation.CHARGED;
+				&& (power.abilities().get(slot).activation() == com.grandline.combat.ability.AbilityDef.Activation.CHARGED
+						|| power.abilities().get(slot).activation() == com.grandline.combat.ability.AbilityDef.Activation.HELD);
 	}
 }

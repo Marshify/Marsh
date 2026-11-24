@@ -18,6 +18,8 @@ public abstract class HumanoidModelPunchMixin {
 	@Shadow @Final public ModelPart leftArm;
 	@Shadow @Final public ModelPart body;
 	@Shadow @Final public ModelPart head;
+	@Shadow @Final public ModelPart rightLeg;
+	@Shadow @Final public ModelPart leftLeg;
 
 	@Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
 	private void grandline$punch(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw,
@@ -27,5 +29,6 @@ public abstract class HumanoidModelPunchMixin {
 		}
 		float age = entity.tickCount + (ageInTicks - (int) ageInTicks);
 		com.grandline.client.fx.MovePoses.apply(entity.getId(), age, head, body, rightArm, leftArm);
+		com.grandline.client.fx.BodyMotion.apply(entity.getId(), age, head, body, rightArm, leftArm, rightLeg, leftLeg);
 	}
 }

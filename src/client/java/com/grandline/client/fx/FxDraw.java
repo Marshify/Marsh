@@ -64,6 +64,21 @@ public final class FxDraw {
 		c.vertex(matrix, (float) (p.x - camPos.x), (float) (p.y - camPos.y), (float) (p.z - camPos.z)).color(r, g, b, a).uv(u, vv).endVertex();
 	}
 
+	/** The buffer for any render type (meshes drawn with their own render types, e.g. {@link WindRender}). */
+	public VertexConsumer buffer(net.minecraft.client.renderer.RenderType type) {
+		return buffers.getBuffer(type);
+	}
+
+	/** One POSITION_COLOR_TEX vertex, camera-relative. */
+	public void vertex(VertexConsumer c, Vec3 p, float r, float g, float b, float a, float u, float vv) {
+		v(c, p, r, g, b, a, u, vv);
+	}
+
+	/** One POSITION_COLOR_TEX_LIGHTMAP vertex; the two extra channels carry per-vertex shader data (0..240). */
+	public void vertex(VertexConsumer c, Vec3 p, float r, float g, float b, float a, float u, float vv, int d0, int d1) {
+		c.vertex(matrix, (float) (p.x - camPos.x), (float) (p.y - camPos.y), (float) (p.z - camPos.z)).color(r, g, b, a).uv(u, vv).uv2(d0, d1).endVertex();
+	}
+
 	/** A quad through four corners (bottom-left, bottom-right, top-right, top-left) with a UV rectangle. */
 	public void quad(ResourceLocation tex, boolean glow, Vec3 bl, Vec3 br, Vec3 tr, Vec3 tl, float[] rgba, float u0, float u1, float v0, float v1) {
 		if (rgba[3] <= 0.003f) {

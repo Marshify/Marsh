@@ -115,6 +115,24 @@ public final class GrandLineSounds {
 	public static final Cue ROCKET_FLIGHT_TRAVEL = abilityLoop("fruits.rocket.blast_off.travel", Stage.TRAVEL, 20, null, 0, 1);
 	public static final Cue ROCKET_FLIGHT_AFTERMATH = ability("fruits.rocket.blast_off.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
 
+	// ============================================================================ Spin (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue SPIN_RAZOR_CHARGE = ability("fruits.spin.razor_wind.charge", Stage.CHARGE, 20, null, 0, 1);
+	public static final Cue SPIN_RAZOR_LOOP = abilityLoop("fruits.spin.razor_wind.travel", Stage.TRAVEL, 20, null, 0, 1);
+	public static final Cue SPIN_RAZOR_IMPACT = ability("fruits.spin.razor_wind.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue SPIN_RAZOR_AFTERMATH = ability("fruits.spin.razor_wind.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
+	public static final Cue SPIN_TORNADO_CAST = ability("fruits.spin.tornado_assault.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue SPIN_TORNADO_LOOP = abilityLoop("fruits.spin.tornado_assault.travel", Stage.TRAVEL, 28, null, 0, 1);
+	public static final Cue SPIN_TORNADO_IMPACT = ability("fruits.spin.tornado_assault.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue SPIN_TORNADO_AFTERMATH = ability("fruits.spin.tornado_assault.aftermath", Stage.AFTERMATH, 36, null, 0, 1);
+	public static final Cue SPIN_SLASHER_CAST = ability("fruits.spin.air_slasher.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue SPIN_SLASHER_CAST_FINAL = ability("fruits.spin.air_slasher.cast_final", Stage.CAST, 36, null, 0, 1);
+	public static final Cue SPIN_SLASHER_TRAVEL = abilityLoop("fruits.spin.air_slasher.travel", Stage.TRAVEL, 14, null, 0, 1);
+	public static final Cue SPIN_SLASHER_IMPACT = ability("fruits.spin.air_slasher.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue SPIN_SLASHER_IMPACT_FINAL = ability("fruits.spin.air_slasher.impact_final", Stage.IMPACT, 40, null, 0, 1);
+	public static final Cue SPIN_HELI_CAST = ability("fruits.spin.helicopter_flight.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue SPIN_HELI_LOOP = abilityLoop("fruits.spin.helicopter_flight.travel", Stage.TRAVEL, 24, null, 0, 1);
+	public static final Cue SPIN_HELI_AFTERMATH = ability("fruits.spin.helicopter_flight.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

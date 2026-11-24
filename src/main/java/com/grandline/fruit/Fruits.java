@@ -37,14 +37,8 @@ public final class Fruits {
 	/** Rocket: its own moves, visuals and sounds (see fruit/rocket/RocketMoves and the client's RocketFx). */
 	public static final FruitDef ROCKET = register("rocket", FruitRarity.COMMON, 0xD94A3A, com.grandline.fruit.rocket.RocketMoves.moves());
 
-	/** Spin (formerly "gale", migrated by FruitRenames). */
-	public static final FruitDef SPIN = register("spin", FruitRarity.COMMON, Element.WIND, 0x9BD13A,
-			FruitMoves.bolt(Element.WIND, 14, 1.4, 6f),
-			FruitMoves.burst(Element.WIND, 5, 7f),
-			FruitMoves.bolt(Element.WIND, 20, 2, 9f),
-			FruitMoves.vortex(Element.WIND, 16, 5, 13f),
-			FruitMoves.updraft(Element.WIND),
-			"spin_cutter", "spin_top", "spin_lance", "spin_drill", "spin_rotor");
+	/** Spin (formerly "gale", migrated by FruitRenames): its own moves, visuals and sounds (fruit/spin/SpinMoves, client SpinFx). */
+	public static final FruitDef SPIN = register("spin", FruitRarity.COMMON, 0x9BD13A, com.grandline.fruit.spin.SpinMoves.moves());
 
 	public static final FruitDef BLADE = register("blade", FruitRarity.COMMON, Element.METAL, 0x8C9BB5,
 			FruitMoves.bolt(Element.METAL, 12, 1.6, 7f),

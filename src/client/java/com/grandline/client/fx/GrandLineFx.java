@@ -151,6 +151,9 @@ public final class GrandLineFx {
 			// Flight can belong to either fruit: both let their own flight effect fade.
 			FlameFx.handle(packet, level, caster, own);
 			RocketFx.handle(packet, level, caster, own);
+			SpinFx.flightEnd(packet.caster(), caster);
+		} else if (SpinFx.handles(packet.effect())) {
+			SpinFx.handle(packet, level, caster, own);
 		} else if (RocketFx.handles(packet.effect())) {
 			RocketFx.handle(packet, level, caster, own);
 		} else if (FlameFx.handles(packet.effect())) {
@@ -189,6 +192,7 @@ public final class GrandLineFx {
 		PENDING.clear();
 		FxSprites.clear();
 		MovePoses.clearAll();
+		BodyMotion.clearAll();
 	}
 
 	private static void tick() {

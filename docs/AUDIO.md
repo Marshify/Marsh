@@ -141,6 +141,23 @@ How they were made:
 - **Levelled:** impacts −13/−14 LUFS, casts −15, the dive −18, charge −19, loops and aftermath −20, with a −1.5 dBTP limiter.
 - **Checked in game:** played at their beats in the dev client. Not yet approved by ear by the owner.
 
+## Spin cues (0.76.0)
+
+All 16 Spin cues have their own audio:
+
+| Move | Cues |
+|---|---|
+| Razor Wind | charge (spin-up), travel (cutting-wind loop, pitch rises with intensity), impact, aftermath (spin-down) |
+| Tornado Assault | cast, travel (swirl loop, pitch follows speed), impact, aftermath (pressure release) |
+| Air Slasher | cast (×5, rising pitch), cast_final, travel (blade loop), impact, impact_final |
+| Helicopter Flight | cast (spin-up), travel (rhythmic air loop, pitch follows speed), aftermath (spin-down, played when the loop ends) |
+
+How they were made:
+- **Generated** with ElevenLabs (`eleven_text_to_sound_v2`): 16 single takes, about 270 credits. The prompts ask for rotating air, not an engine.
+- **Converted** to mono OGG.
+- **Levelled:** −13 to −22 LUFS by stage, with a −1.5 dBTP limiter. The loops have 20 ms edge fades.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

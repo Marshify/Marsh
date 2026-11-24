@@ -279,6 +279,134 @@
       }
     ]
   },
+  "fruits.spin.air_slasher.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/air_slasher/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spin.air_slasher.cast_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/air_slasher/cast_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spin.air_slasher.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/air_slasher/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spin.air_slasher.impact_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/air_slasher/impact_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spin.air_slasher.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/air_slasher/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spin.helicopter_flight.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/helicopter_flight/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.spin.helicopter_flight.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/helicopter_flight/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spin.helicopter_flight.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/helicopter_flight/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spin.razor_wind.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/razor_wind/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.spin.razor_wind.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/razor_wind/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.spin.razor_wind.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/razor_wind/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spin.razor_wind.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/razor_wind/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spin.tornado_assault.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/tornado_assault/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.spin.tornado_assault.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/tornado_assault/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spin.tornado_assault.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/tornado_assault/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spin.tornado_assault.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spin/tornado_assault/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "music.boss.final": {
     "sounds": [
       {

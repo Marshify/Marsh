@@ -5,6 +5,7 @@
   "client": [
     "WorldCreationUiStateMixin",
     "HumanoidModelPunchMixin",
+    "PlayerRendererBodyMotionMixin",
     "GameRendererShakeMixin",
     "GuiHotbarMixin",
     "GuiExperienceBarMixin",

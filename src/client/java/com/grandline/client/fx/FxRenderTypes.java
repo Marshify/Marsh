@@ -47,4 +47,35 @@ public final class FxRenderTypes extends RenderType {
 						.setLightmapState(NO_LIGHTMAP)
 						.createCompositeState(false)));
 	}
+
+	private static final Map<ResourceLocation, RenderType> WIND_SOFT = new HashMap<>();
+	private static final Map<ResourceLocation, RenderType> WIND_GLOW = new HashMap<>();
+
+	/** Translucent surfaces drawn with a custom shader (POSITION_COLOR_TEX_LIGHTMAP; see {@link WindRender}). */
+	public static RenderType shaderSoft(ResourceLocation texture, java.util.function.Supplier<net.minecraft.client.renderer.ShaderInstance> shader) {
+		return WIND_SOFT.computeIfAbsent(texture, t -> create("grandline_fx_shader_soft", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
+				VertexFormat.Mode.QUADS, 8192, false, true, CompositeState.builder()
+						.setShaderState(new ShaderStateShard(shader))
+						.setTextureState(new TextureStateShard(t, true, false))
+						.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+						.setCullState(NO_CULL)
+						.setDepthTestState(LEQUAL_DEPTH_TEST)
+						.setWriteMaskState(COLOR_WRITE)
+						.setLightmapState(NO_LIGHTMAP)
+						.createCompositeState(false)));
+	}
+
+	/** Additive (light-emitting) surfaces with a custom shader: bright edges that brighten what is behind them. */
+	public static RenderType shaderGlow(ResourceLocation texture, java.util.function.Supplier<net.minecraft.client.renderer.ShaderInstance> shader) {
+		return WIND_GLOW.computeIfAbsent(texture, t -> create("grandline_fx_shader_glow", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
+				VertexFormat.Mode.QUADS, 8192, false, false, CompositeState.builder()
+						.setShaderState(new ShaderStateShard(shader))
+						.setTextureState(new TextureStateShard(t, true, false))
+						.setTransparencyState(LIGHTNING_TRANSPARENCY)
+						.setCullState(NO_CULL)
+						.setDepthTestState(LEQUAL_DEPTH_TEST)
+						.setWriteMaskState(COLOR_WRITE)
+						.setLightmapState(NO_LIGHTMAP)
+						.createCompositeState(false)));
+	}
 }

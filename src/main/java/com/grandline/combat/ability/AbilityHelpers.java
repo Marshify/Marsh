@@ -69,6 +69,40 @@ public final class AbilityHelpers {
 	}
 
 	/** Knocks {@code target} away from {@code from}. */
+	/**
+	 * How strongly crowd control (pulls, stagger, lifts) affects {@code target}: reduced by knockback resistance, and
+	 * halved for bosses (captains and the Saber boss), so they can't be held in place.
+	 */
+	public static double ccScale(LivingEntity target) {
+		double resist = target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
+		double scale = Math.max(0, 1 - resist);
+		if (target instanceof com.grandline.entity.GrandLineEnemy enemy && enemy.kind() == com.grandline.entity.EnemyKind.CAPTAIN) {
+			scale *= 0.5;
+		}
+		return scale;
+	}
+
+	/** Adds {@code impulse} to the target's motion, scaled by {@link #ccScale} (none if Instinct just evaded the hit). */
+	public static void pushResisted(LivingEntity target, Vec3 impulse) {
+		if (com.grandline.technique.Dodges.justEvaded(target)) {
+			return;
+		}
+		double k = ccScale(target);
+		if (k <= 0) {
+			return;
+		}
+		target.setDeltaMovement(target.getDeltaMovement().add(impulse.scale(k)));
+		target.hurtMarked = true;
+	}
+
+	/** A short stagger: slowed for {@code ticks} (shorter on resistant targets), never stacking past its length. */
+	public static void stagger(LivingEntity target, int ticks, int amplifier) {
+		int t = (int) Math.round(ticks * ccScale(target));
+		if (t > 0) {
+			target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, t, amplifier, false, false));
+		}
+	}
+
 	public static void knockAway(LivingEntity target, Vec3 from, double strength, double lift) {
 		if (com.grandline.technique.Dodges.justEvaded(target)) {
 			return; // Instinct evaded the hit

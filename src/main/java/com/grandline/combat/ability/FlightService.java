@@ -45,6 +45,11 @@ public final class FlightService {
 				revoke(player);
 			}
 		});
+		// Changing dimension ends ability flight and any held move.
+		net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, from, to) -> {
+			stop(player, true);
+			ChargeService.cancel(player);
+		});
 		ServerLifecycleEvents.SERVER_STOPPING.register(server -> server.getPlayerList().getPlayers().forEach(p -> stop(p, false)));
 	}
 

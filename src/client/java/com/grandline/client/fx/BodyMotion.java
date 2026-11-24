@@ -1,0 +1,323 @@
+package com.grandline.client.fx;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Continuous, rotation-driven body animation for players (Spin's moves, and any later whirling, spinning or rotor
+ * move): sustained states with smooth spin-up and spin-down instead of MovePoses' one-shot windup/release.
+ *
+ * <ul>
+ *   <li>{@link Kind#ARM_WHIRL}: arms reach forward and whirl in tight circles, faster the longer it's held.</li>
+ *   <li>{@link Kind#BODY_SPIN}: arms out, the whole model spins about its vertical axis and leans into its travel.</li>
+ *   <li>{@link Kind#ROTOR}: arms raised above the shoulders sweeping in fast cones, legs hanging, the body pitching
+ *   with speed and banking into turns.</li>
+ *   <li>{@link Kind#SLASH}: an upper-body twist with alternating arm sweeps synced to each released blade, and a
+ *   two-arm finishing sweep.</li>
+ * </ul>
+ *
+ * Arms are aimed by direction ({@link #aim}): every pose is a rotation about the shoulder joint, so hands stay attached
+ * and never bend past the model's joints. Whole-body rotation happens only in the renderer's pose stack
+ * ({@link #applyBody}); the camera and the player's real facing are never touched.
+ */
+public final class BodyMotion {
+	public enum Kind {
+		ARM_WHIRL, BODY_SPIN, ROTOR, SLASH
+	}
+
+	private static final class State {
+		final Kind kind;
+		final float start;
+		float end = -1;       // age the move ended (spin-down starts), or -1 while active
+		float lastAge;
+		double phase;         // accumulated rotation (radians)
+		double spin;          // accumulated whole-body yaw (degrees)
+		float lean, bank;     // smoothed body lean / bank (degrees)
+		float slashAge = -99; // last blade release (SLASH)
+		boolean slashLeft, finale;
+
+		State(Kind kind, float start) {
+			this.kind = kind;
+			this.start = start;
+			this.lastAge = start;
+		}
+	}
+
+	/** Ticks to spin up and to spin down. */
+	static final float SPIN_UP = 6, SPIN_DOWN = 10;
+
+	private static final Map<Integer, State> STATES = new HashMap<>();
+
+	private BodyMotion() {
+	}
+
+	public static void start(int entity, Kind kind, float age) {
+		STATES.put(entity, new State(kind, age));
+	}
+
+	/** Begins the smooth spin-down of {@code kind} (no-op if another state replaced it). */
+	public static void stop(int entity, Kind kind, float age) {
+		State s = STATES.get(entity);
+		if (s != null && s.kind == kind && s.end < 0) {
+			s.end = age;
+		}
+	}
+
+	/** SLASH: a blade leaves the left or right hand now (or the two-arm finishing sweep). */
+	public static void slash(int entity, float age, boolean left, boolean finale) {
+		State s = STATES.get(entity);
+		if (s == null || s.kind != Kind.SLASH) {
+			s = new State(Kind.SLASH, age);
+			STATES.put(entity, s);
+		}
+		s.slashAge = age;
+		s.slashLeft = left;
+		s.finale = finale;
+	}
+
+	public static boolean active(int entity, Kind kind) {
+		State s = STATES.get(entity);
+		return s != null && s.kind == kind;
+	}
+
+	public static void clear(int entity) {
+		STATES.remove(entity);
+	}
+
+	public static void clearAll() {
+		STATES.clear();
+	}
+
+	/** 0..1 how strongly the state is applied: eases in at the start and out during the spin-down. */
+	static float weight(State s, float age) {
+		float in = Mth.clamp((age - s.start) / 3f, 0, 1);
+		float out = s.end < 0 ? 1 : 1 - Mth.clamp((age - s.end) / SPIN_DOWN, 0, 1);
+		return (float) WindMesh.ease(Math.min(in, out));
+	}
+
+	/** Current rotation speed (radians per tick) for the state: spin-up, intensity growth, spin-down. */
+	static double rate(State s, float age) {
+		float t = age - s.start;
+		double up = WindMesh.ease(t / SPIN_UP);
+		double max = switch (s.kind) {
+			case ARM_WHIRL -> 1.1 + 0.9 * Mth.clamp(t / 50f, 0, 1); // faster the longer it's held
+			case BODY_SPIN -> 1.2;
+			case ROTOR -> 1.5;
+			case SLASH -> 0;
+		};
+		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
+		return max * up * down;
+	}
+
+	/** The rotor/whirl phase for anchored emitters (radians), or 0. */
+	public static double phase(int entity) {
+		State s = STATES.get(entity);
+		return s == null ? 0 : s.phase;
+	}
+
+	/** 0..1 how fast the state currently turns compared with its top speed. */
+	public static float intensity(int entity, float age) {
+		State s = STATES.get(entity);
+		if (s == null) {
+			return 0;
+		}
+		double r = rate(s, age);
+		return (float) Mth.clamp(r / 1.5, 0, 1);
+	}
+
+	private static void advance(State s, float age) {
+		float dt = Mth.clamp(age - s.lastAge, 0, 2);
+		if (dt > 0) {
+			double r = rate(s, age);
+			s.phase += r * dt;
+			if (s.kind == Kind.BODY_SPIN) {
+				s.spin += Math.toDegrees(r * 0.9) * dt; // a little slower than the arms: readable, never a blur
+			}
+			s.lastAge = age;
+		}
+	}
+
+	// ------------------------------------------------------------------------------------------------ model posing
+
+	/** Poses arms, torso and legs (called at the end of HumanoidModel.setupAnim for players). */
+	public static void apply(int entity, float age, ModelPart head, ModelPart body, ModelPart rightArm, ModelPart leftArm,
+			ModelPart rightLeg, ModelPart leftLeg) {
+		State s = STATES.get(entity);
+		if (s == null) {
+			return;
+		}
+		if (s.end >= 0 && age - s.end > SPIN_DOWN || age - s.start > 20 * 60 || age < s.start - 2) {
+			STATES.remove(entity); // spun down, or a lost end beat (never animate forever)
+			return;
+		}
+		advance(s, age);
+		float w = weight(s, age);
+		double ph = s.phase;
+		switch (s.kind) {
+			case ARM_WHIRL -> {
+				// Arms reach forward (following the aim a little) and whirl in tight opposite circles.
+				double aimUp = -head.xRot * 0.5;
+				double c = Math.toRadians(14 + 10 * Math.min(1, (age - s.start) / 50f));
+				aim(rightArm, w, forwardUp(aimUp, c, ph, false));
+				aim(leftArm, w, forwardUp(aimUp, c, ph + Math.PI, true));
+				body.xRot = Mth.lerp(w, body.xRot, 0.12f);
+			}
+			case BODY_SPIN -> {
+				// Arms thrown out to the sides, slightly raised; the whole model spins (applyBody).
+				aim(rightArm, w, dir(0.25, 0.12, 0.96, false));
+				aim(leftArm, w, dir(0.25, 0.12, 0.96, true));
+				rightLeg.zRot = Mth.lerp(w, rightLeg.zRot, 0.12f);
+				leftLeg.zRot = Mth.lerp(w, leftLeg.zRot, -0.12f);
+			}
+			case ROTOR -> {
+				// Arms raised above the shoulders, each hand sweeping a fast cone: a rotor of arms.
+				double c = Math.toRadians(32);
+				aim(rightArm, w, rotorArm(c, ph, false));
+				aim(leftArm, w, rotorArm(c, ph + Math.PI, true));
+				// Legs hang a little behind with a slow, loose sway (never a walk cycle).
+				float sway = Mth.sin(age * 0.22f) * 0.08f;
+				rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, 0.22f + sway);
+				leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.14f - sway);
+				rightLeg.zRot = Mth.lerp(w, rightLeg.zRot, 0.06f);
+				leftLeg.zRot = Mth.lerp(w, leftLeg.zRot, -0.06f);
+				rightLeg.yRot = 0;
+				leftLeg.yRot = 0;
+			}
+			case SLASH -> {
+				float t = age - s.slashAge;
+				if (t > 14) {
+					STATES.remove(entity);
+					return;
+				}
+				float k = Mth.clamp(t < 0 ? 0 : 1 - (t - 6) / 8f, 0, 1); // hold, then ease back to the combat stance
+				if (s.finale) {
+					// Two-arm finishing sweep: from overhead-back to forward and down, torso following.
+					double sweep = WindMesh.ease(t / 3.0);
+					double up = Mth.lerp(sweep, 0.9, -0.25);
+					aim(rightArm, k, dir(0.35, up, 0.35 + 0.4 * sweep, false));
+					aim(leftArm, k, dir(0.35, up, 0.35 + 0.4 * sweep, true));
+					body.xRot = Mth.lerp(k, body.xRot, (float) (0.25 * sweep));
+				} else {
+					// One arm sweeps across from the far side and out: the blade leaves at the middle of the arc.
+					double sweep = WindMesh.ease(t / 3.0);
+					double outward = Mth.lerp(sweep, -0.75, 0.85);
+					boolean left = s.slashLeft;
+					aim(left ? leftArm : rightArm, k, dir(0.55, 0.05, outward, left));
+					body.yRot = Mth.lerp(k, body.yRot, (float) ((left ? 1 : -1) * Mth.lerp(sweep, -0.45, 0.35)));
+				}
+			}
+		}
+	}
+
+	/** Forward-reaching whirl: the hand circles round the forward direction (pitched by {@code aimUp}). */
+	private static Vec3 forwardUp(double aimUp, double cone, double phase, boolean left) {
+		double up = Math.sin(aimUp) + Math.sin(cone) * Math.cos(phase);
+		double out = Math.sin(cone) * Math.sin(phase) * (left ? -1 : 1) + 0.12;
+		return dir(Math.cos(aimUp), up, out, left);
+	}
+
+	/** Raised rotor arm: a cone about the up-and-slightly-out axis above the shoulder. */
+	private static Vec3 rotorArm(double cone, double phase, boolean left) {
+		double up = Math.cos(cone);
+		double out = 0.25 + Math.sin(cone) * Math.cos(phase);
+		double fwd = Math.sin(cone) * Math.sin(phase);
+		return dir(fwd, up, out, left);
+	}
+
+	/** A direction in body terms (forward, up, out to the arm's own side), normalised, in model space. */
+	static Vec3 dir(double forward, double up, double out, boolean left) {
+		// Model space: forward = -z, up = -y, the right arm's outside = -x (the left arm's = +x).
+		Vec3 v = new Vec3(left ? out : -out, -up, -forward);
+		return v.normalize();
+	}
+
+	/**
+	 * Points an arm along {@code d} (model space) by rotating it about the shoulder: from rest (straight down, +y),
+	 * xRot = asin(d.z), zRot = atan2(-d.x, d.y); blended by {@code w} over vanilla's pose.
+	 */
+	static void aim(ModelPart arm, float w, Vec3 d) {
+		float x = (float) Math.asin(Mth.clamp(d.z, -1, 1));
+		float z = (float) Math.atan2(-d.x, d.y);
+		arm.xRot = Mth.lerp(w, arm.xRot, x);
+		arm.yRot = Mth.lerp(w, arm.yRot, 0);
+		arm.zRot = Mth.lerp(w, arm.zRot, z);
+	}
+
+	// ------------------------------------------------------------------------------------------------ whole body
+
+	/**
+	 * Whole-model rotation in the renderer (PlayerRenderer.setupRotations): the BODY_SPIN yaw spin, and lean and bank
+	 * for spinning and rotor flight. Pivots at the hips so the body tips naturally. Rendering only.
+	 */
+	public static void applyBody(Entity entity, PoseStack pose, float age) {
+		State s = STATES.get(entity.getId());
+		if (s == null || s.kind == Kind.ARM_WHIRL || s.kind == Kind.SLASH) {
+			return;
+		}
+		float w = weight(s, age);
+		// Lean into the direction of travel (relative to the facing), bank into turns; both smoothed.
+		Vec3 v = entity.getDeltaMovement();
+		double yaw = Math.toRadians(entity.getYRot());
+		double forward = -v.x * Math.sin(yaw) + v.z * Math.cos(yaw);
+		double sideways = -v.x * Math.cos(yaw) - v.z * Math.sin(yaw);
+		float turn = Mth.wrapDegrees(entity.getYRot() - entity.yRotO);
+		float targetLean = (float) Mth.clamp(forward * (s.kind == Kind.ROTOR ? 70 : 30), -12, s.kind == Kind.ROTOR ? 26 : 14);
+		float targetBank = (float) Mth.clamp(-turn * 1.6 + sideways * 40, -22, 22);
+		s.lean = Mth.lerp(0.15f, s.lean, targetLean);
+		s.bank = Mth.lerp(0.15f, s.bank, targetBank);
+		pose.translate(0, 0.9, 0);
+		if (s.kind == Kind.BODY_SPIN) {
+			pose.mulPose(Axis.YP.rotationDegrees((float) (s.spin * w)));
+		}
+		pose.mulPose(Axis.XP.rotationDegrees(-s.lean * w));
+		pose.mulPose(Axis.ZP.rotationDegrees(s.bank * w));
+		pose.translate(0, -0.9, 0);
+	}
+
+	// ------------------------------------------------------------------------------------------------ anchors
+
+	/**
+	 * Approximate world position of a hand for effect emitters: shoulder plus arm length along the same direction the
+	 * model pose uses (so trails and rotor discs follow the animated arms).
+	 */
+	public static Vec3 hand(Entity e, float partial, boolean left) {
+		State s = STATES.get(e.getId());
+		float yawDeg = Mth.rotLerp(partial, e.yRotO, e.getYRot());
+		if (s != null && s.kind == Kind.BODY_SPIN) {
+			yawDeg -= (float) s.spin;
+		}
+		double yaw = Math.toRadians(yawDeg);
+		Vec3 fwd = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw));
+		Vec3 right = new Vec3(-Math.cos(yaw), 0, -Math.sin(yaw));
+		Vec3 out = left ? right.scale(-1) : right;
+		Vec3 shoulder = e.getPosition(partial).add(0, 1.375, 0).add(out.scale(0.32));
+		if (s == null) {
+			return shoulder.add(0, -0.62, 0);
+		}
+		double ph = s.phase + (left ? Math.PI : 0);
+		Vec3 d; // body terms: forward, up, out
+		switch (s.kind) {
+			case ROTOR -> {
+				double c = Math.toRadians(32);
+				d = new Vec3(Math.sin(c) * Math.sin(ph), Math.cos(c), 0.25 + Math.sin(c) * Math.cos(ph));
+			}
+			case ARM_WHIRL -> {
+				double c = Math.toRadians(20);
+				double pitch = -Math.toRadians(e.getXRot()) * 0.5;
+				d = new Vec3(Math.cos(pitch), Math.sin(pitch) + Math.sin(c) * Math.cos(ph), Math.sin(c) * Math.sin(ph) * (left ? -1 : 1) + 0.12);
+			}
+			case BODY_SPIN -> d = new Vec3(0.25, 0.12, 0.96);
+			default -> d = new Vec3(0.55, 0.05, 0.6);
+		}
+		d = d.normalize();
+		Vec3 world = fwd.scale(d.x).add(0, d.y, 0).add(out.scale(d.z));
+		return shoulder.add(world.scale(0.68));
+	}
+}

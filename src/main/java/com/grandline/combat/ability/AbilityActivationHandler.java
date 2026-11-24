@@ -88,6 +88,15 @@ public final class AbilityActivationHandler {
 
 		double multiplier = PlayerProfileService.statRules().abilityMultiplier(profile.stats(), power.scalingStat());
 
+		if (ability.activation() == AbilityDef.Activation.HELD) {
+			// A sustained move: paid up front, then run by the server for as long as the key is held (capped).
+			if (!EnergyService.trySpend(player, ability.energyCost())) {
+				tell(player, "message.grandline.ability.no_energy");
+				return Outcome.NO_ENERGY;
+			}
+			ChargeService.begin(player, power, ability, request.slot(), multiplier);
+			return Outcome.USED;
+		}
 		boolean charges = ability.activation() == AbilityDef.Activation.CHARGED && ChargeService.charges(player, power, ability);
 		if (charges) {
 			// Energy is checked now and spent on release; the server times the charge itself.
@@ -128,7 +137,8 @@ public final class AbilityActivationHandler {
 		if (!player.isAlive()) {
 			return Outcome.NOT_ALLOWED;
 		}
-		if (!EnergyService.trySpend(player, charging.ability().energyCost())) {
+		boolean held = charging.ability().activation() == AbilityDef.Activation.HELD; // already paid on press
+		if (!held && !EnergyService.trySpend(player, charging.ability().energyCost())) {
 			tell(player, "message.grandline.ability.no_energy");
 			return Outcome.NO_ENERGY;
 		}
