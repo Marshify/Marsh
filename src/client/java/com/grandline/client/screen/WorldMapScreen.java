@@ -162,6 +162,13 @@ public final class WorldMapScreen extends Screen {
 	private static final double HOVER_RISE = 7;
 	private static final double HOVER_GROW = 0.06;
 
+	/** Eases one icon's hover progress toward hovered (1) or not (0). */
+	private void ease(long key, boolean hovered, float dt) {
+		float current = hoverProgress.getOrDefault(key, 0f);
+		current += ((hovered ? 1f : 0f) - current) * Math.min(1f, dt * 10f);
+		hoverProgress.put(key, current);
+	}
+
 	private double chartScale;
 	private double chartLeft;
 	private double chartTop;
@@ -287,10 +294,11 @@ public final class WorldMapScreen extends Screen {
 		lastFrameNanos = now;
 		Placed hoveredBox = hitTest(lastPlaced, mouseX, mouseY);
 		for (Island island : islands) {
-			float target = hoveredBox != null && hoveredBox.island().id() == island.id() ? 1f : 0f;
-			float current = hoverProgress.getOrDefault(island.id(), 0f);
-			current += (target - current) * Math.min(1f, dt * 10f);
-			hoverProgress.put(island.id(), current);
+			boolean onIsland = hoveredBox != null && hoveredBox.island().id() == island.id();
+			ease(island.id(), onIsland && !hoveredBox.upper(), dt);
+			if (com.grandline.world.UpperIsles.hosts(island)) {
+				ease(com.grandline.world.UpperIsles.id(island), onIsland && hoveredBox.upper(), dt); // the upper isles' own icon
+			}
 		}
 
 		// Layer 2: island art, drawn north to south so nearer islands overlap the ones behind them.
@@ -326,7 +334,11 @@ public final class WorldMapScreen extends Screen {
 					double uw = UPPER_ART.chartWidth(), uh = UPPER_ART.h() * us;
 					ResourceLocation upper = ClientProfileCache.discoveredId(com.grandline.world.UpperIsles.id(island))
 							? UPPER_ART.texture() : gray(UPPER_ART.texture());
-					blitCrisp(graphics, upper, ax + UPPER_DX - uw / 2, ay + UPPER_DY - uh * UPPER_ART.anchorY(), us, UPPER_ART.w(), UPPER_ART.h());
+					float ut = hoverProgress.getOrDefault(com.grandline.world.UpperIsles.id(island), 0f);
+					double ue = ut * ut * (3 - 2 * ut);
+					double ug = 1 + HOVER_GROW * ue;
+					blitCrisp(graphics, upper, ax + UPPER_DX - uw * ug / 2, ay + UPPER_DY - uh * ug * UPPER_ART.anchorY() - HOVER_RISE * ue, us * ug,
+							UPPER_ART.w(), UPPER_ART.h());
 					double ux = ax + UPPER_DX, uy = ay + UPPER_DY; // its own clickable box (creative teleport, tooltip)
 					placed.add(new Placed(island, ux, uy, screenX(ux - uw * 0.42), screenY(uy - uh * 0.4), screenX(ux + uw * 0.42),
 							screenY(uy + uh * 0.4), true));
