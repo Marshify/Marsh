@@ -36,7 +36,8 @@ public final class FxSprites {
 		double f = switch (com.grandline.client.settings.ClientSettings.get().fxDensity) {
 			case 0 -> 0.3;
 			case 1 -> 0.65;
-			default -> 1.0;
+			case 2 -> 1.0;
+			default -> 1.5; // Ultra
 		};
 		return base <= 0 ? 0 : Math.max(1, (int) Math.round(base * f));
 	}

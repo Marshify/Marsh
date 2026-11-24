@@ -101,6 +101,20 @@ public final class GrandLineSounds {
 	public static final Cue FLAME_WINGS_TRAVEL = abilityLoop("fruits.flame.ember_wings.travel", Stage.TRAVEL, 20, null, 0, 1);
 	public static final Cue FLAME_WINGS_AFTERMATH = ability("fruits.flame.ember_wings.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
 
+	// ============================================================================ Rocket (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue ROCKET_FIST_CAST = ability("fruits.rocket.missile_fist.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue ROCKET_FIST_TRAVEL = abilityLoop("fruits.rocket.missile_fist.travel", Stage.TRAVEL, 16, null, 0, 1);
+	public static final Cue ROCKET_FIST_IMPACT = ability("fruits.rocket.missile_fist.impact", Stage.IMPACT, 32, null, 0, 1);
+	public static final Cue ROCKET_STRIKE_CAST = ability("fruits.rocket.air_strike.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue ROCKET_STRIKE_TRAVEL = ability("fruits.rocket.air_strike.travel", Stage.TRAVEL, 24, null, 0, 1);
+	public static final Cue ROCKET_STRIKE_IMPACT = ability("fruits.rocket.air_strike.impact", Stage.IMPACT, 32, null, 0, 1);
+	public static final Cue ROCKET_CRASH_CHARGE = ability("fruits.rocket.rocket_crash.charge", Stage.CHARGE, 16, null, 0, 1);
+	public static final Cue ROCKET_CRASH_CAST = ability("fruits.rocket.rocket_crash.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue ROCKET_CRASH_IMPACT = ability("fruits.rocket.rocket_crash.impact", Stage.IMPACT, 40, null, 0, 1);
+	public static final Cue ROCKET_FLIGHT_CAST = ability("fruits.rocket.blast_off.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue ROCKET_FLIGHT_TRAVEL = abilityLoop("fruits.rocket.blast_off.travel", Stage.TRAVEL, 20, null, 0, 1);
+	public static final Cue ROCKET_FLIGHT_AFTERMATH = ability("fruits.rocket.blast_off.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

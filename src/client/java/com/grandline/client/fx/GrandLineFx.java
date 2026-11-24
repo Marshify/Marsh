@@ -147,7 +147,13 @@ public final class GrandLineFx {
 			return;
 		}
 		Entity caster = level.getEntity(packet.caster());
-		if (FlameFx.handles(packet.effect())) {
+		if (packet.effect().equals("flight_end")) {
+			// Flight can belong to either fruit: both let their own flight effect fade.
+			FlameFx.handle(packet, level, caster, own);
+			RocketFx.handle(packet, level, caster, own);
+		} else if (RocketFx.handles(packet.effect())) {
+			RocketFx.handle(packet, level, caster, own);
+		} else if (FlameFx.handles(packet.effect())) {
 			FlameFx.handle(packet, level, caster, own);
 		} else if (packet.effect().startsWith("fishing_")) {
 			// Fishing poses: the cast whip, holding the rod out while reeling, back to normal at the end.

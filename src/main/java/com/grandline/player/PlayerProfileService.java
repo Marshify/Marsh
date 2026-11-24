@@ -101,7 +101,7 @@ public final class PlayerProfileService {
 		int now = rules.level(after.powers().masteryXp(id));
 		if (now > before) {
 			for (AbilityDef ability : power.abilities()) {
-				if (ability.requiredMastery() > before && ability.requiredMastery() <= now) {
+				if (!ability.isEmpty() && ability.requiredMastery() > before && ability.requiredMastery() <= now) {
 					player.sendSystemMessage(Component.translatable("message.grandline.ability.unlocked",
 							Component.translatable(ability.translationKey()), Component.translatable(power.translationKey()))
 							.withStyle(ChatFormatting.LIGHT_PURPLE));

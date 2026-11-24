@@ -19,7 +19,7 @@ public final class ClientSettings {
 
 	/** Show move effects cast by other players. */
 	public boolean allyVfx = true;
-	/** Move-effect density: 0 low, 1 medium, 2 high. Secondary sparks, embers and smoke scale; core shapes always show. */
+	/** Move-effect quality preset: 0 low, 1 medium, 2 high, 3 ultra. Secondary sparks, embers and smoke scale; core shapes always show. */
 	public int fxDensity = 2;
 	/** Grand Line action camera (third-person back view): on by default. */
 	public boolean customCamera = true;

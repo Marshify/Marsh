@@ -60,6 +60,9 @@ public final class FruitItem extends Item {
 			String[] keys = {"Z", "X", "C", "V", "F"};
 			for (int i = 0; i < power.abilities().size(); i++) {
 				AbilityDef ability = power.abilities().get(i);
+				if (ability.isEmpty()) {
+					continue;
+				}
 				tooltip.add(Component.literal("[" + keys[i] + "] ").withStyle(ChatFormatting.GOLD)
 						.append(Component.translatable(ability.translationKey()).withStyle(ChatFormatting.WHITE))
 						.append(Component.literal("  ★" + ability.requiredMastery()).withStyle(ChatFormatting.YELLOW)));

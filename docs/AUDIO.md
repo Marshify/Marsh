@@ -123,6 +123,24 @@ How they were made:
 - **Checked in the game:** every cue played its own file at its beat, and the heaviest moment in the recorded mix peaked at −1.7 dB. The Nova aftermath plays at 70% under the impact to keep that headroom.
 - **Approved** by ear by the owner. Pyre Ring's aftermath was regenerated once (the second option was chosen).
 
+## Rocket cues (0.75.0)
+
+All 12 Rocket cues have their own audio:
+
+| Move | Cues |
+|---|---|
+| Missile Fist | cast, travel (loop), impact |
+| Air Strike | cast, travel (the dive whistle), impact |
+| Rocket Crash | charge, cast, impact |
+| Blast Off | cast, travel (loop), aftermath |
+
+How they were made:
+- **Generated** with ElevenLabs Sound Effects (`eleven_text_to_sound_v2`): 10 single takes, about 170 credits.
+- **Reused:** Air Strike's impact is the Missile Fist impact at a lower level. Blast Off's cast is the Rocket Crash launch.
+- **Converted** to mono OGG.
+- **Levelled:** impacts −13/−14 LUFS, casts −15, the dive −18, charge −19, loops and aftermath −20, with a −1.5 dBTP limiter.
+- **Checked in game:** played at their beats in the dev client. Not yet approved by ear by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

@@ -60,7 +60,7 @@ public final class SettingsScreen extends Screen {
 				net.minecraft.client.Minecraft.getInstance().levelRenderer.allChanged(); // re-light every chunk
 			}
 		}));
-		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v));
+		rows.add(new Choice("fx_density", () -> s.fxDensity, v -> s.fxDensity = v, new String[]{"low", "medium", "high", "ultra"}));
 		rows.add("screen.grandline.settings.section.camera");
 		rows.add(new Toggle("custom_camera", () -> s.customCamera, v -> s.customCamera = v));
 		rows.add(new Choice("camera_distance", () -> s.cameraDistance, v -> s.cameraDistance = v, new String[]{"near", "medium", "far"}));

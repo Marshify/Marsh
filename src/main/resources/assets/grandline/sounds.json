@@ -183,6 +183,102 @@
       }
     ]
   },
+  "fruits.rocket.air_strike.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/air_strike/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.rocket.air_strike.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/air_strike/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.rocket.air_strike.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/air_strike/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.rocket.blast_off.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/blast_off/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.rocket.blast_off.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/blast_off/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.rocket.blast_off.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/blast_off/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.rocket.missile_fist.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/missile_fist/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.rocket.missile_fist.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/missile_fist/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.rocket.missile_fist.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/missile_fist/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.rocket.rocket_crash.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/rocket_crash/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.rocket.rocket_crash.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/rocket_crash/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.rocket.rocket_crash.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/rocket/rocket_crash/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "music.boss.final": {
     "sounds": [
       {

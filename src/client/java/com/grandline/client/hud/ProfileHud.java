@@ -194,7 +194,7 @@ public final class ProfileHud {
 		int right = graphics.guiWidth() - 6, bottom = graphics.guiHeight() - 6;
 		int width = Math.max(80, Math.min(128, (int) ((graphics.guiWidth() / 2 - 91 - 12) / scale)));
 		int rowHeight = 12;
-		int movesHeight = rowHeight * power.abilities().size();
+		int movesHeight = rowHeight * (int) power.abilities().stream().filter(a -> !a.isEmpty()).count();
 		int movesTop = -movesHeight;
 		int titleTop = movesTop - 13;
 		int barTop = titleTop - 4;
@@ -225,9 +225,12 @@ public final class ProfileHud {
 		Component switchHint = Component.literal("[" + GrandLineKeys.SWITCH_POWER.getTranslatedKeyMessage().getString() + "]");
 		graphics.drawString(font, switchHint, x + width - font.width(switchHint) - 2, titleTop + 2, 0xFFA9BCD3);
 
-		for (int slot = 0; slot < power.abilities().size(); slot++) {
+		for (int slot = 0, row = 0; slot < power.abilities().size(); slot++) {
 			AbilityDef ability = power.abilities().get(slot);
-			int y = movesTop + slot * rowHeight;
+			if (ability.isEmpty()) {
+				continue;
+			}
+			int y = movesTop + row++ * rowHeight;
 			boolean unlocked = masteryLevel >= ability.requiredMastery();
 			int cooldown = ClientProfileCache.remainingCooldownTicks(power.abilityId(ability));
 

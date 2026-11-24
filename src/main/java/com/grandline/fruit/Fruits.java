@@ -34,13 +34,8 @@ public final class Fruits {
 	private static final Map<ResourceLocation, FruitDef> FRUITS = new LinkedHashMap<>();
 	// ===== Roster: one fruit per approved icon. Renamed ids are migrated by FruitRenames. =====
 
-	public static final FruitDef ROCKET = register("rocket", FruitRarity.COMMON, Element.EXPLOSION, 0xD94A3A,
-			FruitMoves.bolt(Element.EXPLOSION, 16, 1.2, 6f),
-			FruitMoves.burst(Element.EXPLOSION, 4.5, 7f),
-			FruitMoves.eruption(Element.EXPLOSION, 16, 4, 10f, 0.9),
-			FruitMoves.lingering(Element.EXPLOSION, 16, 4, 8f, 3f, 4),
-			FruitMoves.dash(Element.EXPLOSION, 2.4, 4f),
-			"rocket_missile", "rocket_thruster", "rocket_warhead", "rocket_barrage", "rocket_afterburner");
+	/** Rocket: its own moves, visuals and sounds (see fruit/rocket/RocketMoves and the client's RocketFx). */
+	public static final FruitDef ROCKET = register("rocket", FruitRarity.COMMON, 0xD94A3A, com.grandline.fruit.rocket.RocketMoves.moves());
 
 	/** Spin (formerly "gale", migrated by FruitRenames). */
 	public static final FruitDef SPIN = register("spin", FruitRarity.COMMON, Element.WIND, 0x9BD13A,

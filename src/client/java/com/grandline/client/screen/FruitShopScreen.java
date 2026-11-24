@@ -128,9 +128,12 @@ public final class FruitShopScreen extends Screen {
 			}
 
 			int mx = left + panelWidth - 70;
-			for (int m = 0; m < fruit.power().abilities().size(); m++) {
+			for (int m = 0, row = 0; m < fruit.power().abilities().size(); m++) {
 				AbilityDef ability = fruit.power().abilities().get(m);
-				int my = y + 2 + m * 9;
+				if (ability.isEmpty()) {
+					continue;
+				}
+				int my = y + 2 + row++ * 9;
 				graphics.fill(mx, my, mx + 9, my + 8, 0xFF3A3F4A);
 				graphics.drawString(font, KEYS[m], mx + 2, my, 0xFFFFFF);
 				graphics.drawString(font, "★ " + ability.requiredMastery(), mx + 13, my, 0xFFD24B);

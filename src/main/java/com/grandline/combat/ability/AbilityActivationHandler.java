@@ -61,7 +61,7 @@ public final class AbilityActivationHandler {
 			return Outcome.NO_POWER;
 		}
 
-		if (request.slot() >= power.abilities().size()) {
+		if (request.slot() >= power.abilities().size() || power.abilities().get(request.slot()).isEmpty()) {
 			ServerRequestGuard.reject(player, AbilityActivationRequestPayload.TYPE, ServerRequestGuard.Result.REJECTED_INVALID);
 			return Outcome.INVALID_SLOT;
 		}
