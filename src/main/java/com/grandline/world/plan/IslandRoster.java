@@ -130,6 +130,15 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		if (plan instanceof FrostpeakIsle) {
 			return IslandRosters.FROSTPEAK;
 		}
+		if (plan != null && plan.getClass() == LotusPalace.class) { // not the layout-17 interim build (LotusPalaceV17)
+			return IslandRosters.LOTUS;
+		}
+		if (plan instanceof CrystalFountain) {
+			return IslandRosters.CRYSTAL;
+		}
+		if (plan instanceof DawnreachHarbor) {
+			return IslandRosters.DAWNREACH;
+		}
 		if (plan instanceof EmberfallIsle) {
 			return IslandRosters.EMBERFALL;
 		}

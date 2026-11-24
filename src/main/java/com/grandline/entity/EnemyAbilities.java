@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public final class EnemyAbilities {
 	/** Chance to spawn with Aura, by look. */
-	public static final Map<String, Double> AURA_CHANCE = Map.of("ashguard_trooper", 0.5, "cinder_infiltrator", 1.0);
+	public static final Map<String, Double> AURA_CHANCE = Map.of("ashguard_trooper", 0.5, "cinder_infiltrator", 1.0, "steelcrest_captain", 1.0);
 	public static final Set<String> FLASH_STEP = Set.of("cinder_infiltrator");
 	public static final Set<String> MAGMA = Set.of("emberfall_marshal");
 	public static final double AURA_DAMAGE = 0.25;

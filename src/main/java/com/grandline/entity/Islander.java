@@ -74,7 +74,13 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Removes the player's Devil Fruit for a fee (Stonewall Prison). */
 		FRUIT_REMOVER,
 		/** Explains the Second Sea's requirement (Stonewall Prison; talk only). */
-		MILITARY_DETECTIVE;
+		MILITARY_DETECTIVE,
+		/** Lotus Palace (talk only until the Water Kung Fu style exists). */
+		WATER_KUNG_FU_TEACHER,
+		/** Dawnreach Harbor (talk only until Aura customization exists). */
+		AURA_EDITOR,
+		/** Dawnreach Harbor (talk only until the Dark Blade upgrade exists). */
+		DARK_BLADE_SMITH;
 
 		public static Role byId(int id) {
 			Role[] values = values();

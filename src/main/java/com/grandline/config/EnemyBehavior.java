@@ -31,7 +31,7 @@ public final class EnemyBehavior {
 		trainee.pursuitRadius = 12;
 		map.put("marine_trainee", trainee);
 		// Island looks (GrandLineEnemy.skin) with their own leash: short enough never to reach a bridge, gate or harbour.
-		for (String skin : new String[]{"canopy_primate", "ironback", "redcoat_raider", "dock_enforcer", "dune_prowler", "sandwatch_captain", "frost_rover", "rime_construct", "harbor_sentinel", "cloudstep_raider", "duskwarden", "stonewall_inmate", "high_security_inmate", "ashguard_trooper", "cinder_infiltrator"}) {
+		for (String skin : new String[]{"canopy_primate", "ironback", "redcoat_raider", "dock_enforcer", "dune_prowler", "sandwatch_captain", "frost_rover", "rime_construct", "harbor_sentinel", "cloudstep_raider", "duskwarden", "stonewall_inmate", "high_security_inmate", "ashguard_trooper", "cinder_infiltrator", "tideborn_bladesman", "abyssal_guard", "steelcrest_raider", "steelcrest_captain"}) {
 			EnemyBehavior b = new EnemyBehavior();
 			b.pursuitRadius = 12;
 			map.put(skin, b);
@@ -52,7 +52,7 @@ public final class EnemyBehavior {
 			b.pursuitRadius = 10;
 			map.put(skin, b);
 		}
-		for (String skin : new String[]{"iron_jailer", "emerald_overseer", "rose_baron", "emberfall_marshal"}) { // Stonewall's bosses keep to their own ground
+		for (String skin : new String[]{"iron_jailer", "emerald_overseer", "rose_baron", "emberfall_marshal", "deepcourt_sovereign", "ironvolt"}) { // Stonewall's bosses keep to their own ground
 			EnemyBehavior b = new EnemyBehavior();
 			b.aggressionRadius = 5;
 			b.idleRadius = 2;

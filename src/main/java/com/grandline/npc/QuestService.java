@@ -228,7 +228,8 @@ public final class QuestService {
 		// temple's secret boss is never a quest boss.
 		Island questIsland = IslandRegistry.get(player.server).byName(quest.islandName());
 		if (enemy instanceof com.grandline.entity.SaberBoss
-				|| (questIsland != null && com.grandline.world.plan.IslandRoster.of(questIsland) != null && enemy.islandId() != questIsland.id())) {
+				|| (questIsland != null && com.grandline.world.plan.IslandRoster.of(questIsland) != null
+						&& !com.grandline.world.plan.IslandRoster.of(questIsland).groups().isEmpty() && enemy.islandId() != questIsland.id())) {
 			return;
 		}
 		QuestState updated = quest.withProgress(quest.progress() + 1);

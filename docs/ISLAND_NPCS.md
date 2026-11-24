@@ -1,4 +1,4 @@
-# Island NPC rosters (0.72.0)
+# Island NPC rosters (0.74.0)
 
 Islands with a fixed population (`IslandRoster`, enforced by `RosterNpcs`): Millbrook, Ironhold, Verdant Wilds,
 Saltmarket Docks, Sunscorch Dunes, Frostpeak Isle (their rebuilt layouts; older layouts keep their old NPCs).
@@ -18,6 +18,11 @@ spot and respawn timer, spawns on the island's ground, and has a 12-block leash;
 
 | Stonewall Prison | 5 Stonewall Inmate (190, 9 s, outer enclosure west), 5 High Security Inmate (210, 12 s, east), Iron Jailer (220, 4 min) and Emerald Overseer (230, 10 min) in the central courtyard, Rose Baron (240, 30 min, central tower) | Jail Keeper (inmate quests), Head Jailer (boss quests), Military Detective (Second Sea Lv 700 info), Fruit Removal NPC (50,000), Boat Dealer | 8 + 8 inmates (190, 210); Iron Jailer (220), Emerald Overseer (230), Rose Baron (240) |
 | Gladiator's Ring | 5 Arena Vanguard (250, 20 s, west grounds), 5 Gilt Champion (275, 20 s, east grounds); arena free; no boss | Arena Quest Giver, Boat Dealer, Luxury Boat Dealer, Set Home Point | 7 Vanguards (250), 8 Champions (275) |
+
+| Emberfall Isle | 5 Ashguard Trooper (300, 20 s, 50% Aura), 4 Cinder Infiltrator (325, 25 s, Aura, Flash Step), Emberfall Marshal (350, 8 min, magma moves) | Mayor, Ability Teacher, Living Skeleton (Soul Cane), Set Home Point | 7 / 8 / Marshal (300, 325, 350) |
+| Lotus Palace | 7 Tideborn Bladesman (375, 30 s, west), 6 Abyssal Guard (400, 20 s, east), Deepcourt Sovereign (425, 8 min, throne) | King Neptune, Water Kung Fu Teacher*; surface: Fisherman, Set Home Point | 8 / 7 / Sovereign (375, 400, 425) |
+| Crystal Fountain | 6 Steelcrest Raider (625, 16 s, outer level by the gate), 8 Steelcrest Captain (650, 20 s, Aura, inner ring), Ironvolt (675, 12 min, central court) | City Quest Giver, Boat Dealer, Set Home Point | 8 / 9 / Ironvolt (625, 650, 675) |
+| Dawnreach Harbor | none (safe hub) | Fruit Dealer, Fruit Gacha Dealer, Weapon Dealer, Sword Dealer, Experienced Captain (Second Sea, Lv 700), Boat Dealer, Luxury Boat Dealer, Set Home Point, Aura Editor*, Dark Blade Upgrade*, Race Mystic (kept) | none |
 
 \* talk only for now. Not added (no such feature yet): Rich Man, Sick Man. Removed: Saltmarket's Trial Keeper and Fruit
 Dealer, the islands' Fishermen. Verdant's Saber Warden is the Crimson Duelist there (unchanged rules; its skin is

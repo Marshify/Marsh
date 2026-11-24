@@ -169,18 +169,15 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 
 	private static Island island(GameTestHelper helper, String name) {
 		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
-		if (registry.byName(name) != null) {
-			return registry.byName(name); // the test world may hold another island at the island's current spot (layout 19 swap)
+		// An island this test once registered at Dawnreach's spot (id 0) would change the NPC tests that use id 0.
+		registry.removeIf(is -> is.id() == 0 && is.name().equals("Dawnreach Harbor"));
+		Island byName = registry.byName(name);
+		if (byName != null) {
+			return byName;
 		}
 		SeaLayout.Spec spec = SeaLayout.all().stream().filter(sp -> sp.name().equals(name)).findFirst().orElseThrow();
-		long id = SeaLayout.idOf(spec);
-		if (registry.get(id) == null) {
-			registry.add(new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name()));
-		}
-		Island found = registry.get(id);
-		// Another island registered at this spot (the test world predates the layout-19 swap): an unregistered stand-in.
-		return found != null && found.name().equals(name) ? found
-				: new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name());
+		// Never registered: an unregistered stand-in, so other tests see the test world as it was.
+		return new Island(SeaLayout.idOf(spec), spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name());
 	}
 
 	/** Counts per group (kind/skin), friendly roles, quests and leashes of Verdant Wilds, Saltmarket Docks and Sunscorch Dunes. */
@@ -201,6 +198,9 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 			check(helper, "Stonewall Prison", new int[]{5, 5, 1, 1, 1}, new String[]{"stonewall_inmate", "high_security_inmate", "iron_jailer", "emerald_overseer", "rose_baron"}, 5, new int[]{8, 8, 1, 1, 1});
 			check(helper, "Gladiator's Ring", new int[]{5, 5}, new String[]{"arena_vanguard", "gilt_champion"}, 4, new int[]{7, 8});
 			check(helper, "Emberfall Isle", new int[]{5, 4, 1}, new String[]{"ashguard_trooper", "cinder_infiltrator", "emberfall_marshal"}, 4, new int[]{7, 8, 1});
+			check(helper, "Lotus Palace", new int[]{7, 6, 1}, new String[]{"tideborn_bladesman", "abyssal_guard", "deepcourt_sovereign"}, 4, new int[]{8, 7, 1});
+			check(helper, "Crystal Fountain", new int[]{6, 8, 1}, new String[]{"steelcrest_raider", "steelcrest_captain", "ironvolt"}, 3, new int[]{8, 9, 1});
+			check(helper, "Dawnreach Harbor", new int[]{}, new String[]{}, 11, new int[]{});
 			check(helper, "Frostpeak Isle", new int[]{6, 4, 1}, new String[]{"frost_rover", "rime_construct", "glacier_maw"}, 5, new int[]{7, 8, 1});
 			var salt = com.grandline.world.plan.IslandRoster.of(island(helper, "Saltmarket Docks"));
 			helper.assertTrue(salt.groups().get(2).respawnTicks() == 300 * 20 && salt.groups().get(0).respawnTicks() == 15 * 20, "Saltmarket respawn times");

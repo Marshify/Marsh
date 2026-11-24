@@ -204,4 +204,57 @@ final class IslandRosters {
 					new IslandRoster.Slot("INNKEEPER", 6, EmberfallIsle.G + 1, 68, 90)),           // Set Home Point, by the dock road
 			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 300), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 325),
 					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 350)));
+
+	/**
+	 * Lotus Palace: in the sunken city's dry air pocket, Tideborn Bladesmen on the west side, Abyssal Guards on the east,
+	 * the Deepcourt Sovereign before the throne. King Neptune and the Water Kung Fu Teacher below; the surface islets keep
+	 * the Fisherman and the Set Home Point.
+	 */
+	static final IslandRoster LOTUS = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "tideborn_bladesman", 375, 375, seconds(30),
+					atY(LotusPalace.G + 1, -56, -102, -48, -94, -62, -90, -50, -112, -66, -104, -58, -80, -42, -104)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "abyssal_guard", 400, 400, seconds(20),
+					atY(LotusPalace.G + 1, 56, -102, 48, -94, 62, -90, 50, -112, 66, -104, 42, -104)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "deepcourt_sovereign", 425, 425, seconds(480),
+					atY(LotusPalace.FLOOR + 3, 0, LotusPalace.PZ - 13))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", -30, LotusPalace.G + 1, -90, 90),         // King Neptune, before the west corals
+					new IslandRoster.Slot("WATER_KUNG_FU_TEACHER", 25, LotusPalace.G + 1, LotusPalace.PZ - 43, 180), // the rear-right tower
+					new IslandRoster.Slot("FISHERMAN", 0, LotusPalace.SEA + 1, -12, 0),             // surface: the islet's jetty
+					new IslandRoster.Slot("INNKEEPER", -4, -27, 0)),                                // surface: Set Home Point by the arrival
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 8, 375), new IslandRoster.Quest(EnemyKind.RAIDER, 7, 400),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 425)));
+
+	/**
+	 * Crystal Fountain: Steelcrest Raiders on the outer level by the south gate, Steelcrest Captains (Aura) in the north
+	 * of the inner ring, Ironvolt on the central court by the fountain.
+	 */
+	static final IslandRoster CRYSTAL = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "steelcrest_raider", 625, 625, 16 * 20,
+					atY(CrystalFountain.G_OUT + 1, -11, 126, 4, 139, -20, 130, 0, 130, -4, 122, -19, 122)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "steelcrest_captain", 650, 650, seconds(20),
+					atY(CrystalFountain.G_IN + 1, 0, -49, -10, -50, 10, -48, 0, -58, -7, -41, -22, -47, 22, -47, -9, -62)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "ironvolt", 675, 675, seconds(720), atY(CrystalFountain.G_CT + 1, 0, -30))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", -8, CrystalFountain.G_OUT + 1, 140, 0),    // City Quest Giver, left of the gate
+					new IslandRoster.Slot("BOAT_DEALER", -20, CrystalFountain.PLAZA_Y + 1, 180, 0),  // the harbour plaza
+					new IslandRoster.Slot("INNKEEPER", 20, CrystalFountain.PLAZA_Y + 1, 170, 0)),    // Set Home Point, before the gate
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 8, 625), new IslandRoster.Quest(EnemyKind.RAIDER, 9, 650),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 675)));
+
+	/** Dawnreach Harbor: the First Sea's hub, a safe zone with no enemies; every service at its own spot. */
+	static final IslandRoster DAWNREACH = new IslandRoster(List.of(),
+			island -> List.of(
+					new IslandRoster.Slot("FRUIT_DEALER", -7 + DawnreachHarbor.OX, DawnreachHarbor.WALK, -26, 0),
+					new IslandRoster.Slot("GACHA", DawnreachHarbor.CART_X + DawnreachHarbor.OX, DawnreachHarbor.WALK, DawnreachHarbor.CART_Z, 90),
+					new IslandRoster.Slot("GUNSMITH", -9 + DawnreachHarbor.OX, DawnreachHarbor.WALK, -7, -45),    // Weapon Dealer
+					new IslandRoster.Slot("SWORDSMITH", -42, 26, -90),                                             // by the south-west shops
+					new IslandRoster.Slot("NAVIGATOR", -46 + DawnreachHarbor.OX, DawnreachHarbor.WALK, -4, 90),  // Experienced Captain
+					new IslandRoster.Slot("BOAT_DEALER", -62, 10, 90),                                             // the west piers
+					new IslandRoster.Slot("LUXURY_BOAT_DEALER", 62, -10, -90),                                     // the east piers
+					new IslandRoster.Slot("INNKEEPER", -10, 10, 180),                                              // Set Home Point, by the fountain
+					new IslandRoster.Slot("AURA_EDITOR", 40, -30, 180),                                            // among the north-east houses
+					new IslandRoster.Slot("DARK_BLADE_SMITH", -9, -12, 180),                                       // at the cyan-roofed house
+					new IslandRoster.Slot("RACE_MYSTIC", -30, 12, 180)),                                           // kept: race evolution
+			List.of());
 }

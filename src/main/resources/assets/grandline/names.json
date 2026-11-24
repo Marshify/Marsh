@@ -94,6 +94,27 @@
       "Ability Master": "Ability Teacher",
       "Swordsmith": "Living Skeleton",
       "Innkeeper": "Set Home Point"
+    },
+    "Lotus Palace": {
+      "Bandit": "Tideborn Bladesman",
+      "Raider": "Abyssal Guard",
+      "Island Captain": "Deepcourt Sovereign",
+      "Quest Giver": "King Neptune",
+      "Innkeeper": "Set Home Point"
+    },
+    "Crystal Fountain": {
+      "Bandit": "Steelcrest Raider",
+      "Raider": "Steelcrest Captain",
+      "Island Captain": "Ironvolt",
+      "Quest Giver": "City Quest Giver",
+      "Innkeeper": "Set Home Point"
+    },
+    "Dawnreach Harbor": {
+      "Gunsmith": "Weapon Dealer",
+      "Swordsmith": "Sword Dealer",
+      "Navigator": "Experienced Captain",
+      "Innkeeper": "Set Home Point",
+      "Fruit Gacha": "Fruit Gacha Dealer"
     }
   }
 }
