@@ -47,12 +47,11 @@ public final class GrandLineHarbourGameTests implements FabricGameTest {
 		}
 		helper.assertTrue(t.ground(0, 130) < Terrain.WATER_TOP, "open sea beyond the piers");
 		Anchor quest = one(plan, Anchor.Type.QUEST), home = one(plan, Anchor.Type.HOME), boss = one(plan, Anchor.Type.BOSS_ARENA);
-		Anchor arrival = one(plan, Anchor.Type.ARRIVAL), fisher = one(plan, Anchor.Type.FISHERMAN);
+		Anchor arrival = one(plan, Anchor.Type.ARRIVAL);
 		List<Anchor> camps = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList();
-		helper.assertTrue(quest.y() == 68 && Math.abs(quest.x()) < 20 && quest.z() > 0 && quest.z() < 31, "the quest giver stands in the plaza");
-		helper.assertTrue(home.y() == 68 && Math.abs(home.x()) < 20, "the innkeeper is at the hall's veranda");
+		helper.assertTrue(quest.y() == 68 && Math.abs(quest.x()) < 20 && quest.z() < 0 && quest.z() > -36, "the Pirate Adventurer stands inside the landward gate");
+		helper.assertTrue(home.y() == 68 && Math.abs(home.x()) < 20 && home.z() > 40, "the Set Home Point is inside the harbour gate");
 		helper.assertTrue(arrival.y() == 65 && arrival.z() >= 52 && arrival.z() <= 66, "players arrive on the promenade");
-		helper.assertTrue(fisher.z() > 100, "the fisherman is out at the end of the long pier");
 		helper.assertTrue(camps.size() == 2 && camps.stream().allMatch(c -> c.z() < -60), "both camps are in the wilderness behind the town");
 		helper.assertTrue(boss.z() < -100, "the boss stands at the far end of the stronger camp");
 		for (Anchor camp : camps) {

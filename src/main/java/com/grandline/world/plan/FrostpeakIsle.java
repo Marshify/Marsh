@@ -54,14 +54,14 @@ public final class FrostpeakIsle extends BasePlan {
 				.flat(ARENA_X, ARENA_Z, 25, 24, ARENA, 1, null)          // arena plateau
 				.shoreMix(s(Blocks.STONE), s(Blocks.TUFF), s(Blocks.COBBLED_DEEPSLATE), s(Blocks.GRAVEL), s(Blocks.ANDESITE))
 				.reach(96);
-		anchor(Anchor.at(Type.QUEST, 22, VILLAGE + 1, -1, 0));
-		anchor(Anchor.at(Type.HOME, 16, VILLAGE + 1, -7, 180));
+		// NPCs and enemies follow IslandRosters.FROSTPEAK; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.at(Type.QUEST, 8, VILLAGE + 1, 12, 180));                    // the Villager
+		anchor(Anchor.at(Type.HOME, 14, VILLAGE + 1, -2, 180));                    // Set Home Point, at the village entrance
 		anchor(new Anchor(Type.ARRIVAL, -7, DOCK + 1, 47, 0, 180));
-		anchor(Anchor.at(Type.FISHERMAN, -14, DOCK + 1, 62, 0));
 		anchor(Anchor.at(Type.DOCK, 4, 63, 58));
-		anchor(new Anchor(Type.ENEMY_CAMP, ARENA_X, ARENA + 1, ARENA_Z, 12));   // the frozen arena (basic)
-		anchor(Anchor.area(Type.ENEMY_CAMP, 18, -44, 8));                       // northern wilderness (stronger)
-		anchor(Anchor.at(Type.BOSS_ARENA, 0, CAVE_FLOOR + 1, 8));               // the ice cavern
+		anchor(new Anchor(Type.ENEMY_CAMP, 40, VILLAGE + 1, -14, 12));          // Frost Rovers: the village's north-east
+		anchor(new Anchor(Type.ENEMY_CAMP, ARENA_X, ARENA + 1, ARENA_Z, 12));   // Rime Constructs: the frozen arena
+		anchor(Anchor.area(Type.BOSS_ARENA, 20, -46, 4));                       // Glacier Maw: the northern ridge
 	}
 
 	// ==================================================================================================== helpers

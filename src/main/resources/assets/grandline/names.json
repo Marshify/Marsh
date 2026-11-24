@@ -21,6 +21,37 @@
       "Boat Dealer": "Marine Boat Dealer",
       "Luxury Boat Dealer": "Advanced Marine Boat Dealer",
       "Innkeeper": "Set Home Point"
+    },
+    "Verdant Wilds": {
+      "Bandit": "Canopy Primate",
+      "Raider": "Ironback",
+      "Island Captain": "Crownback",
+      "Saber Warden": "Crimson Duelist",
+      "Quest Giver": "Adventurer"
+    },
+    "Saltmarket Docks": {
+      "Bandit": "Redcoat Raider",
+      "Raider": "Dock Enforcer",
+      "Island Captain": "Galley Master",
+      "Quest Giver": "Pirate Adventurer",
+      "Swordsmith": "Sword Dealer of the West",
+      "Innkeeper": "Set Home Point"
+    },
+    "Sunscorch Dunes": {
+      "Bandit": "Dune Prowler",
+      "Raider": "Sandwatch Captain",
+      "Quest Giver": "Desert Adventurer",
+      "Innkeeper": "Set Home Point",
+      "Accessory Dealer": "Guy"
+    },
+    "Frostpeak Isle": {
+      "Bandit": "Frost Rover",
+      "Raider": "Rime Construct",
+      "Island Captain": "Glacier Maw",
+      "Quest Giver": "Villager",
+      "Swordsmith": "Sword Dealer of the East",
+      "Innkeeper": "Set Home Point",
+      "Ability Master": "Ability Teacher"
     }
   }
 }

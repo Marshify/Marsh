@@ -165,7 +165,8 @@ public class SaberBoss extends GrandLineEnemy {
 
 	@Override
 	protected void updateName() {
-		setCustomName(Component.translatable("entity.grandline.saber_boss").append(" [Lv. " + grandLineLevel() + "]"));
+		setCustomName(com.grandline.names.GrandLineNames.npc("entity.grandline.saber_boss", com.grandline.names.GrandLineNames.islandNameOf(islandId()))
+				.append(" [Lv. " + grandLineLevel() + "]")); // its island's name for it (names.json: Verdant Wilds' Crimson Duelist)
 		setCustomNameVisible(true);
 		bossBar.setName(getDisplayName());
 	}

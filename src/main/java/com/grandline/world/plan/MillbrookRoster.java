@@ -11,13 +11,15 @@ import java.util.List;
  * exactly this roster in new and existing worlds.
  */
 public final class MillbrookRoster {
-	/** Five Bandits per field, spread out, clear of the dummies, boulders, tent, fire and wagon. */
-	public static final List<IslandRoster.Spot> BANDITS = List.of(
-			new IslandRoster.Spot(41, -1, 0), new IslandRoster.Spot(46, -6, 0), new IslandRoster.Spot(51, -1, 0), new IslandRoster.Spot(47, 4, 0), new IslandRoster.Spot(42, 5, 0),
-			new IslandRoster.Spot(42, 29, 1), new IslandRoster.Spot(46, 23, 1), new IslandRoster.Spot(47, 29, 1), new IslandRoster.Spot(52, 33, 1), new IslandRoster.Spot(42, 34, 1));
+	/** Five Bandits per field (spots 0-4 the training meadow, 5-9 the bandit camp), clear of the props. */
+	public static final List<int[]> BANDITS = List.of(
+			new int[]{41, -1}, new int[]{46, -6}, new int[]{51, -1}, new int[]{47, 4}, new int[]{42, 5},
+			new int[]{42, 29}, new int[]{46, 23}, new int[]{47, 29}, new int[]{52, 33}, new int[]{42, 34});
 
-	/** Ten Bandits (Lv 1-2) in two fields; the quest asks for five. */
-	public static final IslandRoster ROSTER = new IslandRoster(com.grandline.entity.EnemyKind.BANDIT, 1, 2, 5, BANDITS, MillbrookRoster::slots);
+	/** Ten Bandits (Lv 1-2) in two fields, back 8 s after they fall; the quest asks for five. */
+	public static final IslandRoster ROSTER = new IslandRoster(
+			List.of(new IslandRoster.Group(com.grandline.entity.EnemyKind.BANDIT, "", 1, 2, IslandRoster.seconds(8), BANDITS)),
+			MillbrookRoster::slots, List.of(new IslandRoster.Quest(com.grandline.entity.EnemyKind.BANDIT, 5, 1)));
 
 	private MillbrookRoster() {
 	}

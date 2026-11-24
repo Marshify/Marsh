@@ -38,6 +38,8 @@ public final class NpcScreens {
 			case BOAT_DEALER, LUXURY_BOAT_DEALER -> boatDealer(data);
 			case MARINE_RECRUITER -> recruiter(data, true);
 			case PIRATE_RECRUITER -> recruiter(data, false);
+			case DARK_STEP_TEACHER, BLACKSMITH, DESERT_MERCHANT -> talker(data);
+			case ACCESSORY_DEALER -> accessoryDealer(data);
 		});
 	}
 
@@ -56,6 +58,18 @@ public final class NpcScreens {
 					.withStyle(ChatFormatting.YELLOW));
 			options.add(DialogScreen.Option.of(Component.translatable("npc.grandline.quest.abandon"),
 					() -> send(data, NpcActionPayload.ABANDON_QUEST)));
+		} else if (!data.rosterOffers().isEmpty()) {
+			int level = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
+			for (int i = 0; i < data.rosterOffers().size(); i++) {
+				QuestState q = data.rosterOffers().get(i);
+				int need = data.rosterLevels().get(i);
+				int action = NpcActionPayload.ACCEPT_ROSTER + i;
+				Component label = level < need
+						? Component.translatable("npc.grandline.quest.locked", quest(q), need).withStyle(ChatFormatting.GRAY)
+						: Component.translatable("npc.grandline.quest.accept", quest(q), q.rewardExperience(), q.rewardCurrency())
+								.withStyle(q.boss() ? ChatFormatting.RED : ChatFormatting.RESET);
+				options.add(DialogScreen.Option.of(label, () -> send(data, action)));
+			}
 		} else {
 			data.questOffer().ifPresent(q -> options.add(DialogScreen.Option.of(
 					Component.translatable("npc.grandline.quest.accept", quest(q), q.rewardExperience(), q.rewardCurrency()),
@@ -201,6 +215,32 @@ public final class NpcScreens {
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
 		String role = luxury ? "luxury_boat_dealer" : "boat_dealer";
 		return new DialogScreen(title(data, "entity.grandline.islander." + role), List.of(Component.translatable("npc.grandline." + role + ".greeting")), options);
+	}
+
+	/** An NPC with something to say and nothing to sell yet. */
+	private static DialogScreen talker(OpenNpcPayload data) {
+		String role = com.grandline.entity.Islander.Role.byId(data.role()).name().toLowerCase(java.util.Locale.ROOT);
+		return new DialogScreen(title(data, "entity.grandline.islander." + role),
+				List.of(Component.translatable("npc.grandline." + role + ".greeting")),
+				List.of(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
+	}
+
+	/** The accessory dealer: each item with its price, or Owned. */
+	private static DialogScreen accessoryDealer(OpenNpcPayload data) {
+		java.text.NumberFormat numbers = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT);
+		List<DialogScreen.Option> options = new ArrayList<>();
+		for (int i = 0; i < data.stock().size(); i++) {
+			var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(new net.minecraft.resources.ResourceLocation(data.stock().get(i)));
+			long price = data.prices().get(i);
+			int action = NpcActionPayload.BUY_ACCESSORY + i;
+			options.add(price < 0
+					? DialogScreen.Option.of(Component.translatable("npc.grandline.accessory_dealer.owned", item.getDescription()).withStyle(ChatFormatting.GRAY), () -> { })
+					: DialogScreen.Option.of(Component.translatable("npc.grandline.accessory_dealer.buy", item.getDescription(), numbers.format(price)),
+							() -> send(data, action)));
+		}
+		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
+		return new DialogScreen(title(data, "entity.grandline.islander.accessory_dealer"),
+				List.of(Component.translatable("npc.grandline.accessory_dealer.greeting")), options);
 	}
 
 	/** Marine or Pirate Recruiter: join that side. */

@@ -9,10 +9,10 @@ import java.util.List;
  */
 public final class IronholdRoster {
 	/** Spread across the courtyard inside the main gate, clear of the three great towers and the gate itself. */
-	public static final List<IslandRoster.Spot> TRAINEES = List.of(
-			new IslandRoster.Spot(-24, -5, 0), new IslandRoster.Spot(-14, -8, 0), new IslandRoster.Spot(-5, -12, 0),
-			new IslandRoster.Spot(5, -12, 0), new IslandRoster.Spot(14, -8, 0), new IslandRoster.Spot(24, -5, 0),
-			new IslandRoster.Spot(0, -18, 0));
+	public static final List<int[]> TRAINEES = List.of(
+			new int[]{-24, -5}, new int[]{-14, -8}, new int[]{-5, -12},
+			new int[]{5, -12}, new int[]{14, -8}, new int[]{24, -5},
+			new int[]{0, -18});
 
 	/** Where the Marine Leader stands: on the terrace just outside the main gate, facing the staircase. */
 	public static final int LEADER_X = 6, LEADER_Z = 3;
@@ -28,7 +28,9 @@ public final class IronholdRoster {
 			new IslandRoster.Slot("INNKEEPER", 4, 57, 90));                     // the main dock, beside the Marines' arrival point
 
 	/** Seven Marine Trainees; the Marine Leader's quest asks for five. */
-	public static final IslandRoster ROSTER = new IslandRoster(com.grandline.entity.EnemyKind.MARINE_TRAINEE, 1, 2, 5, TRAINEES, island -> SLOTS);
+	public static final IslandRoster ROSTER = new IslandRoster(
+			List.of(new IslandRoster.Group(com.grandline.entity.EnemyKind.MARINE_TRAINEE, "", 1, 2, IslandRoster.seconds(8), TRAINEES)),
+			island -> SLOTS, List.of(new IslandRoster.Quest(com.grandline.entity.EnemyKind.MARINE_TRAINEE, 5, 1)));
 
 	private IronholdRoster() {
 	}

@@ -79,8 +79,11 @@ public final class GrandLineVerdantWildsGameTests implements FabricGameTest {
 			if (a.type() == Anchor.Type.BOSS_ARENA) {
 				helper.assertTrue(a.x() < split && land(t, a.x(), a.z()), "boss clearing is on the west island");
 			}
-			if (a.type() == Anchor.Type.QUEST || a.type() == Anchor.Type.ENEMY_CAMP) {
-				helper.assertTrue(a.x() > split && land(t, a.x(), a.z()), a.type() + " is on the main island");
+			if (a.type() == Anchor.Type.QUEST) {
+				helper.assertTrue(a.x() > split && land(t, a.x(), a.z()), "the Adventurer is on the main island");
+			}
+			if (a.type() == Anchor.Type.ENEMY_CAMP) {
+				helper.assertTrue(land(t, a.x(), a.z()), "enemy areas are on land (Canopy Primates main island, Ironbacks west)");
 			}
 		}
 		helper.succeed();

@@ -91,6 +91,16 @@ public final class IslandRegistry extends SavedData {
 		return new ArrayList<>(islands.values());
 	}
 
+	/** The island with this (original) name, or null. */
+	public synchronized Island byName(String name) {
+		for (Island island : all()) {
+			if (island.name().equals(name)) {
+				return island;
+			}
+		}
+		return null;
+	}
+
 	public synchronized Island get(long id) {
 		return islands.get(id);
 	}

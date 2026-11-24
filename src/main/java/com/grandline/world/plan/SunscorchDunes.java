@@ -142,15 +142,13 @@ final class SunscorchDunes extends BasePlan {
 		}
 		terrain.reach(DOCK_END_Z + 4);
 
-		anchor(Anchor.at(Type.QUEST, QUEST_X, G + 1, QUEST_Z, 90));          // at the east gate, facing the village
+		// NPCs and enemies follow IslandRosters.SUNSCORCH; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.at(Type.QUEST, -15, G + 1, 5, 90));                              // the Desert Adventurer
 		anchor(new Anchor(Type.ARRIVAL, DOCK_X, Anchor.SURFACE, PLAZA_Z - 1, 0, 180)); // the arrival plaza, facing the village
-		int[] inn = doorStep(BUILDINGS.get(0));
-		anchor(Anchor.at(Type.HOME, inn[0] + 4, G + 1, inn[1] + 3, 270));          // the Innkeeper, past the inn's porch, facing the market
-		anchor(Anchor.at(Type.FISHERMAN, DOCK_X + 4, DOCK_Y + 1, DOCK_END_Z - 2, 0)); // on the pier's T-head
+		anchor(Anchor.of(Type.HOME, 3, 46));                                            // Set Home Point, at the arrival plaza
 		anchor(Anchor.at(Type.DOCK, DOCK_X - 9, 63, DOCK_END_Z - 3));
-		anchor(Anchor.area(Type.ENEMY_CAMP, CAMP_X, CAMP_Z, 6));                      // the bandit camp
-		anchor(Anchor.area(Type.ENEMY_CAMP, RUINS_X, RUINS_Z, 6));                    // the raider ruins
-		anchor(Anchor.area(Type.BOSS_ARENA, RUINS_X, RUINS_Z, 5));                    // quest bosses appear in the ruins
+		anchor(Anchor.area(Type.ENEMY_CAMP, -20, 10, 24));                              // Dune Prowlers: the village courtyards
+		anchor(Anchor.area(Type.ENEMY_CAMP, RUINS_X, RUINS_Z, 7));                      // Sandwatch Captains: the ruins by the pyramids
 		anchor(Anchor.of(Type.TREASURE, -66, 26));
 	}
 

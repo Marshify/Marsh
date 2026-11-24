@@ -39,14 +39,13 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 	public void rosterHasTwoFieldsOfFiveAndSevenFriendlies(GameTestHelper helper) {
 		Island island = millbrook(helper);
 		helper.assertTrue(RosterNpcs.manages(island), "the rebuilt Millbrook is managed");
-		List<com.grandline.world.plan.IslandRoster.Spot> spots = MillbrookRoster.BANDITS;
+		List<com.grandline.world.plan.IslandRoster.Spot> spots = MillbrookRoster.ROSTER.spots();
 		helper.assertTrue(spots.size() == 10, "ten Bandits");
-		helper.assertTrue(spots.stream().filter(s -> s.group() == 0).count() == 5 && spots.stream().filter(s -> s.group() == 1).count() == 5, "five per field");
 		for (int i = 0; i < spots.size(); i++) {
 			for (int j = i + 1; j < spots.size(); j++) {
 				double d = Math.hypot(spots.get(i).x() - spots.get(j).x(), spots.get(i).z() - spots.get(j).z());
 				helper.assertTrue(d >= 4, "spots " + i + " and " + j + " are spaced out");
-				if (spots.get(i).group() != spots.get(j).group()) {
+				if ((i < 5) != (j < 5)) { // spots 0-4 the meadow, 5-9 the camp
 					helper.assertTrue(d >= 15, "the two fields are separate areas");
 				}
 			}
@@ -80,6 +79,7 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 			for (int i = 0; i < 5; i++) {
 				GrandLineEnemy bandit = GrandLineEntities.BANDIT.create(helper.getLevel());
 				bandit.addTag(RosterNpcs.SPOT_TAG + (i < 3 ? i : 5 + i)); // both fields count
+				bandit.setOrigin(helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1)), island.id()); // one of Millbrook's own
 				helper.assertTrue(RosterNpcs.spotOf(bandit) >= 0, "the Bandit knows its spot");
 				QuestService.onKill(p, bandit);
 			}
@@ -140,14 +140,16 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 
 	private static void ironhold(GameTestHelper helper, Island island) {
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		helper.assertTrue(roster != null && roster.kind() == com.grandline.entity.EnemyKind.MARINE_TRAINEE, "Ironhold is managed, with Marine Trainees");
-		helper.assertTrue(roster.spots().size() == 7 && roster.minLevel() == 1 && roster.maxLevel() == 2, "seven Trainees, Lv 1-2");
+		var trainees = roster == null ? null : roster.group(com.grandline.entity.EnemyKind.MARINE_TRAINEE);
+		helper.assertTrue(trainees != null, "Ironhold is managed, with Marine Trainees");
+		helper.assertTrue(roster.spots().size() == 7 && trainees.minLevel() == 1 && trainees.maxLevel() == 2, "seven Trainees, Lv 1-2");
 		var slots = roster.slots().apply(island);
 		helper.assertTrue(slots.size() == 8, "eight friendly NPCs");
 		var leader = slots.stream().filter(sl -> sl.role().equals("QUEST_GIVER")).findFirst().orElseThrow();
-		for (var s : roster.spots()) {
+		var all = roster.spots();
+		for (var s : all) {
 			helper.assertTrue(Math.hypot(s.x() - leader.x(), s.z() - leader.z()) > 11, "the Marine Leader stands clear of the field");
-			for (var t : roster.spots()) {
+			for (var t : all) {
 				helper.assertTrue(s == t || Math.hypot(s.x() - t.x(), s.z() - t.z()) >= 4, "spaced out");
 			}
 		}
@@ -163,5 +165,86 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 				"the same rewards as Millbrook's starting quest");
 		npc.discard();
 		mbNpc.discard();
+	}
+
+	private static Island island(GameTestHelper helper, String name) {
+		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		SeaLayout.Spec spec = SeaLayout.all().stream().filter(sp -> sp.name().equals(name)).findFirst().orElseThrow();
+		long id = SeaLayout.idOf(spec);
+		if (registry.get(id) == null) {
+			registry.add(new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name()));
+		}
+		return registry.get(id);
+	}
+
+	/** Counts per group (kind/skin), friendly roles, quests and leashes of Verdant Wilds, Saltmarket Docks and Sunscorch Dunes. */
+	@GameTest(template = EMPTY_STRUCTURE, batch = "island_rosters", timeoutTicks = 20)
+	public void verdantSaltmarketSunscorchRosters(GameTestHelper helper) {
+		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		int before = registry.layout();
+		try {
+			setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
+			check(helper, "Verdant Wilds", new int[]{7, 4, 1}, new String[]{"canopy_primate", "ironback", "crownback"}, 2, new int[]{6, 8, 1});
+			check(helper, "Saltmarket Docks", new int[]{6, 6, 1}, new String[]{"redcoat_raider", "dock_enforcer", "galley_master"}, 7, new int[]{8, 8, 1});
+			check(helper, "Sunscorch Dunes", new int[]{4, 4}, new String[]{"dune_prowler", "sandwatch_captain"}, 5, new int[]{8, 6});
+			check(helper, "Frostpeak Isle", new int[]{6, 4, 1}, new String[]{"frost_rover", "rime_construct", "glacier_maw"}, 5, new int[]{7, 8, 1});
+			var salt = com.grandline.world.plan.IslandRoster.of(island(helper, "Saltmarket Docks"));
+			helper.assertTrue(salt.groups().get(2).respawnTicks() == 300 * 20 && salt.groups().get(0).respawnTicks() == 15 * 20, "Saltmarket respawn times");
+			helper.assertTrue(salt.quests().get(0).minLevel() == 30 && salt.quests().get(1).minLevel() == 40 && salt.quests().get(2).minLevel() == 55, "Saltmarket quest levels");
+			// Kills count only on the quest's own island: another island's Raider is not an Ironback.
+			Island verdant = island(helper, "Verdant Wilds");
+			Islander giver = GrandLineEntities.ISLANDER.create(helper.getLevel());
+			giver.setup(Islander.Role.QUEST_GIVER, verdant.id(), verdant.level());
+			ServerPlayer p = GrandLineBatch3GameTests.survivor(helper);
+			try {
+				QuestState ironbacks = QuestService.rosterOffers(verdant, giver).get(1);
+				p.setAttached(ModAttachments.ACTIVE_QUEST, ironbacks);
+				GrandLineEnemy elsewhere = GrandLineEntities.RAIDER.create(helper.getLevel());
+				elsewhere.setOrigin(helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1)), island(helper, "Saltmarket Docks").id());
+				QuestService.onKill(p, elsewhere);
+				helper.assertTrue(QuestService.active(p).progress() == 0, "a Saltmarket Raider does not count for Ironbacks");
+				GrandLineEnemy here = GrandLineEntities.RAIDER.create(helper.getLevel());
+				here.setOrigin(helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1)), verdant.id());
+				QuestService.onKill(p, here);
+				helper.assertTrue(QuestService.active(p).progress() == 1, "an Ironback does");
+				helper.assertTrue(ironbacks.rewardExperience() > QuestService.rosterOffers(verdant, giver).get(0).rewardExperience(),
+						"eight Ironbacks pay more than six Canopy Primates");
+				elsewhere.discard();
+				here.discard();
+			} finally {
+				GrandLineBatch3GameTests.remove(helper, p, giver);
+			}
+		} finally {
+			setLayout(registry, before);
+		}
+		helper.succeed();
+	}
+
+	private static void check(GameTestHelper helper, String name, int[] counts, String[] skins, int friendlies, int[] questCounts) {
+		Island island = island(helper, name);
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		helper.assertTrue(roster != null, name + " is managed");
+		helper.assertTrue(roster.groups().size() == counts.length, name + ": groups");
+		for (int g = 0; g < counts.length; g++) {
+			helper.assertTrue(roster.groups().get(g).spots().size() == counts[g] && roster.groups().get(g).skin().equals(skins[g]),
+					name + ": " + counts[g] + " " + skins[g]);
+		}
+		var spots = roster.spots();
+		for (var a : spots) {
+			for (var b : spots) {
+				helper.assertTrue(a == b || Math.hypot(a.x() - b.x(), a.z() - b.z()) >= 4, name + ": spots spaced out");
+			}
+		}
+		var slots = roster.slots().apply(island);
+		helper.assertTrue(slots.size() == friendlies, name + ": " + friendlies + " friendly NPCs, not " + slots.size());
+		for (var slot : slots) {
+			for (var s : spots) {
+				helper.assertTrue(Math.hypot(s.x() - slot.x(), s.z() - slot.z()) > 11, name + ": " + slot.role() + " stands clear of every enemy spot");
+			}
+		}
+		helper.assertTrue(roster.quests().size() == questCounts.length, name + ": quests");
+		for (int q = 0; q < questCounts.length; q++) {
+			helper.assertTrue(roster.quests().get(q).count() == questCounts[q], name + ": quest " + q);
+		}
 	}
 }

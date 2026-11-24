@@ -63,11 +63,12 @@ final class VerdantWilds extends BasePlan {
 				.path(path, 3, ISLET_TRAIL)
 				.floorMix(s(Blocks.GRASS_BLOCK), s(Blocks.PODZOL), s(Blocks.GRASS_BLOCK), s(Blocks.MOSS_BLOCK), s(Blocks.PODZOL))
 				.shoreMix(s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.GRAVEL), s(Blocks.STONE), s(Blocks.ANDESITE));
-		anchor(Anchor.of(Type.QUEST, QUEST_X + 5, QUEST_Z));
-		anchor(Anchor.of(Type.FISHERMAN, -6, 41));
+		// NPCs and enemies follow IslandRosters.VERDANT; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.of(Type.QUEST, 7, 0));                         // the Adventurer, beside the temple staircase
 		anchor(Anchor.at(Type.DOCK, 7, 63, 58));
-		anchor(Anchor.area(Type.ENEMY_CAMP, CAMP_X, CAMP_Z, 7));
-		anchor(Anchor.of(Type.BOSS_ARENA, BOSS_X, BOSS_Z));
+		anchor(Anchor.area(Type.ENEMY_CAMP, 0, 2, 40));              // Canopy Primates: the main island's forest
+		anchor(Anchor.area(Type.ENEMY_CAMP, -114, 4, 12));           // Ironbacks: the west island
+		anchor(Anchor.of(Type.BOSS_ARENA, -100, -16));               // Crownback: the west island's north side
 		// The Saber boss waits in the temple hall, in front of the altar dais, facing the door.
 		anchor(new Anchor(Type.TEMPLE_BOSS, 0, FLOOR + 1, -22, 11, 0));
 		anchor(Anchor.of(Type.TREASURE, -36, -27));

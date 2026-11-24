@@ -30,13 +30,12 @@ import java.util.Map;
  * <ul>
  * <li>Friendly NPCs, each at its own spot. A missing one is placed, a misplaced one walked back, extras and roles the
  * island no longer has removed, and each carries the island's name for its role (names.json).</li>
- * <li>Enemies (Lv per roster), one per spawn spot. Each comes back {@link #RESPAWN_TICKS} after it falls, at its own
+ * <li>Enemies (Lv per roster), one per spawn spot. Each comes back its group's respawn time after it falls, at its own
  * spot, on its own timer. Enemies from before the roster (no spot) and bosses are removed; a spot never has two.</li>
  * </ul>
  * Only while the whole island is loaded, so nothing standing in an unloaded chunk is doubled.
  */
 public final class RosterNpcs {
-	public static final int RESPAWN_TICKS = 8 * 20;
 	/** Tag carrying an enemy's spawn spot index (the name dates from Millbrook, the first roster island). */
 	public static final String SPOT_TAG = "grandline.millbrook_spot.";
 	static final int CHECK_TICKS = 5; // a quarter second, so respawns land on time
@@ -91,17 +90,17 @@ public final class RosterNpcs {
 		}
 		for (Island island : IslandRegistry.get(server).all()) {
 			IslandRoster roster = IslandRoster.of(island);
-			if (roster != null && loaded(level, island)) {
+			if (roster != null && level.isPositionEntityTicking(new BlockPos(island.x(), 64, island.z()))) {
 				enforce(level, island, roster);
 			}
 		}
 	}
 
-	/** Every chunk the roster touches is ticking entities. */
-	static boolean loaded(ServerLevel level, Island island) {
-		for (int dx = -REACH; dx <= REACH; dx += 16) {
-			for (int dz = -REACH; dz <= REACH; dz += 16) {
-				if (!level.isPositionEntityTicking(new BlockPos(island.x() + dx, 64, island.z() + dz))) {
+	/** Every chunk within {@code r} blocks of island-local (x, z) is ticking entities (so nothing standing there is missed). */
+	static boolean loaded(ServerLevel level, Island island, int x, int z, int r) {
+		for (int dx = -r; dx <= r; dx += 8) {
+			for (int dz = -r; dz <= r; dz += 8) {
+				if (!level.isPositionEntityTicking(new BlockPos(island.x() + x + dx, 64, island.z() + z + dz))) {
 					return false;
 				}
 			}
@@ -109,11 +108,16 @@ public final class RosterNpcs {
 		return true;
 	}
 
+	/** Blocks around an enemy spot that must be loaded before it is checked: its leash and a margin. */
+	static final int SPOT_CLEARANCE = 32;
+
 	/** Brings the island to its roster now (exposed for tests). */
 	public static void enforce(ServerLevel level, Island island, IslandRoster roster) {
 		EnemyRespawns.forget(level, island.id()); // the island's own timers replace the general respawn queue
-		AABB area = new AABB(island.x() - REACH - 16, level.getMinBuildHeight(), island.z() - REACH - 16,
-				island.x() + REACH + 16, level.getMaxBuildHeight(), island.z() + REACH + 16);
+		var plan = com.grandline.world.plan.IslandPlans.get(island);
+		int reach = Math.max(REACH, plan != null ? plan.extent() : 0) + 32; // the whole island, however large
+		AABB area = new AABB(island.x() - reach, level.getMinBuildHeight(), island.z() - reach,
+				island.x() + reach, level.getMaxBuildHeight(), island.z() + reach);
 		friendlies(level, island, roster, area);
 		enemies(level, island, roster, area);
 	}
@@ -121,6 +125,11 @@ public final class RosterNpcs {
 	// ------------------------------------------------------------------------------------------------ friendly NPCs
 
 	private static void friendlies(ServerLevel level, Island island, IslandRoster roster, AABB area) {
+		for (IslandRoster.Slot slot : roster.slots().apply(island)) {
+			if (!loaded(level, island, slot.x(), slot.z(), 16)) {
+				return; // part of the town is not loaded: leave its NPCs until it is (no doubles)
+			}
+		}
 		List<Islander> npcs = new ArrayList<>(level.getEntitiesOfClass(Islander.class, area,
 				n -> n.isAlive() && n.islandId() == island.id()));
 		List<Islander> kept = new ArrayList<>();
@@ -182,34 +191,62 @@ public final class RosterNpcs {
 		// Every hostile on the island that is not one of its spot enemies goes: old camp enemies, other kinds, bosses.
 		List<GrandLineEnemy> enemies = level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> e.isAlive()
 				&& !e.getTags().contains(com.grandline.race.RaceTrials.TAG)
+				&& !(e instanceof com.grandline.entity.SaberBoss) // the temple's secret boss keeps its own rules (TempleBosses)
 				&& (e.islandId() == island.id() || e.islandId() == Long.MIN_VALUE));
+		List<IslandRoster.Spot> spots = roster.spots();
 		Map<Integer, GrandLineEnemy> bySpot = new HashMap<>();
 		for (GrandLineEnemy enemy : enemies) {
 			int spot = spotOf(enemy);
-			if (spot < 0 || spot >= roster.spots().size() || enemy.kind() != roster.kind() || bySpot.containsKey(spot)) {
+			if (spot >= 0 && spot < spots.size() && !loaded(level, island, spots.get(spot).x(), spots.get(spot).z(), SPOT_CLEARANCE)) {
+				continue; // its spot's surroundings are not all loaded yet: judged once they are
+			}
+			if (spot < 0 || spot >= spots.size() || enemy.kind() != spots.get(spot).group().kind() || bySpot.containsKey(spot)
+					|| movedSpot(island, spots.get(spot), enemy)) {
 				enemy.discard(); // from before the roster, the wrong kind, a boss, or a second enemy on one spot
 				continue;
 			}
 			bySpot.put(spot, enemy);
+			if (!enemy.skin().equals(spots.get(spot).group().skin())) {
+				enemy.setSkin(spots.get(spot).group().skin()); // an enemy spawned before its island had its own look
+			}
 		}
 		long now = level.getGameTime();
 		Map<Integer, Long> fallen = FALLEN.computeIfAbsent(island.id(), k -> new HashMap<>());
-		for (int i = 0; i < roster.spots().size(); i++) {
+		for (int i = 0; i < spots.size(); i++) {
+			if (!loaded(level, island, spots.get(i).x(), spots.get(i).z(), SPOT_CLEARANCE)) {
+				continue;
+			}
+			if (!COVERED.contains(island.name() + "#" + i)) { // a spot under a roof or an arch is reported once
+				COVERED.add(island.name() + "#" + i);
+				var plan = com.grandline.world.plan.IslandPlans.get(island);
+				BlockPos top = standAt(level, island, spots.get(i).x(), Anchor.SURFACE, spots.get(i).z());
+				int ground = plan == null ? top.getY() : plan.terrain().ground(spots.get(i).x(), spots.get(i).z()) + 1;
+				if (top.getY() > ground + 2) {
+					GrandLineMod.LOGGER.warn("{}: enemy spot {} ({}, {}) is covered {} blocks up", island.name(), i, spots.get(i).x(), spots.get(i).z(), top.getY() - ground);
+				}
+			}
 			if (bySpot.containsKey(i)) {
 				continue;
 			}
 			Long when = fallen.get(i);
-			if (when != null && now - when < RESPAWN_TICKS && now >= when) {
+			if (when != null && now - when < spots.get(i).group().respawnTicks() && now >= when) {
 				continue; // still on its own timer
 			}
 			fallen.remove(i);
-			spawn(level, island, roster, i);
+			spawn(level, island, spots.get(i), i);
 		}
 	}
 
-	private static void spawn(ServerLevel level, Island island, IslandRoster roster, int index) {
-		IslandRoster.Spot spot = roster.spots().get(index);
-		BlockPos at = standAt(level, island, spot.x(), Anchor.SURFACE, spot.z());
+	private static void spawn(ServerLevel level, Island island, IslandRoster.Spot spot, int index) {
+		IslandRoster.Group group = spot.group();
+		// On the island's own ground (never a roof); a spot whose column is built over is reported once.
+		var plan = com.grandline.world.plan.IslandPlans.get(island);
+		BlockPos top = standAt(level, island, spot.x(), Anchor.SURFACE, spot.z());
+		BlockPos at = top;
+		if (plan != null) {
+			int ground = plan.terrain().ground(spot.x(), spot.z()) + 1;
+			at = new BlockPos(top.getX(), ground, top.getZ());
+		}
 		if (!IslandSpawns.isSafe(level, at)) {
 			BlockPos near = nearestSafe(level, at);
 			if (near == null) {
@@ -217,27 +254,44 @@ public final class RosterNpcs {
 			}
 			at = near;
 		}
-		GrandLineEnemy enemy = GrandLineEntities.typeOf(roster.kind()).create(level);
+		GrandLineEnemy enemy = GrandLineEntities.typeOf(group.kind()).create(level);
 		if (enemy == null) {
 			return;
 		}
 		enemy.moveTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, level.getRandom().nextFloat() * 360, 0);
 		enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
 		enemy.equip();
-		enemy.setGrandLineLevel(roster.minLevel() + level.getRandom().nextInt(roster.maxLevel() - roster.minLevel() + 1));
+		enemy.setSkin(group.skin());
 		enemy.setOrigin(at, island.id());
+		enemy.setGrandLineLevel(group.minLevel() + level.getRandom().nextInt(group.maxLevel() - group.minLevel() + 1));
 		enemy.addTag(SPOT_TAG + index);
 		enemy.setPersistenceRequired();
 		level.addFreshEntity(enemy);
 	}
 
+	/** An enemy whose home is not its spot as the roster now has it (the spot moved, or it was placed on a roof): replaced. */
+	private static boolean movedSpot(Island island, IslandRoster.Spot spot, GrandLineEnemy enemy) {
+		BlockPos home = enemy.origin();
+		var plan = com.grandline.world.plan.IslandPlans.get(island);
+		if (home == null || plan == null) {
+			return home == null;
+		}
+		int ground = plan.terrain().ground(spot.x(), spot.z()) + 1;
+		return Math.abs(home.getX() - (island.x() + spot.x())) > 3 || Math.abs(home.getZ() - (island.z() + spot.z())) > 3
+				|| Math.abs(home.getY() - ground) > 2;
+	}
+
+	private static final java.util.Set<String> COVERED = new java.util.HashSet<>();
+
 	private static BlockPos nearestSafe(ServerLevel level, BlockPos at) {
 		for (int r = 1; r <= 2; r++) {
 			for (int dx = -r; dx <= r; dx++) {
 				for (int dz = -r; dz <= r; dz++) {
-					BlockPos p = new BlockPos(at.getX() + dx, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, at.getX() + dx, at.getZ() + dz), at.getZ() + dz);
-					if (IslandSpawns.isSafe(level, p)) {
-						return p;
+					for (int dy : new int[]{0, 1, -1}) {
+						BlockPos p = new BlockPos(at.getX() + dx, at.getY() + dy, at.getZ() + dz);
+						if (IslandSpawns.isSafe(level, p)) {
+							return p;
+						}
 					}
 				}
 			}

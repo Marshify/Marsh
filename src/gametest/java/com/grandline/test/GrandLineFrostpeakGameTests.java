@@ -26,6 +26,15 @@ public final class GrandLineFrostpeakGameTests implements FabricGameTest {
 	public void snowIslandLayersArenaVillageAndOldWorlds(GameTestHelper helper) {
 		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
 		int before = registry.layout();
+		try {
+			checks(helper, registry);
+		} finally {
+			setLayout(registry, before); // also when a check fails: the test world must stay on its own layout
+		}
+		helper.succeed();
+	}
+
+	private static void checks(GameTestHelper helper, IslandRegistry registry) {
 		IslandPlan legacy = IslandPlans.legacy("Frostpeak Isle");
 		setLayout(registry, 10);
 		helper.assertTrue(legacy != null && IslandPlans.get("Frostpeak Isle") == legacy, "a layout-10 world keeps the original Frostpeak");
@@ -43,9 +52,7 @@ public final class GrandLineFrostpeakGameTests implements FabricGameTest {
 		helper.assertTrue(t.ground(-14, 70) < Terrain.WATER_TOP, "open water past the docks");
 		Anchor quest = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.QUEST).findFirst().orElseThrow();
 		Anchor boss = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.BOSS_ARENA).findFirst().orElseThrow();
-		helper.assertTrue(quest.y() == 82 && Math.abs(quest.x() - 25) < 12, "the quest giver is in the village");
-		helper.assertTrue(boss.y() == 58, "the boss waits in the ice cavern");
-		setLayout(registry, before);
-		helper.succeed();
+		helper.assertTrue(quest.y() == 82 && quest.x() >= 0 && quest.x() <= 30, "the Villager is in the village");
+		helper.assertTrue(boss.z() < -35, "Glacier Maw has the northern ridge to himself (the ice cavern is the Ability Teacher's)");
 	}
 }

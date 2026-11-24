@@ -30,6 +30,19 @@ public final class EnemyBehavior {
 		EnemyBehavior trainee = new EnemyBehavior(); // Ironhold's training field: a short leash keeps them inside the courtyard
 		trainee.pursuitRadius = 12;
 		map.put("marine_trainee", trainee);
+		// Island looks (GrandLineEnemy.skin) with their own leash: short enough never to reach a bridge, gate or harbour.
+		for (String skin : new String[]{"canopy_primate", "ironback", "redcoat_raider", "dock_enforcer", "dune_prowler", "sandwatch_captain", "frost_rover", "rime_construct"}) {
+			EnemyBehavior b = new EnemyBehavior();
+			b.pursuitRadius = 12;
+			map.put(skin, b);
+		}
+		for (String skin : new String[]{"crownback", "galley_master", "glacier_maw"}) { // island bosses: a bigger presence, a tight arena
+			EnemyBehavior b = new EnemyBehavior();
+			b.aggressionRadius = 6;
+			b.idleRadius = 3;
+			b.pursuitRadius = 12;
+			map.put(skin, b);
+		}
 		map.put("raider", new EnemyBehavior());
 		map.put("corsair", new EnemyBehavior());
 		EnemyBehavior captain = new EnemyBehavior(); // island bosses: a bigger presence in their arena

@@ -28,7 +28,7 @@ public final class QuestService {
 	public static final int BOSS_MIN_ISLAND_LEVEL = 10; // Verdant Wilds (Lv 10-30) is the first island with a boss
 
 	public enum Result {
-		ACCEPTED, ALREADY_ON_QUEST, NO_BOSS_HERE, TOO_FAR, ABANDONED, NO_QUEST
+		ACCEPTED, ALREADY_ON_QUEST, NO_BOSS_HERE, TOO_FAR, ABANDONED, NO_QUEST, LEVEL_TOO_LOW
 	}
 
 	private QuestService() {
@@ -57,10 +57,65 @@ public final class QuestService {
 			return new QuestState(EnemyKind.CAPTAIN.name(), name, 1, 0, xp * 5, currency * 5, x, z, true);
 		}
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster != null) { // Millbrook's Bandits, Ironhold's Marine Trainees
-			return new QuestState(roster.kind().name(), name, roster.questKills(), 0, xp, currency, x, z, false);
+		if (roster != null && !roster.quests().isEmpty()) { // a roster island's first quest
+			return rosterQuest(island, npc, roster.quests().get(0));
 		}
 		return new QuestState(EnemyKind.forLevel(level).name(), name, KILL_COUNT, 0, xp, currency, x, z, false);
+	}
+
+	/**
+	 * A roster island's quest: the stage's reward for a regular quest scaled by how many it asks for (six is the usual
+	 * number), five times that for a boss.
+	 */
+	public static QuestState rosterQuest(Island island, Islander npc, com.grandline.world.plan.IslandRoster.Quest q) {
+		var stage = stageOf(island, npc);
+		int level = questLevel(island, npc);
+		long xp = stage != null ? com.grandline.world.FirstSeaProgression.questExperience(stage) : 120 + level * 60L;
+		long currency = stage != null ? com.grandline.world.FirstSeaProgression.questCurrency(stage) : 50 + level * 15L;
+		if (q.boss()) {
+			xp *= 5;
+			currency *= 5;
+		} else if (q.count() > KILL_COUNT) {
+			xp = xp * q.count() / KILL_COUNT;
+			currency = currency * q.count() / KILL_COUNT;
+		}
+		return new QuestState(q.kind().name(), island.name(), q.count(), 0, xp, currency, island.x(), island.z(), q.boss());
+	}
+
+	/** Every quest a roster island's quest giver offers, in order (empty elsewhere). */
+	public static java.util.List<QuestState> rosterOffers(Island island, Islander npc) {
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		java.util.List<QuestState> offers = new java.util.ArrayList<>();
+		if (roster != null && npc.role() == Islander.Role.QUEST_GIVER) {
+			for (var q : roster.quests()) {
+				offers.add(rosterQuest(island, npc, q));
+			}
+		}
+		return offers;
+	}
+
+	/** Accepts a roster island's quest number {@code index}: its level is checked; a boss quest spawns nothing (the boss lives there). */
+	public static Result acceptRoster(ServerPlayer player, Islander npc, int index) {
+		if (npc.role() != Islander.Role.QUEST_GIVER || npc.distanceTo(player) > 8) {
+			return Result.TOO_FAR;
+		}
+		if (active(player) != null) {
+			return Result.ALREADY_ON_QUEST;
+		}
+		Island island = IslandRegistry.get(player.server).get(npc.islandId());
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		if (roster == null || index < 0 || index >= roster.quests().size()) {
+			return Result.NO_QUEST;
+		}
+		var q = roster.quests().get(index);
+		if (PlayerProfileService.get(player).level() < q.minLevel()) {
+			return Result.LEVEL_TOO_LOW;
+		}
+		QuestState quest = rosterQuest(island, npc, q);
+		player.setAttached(ModAttachments.ACTIVE_QUEST, quest);
+		player.sendSystemMessage(Component.translatable("message.grandline.quest.accepted", describe(quest)).withStyle(ChatFormatting.GOLD));
+		sync(player);
+		return Result.ACCEPTED;
 	}
 
 	/**
@@ -147,6 +202,13 @@ public final class QuestService {
 	public static void onKill(ServerPlayer player, LivingEntity killed) {
 		QuestState quest = active(player);
 		if (quest == null || !(killed instanceof GrandLineEnemy enemy) || !enemy.kind().name().equals(quest.target())) {
+			return;
+		}
+		// A roster island's quest counts only its own enemies (another island's Raiders are not its Ironbacks), and the
+		// temple's secret boss is never a quest boss.
+		Island questIsland = IslandRegistry.get(player.server).byName(quest.islandName());
+		if (enemy instanceof com.grandline.entity.SaberBoss
+				|| (questIsland != null && com.grandline.world.plan.IslandRoster.of(questIsland) != null && enemy.islandId() != questIsland.id())) {
 			return;
 		}
 		QuestState updated = quest.withProgress(quest.progress() + 1);

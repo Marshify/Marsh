@@ -32,8 +32,15 @@ public final class NpcService {
 		String islandName = island == null ? "" : regionStage != null ? regionStage.label() : island.name();
 		int level = QuestService.questLevel(island, npc);
 
-		QuestState offer = npc.role() == Islander.Role.QUEST_GIVER ? QuestService.offer(island, npc, false) : null;
-		QuestState bossOffer = npc.role() == Islander.Role.QUEST_GIVER && level >= QuestService.BOSS_MIN_ISLAND_LEVEL
+		List<QuestState> rosterOffers = QuestService.rosterOffers(island, npc);
+		List<Integer> rosterLevels = new ArrayList<>();
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		if (roster != null) {
+			roster.quests().forEach(q -> rosterLevels.add(q.minLevel()));
+		}
+		boolean rosterGiver = !rosterOffers.isEmpty(); // a roster island's quest giver lists its own quests instead
+		QuestState offer = npc.role() == Islander.Role.QUEST_GIVER && !rosterGiver ? QuestService.offer(island, npc, false) : null;
+		QuestState bossOffer = npc.role() == Islander.Role.QUEST_GIVER && !rosterGiver && level >= QuestService.BOSS_MIN_ISLAND_LEVEL
 				? QuestService.offer(island, npc, true) : null;
 
 		// The dealer lists every fruit; only the current stock can be bought.
@@ -50,6 +57,12 @@ public final class NpcService {
 		if (npc.role() == Islander.Role.FISHERMAN) {
 			stock.add(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(com.grandline.registry.ModItems.STARTER_FISHING_ROD).toString());
 			prices.add(com.grandline.gear.EquipmentOwnership.owns(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD) ? -1L : GrandLineMod.config().fishingRodPrice);
+		}
+		if (npc.role() == Islander.Role.ACCESSORY_DEALER) {
+			stock.addAll(AccessoryShop.ids());
+			for (int i = 0; i < AccessoryShop.STOCK.size(); i++) {
+				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, AccessoryShop.STOCK.get(i)) ? -1L : AccessoryShop.price(i));
+			}
 		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
 			stock.addAll(SwordShop.ids());
@@ -71,7 +84,7 @@ public final class NpcService {
 		ServerPlayNetworking.send(player, new OpenNpcPayload(npc.getId(), npc.role().ordinal(), islandName, level,
 				java.util.Optional.ofNullable(offer), java.util.Optional.ofNullable(bossOffer),
 				java.util.Optional.ofNullable(QuestService.active(player)), stock, prices, available, FruitService.millisUntilRestock(),
-				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel));
+				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel, rosterOffers, rosterLevels));
 	}
 
 	/** Validates and runs an NPC choice. Returns the result key (exposed for tests). */
@@ -98,6 +111,10 @@ public final class NpcService {
 			case NpcActionPayload.LAUNCH_SHIP, NpcActionPayload.LAUNCH_SHIP + 1, NpcActionPayload.LAUNCH_SHIP + 2 -> sellsShip(npc, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP])
 					? com.grandline.ship.ShipService.launchFromNavigator(player, com.grandline.ship.ShipClass.values()[packet.action() - NpcActionPayload.LAUNCH_SHIP], npc)
 					: "too_far";
+			case NpcActionPayload.ACCEPT_ROSTER, NpcActionPayload.ACCEPT_ROSTER + 1, NpcActionPayload.ACCEPT_ROSTER + 2, NpcActionPayload.ACCEPT_ROSTER + 3 ->
+					QuestService.acceptRoster(player, npc, packet.action() - NpcActionPayload.ACCEPT_ROSTER).name().toLowerCase(java.util.Locale.ROOT);
+			case NpcActionPayload.BUY_ACCESSORY, NpcActionPayload.BUY_ACCESSORY + 1, NpcActionPayload.BUY_ACCESSORY + 2 -> npc.role() == Islander.Role.ACCESSORY_DEALER
+					? AccessoryShop.buy(player, packet.action() - NpcActionPayload.BUY_ACCESSORY) : "too_far";
 			case NpcActionPayload.JOIN_MARINES -> npc.role() == Islander.Role.MARINE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.MARINES) : "too_far";
 			case NpcActionPayload.JOIN_PIRATES -> npc.role() == Islander.Role.PIRATE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.PIRATES) : "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
@@ -118,7 +135,7 @@ public final class NpcService {
 		};
 		boolean success = result.equals("joined_marines") || result.equals("joined_pirates") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
-				|| result.equals("sword_bought") || result.equals("rod_bought") || result.equals("technique_learned")
+				|| result.equals("sword_bought") || result.equals("accessory_bought") || result.equals("rod_bought") || result.equals("technique_learned")
 				|| result.equals("tutorial_started");
 		if (result.equals("home_set")) {
 			return result; // the confirmation names the island (see setHome)

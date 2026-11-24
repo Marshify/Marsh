@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public record OpenNpcPayload(int entityId, int role, String islandName, int islandLevel, Optional<QuestState> questOffer,
 		Optional<QuestState> bossOffer, Optional<QuestState> activeQuest, List<String> stock, List<Long> prices, List<String> available, long restockMillis, long gachaCost,
-		long gachaRemainingMillis, long fishValue, int gachaMinLevel) implements FabricPacket {
+		long gachaRemainingMillis, long fishValue, int gachaMinLevel, List<QuestState> rosterOffers, List<Integer> rosterLevels) implements FabricPacket {
 	public static final PacketType<OpenNpcPayload> TYPE = PacketType.create(GrandLineMod.id("open_npc"), OpenNpcPayload::read);
 
 	private static OpenNpcPayload read(FriendlyByteBuf buf) {
@@ -46,8 +46,20 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 		for (int i = 0; i < availableSize; i++) {
 			available.add(buf.readUtf(256));
 		}
-		return new OpenNpcPayload(entityId, role, island, level, offer, boss, active, stock, prices, available, buf.readVarLong(), buf.readVarLong(),
-				buf.readVarLong(), buf.readVarLong(), buf.readVarInt());
+		long restock = buf.readVarLong(), gachaCost = buf.readVarLong(), gachaLeft = buf.readVarLong(), fish = buf.readVarLong();
+		int gachaMin = buf.readVarInt();
+		int offers = buf.readVarInt();
+		if (offers < 0 || offers > 8) {
+			throw new IllegalArgumentException("Invalid quest count " + offers);
+		}
+		List<QuestState> rosterOffers = new ArrayList<>();
+		List<Integer> rosterLevels = new ArrayList<>();
+		for (int i = 0; i < offers; i++) {
+			rosterOffers.add(QuestState.read(buf));
+			rosterLevels.add(buf.readVarInt());
+		}
+		return new OpenNpcPayload(entityId, role, island, level, offer, boss, active, stock, prices, available, restock, gachaCost,
+				gachaLeft, fish, gachaMin, rosterOffers, rosterLevels);
 	}
 
 	@Override
@@ -71,6 +83,11 @@ public record OpenNpcPayload(int entityId, int role, String islandName, int isla
 		buf.writeVarLong(gachaRemainingMillis);
 		buf.writeVarLong(fishValue);
 		buf.writeVarInt(gachaMinLevel);
+		buf.writeVarInt(rosterOffers.size());
+		for (int i = 0; i < rosterOffers.size(); i++) {
+			rosterOffers.get(i).write(buf);
+			buf.writeVarInt(rosterLevels.get(i));
+		}
 	}
 
 	@Override

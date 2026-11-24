@@ -46,13 +46,13 @@ public final class GrandLineNamesGameTests implements FabricGameTest {
 			helper.assertTrue("item.grandline.katana".equals(Gear.KATANA.getDescriptionId()), "the item keeps its translation key");
 			helper.assertTrue("grandline:katana".equals(BuiltInRegistries.ITEM.getKey(Gear.KATANA).toString()), "and its id");
 			// An NPC or enemy renamed on one island only.
-			GrandLineNames.renameOnIsland("Verdant Wilds", "Bandit", "Lion");
-			helper.assertTrue("Lion".equals(GrandLineNames.npc("entity.grandline.bandit", "Verdant Wilds").getString()), "bandits are lions in the jungle");
+			GrandLineNames.renameOnIsland("Emberfall Isle", "Bandit", "Lion");
+			helper.assertTrue("Lion".equals(GrandLineNames.npc("entity.grandline.bandit", "Emberfall Isle").getString()), "bandits are lions on that island");
 			helper.assertTrue(GrandLineNames.npc("entity.grandline.bandit", "Millbrook Village").getContents()
 					instanceof net.minecraft.network.chat.contents.TranslatableContents t && t.getKey().equals("entity.grandline.bandit"),
 					"and bandits elsewhere");
-			GrandLineNames.resetOnIsland("Verdant Wilds", "Bandit");
-			helper.assertTrue(!GrandLineNames.islandNpcRenames().containsKey("Verdant Wilds"), "reset on the island");
+			GrandLineNames.resetOnIsland("Emberfall Isle", "Bandit");
+			helper.assertTrue(!GrandLineNames.islandNpcRenames().containsKey("Emberfall Isle"), "reset on the island");
 			// A rename whose original no longer exists (the mod renamed it later) is kept, not used, never lost.
 			GrandLineNames.rename(Category.ITEM, "A Sword That Was Renamed Later", "Whatever");
 			helper.assertTrue(GrandLineNames.renames(Category.ITEM).containsKey("A Sword That Was Renamed Later"), "kept in the file");

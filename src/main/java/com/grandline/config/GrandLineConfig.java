@@ -278,6 +278,8 @@ public final class GrandLineConfig {
 	 */
 	public long[] swordPrices = {500, 300, 1_200, 8_000, 15_000, 40_000, 100_000, 150_000, 200_000, 250_000, 300_000,
 			1_000_000, 1_500_000, 4_000_000};
+	/** Accessory prices at the accessory dealer (Sunscorch Dunes' Guy), in AccessoryShop.STOCK order: Swordsman Hat. */
+	public long[] accessoryPrices = {15_000};
 	/** Sword mastery at which the Bisento and the Eclipse Blade switch to their upgraded moves. */
 	public int swordUpgradeMastery = 300;
 
@@ -497,6 +499,9 @@ public final class GrandLineConfig {
 		}
 		for (int i = 0; i < gunPrices.length; i++) {
 			gunPrices[i] = clamp(gunPrices[i], 0, maxCurrency);
+		}
+		if (accessoryPrices == null || accessoryPrices.length != 1) {
+			accessoryPrices = new long[]{15_000};
 		}
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);

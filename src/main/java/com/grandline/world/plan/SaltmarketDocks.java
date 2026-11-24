@@ -64,15 +64,14 @@ public final class SaltmarketDocks extends BasePlan {
 				.flat(LX, LZ, 8, 8, LTOP, 3, null)
 				.shoreMix(s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.TUFF), s(Blocks.COBBLESTONE), s(Blocks.GRAVEL))
 				.reach(150);
-		anchor(Anchor.at(Type.QUEST, 0, TOWN + 1, 6, 0));
-		anchor(Anchor.at(Type.HOME, 10, TOWN + 1, 3, 0));
-		anchor(Anchor.at(Type.FRUIT_DEALER, -16, TOWN + 1, 18, 90));
+		// NPCs and enemies follow IslandRosters.SALTMARKET; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.at(Type.QUEST, 5, TOWN + 1, -31, 0));           // the Pirate Adventurer, inside the landward gate
+		anchor(Anchor.at(Type.HOME, 6, TOWN + 1, 44, 0));             // Set Home Point, inside the harbour gate
 		anchor(new Anchor(Type.ARRIVAL, 12, PROM + 1, 60, 0, 180));
-		anchor(Anchor.at(Type.FISHERMAN, 12, PROM + 1, 108, 0));
 		anchor(Anchor.at(Type.DOCK, 16, 63, 100));
 		anchor(new Anchor(Type.ENEMY_CAMP, -45, Anchor.SURFACE, -95, 12));
 		anchor(new Anchor(Type.ENEMY_CAMP, 42, Anchor.SURFACE, -92, 12));
-		anchor(Anchor.area(Type.BOSS_ARENA, 46, -112, 6));
+		anchor(Anchor.area(Type.BOSS_ARENA, 46, -114, 4));            // the Galley Master
 		anchor(Anchor.of(Type.TREASURE, -88, -118));
 	}
 

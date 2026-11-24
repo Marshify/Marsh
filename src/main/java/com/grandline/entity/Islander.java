@@ -58,7 +58,15 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Signs players up with the Marines (Millbrook's village). */
 		MARINE_RECRUITER,
 		/** Signs players up with the Pirates (Ironhold Bastion's town). */
-		PIRATE_RECRUITER;
+		PIRATE_RECRUITER,
+		/** Teaches Dark Step (Saltmarket Docks; talk only until the technique exists). */
+		DARK_STEP_TEACHER,
+		/** The smith at the workshop (Saltmarket Docks; talk only for now). */
+		BLACKSMITH,
+		/** The market trader (Sunscorch Dunes; talk only for now). */
+		DESERT_MERCHANT,
+		/** Sells accessories (Sunscorch Dunes' Guy: the Swordsman Hat). */
+		ACCESSORY_DEALER;
 
 		public static Role byId(int id) {
 			Role[] values = values();

@@ -63,6 +63,24 @@ public class GrandLineEnemy extends Monster {
 		setPersistenceRequired();
 	}
 
+	/** An island's own look for this enemy (a texture under textures/entity, e.g. "canopy_primate"); empty: the kind's. */
+	private static final net.minecraft.network.syncher.EntityDataAccessor<String> SKIN =
+			net.minecraft.network.syncher.SynchedEntityData.defineId(GrandLineEnemy.class, net.minecraft.network.syncher.EntityDataSerializers.STRING);
+
+	@Override
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		entityData.define(SKIN, "");
+	}
+
+	public String skin() {
+		return entityData.get(SKIN);
+	}
+
+	public void setSkin(String skin) {
+		entityData.set(SKIN, skin == null ? "" : skin);
+	}
+
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
 				.add(Attributes.MAX_HEALTH, 20.0)
@@ -117,7 +135,7 @@ public class GrandLineEnemy extends Monster {
 	public com.grandline.config.EnemyBehavior behavior() {
 		var map = com.grandline.GrandLineMod.config().enemyBehavior;
 		String key = getTags().contains(com.grandline.race.RaceTrials.TAG) ? "trial" : kind().id();
-		var b = map.get(key);
+		var b = !skin().isEmpty() && !key.equals("trial") && map.containsKey(skin()) ? map.get(skin()) : map.get(key);
 		return b != null ? b : map.getOrDefault("bandit", new com.grandline.config.EnemyBehavior());
 	}
 
@@ -392,6 +410,9 @@ public class GrandLineEnemy extends Monster {
 			tag.putLong("GrandLineHome", home.asLong());
 		}
 		tag.putBoolean("GrandLineReturning", returning);
+		if (!skin().isEmpty()) {
+			tag.putString("GrandLineSkin", skin());
+		}
 	}
 
 	@Override
@@ -406,6 +427,7 @@ public class GrandLineEnemy extends Monster {
 			home = net.minecraft.core.BlockPos.of(tag.getLong("GrandLineHome"));
 		}
 		returning = tag.getBoolean("GrandLineReturning");
+		setSkin(tag.getString("GrandLineSkin"));
 		// (Older saves stored a camp-wide "GrandLineLeash"; the territory AI sets its own idle area on the first tick.)
 		updateName(); // picks up the mod's current names
 	}

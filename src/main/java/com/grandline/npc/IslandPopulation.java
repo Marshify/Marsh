@@ -234,8 +234,17 @@ public final class IslandPopulation {
 	/** The regular enemy kind for the camp nearest {@code at}: by its stage's level (quests ask for the same kind). */
 	public static EnemyKind kindAt(Island island, BlockPos at) {
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster != null) {
-			return roster.kind(); // an island with a fixed population (Ironhold's Marine Trainees)
+		if (roster != null && !roster.groups().isEmpty()) { // an island with a fixed population: the nearest spot's group
+			com.grandline.world.plan.IslandRoster.Spot best = null;
+			double bestD = Double.MAX_VALUE;
+			for (var s : roster.spots()) {
+				double d = at == null ? 0 : Math.pow(island.x() + s.x() - at.getX(), 2) + Math.pow(island.z() + s.z() - at.getZ(), 2);
+				if (d < bestD && !s.group().boss()) {
+					bestD = d;
+					best = s;
+				}
+			}
+			return best != null ? best.group().kind() : roster.groups().get(0).kind();
 		}
 		FirstSeaProgression.Stage stage = FirstSeaProgression.stage(island.name(), regionAt(island, at));
 		return EnemyKind.forLevel(stage != null ? stage.min() : island.level());

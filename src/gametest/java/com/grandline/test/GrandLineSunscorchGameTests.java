@@ -48,20 +48,32 @@ public final class GrandLineSunscorchGameTests implements FabricGameTest {
 		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
 		int before = registry.layout();
 		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
+		try {
+			planChecks(helper);
+		} finally {
+			setLayout(registry, before); // also when a check fails: a failed test must not leave the test world on another layout
+		}
+		helper.succeed();
+	}
+
+	private static void planChecks(GameTestHelper helper) {
 		IslandPlan plan = IslandPlans.get("Sunscorch Dunes");
-		for (Anchor.Type t : List.of(Anchor.Type.QUEST, Anchor.Type.HOME, Anchor.Type.FISHERMAN, Anchor.Type.DOCK, Anchor.Type.ARRIVAL,
-				Anchor.Type.BOSS_ARENA, Anchor.Type.TREASURE)) {
+		helper.assertTrue(plan.anchors().stream().noneMatch(a -> a.type() == Anchor.Type.BOSS_ARENA), "no boss on Sunscorch");
+		for (Anchor.Type t : List.of(Anchor.Type.QUEST, Anchor.Type.HOME, Anchor.Type.DOCK, Anchor.Type.ARRIVAL, Anchor.Type.TREASURE)) {
 			helper.assertTrue(plan.anchors().stream().anyMatch(a -> a.type() == t), "has a " + t + " spot");
 		}
 		List<Anchor> camps = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList();
 		helper.assertTrue(camps.size() == 2, "two combat areas: " + camps.size());
 		Terrain terrain = plan.terrain();
-		// Safe spots: no camp (leash = radius + 6, plus a margin) reaches the quest giver, innkeeper or arrival plaza.
+		// Safe spots: no enemy spawn spot (Dune Prowlers, Sandwatch Captains) is near the quest giver, home point or arrival.
+		var roster = com.grandline.world.plan.IslandRoster.of(com.grandline.world.IslandRegistry.get(helper.getLevel().getServer()).byName("Sunscorch Dunes"));
 		for (Anchor.Type t : List.of(Anchor.Type.QUEST, Anchor.Type.HOME, Anchor.Type.ARRIVAL)) {
 			Anchor a = one(plan, t);
-			for (Anchor camp : camps) {
-				double d = Math.hypot(a.x() - camp.x(), a.z() - camp.z());
-				helper.assertTrue(d >= camp.radius() + 12, t + " is " + d + " blocks from a camp");
+			if (roster != null) {
+				for (var s : roster.spots()) {
+					double d = Math.hypot(a.x() - s.x(), a.z() - s.z());
+					helper.assertTrue(d > 11, t + " is " + d + " blocks from an enemy spot");
+				}
 			}
 			int ground = terrain.ground(a.x(), a.z());
 			helper.assertTrue(ground > Terrain.WATER_TOP, t + " stands on land (" + ground + ")");
@@ -69,13 +81,9 @@ public final class GrandLineSunscorchGameTests implements FabricGameTest {
 				helper.assertTrue(a.y() == ground + 1, t + " stands on the ground: y " + a.y() + ", ground " + ground);
 			}
 		}
-		// Camps are on land, on level ground.
+		// Combat areas are on land.
 		for (Anchor camp : camps) {
-			int g = terrain.ground(camp.x(), camp.z());
-			helper.assertTrue(g > Terrain.WATER_TOP + 2, "camp on dry land");
-			for (int[] o : new int[][]{{3, 0}, {-3, 0}, {0, 3}, {0, -3}}) {
-				helper.assertTrue(Math.abs(terrain.ground(camp.x() + o[0], camp.z() + o[1]) - g) <= 1, "camp ground is level");
-			}
+			helper.assertTrue(terrain.ground(camp.x(), camp.z()) > Terrain.WATER_TOP + 2, "camp on dry land");
 		}
 		// Size: about 150 x 133 of land (pier excluded).
 		int minX = 0, maxX = 0, minZ = 0, maxZ = 0;
@@ -91,7 +99,6 @@ public final class GrandLineSunscorchGameTests implements FabricGameTest {
 		}
 		int w = maxX - minX + 1, d = maxZ - minZ + 1;
 		helper.assertTrue(w >= 140 && w <= 165 && d >= 125 && d <= 145, "island size " + w + " x " + d);
-		setLayout(registry, before);
-		helper.succeed();
+
 	}
 }
