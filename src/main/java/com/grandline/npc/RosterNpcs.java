@@ -267,6 +267,7 @@ public final class RosterNpcs {
 		enemy.finalizeSpawn(level, level.getCurrentDifficultyAt(at), MobSpawnType.EVENT, null, null);
 		enemy.equip();
 		enemy.setSkin(group.skin());
+		com.grandline.entity.EnemyAbilities.onSpawn(enemy); // Aura, by look
 		enemy.setOrigin(at, island.id());
 		enemy.setGrandLineLevel(group.minLevel() + level.getRandom().nextInt(group.maxLevel() - group.minLevel() + 1));
 		enemy.addTag(SPOT_TAG + index);

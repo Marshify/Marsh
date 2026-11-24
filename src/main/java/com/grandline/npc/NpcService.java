@@ -62,9 +62,10 @@ public final class NpcService {
 			}
 		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
-			stock.addAll(SwordShop.ids());
+			List<Integer> sold = SwordShop.stockFor(island);
+			sold.forEach(i -> stock.add(SwordShop.ids().get(i)));
 			// An owned item is listed with price -1: the screen shows it as Owned and offers no purchase.
-			for (int i = 0; i < SwordShop.STOCK.size(); i++) {
+			for (int i : sold) {
 				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, SwordShop.STOCK.get(i)) ? -1L : SwordShop.price(i));
 			}
 		}
@@ -128,7 +129,7 @@ public final class NpcService {
 			case NpcActionPayload.TRAIN + 3 -> npc.role() == Islander.Role.MOVEMENT_INSTRUCTOR
 					? com.grandline.technique.TechniqueTrainers.startTutorial(player) : "too_far";
 			default -> packet.action() >= NpcActionPayload.BUY_SWORD && packet.action() < NpcActionPayload.BUY_SWORD + SwordShop.STOCK.size()
-					? npc.role() == Islander.Role.SWORDSMITH ? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
+					? npc.role() == Islander.Role.SWORDSMITH ? buySword(player, npc, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
 					: "too_far";
 		};
 		boolean success = result.equals("joined_marines") || result.equals("fruit_removed") || result.equals("joined_pirates") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
@@ -172,6 +173,12 @@ public final class NpcService {
 		com.grandline.player.PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price));
 		com.grandline.gear.EquipmentOwnership.grant(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD);
 		return "rod_bought";
+	}
+
+	/** Buys entry {@code position} of this dealer's own list (SwordShop.stockFor its island). */
+	private static String buySword(ServerPlayer player, Islander npc, int position) {
+		List<Integer> sold = SwordShop.stockFor(IslandRegistry.get(player.server).get(npc.islandId()));
+		return position < 0 || position >= sold.size() ? "too_far" : SwordShop.buy(player, sold.get(position));
 	}
 
 	/** The Fruit Removal NPC: takes the fee and removes the eaten Devil Fruit (its moves go with it). */

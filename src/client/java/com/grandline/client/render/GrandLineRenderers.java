@@ -61,6 +61,7 @@ public final class GrandLineRenderers {
 			this.kindSkin = kindSkin;
 			this.kindIsPlayerSkin = kindIsPlayerSkin;
 			this.scale = scale;
+			addLayer(new EnemyAuraLayer(this));
 		}
 
 		@Override
@@ -77,6 +78,32 @@ public final class GrandLineRenderers {
 		@Override
 		protected void scale(GrandLineEnemy entity, PoseStack poseStack, float partialTick) {
 			poseStack.scale(scale, scale, scale);
+		}
+	}
+
+	/** Enemies with Aura (EnemyAbilities): the players' dark coating over hands and arms, a hair outside the skin. */
+	private static final class EnemyAuraLayer extends net.minecraft.client.renderer.entity.layers.RenderLayer<GrandLineEnemy, HumanoidModel<GrandLineEnemy>> {
+		private final net.minecraft.client.model.PlayerModel<GrandLineEnemy> shell;
+
+		EnemyAuraLayer(net.minecraft.client.renderer.entity.RenderLayerParent<GrandLineEnemy, HumanoidModel<GrandLineEnemy>> parent) {
+			super(parent);
+			shell = new net.minecraft.client.model.PlayerModel<>(net.minecraft.client.model.geom.builders.LayerDefinition.create(
+					net.minecraft.client.model.PlayerModel.createMesh(new net.minecraft.client.model.geom.builders.CubeDeformation(0.3F), false), 64, 64).bakeRoot(), false);
+			shell.hat.visible = shell.jacket.visible = shell.leftSleeve.visible = shell.rightSleeve.visible = false;
+			shell.leftPants.visible = shell.rightPants.visible = false;
+		}
+
+		@Override
+		public void render(PoseStack pose, net.minecraft.client.renderer.MultiBufferSource buffers, int light, GrandLineEnemy enemy, float limbSwing,
+				float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+			if (!enemy.aura() || enemy.isInvisible()) {
+				return;
+			}
+			getParentModel().copyPropertiesTo(shell);
+			shell.hat.visible = shell.jacket.visible = shell.leftSleeve.visible = shell.rightSleeve.visible = false;
+			shell.leftPants.visible = shell.rightPants.visible = false;
+			var consumer = buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityTranslucent(com.grandline.client.render.aura.AuraLayer.texture(2)));
+			shell.renderToBuffer(pose, consumer, light, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		}
 	}
 

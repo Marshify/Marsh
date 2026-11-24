@@ -20,6 +20,22 @@ public final class SwordShop {
 	private SwordShop() {
 	}
 
+	/**
+	 * The STOCK indices this island's sword dealer sells: Emberfall's Living Skeleton only the Soul Cane (the Wraith
+	 * Cane's island name), every other sword dealer everything else.
+	 */
+	public static List<Integer> stockFor(com.grandline.world.Island island) {
+		int cane = STOCK.indexOf(Gear.WRAITH_CANE);
+		List<Integer> out = new ArrayList<>();
+		boolean emberfall = island != null && "Emberfall Isle".equals(island.name());
+		for (int i = 0; i < STOCK.size(); i++) {
+			if ((i == cane) == emberfall) {
+				out.add(i);
+			}
+		}
+		return out;
+	}
+
 	public static long price(int index) {
 		return GrandLineMod.config().swordPrices[index];
 	}

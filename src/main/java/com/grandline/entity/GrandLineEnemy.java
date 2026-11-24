@@ -67,10 +67,34 @@ public class GrandLineEnemy extends Monster {
 	private static final net.minecraft.network.syncher.EntityDataAccessor<String> SKIN =
 			net.minecraft.network.syncher.SynchedEntityData.defineId(GrandLineEnemy.class, net.minecraft.network.syncher.EntityDataSerializers.STRING);
 
+	/** Aura on (EnemyAbilities): drawn as the dark coating on the arms. */
+	private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> AURA =
+			net.minecraft.network.syncher.SynchedEntityData.defineId(GrandLineEnemy.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+	/** Where a magma pool or geyser of this enemy's is (EnemyAbilities), or null. Not saved. */
+	private net.minecraft.world.phys.Vec3 poolCenter;
+
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		entityData.define(SKIN, "");
+		entityData.define(AURA, false);
+	}
+
+	public boolean aura() {
+		return entityData.get(AURA);
+	}
+
+	/** Sets the flag only; use {@link EnemyAbilities#setAura} (it also sets the damage). */
+	void setAura(boolean on) {
+		entityData.set(AURA, on);
+	}
+
+	net.minecraft.world.phys.Vec3 poolCenter() {
+		return poolCenter;
+	}
+
+	void setPoolCenter(net.minecraft.world.phys.Vec3 at) {
+		poolCenter = at;
 	}
 
 	public String skin() {
@@ -252,6 +276,7 @@ public class GrandLineEnemy extends Monster {
 
 	@Override
 	protected void customServerAiStep() {
+		EnemyAbilities.tick(this);
 		super.customServerAiStep();
 		if (!territoryAi()) {
 			return;
@@ -417,6 +442,7 @@ public class GrandLineEnemy extends Monster {
 		if (!skin().isEmpty()) {
 			tag.putString("GrandLineSkin", skin());
 		}
+		tag.putBoolean("GrandLineAura", aura());
 	}
 
 	@Override
@@ -432,6 +458,7 @@ public class GrandLineEnemy extends Monster {
 		}
 		returning = tag.getBoolean("GrandLineReturning");
 		setSkin(tag.getString("GrandLineSkin"));
+		setAura(tag.getBoolean("GrandLineAura")); // the damage modifier is saved with the attributes
 		// (Older saves stored a camp-wide "GrandLineLeash"; the territory AI sets its own idle area on the first tick.)
 		updateName(); // picks up the mod's current names
 	}

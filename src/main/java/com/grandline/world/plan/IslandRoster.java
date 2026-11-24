@@ -130,6 +130,9 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		if (plan instanceof FrostpeakIsle) {
 			return IslandRosters.FROSTPEAK;
 		}
+		if (plan instanceof EmberfallIsle) {
+			return IslandRosters.EMBERFALL;
+		}
 		if (plan instanceof StonewallPrison) {
 			return IslandRosters.STONEWALL;
 		}

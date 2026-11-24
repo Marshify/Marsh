@@ -90,11 +90,11 @@ final class EmberfallIsle extends BasePlan {
 		anchor(Anchor.at(Type.QUEST, QUEST_X, G + 1, QUEST_Z, 180));                       // outside the mayor's house, facing the volcano
 		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, DOCK_LAND_Z - 3, 0, 180));
 		anchor(Anchor.at(Type.HOME, 6, G + 1, 68, 90));                                    // the Innkeeper, by the dock road
-		anchor(Anchor.at(Type.FISHERMAN, 4, DOCK_Y + 1, DOCK_END_Z - 2, 0));
 		anchor(Anchor.at(Type.DOCK, -8, 63, DOCK_END_Z - 3));
-		anchor(Anchor.area(Type.ENEMY_CAMP, TRAIN_X, TRAIN_Z, 7));                         // soldiers (basic)
-		anchor(Anchor.at(Type.ENEMY_CAMP, SPY_X, PLATEAU_Y, SPY_Z, 8));                    // spies on the plateau (stronger)
-		anchor(Anchor.at(Type.BOSS_ARENA, VX, CHAMBER_Y + 1, VZ));                         // the platform in the boss chamber
+		// NPCs and enemies follow IslandRosters.EMBERFALL; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.area(Type.ENEMY_CAMP, TRAIN_X, TRAIN_Z, 7));                         // Ashguard Troopers
+		anchor(Anchor.at(Type.ENEMY_CAMP, SPY_X, PLATEAU_Y, SPY_Z, 8));                    // Cinder Infiltrators on the plateau
+		anchor(Anchor.at(Type.BOSS_ARENA, VX, CHAMBER_Y + 1, VZ));                         // the Emberfall Marshal, in the chamber
 		anchor(Anchor.of(Type.TREASURE, 46, -40));
 	}
 

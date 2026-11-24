@@ -7,8 +7,12 @@
   ],
   "islands": {},
   "npcs": {},
-  "items": {},
-  "abilities": {},
+  "items": {
+    "Wraith Cane": "Soul Cane"
+  },
+  "abilities": {
+    "Wraith Cane": "Soul Cane"
+  },
   "island_npcs": {
     "Millbrook Village": {
       "Quest Giver": "Bandit Quest Giver",
@@ -80,6 +84,15 @@
       "Bandit": "Arena Vanguard",
       "Raider": "Gilt Champion",
       "Quest Giver": "Arena Quest Giver",
+      "Innkeeper": "Set Home Point"
+    },
+    "Emberfall Isle": {
+      "Bandit": "Ashguard Trooper",
+      "Raider": "Cinder Infiltrator",
+      "Island Captain": "Emberfall Marshal",
+      "Quest Giver": "Mayor",
+      "Ability Master": "Ability Teacher",
+      "Swordsmith": "Living Skeleton",
       "Innkeeper": "Set Home Point"
     }
   }

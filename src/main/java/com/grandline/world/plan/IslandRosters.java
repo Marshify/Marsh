@@ -182,4 +182,26 @@ final class IslandRosters {
 					new IslandRoster.Slot("LUXURY_BOAT_DEALER", 6, 66, 62, 0),       // the landing, east
 					new IslandRoster.Slot("INNKEEPER", 8, GladiatorsRing.G + 1, 55, 90)), // Set Home Point, on the entrance path
 			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 250), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 275)));
+
+	/**
+	 * Emberfall Isle: Ashguard Troopers (swords, half with Aura) on the training ground between the village and the
+	 * volcano, Cinder Infiltrators (Aura, Flash Step) on the plateau behind it, the Emberfall Marshal (magma moves) on the
+	 * platform in the volcano's chamber. The Living Skeleton sells the Soul Cane in the hidden mine's corridor.
+	 */
+	static final IslandRoster EMBERFALL = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "ashguard_trooper", 300, 300, seconds(20),
+					at(EmberfallIsle.TRAIN_X, EmberfallIsle.TRAIN_Z - 6, EmberfallIsle.TRAIN_X + 6, EmberfallIsle.TRAIN_Z - 6,
+							EmberfallIsle.TRAIN_X, EmberfallIsle.TRAIN_Z + 2, EmberfallIsle.TRAIN_X - 6, EmberfallIsle.TRAIN_Z + 6,
+							EmberfallIsle.TRAIN_X + 6, EmberfallIsle.TRAIN_Z + 6)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "cinder_infiltrator", 325, 325, seconds(25),
+					atY(EmberfallIsle.PLATEAU_Y + 1, -10, -70, 10, -70, -14, -80, 8, -80)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "emberfall_marshal", 350, 350, seconds(480),
+					atY(EmberfallIsle.CHAMBER_Y + 1, EmberfallIsle.VX, EmberfallIsle.VZ))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", EmberfallIsle.QUEST_X, EmberfallIsle.G + 1, EmberfallIsle.QUEST_Z, 180), // the Mayor
+					new IslandRoster.Slot("FLASH_STEP_MASTER", 8, EmberfallIsle.G + 1, 52, 180),   // the Ability Teacher, on the village square
+					new IslandRoster.Slot("SWORDSMITH", -46, EmberfallIsle.G + 1, -74, -90),       // the Living Skeleton, in the hidden mine
+					new IslandRoster.Slot("INNKEEPER", 6, EmberfallIsle.G + 1, 68, 90)),           // Set Home Point, by the dock road
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 300), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 325),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 350)));
 }

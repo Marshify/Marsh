@@ -200,6 +200,7 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 					&& com.grandline.world.plan.IslandRoster.covers(cloud, com.grandline.world.FirstSeaProgression.LOWER), "Cloudtop: the upper region keeps its own population");
 			check(helper, "Stonewall Prison", new int[]{5, 5, 1, 1, 1}, new String[]{"stonewall_inmate", "high_security_inmate", "iron_jailer", "emerald_overseer", "rose_baron"}, 5, new int[]{8, 8, 1, 1, 1});
 			check(helper, "Gladiator's Ring", new int[]{5, 5}, new String[]{"arena_vanguard", "gilt_champion"}, 4, new int[]{7, 8});
+			check(helper, "Emberfall Isle", new int[]{5, 4, 1}, new String[]{"ashguard_trooper", "cinder_infiltrator", "emberfall_marshal"}, 4, new int[]{7, 8, 1});
 			check(helper, "Frostpeak Isle", new int[]{6, 4, 1}, new String[]{"frost_rover", "rime_construct", "glacier_maw"}, 5, new int[]{7, 8, 1});
 			var salt = com.grandline.world.plan.IslandRoster.of(island(helper, "Saltmarket Docks"));
 			helper.assertTrue(salt.groups().get(2).respawnTicks() == 300 * 20 && salt.groups().get(0).respawnTicks() == 15 * 20, "Saltmarket respawn times");
@@ -276,6 +277,22 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 		} finally {
 			GrandLineBatch3GameTests.remove(helper, p);
 		}
+		helper.succeed();
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "enemy_aura", timeoutTicks = 20)
+	public void infiltratorsAlwaysHaveAuraAndHitHarder(GameTestHelper helper) {
+		GrandLineEnemy e = GrandLineEntities.RAIDER.create(helper.getLevel());
+		e.setGrandLineLevel(325);
+		double base = e.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+		e.setSkin("cinder_infiltrator");
+		com.grandline.entity.EnemyAbilities.onSpawn(e);
+		helper.assertTrue(e.aura(), "Cinder Infiltrators always spawn with Aura");
+		double boosted = e.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+		helper.assertTrue(Math.abs(boosted - base * 1.25) < 1e-6, "Aura: +25% damage (" + base + " -> " + boosted + ")");
+		com.grandline.entity.EnemyAbilities.setAura(e, false);
+		helper.assertTrue(Math.abs(e.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) - base) < 1e-6, "and back without it");
+		e.discard();
 		helper.succeed();
 	}
 }
