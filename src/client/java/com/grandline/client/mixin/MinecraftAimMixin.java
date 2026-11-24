@@ -11,9 +11,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /** Attacking or using an item first turns the character to the camera's aim and tells the server (see GrandLineCamera). */
 @Mixin(Minecraft.class)
 public abstract class MinecraftAimMixin {
-	@Inject(method = "startAttack", at = @At("HEAD"))
+	@Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
 	private void grandline$aimAttack(CallbackInfoReturnable<Boolean> cir) {
 		GrandLineCamera.faceCamera(true);
+		// Fruit M1 combos (e.g. Blade Strikes): the server plays the combo; no vanilla punch is sent, so no extra damage.
+		Minecraft self = (Minecraft) (Object) this;
+		var profile = com.grandline.client.ClientProfileCache.profile();
+		if (self.player != null && self.screen == null && profile != null
+				&& com.grandline.client.GrandLineKeys.activeSource() == com.grandline.combat.ability.PowerSource.FRUIT
+				&& com.grandline.client.GrandLineKeys.movesReady()
+				&& com.grandline.combat.ability.FruitStrikes.has(profile.powers().fruit())
+				&& net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(com.grandline.network.payload.FruitStrikePayload.TYPE)) {
+			net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.grandline.network.payload.FruitStrikePayload());
+			cir.setReturnValue(false);
+			return;
+		}
 		// Sword combos: the server counts every swing (hit or miss) and plays the combo step.
 		Minecraft mc = (Minecraft) (Object) this;
 		if (mc.player != null && mc.screen == null && com.grandline.gear.sword.Swords.spec(mc.player.getMainHandItem().getItem()) != null

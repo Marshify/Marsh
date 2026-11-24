@@ -133,6 +133,26 @@ public final class GrandLineSounds {
 	public static final Cue SPIN_HELI_LOOP = abilityLoop("fruits.spin.helicopter_flight.travel", Stage.TRAVEL, 24, null, 0, 1);
 	public static final Cue SPIN_HELI_AFTERMATH = ability("fruits.spin.helicopter_flight.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
 
+	// ============================================================================ Blade (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue BLADE_DEFLECT = ability("fruits.blade.blade_body.deflect", Stage.IMPACT, 20, null, 0, 1);
+	public static final Cue BLADE_STRIKE_CHARGE = ability("fruits.blade.blade_strikes.charge", Stage.CHARGE, 16, null, 0, 1);
+	public static final Cue BLADE_STRIKE_CAST = ability("fruits.blade.blade_strikes.cast", Stage.CAST, 20, null, 0, 1);
+	public static final Cue BLADE_STRIKE_CAST_FINAL = ability("fruits.blade.blade_strikes.cast_final", Stage.CAST, 24, null, 0, 1);
+	public static final Cue BLADE_STRIKE_IMPACT = ability("fruits.blade.blade_strikes.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue BLADE_STRIKE_IMPACT_FINAL = ability("fruits.blade.blade_strikes.impact_final", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue BLADE_RUSH_CAST = ability("fruits.blade.razor_rush.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue BLADE_RUSH_IMPACT = ability("fruits.blade.razor_rush.impact", Stage.IMPACT, 32, null, 0, 1);
+	public static final Cue BLADE_DANCE_CAST = ability("fruits.blade.blade_dance.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue BLADE_DANCE_IMPACT = ability("fruits.blade.blade_dance.impact", Stage.IMPACT, 20, null, 0, 1);
+	public static final Cue BLADE_DANCE_CAST_FINAL = ability("fruits.blade.blade_dance.cast_final", Stage.CAST, 32, null, 0, 1);
+	public static final Cue BLADE_BARRAGE_CAST = ability("fruits.blade.blade_barrage.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue BLADE_BARRAGE_TRAVEL = abilityLoop("fruits.blade.blade_barrage.travel", Stage.TRAVEL, 14, null, 0, 1);
+	public static final Cue BLADE_BARRAGE_IMPACT = ability("fruits.blade.blade_barrage.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue BLADE_BARRAGE_IMPACT_FINAL = ability("fruits.blade.blade_barrage.impact_final", Stage.IMPACT, 36, null, 0, 1);
+	public static final Cue BLADE_FLIGHT_CAST = ability("fruits.blade.blade_flight.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue BLADE_FLIGHT_LOOP = abilityLoop("fruits.blade.blade_flight.travel", Stage.TRAVEL, 24, null, 0, 1);
+	public static final Cue BLADE_FLIGHT_AFTERMATH = ability("fruits.blade.blade_flight.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

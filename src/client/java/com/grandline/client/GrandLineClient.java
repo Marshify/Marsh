@@ -22,6 +22,7 @@ public final class GrandLineClient implements ClientModInitializer {
 		net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, ctx) -> {
 			if (renderer instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer player) {
 				helper.register(new com.grandline.client.render.aura.AuraLayer(player));
+				helper.register(new com.grandline.client.fx.BodyAttachments.Layer(player));
 			}
 		});
 		ClientNetworking.register();

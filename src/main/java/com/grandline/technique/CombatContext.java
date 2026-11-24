@@ -23,6 +23,11 @@ public final class CombatContext {
 	private CombatContext() {
 	}
 
+	/** The power whose move is dealing damage right now, or null (a plain attack, a mob, the world). */
+	public static Power currentPower() {
+		return power;
+	}
+
 	/** Runs {@code hit} as damage from {@code power}'s move {@code ability}. */
 	public static boolean during(Power p, AbilityDef a, java.util.function.BooleanSupplier hit) {
 		Power oldPower = power;

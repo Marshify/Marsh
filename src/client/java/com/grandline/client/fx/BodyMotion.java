@@ -29,7 +29,15 @@ import java.util.Map;
  */
 public final class BodyMotion {
 	public enum Kind {
-		ARM_WHIRL, BODY_SPIN, ROTOR, SLASH
+		ARM_WHIRL, BODY_SPIN, ROTOR, SLASH,
+		/** Three-step melee: right horizontal, left diagonal, two-arm cross ({@link #strike}). */
+		STRIKE,
+		/** Low forward dash stance with both arms trailing; {@link #finish} plays a crossing slash. */
+		RUSH,
+		/** A controlled spinning flurry of alternating cuts; {@link #finish} opens into a wide final sweep. */
+		DANCE,
+		/** Both arms straight up holding a rotor each; legs hang; leans and banks like {@link #ROTOR}. */
+		ARM_ROTOR
 	}
 
 	private static final class State {
@@ -42,6 +50,7 @@ public final class BodyMotion {
 		float lean, bank;     // smoothed body lean / bank (degrees)
 		float slashAge = -99; // last blade release (SLASH)
 		boolean slashLeft, finale;
+		int variant;
 
 		State(Kind kind, float start) {
 			this.kind = kind;
@@ -82,6 +91,26 @@ public final class BodyMotion {
 		s.finale = finale;
 	}
 
+	/** STRIKE: combo step {@code step} (0, 1, 2) swings now. */
+	public static void strike(int entity, float age, int step) {
+		State s = new State(Kind.STRIKE, age);
+		s.slashAge = age;
+		s.variant = step;
+		STATES.put(entity, s);
+	}
+
+	/** RUSH or DANCE: the finishing cut happens now (the state then winds down on its own). */
+	public static void finish(int entity, Kind kind, float age) {
+		State s = STATES.get(entity);
+		if (s != null && s.kind == kind) {
+			s.finale = true;
+			s.slashAge = age;
+			if (s.end < 0) {
+				s.end = age + (kind == Kind.DANCE ? 6 : 8);
+			}
+		}
+	}
+
 	public static boolean active(int entity, Kind kind) {
 		State s = STATES.get(entity);
 		return s != null && s.kind == kind;
@@ -110,7 +139,9 @@ public final class BodyMotion {
 			case ARM_WHIRL -> 1.1 + 0.9 * Mth.clamp(t / 50f, 0, 1); // faster the longer it's held
 			case BODY_SPIN -> 1.2;
 			case ROTOR -> 1.5;
-			case SLASH -> 0;
+			case ARM_ROTOR -> 1.8;
+			case DANCE -> 0.42; // body turns (radians per tick): two and a half turns over the move
+			case SLASH, STRIKE, RUSH -> 0;
 		};
 		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
 		return max * up * down;
@@ -137,6 +168,9 @@ public final class BodyMotion {
 		if (dt > 0) {
 			double r = rate(s, age);
 			s.phase += r * dt;
+			if (s.kind == Kind.DANCE) {
+				s.spin += Math.toDegrees(r) * dt;
+			}
 			if (s.kind == Kind.BODY_SPIN) {
 				s.spin += Math.toDegrees(r * 0.9) * dt; // a little slower than the arms: readable, never a blur
 			}
@@ -187,6 +221,74 @@ public final class BodyMotion {
 				leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.14f - sway);
 				rightLeg.zRot = Mth.lerp(w, rightLeg.zRot, 0.06f);
 				leftLeg.zRot = Mth.lerp(w, leftLeg.zRot, -0.06f);
+				rightLeg.yRot = 0;
+				leftLeg.yRot = 0;
+			}
+			case STRIKE -> {
+				float t = age - s.slashAge;
+				if (t > 14) {
+					STATES.remove(entity);
+					return;
+				}
+				float k = Mth.clamp(1 - (t - 6) / 8f, 0, 1);
+				double sweep = WindMesh.ease(t / 3.0);
+				switch (s.variant) {
+					case 0 -> { // right forearm, flat and fast from the outside across
+						aim(rightArm, k, dir(0.65, 0.05, Mth.lerp(sweep, 0.9, -0.7), false));
+						body.yRot = Mth.lerp(k, body.yRot, (float) Mth.lerp(sweep, -0.3, 0.35));
+					}
+					case 1 -> { // left forearm, high outside down across the body
+						aim(leftArm, k, dir(0.5, Mth.lerp(sweep, 0.8, -0.4), Mth.lerp(sweep, 0.6, -0.6), true));
+						body.yRot = Mth.lerp(k, body.yRot, (float) Mth.lerp(sweep, 0.3, -0.35));
+					}
+					default -> { // both blades crossing in front
+						aim(rightArm, k, dir(Mth.lerp(sweep, 0.3, 0.75), Mth.lerp(sweep, 0.45, -0.15), Mth.lerp(sweep, 1.0, -0.45), false));
+						aim(leftArm, k, dir(Mth.lerp(sweep, 0.3, 0.75), Mth.lerp(sweep, 0.45, -0.15), Mth.lerp(sweep, 1.0, -0.45), true));
+						body.xRot = Mth.lerp(k, body.xRot, (float) (0.22 * sweep));
+					}
+				}
+			}
+			case RUSH -> {
+				if (!s.finale) {
+					// Low, leaning stance; both blades held back and out, ready to cut.
+					aim(rightArm, w, dir(-0.45, -0.25, 0.55, false));
+					aim(leftArm, w, dir(-0.45, -0.25, 0.55, true));
+					body.xRot = Mth.lerp(w, body.xRot, 0.5f);
+					rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, -0.55f);
+					leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.45f);
+				} else {
+					double sweep = WindMesh.ease((age - s.slashAge) / 2.5);
+					aim(rightArm, w, dir(Mth.lerp(sweep, 0.2, 0.8), Mth.lerp(sweep, 0.3, -0.1), Mth.lerp(sweep, 1.0, -0.5), false));
+					aim(leftArm, w, dir(Mth.lerp(sweep, 0.2, 0.8), Mth.lerp(sweep, 0.3, -0.1), Mth.lerp(sweep, 1.0, -0.5), true));
+					body.xRot = Mth.lerp(w, body.xRot, (float) (0.3 * (1 - sweep) + 0.15));
+				}
+			}
+			case DANCE -> {
+				if (s.finale) {
+					// The wide final sweep: both blades thrown out level.
+					aim(rightArm, w, dir(0.3, 0.05, 1.0, false));
+					aim(leftArm, w, dir(0.3, 0.05, 1.0, true));
+				} else {
+					// Alternating cuts every 6 ticks: right flat, left diagonal; the body keeps turning (applyBody).
+					float seg = ((age - s.start) % 12) / 6f;
+					boolean right = seg < 1;
+					double sweep = WindMesh.ease((seg % 1) * 1.6);
+					if (right) {
+						aim(rightArm, w, dir(0.6, 0.1, Mth.lerp(sweep, 0.95, -0.5), false));
+						aim(leftArm, w * 0.7f, dir(-0.2, -0.1, 0.8, true));
+					} else {
+						aim(leftArm, w, dir(0.55, Mth.lerp(sweep, 0.7, -0.35), Mth.lerp(sweep, 0.8, -0.5), true));
+						aim(rightArm, w * 0.7f, dir(-0.2, -0.1, 0.8, false));
+					}
+				}
+			}
+			case ARM_ROTOR -> {
+				// Both arms straight up, each holding a rotor; legs hang loose beneath.
+				aim(rightArm, w, dir(0.05, 1, 0.1, false));
+				aim(leftArm, w, dir(0.05, 1, 0.1, true));
+				float sway = Mth.sin(age * 0.2f) * 0.07f;
+				rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, 0.18f + sway);
+				leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.1f - sway);
 				rightLeg.yRot = 0;
 				leftLeg.yRot = 0;
 			}
@@ -258,7 +360,7 @@ public final class BodyMotion {
 	 */
 	public static void applyBody(Entity entity, PoseStack pose, float age) {
 		State s = STATES.get(entity.getId());
-		if (s == null || s.kind == Kind.ARM_WHIRL || s.kind == Kind.SLASH) {
+		if (s == null || s.kind == Kind.ARM_WHIRL || s.kind == Kind.SLASH || s.kind == Kind.STRIKE || s.kind == Kind.RUSH) {
 			return;
 		}
 		float w = weight(s, age);
@@ -268,12 +370,13 @@ public final class BodyMotion {
 		double forward = -v.x * Math.sin(yaw) + v.z * Math.cos(yaw);
 		double sideways = -v.x * Math.cos(yaw) - v.z * Math.sin(yaw);
 		float turn = Mth.wrapDegrees(entity.getYRot() - entity.yRotO);
-		float targetLean = (float) Mth.clamp(forward * (s.kind == Kind.ROTOR ? 70 : 30), -12, s.kind == Kind.ROTOR ? 26 : 14);
+		boolean rotor = s.kind == Kind.ROTOR || s.kind == Kind.ARM_ROTOR;
+		float targetLean = (float) Mth.clamp(forward * (rotor ? 70 : 30), -12, rotor ? 26 : 14);
 		float targetBank = (float) Mth.clamp(-turn * 1.6 + sideways * 40, -22, 22);
 		s.lean = Mth.lerp(0.15f, s.lean, targetLean);
 		s.bank = Mth.lerp(0.15f, s.bank, targetBank);
 		pose.translate(0, 0.9, 0);
-		if (s.kind == Kind.BODY_SPIN) {
+		if (s.kind == Kind.BODY_SPIN || s.kind == Kind.DANCE) {
 			pose.mulPose(Axis.YP.rotationDegrees((float) (s.spin * w)));
 		}
 		pose.mulPose(Axis.XP.rotationDegrees(-s.lean * w));
@@ -290,7 +393,7 @@ public final class BodyMotion {
 	public static Vec3 hand(Entity e, float partial, boolean left) {
 		State s = STATES.get(e.getId());
 		float yawDeg = Mth.rotLerp(partial, e.yRotO, e.getYRot());
-		if (s != null && s.kind == Kind.BODY_SPIN) {
+		if (s != null && (s.kind == Kind.BODY_SPIN || s.kind == Kind.DANCE)) {
 			yawDeg -= (float) s.spin;
 		}
 		double yaw = Math.toRadians(yawDeg);
@@ -313,7 +416,9 @@ public final class BodyMotion {
 				double pitch = -Math.toRadians(e.getXRot()) * 0.5;
 				d = new Vec3(Math.cos(pitch), Math.sin(pitch) + Math.sin(c) * Math.cos(ph), Math.sin(c) * Math.sin(ph) * (left ? -1 : 1) + 0.12);
 			}
-			case BODY_SPIN -> d = new Vec3(0.25, 0.12, 0.96);
+			case BODY_SPIN, DANCE -> d = new Vec3(0.3, 0.05, 0.95);
+			case ARM_ROTOR -> d = new Vec3(0.05, 1, 0.1);
+			case RUSH -> d = new Vec3(-0.45, -0.25, 0.55);
 			default -> d = new Vec3(0.55, 0.05, 0.6);
 		}
 		d = d.normalize();

@@ -24,6 +24,8 @@ import net.minecraft.world.phys.Vec3;
 public final class WindRender {
 	public static final ResourceLocation MASK = GrandLineMod.id("textures/fx/wind_mask.png");
 	public static final ResourceLocation FLOW = GrandLineMod.id("textures/fx/wind_flow.png");
+	/** Same mask, own texture key so the metal render types are cached apart from the wind ones. */
+	public static final ResourceLocation METAL_MASK = GrandLineMod.id("textures/fx/metal_mask.png");
 
 	// Spin palette (docs/SPIN.md): core, edge, airflow, vortex shading, haze, debris.
 	public static final int CORE = 0xF1FCFF;
@@ -33,7 +35,27 @@ public final class WindRender {
 	public static final int HAZE = 0xB8C1C9;
 	public static final int DEBRIS = 0xA49B87;
 
+	/** Surface material: compressed air (Spin) or sharpened steel (Blade), each its own GLSL program. */
+	public enum Material {
+		WIND, METAL
+	}
+
 	private static ShaderInstance shader;
+	private static ShaderInstance metal;
+	private static Material material = Material.WIND;
+
+	/** Draws {@code draw} with {@code m} (meshes drawn inside use that material's shader and fallback texture). */
+	public static void with(Material m, Runnable draw) {
+		Material old = material;
+		material = m;
+		try {
+			draw.run();
+		} finally {
+			material = old;
+		}
+	}
+
+	public static final ResourceLocation METAL_FLOW = GrandLineMod.id("textures/fx/metal_flow.png");
 	private static Boolean irisPresent;
 
 	private WindRender() {
@@ -42,11 +64,13 @@ public final class WindRender {
 	public static void register() {
 		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("wind"),
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> shader = program));
+		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("metal"),
+				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> metal = program));
 	}
 
 	/** Whether the custom shader path is used this frame. */
 	public static boolean shaderPath() {
-		return shader != null && !shaderPackActive();
+		return (material == Material.METAL ? metal : shader) != null && !shaderPackActive();
 	}
 
 	/** An Iris shader pack is in use (Iris replaces the core shader pipeline, so custom core shaders aren't safe). */
@@ -73,14 +97,17 @@ public final class WindRender {
 	public static void quad(FxDraw d, boolean glow, Vec3[] p, float[] u, float[] v, int rgb, float[] alpha, float dissolve, float[] fresnel) {
 		float r = (rgb >> 16 & 255) / 255f, g = (rgb >> 8 & 255) / 255f, b = (rgb & 255) / 255f;
 		if (shaderPath()) {
-			VertexConsumer c = d.buffer(glow ? FxRenderTypes.shaderGlow(MASK, () -> shader) : FxRenderTypes.shaderSoft(MASK, () -> shader));
+			ShaderInstance program = material == Material.METAL ? metal : shader;
+			ResourceLocation key = material == Material.METAL ? METAL_MASK : MASK;
+			VertexConsumer c = d.buffer(glow ? FxRenderTypes.shaderGlow(key, () -> program) : FxRenderTypes.shaderSoft(key, () -> program));
 			int dis = (int) (Math.max(0, Math.min(1, dissolve)) * 240);
 			for (int i = 0; i < 4; i++) {
 				d.vertex(c, p[i], r, g, b, alpha[i], u[i], v[i], dis, (int) (Math.max(0, Math.min(1, fresnel[i])) * 240));
 			}
 			return;
 		}
-		VertexConsumer c = d.buffer(glow ? FxRenderTypes.glow(FLOW) : FxRenderTypes.soft(FLOW));
+		ResourceLocation fallback = material == Material.METAL ? METAL_FLOW : FLOW;
+		VertexConsumer c = d.buffer(glow ? FxRenderTypes.glow(fallback) : FxRenderTypes.soft(fallback));
 		float keep = 1 - Math.max(0, Math.min(1, dissolve));
 		for (int i = 0; i < 4; i++) {
 			float lift = 1 + 0.6f * fresnel[i];

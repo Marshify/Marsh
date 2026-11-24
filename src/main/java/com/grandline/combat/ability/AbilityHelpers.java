@@ -103,6 +103,32 @@ public final class AbilityHelpers {
 		}
 	}
 
+	/** The crosshair target, or the most centred visible enemy inside a narrow cone round it (never through walls). */
+	public static Vec3 assistedAim(ServerPlayer player, double range, double coneDegrees) {
+		Vec3 aim = Projectiles.crosshairAim(player, range);
+		Vec3 eye = player.getEyePosition();
+		Vec3 look = player.getLookAngle();
+		double minDot = Math.cos(Math.toRadians(coneDegrees));
+		return inCone(player, range, coneDegrees).stream()
+				.filter(player::hasLineOfSight)
+				.filter(e -> e.getBoundingBox().getCenter().subtract(eye).normalize().dot(look) >= minDot)
+				.max(Comparator.comparingDouble(e -> e.getBoundingBox().getCenter().subtract(eye).normalize().dot(look)))
+				.map(e -> e.getBoundingBox().getCenter())
+				.orElse(aim);
+	}
+
+	/** In water now: the vanilla flag, or water at the feet or body checked directly (never a tick late). */
+	public static boolean inWater(ServerPlayer player) {
+		net.minecraft.core.BlockPos feet = player.blockPosition();
+		return player.isInWater() || player.level().getFluidState(feet).is(net.minecraft.tags.FluidTags.WATER)
+				|| player.level().getFluidState(feet.above()).is(net.minecraft.tags.FluidTags.WATER);
+	}
+
+	/** Living targets within {@code range} of the eye and {@code halfAngle} degrees of the look, in sight. */
+	public static List<LivingEntity> inArc(ServerPlayer caster, double range, double halfAngle) {
+		return inCone(caster, range, halfAngle).stream().filter(caster::hasLineOfSight).toList();
+	}
+
 	public static void knockAway(LivingEntity target, Vec3 from, double strength, double lift) {
 		if (com.grandline.technique.Dodges.justEvaded(target)) {
 			return; // Instinct evaded the hit

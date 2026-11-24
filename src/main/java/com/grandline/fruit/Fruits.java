@@ -40,13 +40,8 @@ public final class Fruits {
 	/** Spin (formerly "gale", migrated by FruitRenames): its own moves, visuals and sounds (fruit/spin/SpinMoves, client SpinFx). */
 	public static final FruitDef SPIN = register("spin", FruitRarity.COMMON, 0x9BD13A, com.grandline.fruit.spin.SpinMoves.moves());
 
-	public static final FruitDef BLADE = register("blade", FruitRarity.COMMON, Element.METAL, 0x8C9BB5,
-			FruitMoves.bolt(Element.METAL, 12, 1.6, 7f),
-			FruitMoves.burst(Element.METAL, 4.5, 8f),
-			FruitMoves.dash(Element.METAL, 2, 9f),
-			FruitMoves.lingering(Element.METAL, 14, 4, 9f, 3f, 4),
-			FruitMoves.blink(Element.METAL, 9),
-			"blade_flick", "blade_fan", "blade_sever", "blade_thousand", "blade_step");
+	/** Blade: its own moves, M1 combo and Blade Body passive (fruit/blade/BladeMoves, client BladeFx). */
+	public static final FruitDef BLADE = register("blade", FruitRarity.COMMON, 0x8C9BB5, com.grandline.fruit.blade.BladeMoves.moves());
 
 	public static final FruitDef SPRING = register("spring", FruitRarity.COMMON, Element.BOUNCE, 0xB8BCC8,
 			FruitMoves.strike(Element.BOUNCE, 12, 7f),

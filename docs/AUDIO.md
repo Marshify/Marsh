@@ -158,6 +158,18 @@ How they were made:
 - **Levelled:** −13 to −22 LUFS by stage, with a −1.5 dBTP limiter. The loops have 20 ms edge fades.
 - **Not yet approved by ear** by the owner.
 
+## Blade cues (0.77.0)
+
+- **19 files** (ElevenLabs, single takes, about 300 credits; levelled −13 to −22 LUFS):
+  - deflect, with two variants and random pitch;
+  - M1: extend, swing, crossing swing, cut, heavy finisher;
+  - Razor Rush: cast, impact;
+  - Blade Dance: flurry, hit, final sweep;
+  - Blade Barrage: launch, travel whistle loop, impact, final impact;
+  - Blade Flight: spin-up, rotor loop, spin-down.
+- **Volume control:** Blade Dance hit sounds are limited to one per tick per caster.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

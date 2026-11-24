@@ -6,6 +6,7 @@
     "WorldCreationUiStateMixin",
     "HumanoidModelPunchMixin",
     "PlayerRendererBodyMotionMixin",
+    "PlayerRendererHandAttachmentMixin",
     "GameRendererShakeMixin",
     "GuiHotbarMixin",
     "GuiExperienceBarMixin",

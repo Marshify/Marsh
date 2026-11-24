@@ -1,4 +1,152 @@
 {
+  "fruits.blade.blade_barrage.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_barrage/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.blade.blade_barrage.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_barrage/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.blade.blade_barrage.impact_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_barrage/impact_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_barrage.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_barrage/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_body.deflect": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_body/deflect",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "grandline:fruits/blade/blade_body/deflect_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_dance.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_dance/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.blade.blade_dance.cast_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_dance/cast_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_dance.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_dance/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.blade.blade_flight.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_flight/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.blade.blade_flight.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_flight/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.blade.blade_flight.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_flight/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_strikes.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_strikes/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.blade.blade_strikes.cast_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_strikes/cast_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.blade_strikes.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_strikes/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.blade.blade_strikes.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_strikes/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.blade.blade_strikes.impact_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/blade_strikes/impact_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.blade.razor_rush.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/razor_rush/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.blade.razor_rush.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/blade/razor_rush/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "fruits.flame.blaze_wave.aftermath": {
     "sounds": [
       {
