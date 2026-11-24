@@ -140,4 +140,46 @@ final class IslandRosters {
 					new IslandRoster.Slot("ACCESSORY_DEALER", -37, CloudtopIsles.V_Y + 1, -52, 0),   // Yoshi, outside the pink house
 					new IslandRoster.Slot("INNKEEPER", CloudtopIsles.V_X - 5, CloudtopIsles.V_Y + 1, CloudtopIsles.V_Z + 4, 90)), // Set Home Point
 			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 150), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 175)));
+
+	/**
+	 * Stonewall Prison: Stonewall Inmates in the west of the outer enclosure, High Security Inmates in the east; the Iron
+	 * Jailer and the Emerald Overseer in the north-west and north-east of the central courtyard; the Rose Baron inside
+	 * the central tower. The Jail Keeper gives the inmate quests, the Head Jailer the boss quests.
+	 */
+	static final IslandRoster STONEWALL = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "stonewall_inmate", 190, 190, 9 * 20, at(-36, -6, -38, 6, -32, 16, -30, -16, -22, -26)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "high_security_inmate", 210, 210, 12 * 20, at(36, -6, 38, 6, 32, 16, 30, -16, 22, -26)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "iron_jailer", 220, 220, seconds(240), at(-10, -15)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "emerald_overseer", 230, 230, seconds(600), at(10, -15)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "rose_baron", 240, 240, seconds(1800), at(0, 0))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", 12, StonewallPrison.G + 1, 36, 0),          // Jail Keeper, inside the gate
+					new IslandRoster.Slot("BOSS_QUEST_GIVER", -4, StonewallPrison.G + 1, 14, 0),     // Head Jailer, left of the tower's door
+					new IslandRoster.Slot("MILITARY_DETECTIVE", 5, 53, 180),                         // by the main entrance
+					new IslandRoster.Slot("FRUIT_REMOVER", -25, StonewallPrison.G + 1, 30, 90),      // a quiet corner of the south-west yard
+					new IslandRoster.Slot("BOAT_DEALER", -4, 65, 56, 0)),                            // the main dock's landing
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 8, 190), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 210),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 220, "iron_jailer"),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 230, "emerald_overseer"),
+					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 240, "rose_baron")));
+
+	/**
+	 * Gladiator's Ring: Arena Vanguards on the west warrior grounds (left, coming from the dock), Gilt Champions on the
+	 * east training grounds. The arena itself stays free of enemies; no boss.
+	 */
+	static final IslandRoster GLADIATOR = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "arena_vanguard", 250, 250, seconds(20),
+					at(GladiatorsRing.RUINS_X - 6, GladiatorsRing.RUINS_Z - 6, GladiatorsRing.RUINS_X + 6, GladiatorsRing.RUINS_Z - 6,
+							GladiatorsRing.RUINS_X, GladiatorsRing.RUINS_Z + 6, GladiatorsRing.RUINS_X - 8, GladiatorsRing.RUINS_Z + 8,
+							GladiatorsRing.RUINS_X + 8, GladiatorsRing.RUINS_Z + 8)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "gilt_champion", 275, 275, seconds(20),
+					at(GladiatorsRing.TRAIN_X - 6, GladiatorsRing.TRAIN_Z - 6, GladiatorsRing.TRAIN_X + 6, GladiatorsRing.TRAIN_Z - 6,
+							GladiatorsRing.TRAIN_X, GladiatorsRing.TRAIN_Z + 6, GladiatorsRing.TRAIN_X - 8, GladiatorsRing.TRAIN_Z + 8,
+							GladiatorsRing.TRAIN_X + 8, GladiatorsRing.TRAIN_Z + 8))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", GladiatorsRing.QUEST_X, GladiatorsRing.G + 1, GladiatorsRing.QUEST_Z, 90), // by the gate pillars
+					new IslandRoster.Slot("BOAT_DEALER", -6, 66, 62, 0),             // the landing, west
+					new IslandRoster.Slot("LUXURY_BOAT_DEALER", 6, 66, 62, 0),       // the landing, east
+					new IslandRoster.Slot("INNKEEPER", 8, GladiatorsRing.G + 1, 55, 90)), // Set Home Point, on the entrance path
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 250), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 275)));
 }

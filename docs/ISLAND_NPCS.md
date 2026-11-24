@@ -1,4 +1,4 @@
-# Island NPC rosters (0.71.0)
+# Island NPC rosters (0.72.0)
 
 Islands with a fixed population (`IslandRoster`, enforced by `RosterNpcs`): Millbrook, Ironhold, Verdant Wilds,
 Saltmarket Docks, Sunscorch Dunes, Frostpeak Isle (their rebuilt layouts; older layouts keep their old NPCs).
@@ -15,6 +15,9 @@ spot and respawn timer, spawns on the island's ground, and has a 12-block leash;
 
 | Redbrick Port | 8 Harbor Sentinel (120, 15 s, grass behind the crescent wall, 4 west + 4 east), Bastion Commander (130, 5 min, HQ hall) | Marine Officer, Advanced Weapon Dealer (guns), Parlus (Black Cape 50,000, SW watchtower chamber) | 8 Sentinels (120), Bastion Commander (130) |
 | Cloudtop Isles (lower region only) | 4 Cloudstep Raider (150, 15 s, Azure Rise temple), 4 Duskwarden (175, 15 s, Skyreach Citadel); no boss | Mad Scientist*, Boat Dealer, Luxury Boat Dealer, Angler (fishing), Sky Adventurer, Master Sword Dealer, Yoshi (Tomoe Ring 100,000), Set Home Point | 7 Raiders (150), 8 Duskwardens (175) |
+
+| Stonewall Prison | 5 Stonewall Inmate (190, 9 s, outer enclosure west), 5 High Security Inmate (210, 12 s, east), Iron Jailer (220, 4 min) and Emerald Overseer (230, 10 min) in the central courtyard, Rose Baron (240, 30 min, central tower) | Jail Keeper (inmate quests), Head Jailer (boss quests), Military Detective (Second Sea Lv 700 info), Fruit Removal NPC (50,000), Boat Dealer | 8 + 8 inmates (190, 210); Iron Jailer (220), Emerald Overseer (230), Rose Baron (240) |
+| Gladiator's Ring | 5 Arena Vanguard (250, 20 s, west grounds), 5 Gilt Champion (275, 20 s, east grounds); arena free; no boss | Arena Quest Giver, Boat Dealer, Luxury Boat Dealer, Set Home Point | 7 Vanguards (250), 8 Champions (275) |
 
 \* talk only for now. Not added (no such feature yet): Rich Man, Sick Man. Removed: Saltmarket's Trial Keeper and Fruit
 Dealer, the islands' Fishermen. Verdant's Saber Warden is the Crimson Duelist there (unchanged rules; its skin is

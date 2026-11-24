@@ -108,11 +108,10 @@ final class GladiatorsRing extends BasePlan {
 		anchor(Anchor.at(Type.QUEST, QUEST_X, G + 1, QUEST_Z, 90));                       // on the plaza, by the gate
 		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, DOCK_LAND_Z - 3, 0, 180));     // the landing, facing the colosseum
 		anchor(Anchor.at(Type.HOME, 8, G + 1, 55, 90));                                   // the Innkeeper, by the tavern door
-		anchor(Anchor.at(Type.FISHERMAN, 5, DOCK_Y + 1, DOCK_END_Z - 2, 0));
 		anchor(Anchor.at(Type.DOCK, -8, 63, DOCK_END_Z - 3));
 		anchor(Anchor.area(Type.ENEMY_CAMP, TRAIN_X, TRAIN_Z, 8));                         // the training grounds
 		anchor(Anchor.area(Type.ENEMY_CAMP, RUINS_X, RUINS_Z, 8));                         // the warrior grounds
-		anchor(Anchor.at(Type.BOSS_ARENA, CX, F, CZ - 2));                           // quest bosses fight on the arena floor
+		// NPCs and enemies follow IslandRosters.GLADIATOR: the arena floor stays free of enemies (no boss).
 		anchor(Anchor.of(Type.TREASURE, -46, 50));
 	}
 

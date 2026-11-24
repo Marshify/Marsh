@@ -42,9 +42,10 @@ public final class GrandLineStonewallGameTests implements FabricGameTest {
 		Anchor home = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.HOME).findFirst().orElseThrow();
 		Anchor boss = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.BOSS_ARENA).findFirst().orElseThrow();
 		List<Anchor> camps = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList();
-		helper.assertTrue(quest.z() > 30 && quest.y() == 67 && home.z() > 30 && home.y() == 67, "quest giver and innkeeper wait inside the gate");
-		helper.assertTrue(boss.y() == 47, "quest bosses fight in the chamber under the tower");
-		helper.assertTrue(camps.size() == 2, "two camps: the outer courtyard and the central courtyard");
+		helper.assertTrue(quest.z() > 30 && quest.y() == 67, "the Jail Keeper waits inside the gate");
+		helper.assertTrue(home.z() > 10 && home.y() == 67, "the Head Jailer stands by the tower's door");
+		helper.assertTrue(boss.y() == 67, "the bosses hold the central courtyard and tower");
+		helper.assertTrue(camps.size() == 2, "two inmate areas: the outer enclosure's west and east");
 		for (Anchor camp : camps) {
 			helper.assertTrue(Math.hypot(quest.x() - camp.x(), quest.z() - camp.z()) >= camp.radius() + 20, "the quest giver is clear of " + camp);
 		}

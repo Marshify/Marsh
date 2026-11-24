@@ -68,7 +68,13 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** Sells accessories (Sunscorch Dunes' Guy: the Swordsman Hat). */
 		ACCESSORY_DEALER,
 		/** Cloudtop Isles' Mad Scientist (talk only until the Electric fighting style exists). */
-		MAD_SCIENTIST;
+		MAD_SCIENTIST,
+		/** Hands out the island's boss quests where they have their own giver (Stonewall's Head Jailer). */
+		BOSS_QUEST_GIVER,
+		/** Removes the player's Devil Fruit for a fee (Stonewall Prison). */
+		FRUIT_REMOVER,
+		/** Explains the Second Sea's requirement (Stonewall Prison; talk only). */
+		MILITARY_DETECTIVE;
 
 		public static Role byId(int id) {
 			Role[] values = values();

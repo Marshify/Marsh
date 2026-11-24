@@ -25,6 +25,8 @@ public record NpcActionPayload(int entityId, int action) implements FabricPacket
 	public static final int JOIN_MARINES = 60;
 	/** Pirate Recruiter: join the Pirates. */
 	public static final int JOIN_PIRATES = 61;
+	/** Fruit Removal NPC: remove the eaten Devil Fruit (after the screen's confirmation). */
+	public static final int REMOVE_FRUIT = 62;
 	/** A roster island's quest giver: accept its quest number (action - ACCEPT_ROSTER). */
 	public static final int ACCEPT_ROSTER = 80;
 	/** The accessory dealer: buy item number (action - BUY_ACCESSORY). */

@@ -49,8 +49,7 @@ public final class GrandLineGladiatorGameTests implements FabricGameTest {
 		int before = registry.layout();
 		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
 		IslandPlan plan = IslandPlans.get("Gladiator's Ring");
-		for (Anchor.Type t : List.of(Anchor.Type.QUEST, Anchor.Type.HOME, Anchor.Type.FISHERMAN, Anchor.Type.DOCK, Anchor.Type.ARRIVAL,
-				Anchor.Type.BOSS_ARENA, Anchor.Type.TREASURE)) {
+		for (Anchor.Type t : List.of(Anchor.Type.QUEST, Anchor.Type.HOME, Anchor.Type.DOCK, Anchor.Type.ARRIVAL, Anchor.Type.TREASURE)) {
 			helper.assertTrue(plan.anchors().stream().anyMatch(a -> a.type() == t), "has a " + t + " spot");
 		}
 		List<Anchor> camps = plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList();
@@ -101,8 +100,7 @@ public final class GrandLineGladiatorGameTests implements FabricGameTest {
 		int before = registry.layout();
 		setLayout(registry, IslandRegistry.CURRENT_LAYOUT);
 		IslandPlan plan = IslandPlans.get("Gladiator's Ring");
-		Anchor boss = one(plan, Anchor.Type.BOSS_ARENA);
-		helper.assertTrue(boss.y() == 69, "the boss arena is the arena floor (y 69; bosses stand on it): " + boss.y());
+		helper.assertTrue(plan.anchors().stream().noneMatch(a -> a.type() == Anchor.Type.BOSS_ARENA), "no boss: the arena stays free of enemies");
 		// Camps are outside the colosseum (92 x 80 around (0, -8)).
 		for (Anchor camp : plan.anchors().stream().filter(a -> a.type() == Anchor.Type.ENEMY_CAMP).toList()) {
 			double px = (camp.x() - 0) / 46.0, pz = (camp.z() + 8) / 40.0;

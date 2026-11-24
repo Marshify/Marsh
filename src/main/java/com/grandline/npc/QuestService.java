@@ -79,35 +79,52 @@ public final class QuestService {
 			xp = xp * q.count() / KILL_COUNT;
 			currency = currency * q.count() / KILL_COUNT;
 		}
-		return new QuestState(q.kind().name(), island.name(), q.count(), 0, xp, currency, island.x(), island.z(), q.boss());
+		return new QuestState(q.target(), island.name(), q.count(), 0, xp, currency, island.x(), island.z(), q.boss());
+	}
+
+	/**
+	 * The quests this NPC hands out on a roster island, in order: all of them, or (where the island has a boss-quest
+	 * giver, Stonewall's Head Jailer) the regular ones for the quest giver and the boss ones for the boss-quest giver.
+	 */
+	public static java.util.List<com.grandline.world.plan.IslandRoster.Quest> rosterQuests(Island island, Islander npc) {
+		var roster = com.grandline.world.plan.IslandRoster.of(island);
+		java.util.List<com.grandline.world.plan.IslandRoster.Quest> out = new java.util.ArrayList<>();
+		if (roster == null || !com.grandline.world.plan.IslandRoster.covers(island, npc.region())
+				|| (npc.role() != Islander.Role.QUEST_GIVER && npc.role() != Islander.Role.BOSS_QUEST_GIVER)) {
+			return out;
+		}
+		boolean split = roster.slots().apply(island).stream().anyMatch(s -> s.role().equals("BOSS_QUEST_GIVER"));
+		for (var q : roster.quests()) {
+			if (!split || q.boss() == (npc.role() == Islander.Role.BOSS_QUEST_GIVER)) {
+				out.add(q);
+			}
+		}
+		return out;
 	}
 
 	/** Every quest a roster island's quest giver offers, in order (empty elsewhere). */
 	public static java.util.List<QuestState> rosterOffers(Island island, Islander npc) {
-		var roster = com.grandline.world.plan.IslandRoster.of(island);
 		java.util.List<QuestState> offers = new java.util.ArrayList<>();
-		if (roster != null && npc.role() == Islander.Role.QUEST_GIVER && com.grandline.world.plan.IslandRoster.covers(island, npc.region())) {
-			for (var q : roster.quests()) {
-				offers.add(rosterQuest(island, npc, q));
-			}
+		for (var q : rosterQuests(island, npc)) {
+			offers.add(rosterQuest(island, npc, q));
 		}
 		return offers;
 	}
 
 	/** Accepts a roster island's quest number {@code index}: its level is checked; a boss quest spawns nothing (the boss lives there). */
 	public static Result acceptRoster(ServerPlayer player, Islander npc, int index) {
-		if (npc.role() != Islander.Role.QUEST_GIVER || npc.distanceTo(player) > 8) {
+		if ((npc.role() != Islander.Role.QUEST_GIVER && npc.role() != Islander.Role.BOSS_QUEST_GIVER) || npc.distanceTo(player) > 8) {
 			return Result.TOO_FAR;
 		}
 		if (active(player) != null) {
 			return Result.ALREADY_ON_QUEST;
 		}
 		Island island = IslandRegistry.get(player.server).get(npc.islandId());
-		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster == null || index < 0 || index >= roster.quests().size() || !com.grandline.world.plan.IslandRoster.covers(island, npc.region())) {
+		var quests = rosterQuests(island, npc);
+		if (index < 0 || index >= quests.size()) {
 			return Result.NO_QUEST;
 		}
-		var q = roster.quests().get(index);
+		var q = quests.get(index);
 		if (PlayerProfileService.get(player).level() < q.minLevel()) {
 			return Result.LEVEL_TOO_LOW;
 		}
@@ -132,6 +149,7 @@ public final class QuestService {
 		if (!quest.boss()) {
 			for (com.grandline.world.Island island : com.grandline.world.IslandRegistry.get(player.server).all()) {
 				if (island.name().equals(quest.islandName()) && island.sea() == 1
+						&& com.grandline.world.plan.IslandRoster.of(island) == null // a roster island's quests name their own targets
 						&& com.grandline.world.FirstSeaProgression.stage(island.name(), com.grandline.world.FirstSeaProgression.LOWER) != null) {
 					java.util.Set<String> kinds = new java.util.HashSet<>();
 					for (com.grandline.world.FirstSeaProgression.Stage st : com.grandline.world.FirstSeaProgression.STAGES) {
@@ -201,8 +219,10 @@ public final class QuestService {
 	/** Called for every kill by a player. Advances and completes matching quests. */
 	public static void onKill(ServerPlayer player, LivingEntity killed) {
 		QuestState quest = active(player);
-		if (quest == null || !(killed instanceof GrandLineEnemy enemy) || !enemy.kind().name().equals(quest.target())) {
-			return;
+		if (quest == null || !(killed instanceof GrandLineEnemy enemy)
+				|| enemy.kind() != com.grandline.world.plan.IslandRoster.targetKind(quest.target())
+				|| (quest.target().contains("#") && !quest.target().endsWith("#" + enemy.skin()))) {
+			return; // another kind, or another of the island's bosses
 		}
 		// A roster island's quest counts only its own enemies (another island's Raiders are not its Ironbacks), and the
 		// temple's secret boss is never a quest boss.
@@ -266,7 +286,7 @@ public final class QuestService {
 	}
 
 	public static Component describe(QuestState quest) {
-		Component target = com.grandline.names.GrandLineNames.npc("entity.grandline." + EnemyKind.valueOf(quest.target()).id(), quest.islandName());
+		Component target = com.grandline.names.GrandLineNames.npc(com.grandline.world.plan.IslandRoster.targetName(quest.target()), quest.islandName());
 		return Component.translatable(quest.boss() ? "quest.grandline.boss" : "quest.grandline.kill", quest.required(), target, com.grandline.names.GrandLineNames.island(quest.islandName()));
 	}
 

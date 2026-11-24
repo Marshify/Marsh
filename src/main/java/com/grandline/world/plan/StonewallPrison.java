@@ -47,12 +47,12 @@ final class StonewallPrison extends BasePlan {
 		terrain.flat(0, 0, 42, 42, G, 1, null).reach(82);
 		anchor(new Anchor(Type.ARRIVAL, 0, 65, 53, 0, 180));
 		anchor(Anchor.at(Type.QUEST, 12, G + 1, 36, 0));
-		anchor(Anchor.at(Type.HOME, -12, G + 1, 36, 0));
-		anchor(Anchor.at(Type.FISHERMAN, 0, 65, 72, 180));
+		// NPCs and enemies follow IslandRosters.STONEWALL; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.at(Type.HOME, -4, G + 1, 14, 0));          // the Head Jailer, left of the tower's door
 		anchor(Anchor.at(Type.DOCK, -4, 63, 68));
-		anchor(new Anchor(Type.ENEMY_CAMP, 0, G, -38, 6));       // the outer courtyard, north (basic)
-		anchor(new Anchor(Type.ENEMY_CAMP, 0, G, -16, 4));       // the central courtyard (stronger)
-		anchor(Anchor.at(Type.BOSS_ARENA, 0, CH_FLOOR, -10));    // the secondary chamber, underground
+		anchor(new Anchor(Type.ENEMY_CAMP, -33, G, 0, 10));      // Stonewall Inmates: the outer enclosure, west
+		anchor(new Anchor(Type.ENEMY_CAMP, 33, G, 0, 10));       // High Security Inmates: the outer enclosure, east
+		anchor(Anchor.at(Type.BOSS_ARENA, 0, G + 1, -13));       // the central courtyard (Iron Jailer, Emerald Overseer) and tower (Rose Baron)
 	}
 
 	protected static BlockState s(Block b) {

@@ -169,12 +169,18 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 
 	private static Island island(GameTestHelper helper, String name) {
 		IslandRegistry registry = IslandRegistry.get(helper.getLevel().getServer());
+		if (registry.byName(name) != null) {
+			return registry.byName(name); // the test world may hold another island at the island's current spot (layout 19 swap)
+		}
 		SeaLayout.Spec spec = SeaLayout.all().stream().filter(sp -> sp.name().equals(name)).findFirst().orElseThrow();
 		long id = SeaLayout.idOf(spec);
 		if (registry.get(id) == null) {
 			registry.add(new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name()));
 		}
-		return registry.get(id);
+		Island found = registry.get(id);
+		// Another island registered at this spot (the test world predates the layout-19 swap): an unregistered stand-in.
+		return found != null && found.name().equals(name) ? found
+				: new Island(id, spec.x(), spec.z(), spec.radius(), spec.level(), spec.name(), false, true, spec.theme().name());
 	}
 
 	/** Counts per group (kind/skin), friendly roles, quests and leashes of Verdant Wilds, Saltmarket Docks and Sunscorch Dunes. */
@@ -192,6 +198,8 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 			Island cloud = island(helper, "Cloudtop Isles");
 			helper.assertTrue(!com.grandline.world.plan.IslandRoster.covers(cloud, com.grandline.world.FirstSeaProgression.UPPER)
 					&& com.grandline.world.plan.IslandRoster.covers(cloud, com.grandline.world.FirstSeaProgression.LOWER), "Cloudtop: the upper region keeps its own population");
+			check(helper, "Stonewall Prison", new int[]{5, 5, 1, 1, 1}, new String[]{"stonewall_inmate", "high_security_inmate", "iron_jailer", "emerald_overseer", "rose_baron"}, 5, new int[]{8, 8, 1, 1, 1});
+			check(helper, "Gladiator's Ring", new int[]{5, 5}, new String[]{"arena_vanguard", "gilt_champion"}, 4, new int[]{7, 8});
 			check(helper, "Frostpeak Isle", new int[]{6, 4, 1}, new String[]{"frost_rover", "rime_construct", "glacier_maw"}, 5, new int[]{7, 8, 1});
 			var salt = com.grandline.world.plan.IslandRoster.of(island(helper, "Saltmarket Docks"));
 			helper.assertTrue(salt.groups().get(2).respawnTicks() == 300 * 20 && salt.groups().get(0).respawnTicks() == 15 * 20, "Saltmarket respawn times");
@@ -229,7 +237,8 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 		Island island = island(helper, name);
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
 		helper.assertTrue(roster != null, name + " is managed");
-		helper.assertTrue(roster.groups().size() == counts.length, name + ": groups");
+		helper.assertTrue(roster.groups().size() == counts.length, name + ": groups " + roster.groups().size() + " on " + island.name() + " plan "
+				+ com.grandline.world.plan.IslandPlans.get(island).getClass().getSimpleName());
 		for (int g = 0; g < counts.length; g++) {
 			helper.assertTrue(roster.groups().get(g).spots().size() == counts[g] && roster.groups().get(g).skin().equals(skins[g]),
 					name + ": " + counts[g] + " " + skins[g]);
@@ -251,5 +260,22 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 		for (int q = 0; q < questCounts.length; q++) {
 			helper.assertTrue(roster.quests().get(q).count() == questCounts[q], name + ": quest " + q);
 		}
+	}
+
+	@GameTest(template = EMPTY_STRUCTURE, batch = "fruit_removal", timeoutTicks = 20)
+	public void fruitRemovalTakesTheFeeAndTheFruit(GameTestHelper helper) {
+		ServerPlayer p = GrandLineBatch3GameTests.survivor(helper);
+		try {
+			helper.assertTrue(NpcService.removeFruit(p).equals("no_fruit"), "nothing to remove without a fruit");
+			PlayerProfileService.update(p, pr -> pr.withPowers(pr.powers().withFruit(com.grandline.fruit.Fruits.all().get(0).id())).withCurrency(10));
+			helper.assertTrue(NpcService.removeFruit(p).equals("removal_money"), "the fee is checked first");
+			long fee = com.grandline.GrandLineMod.config().fruitRemovalPrice;
+			PlayerProfileService.update(p, pr -> pr.withCurrency(fee + 5));
+			helper.assertTrue(NpcService.removeFruit(p).equals("fruit_removed"), "removed");
+			helper.assertTrue(!PlayerProfileService.get(p).powers().hasFruit() && PlayerProfileService.get(p).currency() == 5, "fruit gone, fee paid");
+		} finally {
+			GrandLineBatch3GameTests.remove(helper, p);
+		}
+		helper.succeed();
 	}
 }

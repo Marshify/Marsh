@@ -39,12 +39,15 @@ public final class NpcScreens {
 			case MARINE_RECRUITER -> recruiter(data, true);
 			case PIRATE_RECRUITER -> recruiter(data, false);
 			case DARK_STEP_TEACHER, BLACKSMITH, DESERT_MERCHANT, MAD_SCIENTIST -> talker(data);
+			case BOSS_QUEST_GIVER -> questGiver(data);
+			case FRUIT_REMOVER -> fruitRemover(data);
+			case MILITARY_DETECTIVE -> detective(data);
 			case ACCESSORY_DEALER -> accessoryDealer(data);
 		});
 	}
 
 	static Component quest(QuestState q) {
-		Component target = com.grandline.names.GrandLineNames.npc("entity.grandline." + EnemyKind.valueOf(q.target()).id(), q.islandName());
+		Component target = com.grandline.names.GrandLineNames.npc(com.grandline.world.plan.IslandRoster.targetName(q.target()), q.islandName());
 		return Component.translatable(q.boss() ? "quest.grandline.boss" : "quest.grandline.kill", q.required(), target, com.grandline.names.GrandLineNames.island(q.islandName()));
 	}
 
@@ -79,7 +82,7 @@ public final class NpcScreens {
 							.withStyle(ChatFormatting.RED), () -> send(data, NpcActionPayload.ACCEPT_BOSS))));
 		}
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
-		return new DialogScreen(title(data, "entity.grandline.islander.quest_giver"), lines, options);
+		return new DialogScreen(title(data, "entity.grandline.islander." + com.grandline.entity.Islander.Role.byId(data.role()).name().toLowerCase(java.util.Locale.ROOT)), lines, options);
 	}
 
 	private static DialogScreen fruitDealer(OpenNpcPayload data) {
@@ -215,6 +218,29 @@ public final class NpcScreens {
 		options.add(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { }));
 		String role = luxury ? "luxury_boat_dealer" : "boat_dealer";
 		return new DialogScreen(title(data, "entity.grandline.islander." + role), List.of(Component.translatable("npc.grandline." + role + ".greeting")), options);
+	}
+
+	/** The Fruit Removal NPC: the fee, then a confirmation before anything is taken. */
+	private static DialogScreen fruitRemover(OpenNpcPayload data) {
+		String price = java.text.NumberFormat.getIntegerInstance(java.util.Locale.ROOT).format(data.fishValue()); // the fee rides in fishValue
+		Component title = title(data, "entity.grandline.islander.fruit_remover");
+		DialogScreen confirm = new DialogScreen(title, List.of(Component.translatable("npc.grandline.fruit_remover.confirm", price).withStyle(ChatFormatting.RED)),
+				List.of(DialogScreen.Option.of(Component.translatable("npc.grandline.fruit_remover.yes").withStyle(ChatFormatting.RED), () -> send(data, NpcActionPayload.REMOVE_FRUIT)),
+						DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
+		return new DialogScreen(title, List.of(Component.translatable("npc.grandline.fruit_remover.greeting", price)),
+				List.of(new DialogScreen.Option(Component.translatable("npc.grandline.fruit_remover.remove", price), () -> net.minecraft.client.Minecraft.getInstance().setScreen(confirm), true),
+						DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
+	}
+
+	/** The Military Detective: the Second Sea's requirement, and whether the player meets it. */
+	private static DialogScreen detective(OpenNpcPayload data) {
+		int level = ClientProfileCache.profile() == null ? 1 : ClientProfileCache.profile().level();
+		int need = com.grandline.world.SeaLayout.SEA_MIN_LEVEL[1];
+		return new DialogScreen(title(data, "entity.grandline.islander.military_detective"),
+				List.of(Component.translatable("npc.grandline.military_detective.greeting", need),
+						Component.translatable(level >= need ? "npc.grandline.military_detective.ready" : "npc.grandline.military_detective.not_yet", level, need)
+								.withStyle(level >= need ? ChatFormatting.GREEN : ChatFormatting.YELLOW)),
+				List.of(DialogScreen.Option.of(Component.translatable("dialog.grandline.nevermind"), () -> { })));
 	}
 
 	/** An NPC with something to say and nothing to sell yet. */

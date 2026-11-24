@@ -34,11 +34,34 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		}
 	}
 
-	/** A quest: defeat {@code count} of a kind (1 for a boss), offered from {@code minLevel}. */
-	public record Quest(EnemyKind kind, int count, int minLevel) {
+	/**
+	 * A quest: defeat {@code count} of a kind (1 for a boss), offered from {@code minLevel}. {@code skin} names one
+	 * look when an island has several of a kind (Stonewall's three bosses); empty: any of the kind.
+	 */
+	public record Quest(EnemyKind kind, int count, int minLevel, String skin) {
+		public Quest(EnemyKind kind, int count, int minLevel) {
+			this(kind, count, minLevel, "");
+		}
+
 		public boolean boss() {
 			return kind == EnemyKind.CAPTAIN;
 		}
+
+		/** The quest's target as saved: the kind, or "KIND#skin". */
+		public String target() {
+			return skin.isEmpty() ? kind.name() : kind.name() + "#" + skin;
+		}
+	}
+
+	/** The kind of a saved quest target ("BANDIT" or "CAPTAIN#iron_jailer"). */
+	public static EnemyKind targetKind(String target) {
+		return EnemyKind.valueOf(target.split("#")[0]);
+	}
+
+	/** The translation key naming a saved quest target: a named look's own name, else the kind's. */
+	public static String targetName(String target) {
+		int i = target.indexOf('#');
+		return i < 0 ? "entity.grandline." + EnemyKind.valueOf(target).id() : "entity.grandline." + target.substring(i + 1);
 	}
 
 	/** One spawn spot: its group and island-local position; y is {@link Anchor#SURFACE} (the island's ground) or exact. */
@@ -106,6 +129,12 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		}
 		if (plan instanceof FrostpeakIsle) {
 			return IslandRosters.FROSTPEAK;
+		}
+		if (plan instanceof StonewallPrison) {
+			return IslandRosters.STONEWALL;
+		}
+		if (plan instanceof GladiatorsRing) {
+			return IslandRosters.GLADIATOR;
 		}
 		if (plan instanceof RedbrickPort) {
 			return IslandRosters.REDBRICK;

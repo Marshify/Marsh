@@ -68,6 +68,19 @@
       "Accessory Dealer": "Yoshi",
       "Innkeeper": "Set Home Point",
       "Quest Giver": "Sky Adventurer"
+    },
+    "Stonewall Prison": {
+      "Bandit": "Stonewall Inmate",
+      "Raider": "High Security Inmate",
+      "Quest Giver": "Jail Keeper",
+      "Boss Quest Giver": "Head Jailer",
+      "Fruit Remover": "Fruit Removal NPC"
+    },
+    "Gladiator's Ring": {
+      "Bandit": "Arena Vanguard",
+      "Raider": "Gilt Champion",
+      "Quest Giver": "Arena Quest Giver",
+      "Innkeeper": "Set Home Point"
     }
   }
 }

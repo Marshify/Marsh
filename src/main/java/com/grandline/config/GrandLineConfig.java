@@ -279,6 +279,8 @@ public final class GrandLineConfig {
 	public long[] swordPrices = {500, 300, 1_200, 8_000, 15_000, 40_000, 100_000, 150_000, 200_000, 250_000, 300_000,
 			1_000_000, 1_500_000, 4_000_000};
 	/** Accessory prices at the accessory dealer (Sunscorch Dunes' Guy), in AccessoryShop.STOCK order: Swordsman Hat. */
+	/** Beli the Fruit Removal NPC (Stonewall Prison) charges to remove a Devil Fruit. */
+	public long fruitRemovalPrice = 50_000;
 	public long[] accessoryPrices = {15_000, 50_000, 100_000};
 	/** Raid events (Redbrick Port's Quake Monarch): minutes between raids while players are online, and how long one lasts. */
 	public int raidIntervalMinutes = 120;

@@ -34,10 +34,7 @@ public final class NpcService {
 
 		List<QuestState> rosterOffers = QuestService.rosterOffers(island, npc);
 		List<Integer> rosterLevels = new ArrayList<>();
-		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster != null) {
-			roster.quests().forEach(q -> rosterLevels.add(q.minLevel()));
-		}
+		QuestService.rosterQuests(island, npc).forEach(q -> rosterLevels.add(q.minLevel()));
 		boolean rosterGiver = !rosterOffers.isEmpty(); // a roster island's quest giver lists its own quests instead
 		QuestState offer = npc.role() == Islander.Role.QUEST_GIVER && !rosterGiver ? QuestService.offer(island, npc, false) : null;
 		QuestState bossOffer = npc.role() == Islander.Role.QUEST_GIVER && !rosterGiver && level >= QuestService.BOSS_MIN_ISLAND_LEVEL
@@ -84,7 +81,7 @@ public final class NpcService {
 		ServerPlayNetworking.send(player, new OpenNpcPayload(npc.getId(), npc.role().ordinal(), islandName, level,
 				java.util.Optional.ofNullable(offer), java.util.Optional.ofNullable(bossOffer),
 				java.util.Optional.ofNullable(QuestService.active(player)), stock, prices, available, FruitService.millisUntilRestock(),
-				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel, rosterOffers, rosterLevels));
+				FruitService.gachaCost(player), FruitService.gachaMillisRemaining(player), npc.role() == Islander.Role.FRUIT_REMOVER ? GrandLineMod.config().fruitRemovalPrice : FishingService.inventoryValue(player), GrandLineMod.config().gachaMinLevel, rosterOffers, rosterLevels));
 	}
 
 	/** Validates and runs an NPC choice. Returns the result key (exposed for tests). */
@@ -115,6 +112,7 @@ public final class NpcService {
 					QuestService.acceptRoster(player, npc, packet.action() - NpcActionPayload.ACCEPT_ROSTER).name().toLowerCase(java.util.Locale.ROOT);
 			case NpcActionPayload.BUY_ACCESSORY, NpcActionPayload.BUY_ACCESSORY + 1, NpcActionPayload.BUY_ACCESSORY + 2 -> npc.role() == Islander.Role.ACCESSORY_DEALER
 					? AccessoryShop.buy(player, IslandRegistry.get(player.server).get(npc.islandId()), packet.action() - NpcActionPayload.BUY_ACCESSORY) : "too_far";
+			case NpcActionPayload.REMOVE_FRUIT -> npc.role() == Islander.Role.FRUIT_REMOVER ? removeFruit(player) : "too_far";
 			case NpcActionPayload.JOIN_MARINES -> npc.role() == Islander.Role.MARINE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.MARINES) : "too_far";
 			case NpcActionPayload.JOIN_PIRATES -> npc.role() == Islander.Role.PIRATE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.PIRATES) : "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH
@@ -133,7 +131,7 @@ public final class NpcService {
 					? npc.role() == Islander.Role.SWORDSMITH ? SwordShop.buy(player, packet.action() - NpcActionPayload.BUY_SWORD) : "too_far"
 					: "too_far";
 		};
-		boolean success = result.equals("joined_marines") || result.equals("joined_pirates") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
+		boolean success = result.equals("joined_marines") || result.equals("fruit_removed") || result.equals("joined_pirates") || result.equals("accepted") || result.equals("abandoned") || result.equals("sold") || result.equals("sailed")
 				|| result.equals("ship_launched") || result.equals("ship_bought") || result.equals("gun_bought")
 				|| result.equals("sword_bought") || result.equals("accessory_bought") || result.equals("rod_bought") || result.equals("technique_learned")
 				|| result.equals("tutorial_started");
@@ -174,6 +172,20 @@ public final class NpcService {
 		com.grandline.player.PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price));
 		com.grandline.gear.EquipmentOwnership.grant(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD);
 		return "rod_bought";
+	}
+
+	/** The Fruit Removal NPC: takes the fee and removes the eaten Devil Fruit (its moves go with it). */
+	public static String removeFruit(ServerPlayer player) {
+		var profile = com.grandline.player.PlayerProfileService.get(player);
+		if (!profile.powers().hasFruit()) {
+			return "no_fruit";
+		}
+		long price = GrandLineMod.config().fruitRemovalPrice;
+		if (profile.currency() < price) {
+			return "removal_money";
+		}
+		com.grandline.player.PlayerProfileService.update(player, p -> p.withCurrency(p.currency() - price).withPowers(p.powers().withFruit("")));
+		return "fruit_removed";
 	}
 
 	/** Ships an NPC deals in: the Navigator all of them, a Boat Dealer the everyday ones, the Luxury Boat Dealer the Galleon. */
