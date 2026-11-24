@@ -399,6 +399,17 @@ public final class GrandLineCommands {
 								.then(Commands.argument("amount", IntegerArgumentType.integer(1))
 										.executes(GrandLineCommands::allocate))))
 				.then(Commands.literal("admin")
+						.then(Commands.literal("raid").requires(source -> source.hasPermission(2))
+								.then(Commands.literal("start").executes(context -> {
+									boolean ok = com.grandline.npc.RaidEvents.start(context.getSource().getServer());
+									context.getSource().sendSuccess(() -> Component.literal(ok ? "Raid started" : "A raid is already on (or no Redbrick Port)"), true);
+									return ok ? 1 : 0;
+								}))
+								.then(Commands.literal("stop").executes(context -> {
+									boolean ok = com.grandline.npc.RaidEvents.stop(context.getSource().getServer());
+									context.getSource().sendSuccess(() -> Component.literal(ok ? "Raid ended" : "No raid is on"), true);
+									return ok ? 1 : 0;
+								})))
 						.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
 						// Accessibility check: /grandline admin access <island name | all>
 						.then(Commands.literal("access")

@@ -99,7 +99,15 @@ public final class KeeperNpcs {
 	/** Places any of the island's keepers that are missing (only where their spot is loaded). Exposed for tests. */
 	public static void ensure(ServerLevel level, Island island) {
 		if (RosterNpcs.manages(island)) {
-			return; // Millbrook keeps its fixed roster (RosterNpcs)
+			if (com.grandline.world.plan.IslandRoster.lowerOnly(island)) { // the upper region keeps its own keepers
+				ensure(level, island, Islander.Role.INSTINCT_SAGE);
+				for (Anchor a : IslandPlans.anchors(island, Anchor.Type.QUEST)) {
+					if (a.region() != com.grandline.world.FirstSeaProgression.LOWER) {
+						ensureRegionQuestGiver(level, island, a);
+					}
+				}
+			}
+			return; // the rest follows the island's fixed roster (RosterNpcs)
 		}
 		List<Islander.Role> roles = rolesFor(island);
 		for (Islander.Role role : roles) {

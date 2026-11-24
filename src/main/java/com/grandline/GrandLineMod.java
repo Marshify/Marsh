@@ -92,6 +92,7 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.npc.IslandPopulation.register();
 		com.grandline.npc.KeeperNpcs.register();
 		com.grandline.npc.RosterNpcs.register();
+		com.grandline.npc.RaidEvents.register();
 		com.grandline.quest.QuestUnlocks.register();
 		com.grandline.quest.QuestNavigation.register();
 		com.grandline.world.AdventureRules.register();

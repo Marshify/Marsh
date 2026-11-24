@@ -66,7 +66,9 @@ public class Islander extends PathfinderMob implements FruitDealer {
 		/** The market trader (Sunscorch Dunes; talk only for now). */
 		DESERT_MERCHANT,
 		/** Sells accessories (Sunscorch Dunes' Guy: the Swordsman Hat). */
-		ACCESSORY_DEALER;
+		ACCESSORY_DEALER,
+		/** Cloudtop Isles' Mad Scientist (talk only until the Electric fighting style exists). */
+		MAD_SCIENTIST;
 
 		public static Role byId(int id) {
 			Role[] values = values();

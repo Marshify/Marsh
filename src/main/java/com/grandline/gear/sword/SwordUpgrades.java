@@ -7,8 +7,8 @@ import com.grandline.player.PlayerProfileService;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Upgraded sword forms (Bisento, Eclipse Blade): a sword is upgraded once its own mastery reaches
- * {@code swordUpgradeMastery} (config, default 300). Upgrading changes how its moves behave; nothing is lost or replaced.
+ * Upgraded sword forms: the Eclipse Blade is upgraded once its own mastery reaches {@code swordUpgradeMastery}
+ * (config, default 300); the Bisento (V2) by defeating the Quake Monarch raid boss. Upgrading changes how its moves behave; nothing is lost or replaced.
  */
 public final class SwordUpgrades {
 	private SwordUpgrades() {
@@ -19,6 +19,10 @@ public final class SwordUpgrades {
 	}
 
 	public static boolean upgraded(ServerPlayer player, Power power) {
+		if (power.id().toString().contains("bisento")) {
+			// The Bisento's upgraded form (V2) is earned only by defeating the Quake Monarch raid boss (RaidEvents).
+			return player.getAttachedOrElse(com.grandline.data.ModAttachments.BISENTO_V2, false);
+		}
 		long xp = PlayerProfileService.get(player).powers().masteryXp(power.id().toString());
 		return AbilityActivationHandler.masteryRules().level(xp) >= upgradeMastery();
 	}

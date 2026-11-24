@@ -52,6 +52,22 @@
       "Swordsmith": "Sword Dealer of the East",
       "Innkeeper": "Set Home Point",
       "Ability Master": "Ability Teacher"
+    },
+    "Redbrick Port": {
+      "Bandit": "Harbor Sentinel",
+      "Island Captain": "Bastion Commander",
+      "Quest Giver": "Marine Officer",
+      "Gunsmith": "Advanced Weapon Dealer",
+      "Accessory Dealer": "Parlus"
+    },
+    "Cloudtop Isles": {
+      "Bandit": "Cloudstep Raider",
+      "Raider": "Duskwarden",
+      "Fisherman": "Angler",
+      "Swordsmith": "Master Sword Dealer",
+      "Accessory Dealer": "Yoshi",
+      "Innkeeper": "Set Home Point",
+      "Quest Giver": "Sky Adventurer"
     }
   }
 }

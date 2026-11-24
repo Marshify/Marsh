@@ -157,9 +157,9 @@ public final class EnemyRespawns {
 	}
 
 	/** Drops the island's queued respawns (an island whose enemies are managed elsewhere: Millbrook). */
-	public static void forget(ServerLevel level, long islandId) {
+	public static void forget(ServerLevel level, long islandId, java.util.function.Predicate<BlockPos> where) {
 		Data data = Data.get(level);
-		if (data.pending.removeIf(p -> p.islandId() == islandId)) {
+		if (data.pending.removeIf(p -> p.islandId() == islandId && where.test(p.pos()))) {
 			data.setDirty();
 		}
 	}

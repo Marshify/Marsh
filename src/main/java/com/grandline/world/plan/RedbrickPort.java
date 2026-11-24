@@ -68,12 +68,12 @@ public final class RedbrickPort extends BasePlan {
 				.shoreMix(s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.COARSE_DIRT), s(Blocks.STONE))
 				.reach(76);
 		anchor(new Anchor(Type.ARRIVAL, 0, G + 1, 34, 0, 180)); // the Marines arrive on the harbour apron
-		anchor(Anchor.at(Type.QUEST, 4, G + 1, 19, 0));
-		anchor(Anchor.at(Type.FISHERMAN, 0, G + 1, 45, 0));
+		// NPCs and enemies follow IslandRosters.REDBRICK; these anchors mark the same places for navigation and safe zones.
+		anchor(Anchor.at(Type.QUEST, -5, G + 1, 24, -90));         // the Marine Officer, left of the path to the HQ
 		anchor(Anchor.at(Type.DOCK, 7, 63, 42));
-		anchor(Anchor.area(Type.ENEMY_CAMP, 0, -52, 8));
-		anchor(Anchor.area(Type.ENEMY_CAMP, -36, 2, 5));
-		anchor(Anchor.area(Type.BOSS_ARENA, 36, 2, 5));
+		anchor(Anchor.area(Type.ENEMY_CAMP, -34, -52, 10));         // Harbor Sentinels, west
+		anchor(Anchor.area(Type.ENEMY_CAMP, 34, -52, 10));          // Harbor Sentinels, east
+		anchor(Anchor.at(Type.BOSS_ARENA, 0, G + 1, 0));            // the Bastion Commander, in the headquarters' hall
 	}
 
 	// ------------------------------------------------------------------------------------------------------- helpers

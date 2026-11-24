@@ -113,7 +113,7 @@ public final class RosterNpcs {
 
 	/** Brings the island to its roster now (exposed for tests). */
 	public static void enforce(ServerLevel level, Island island, IslandRoster roster) {
-		EnemyRespawns.forget(level, island.id()); // the island's own timers replace the general respawn queue
+		EnemyRespawns.forget(level, island.id(), pos -> IslandRoster.covers(island, IslandPopulation.regionAt(island, pos))); // own timers instead
 		var plan = com.grandline.world.plan.IslandPlans.get(island);
 		int reach = Math.max(REACH, plan != null ? plan.extent() : 0) + 32; // the whole island, however large
 		AABB area = new AABB(island.x() - reach, level.getMinBuildHeight(), island.z() - reach,
@@ -131,7 +131,8 @@ public final class RosterNpcs {
 			}
 		}
 		List<Islander> npcs = new ArrayList<>(level.getEntitiesOfClass(Islander.class, area,
-				n -> n.isAlive() && n.islandId() == island.id()));
+				n -> n.isAlive() && n.islandId() == island.id() && IslandRoster.covers(island, n.region())
+						&& !(IslandRoster.lowerOnly(island) && n.role() == Islander.Role.INSTINCT_SAGE))); // the upper region's own
 		List<Islander> kept = new ArrayList<>();
 		for (IslandRoster.Slot slot : roster.slots().apply(island)) {
 			Islander.Role role = Islander.Role.valueOf(slot.role());
@@ -192,6 +193,8 @@ public final class RosterNpcs {
 		List<GrandLineEnemy> enemies = level.getEntitiesOfClass(GrandLineEnemy.class, area, e -> e.isAlive()
 				&& !e.getTags().contains(com.grandline.race.RaceTrials.TAG)
 				&& !(e instanceof com.grandline.entity.SaberBoss) // the temple's secret boss keeps its own rules (TempleBosses)
+				&& !e.getTags().contains(RaidEvents.TAG) // the raid boss is not part of the population
+				&& IslandRoster.covers(island, IslandPopulation.regionAt(island, e.origin() != null ? e.origin() : e.blockPosition()))
 				&& (e.islandId() == island.id() || e.islandId() == Long.MIN_VALUE));
 		List<IslandRoster.Spot> spots = roster.spots();
 		Map<Integer, GrandLineEnemy> bySpot = new HashMap<>();
@@ -218,9 +221,8 @@ public final class RosterNpcs {
 			}
 			if (!COVERED.contains(island.name() + "#" + i)) { // a spot under a roof or an arch is reported once
 				COVERED.add(island.name() + "#" + i);
-				var plan = com.grandline.world.plan.IslandPlans.get(island);
 				BlockPos top = standAt(level, island, spots.get(i).x(), Anchor.SURFACE, spots.get(i).z());
-				int ground = plan == null ? top.getY() : plan.terrain().ground(spots.get(i).x(), spots.get(i).z()) + 1;
+				int ground = standY(island, spots.get(i), top.getY());
 				if (top.getY() > ground + 2) {
 					GrandLineMod.LOGGER.warn("{}: enemy spot {} ({}, {}) is covered {} blocks up", island.name(), i, spots.get(i).x(), spots.get(i).z(), top.getY() - ground);
 				}
@@ -239,13 +241,16 @@ public final class RosterNpcs {
 
 	private static void spawn(ServerLevel level, Island island, IslandRoster.Spot spot, int index) {
 		IslandRoster.Group group = spot.group();
-		// On the island's own ground (never a roof); a spot whose column is built over is reported once.
-		var plan = com.grandline.world.plan.IslandPlans.get(island);
 		BlockPos top = standAt(level, island, spot.x(), Anchor.SURFACE, spot.z());
-		BlockPos at = top;
-		if (plan != null) {
-			int ground = plan.terrain().ground(spot.x(), spot.z()) + 1;
-			at = new BlockPos(top.getX(), ground, top.getZ());
+		BlockPos at = new BlockPos(top.getX(), standY(island, spot, top.getY()), top.getZ()); // on the ground, never a roof
+		if (spot.y() != Anchor.SURFACE && !IslandSpawns.isSafe(level, at)) {
+			for (int dy = 4; dy >= -8; dy--) { // a floating island's surface rolls: find the footing near the given height
+				BlockPos p = at.above(dy);
+				if (IslandSpawns.isSafe(level, p)) {
+					at = p;
+					break;
+				}
+			}
 		}
 		if (!IslandSpawns.isSafe(level, at)) {
 			BlockPos near = nearestSafe(level, at);
@@ -269,16 +274,24 @@ public final class RosterNpcs {
 		level.addFreshEntity(enemy);
 	}
 
+	/** Where a spot's enemy stands: its exact height, or on the island's ground (never a roof). */
+	static int standY(Island island, IslandRoster.Spot spot, int fallback) {
+		if (spot.y() != Anchor.SURFACE) {
+			return spot.y();
+		}
+		var plan = com.grandline.world.plan.IslandPlans.get(island);
+		return plan != null ? plan.terrain().ground(spot.x(), spot.z()) + 1 : fallback;
+	}
+
 	/** An enemy whose home is not its spot as the roster now has it (the spot moved, or it was placed on a roof): replaced. */
 	private static boolean movedSpot(Island island, IslandRoster.Spot spot, GrandLineEnemy enemy) {
 		BlockPos home = enemy.origin();
-		var plan = com.grandline.world.plan.IslandPlans.get(island);
-		if (home == null || plan == null) {
-			return home == null;
+		if (home == null) {
+			return true;
 		}
-		int ground = plan.terrain().ground(spot.x(), spot.z()) + 1;
+		int ground = standY(island, spot, home.getY());
 		return Math.abs(home.getX() - (island.x() + spot.x())) > 3 || Math.abs(home.getZ() - (island.z() + spot.z())) > 3
-				|| Math.abs(home.getY() - ground) > 2;
+				|| (spot.y() != Anchor.SURFACE ? home.getY() - ground > 4 || ground - home.getY() > 8 : Math.abs(home.getY() - ground) > 2);
 	}
 
 	private static final java.util.Set<String> COVERED = new java.util.HashSet<>();

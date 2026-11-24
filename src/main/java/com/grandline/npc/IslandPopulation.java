@@ -119,7 +119,7 @@ public final class IslandPopulation {
 			if (role == Islander.Role.QUEST_GIVER && anchor.region() != FirstSeaProgression.LOWER) {
 				continue; // a region's own quest giver is kept in place by KeeperNpcs (also in worlds already populated)
 			}
-			if (role != null && RosterNpcs.manages(island)) {
+			if (role != null && com.grandline.world.plan.IslandRoster.covers(island, anchor.region())) {
 				continue; // Millbrook's NPCs follow its roster (RosterNpcs)
 			}
 			if (role != null) {
@@ -234,7 +234,7 @@ public final class IslandPopulation {
 	/** The regular enemy kind for the camp nearest {@code at}: by its stage's level (quests ask for the same kind). */
 	public static EnemyKind kindAt(Island island, BlockPos at) {
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster != null && !roster.groups().isEmpty()) { // an island with a fixed population: the nearest spot's group
+		if (roster != null && !roster.groups().isEmpty() && com.grandline.world.plan.IslandRoster.covers(island, regionAt(island, at))) { // fixed population: the nearest spot's group
 			com.grandline.world.plan.IslandRoster.Spot best = null;
 			double bestD = Double.MAX_VALUE;
 			for (var s : roster.spots()) {
@@ -320,8 +320,8 @@ public final class IslandPopulation {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			for (Island island : IslandRegistry.reaching(server, player.getBlockX(), player.getBlockZ(), 0)) {
-				if (island.starter() || RosterNpcs.manages(island)) {
-					continue; // safe zone, or Millbrook (fixed Bandit spots: RosterNpcs)
+				if (island.starter() || (RosterNpcs.manages(island) && !com.grandline.world.plan.IslandRoster.lowerOnly(island))) {
+					continue; // safe zone, or a roster island (fixed spots: RosterNpcs)
 				}
 				boolean nearCentre = Math.hypot(island.x() - player.getX(), island.z() - player.getZ()) <= 64;
 				int x;
@@ -330,6 +330,9 @@ public final class IslandPopulation {
 				BlockPos camp = campSpotNear(level, island, random, player.blockPosition());
 				if (camp == null && nearCentre) {
 					camp = campSpot(level, island, random);
+				}
+				if (camp != null && com.grandline.world.plan.IslandRoster.covers(island, regionAt(island, camp))) {
+					continue; // a roster region (Cloudtop's lower islands) has fixed spots
 				}
 				if (camp != null) {
 					x = camp.getX();

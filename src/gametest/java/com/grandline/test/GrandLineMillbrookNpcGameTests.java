@@ -187,6 +187,11 @@ public class GrandLineMillbrookNpcGameTests implements FabricGameTest {
 			check(helper, "Verdant Wilds", new int[]{7, 4, 1}, new String[]{"canopy_primate", "ironback", "crownback"}, 2, new int[]{6, 8, 1});
 			check(helper, "Saltmarket Docks", new int[]{6, 6, 1}, new String[]{"redcoat_raider", "dock_enforcer", "galley_master"}, 7, new int[]{8, 8, 1});
 			check(helper, "Sunscorch Dunes", new int[]{4, 4}, new String[]{"dune_prowler", "sandwatch_captain"}, 5, new int[]{8, 6});
+			check(helper, "Redbrick Port", new int[]{8, 1}, new String[]{"harbor_sentinel", "bastion_commander"}, 3, new int[]{8, 1});
+			check(helper, "Cloudtop Isles", new int[]{4, 4}, new String[]{"cloudstep_raider", "duskwarden"}, 8, new int[]{7, 8});
+			Island cloud = island(helper, "Cloudtop Isles");
+			helper.assertTrue(!com.grandline.world.plan.IslandRoster.covers(cloud, com.grandline.world.FirstSeaProgression.UPPER)
+					&& com.grandline.world.plan.IslandRoster.covers(cloud, com.grandline.world.FirstSeaProgression.LOWER), "Cloudtop: the upper region keeps its own population");
 			check(helper, "Frostpeak Isle", new int[]{6, 4, 1}, new String[]{"frost_rover", "rime_construct", "glacier_maw"}, 5, new int[]{7, 8, 1});
 			var salt = com.grandline.world.plan.IslandRoster.of(island(helper, "Saltmarket Docks"));
 			helper.assertTrue(salt.groups().get(2).respawnTicks() == 300 * 20 && salt.groups().get(0).respawnTicks() == 15 * 20, "Saltmarket respawn times");

@@ -79,6 +79,7 @@ public class GrandLineEnemy extends Monster {
 
 	public void setSkin(String skin) {
 		entityData.set(SKIN, skin == null ? "" : skin);
+		updateName();
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -178,7 +179,10 @@ public class GrandLineEnemy extends Monster {
 
 	protected void updateName() {
 		// The name on its island (an island can give it its own name; see GrandLineNames), then the level.
-		setCustomName(com.grandline.names.GrandLineNames.npc("entity.grandline." + kind().id(), com.grandline.names.GrandLineNames.islandNameOf(islandId))
+		// A look with a name of its own (the Quake Monarch raid boss) goes by it; others by their kind's name.
+		String own = "entity.grandline." + skin();
+		String key = !skin().isEmpty() && net.minecraft.locale.Language.getInstance().has(own) ? own : "entity.grandline." + kind().id();
+		setCustomName(com.grandline.names.GrandLineNames.npc(key, com.grandline.names.GrandLineNames.islandNameOf(islandId))
 				.append(" [Lv. " + grandLineLevel + "]"));
 		setCustomNameVisible(true);
 	}

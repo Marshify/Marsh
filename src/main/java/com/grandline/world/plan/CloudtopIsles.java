@@ -95,13 +95,13 @@ final class CloudtopIsles extends BasePlan {
 				.reach(300);
 		// Lower region (Lv 150-190).
 		anchor(new Anchor(Type.ARRIVAL, 0, Anchor.SURFACE, 36, 0, 180));
-		anchor(Anchor.at(Type.FISHERMAN, 1, 65, 56, 180));
+		// The lower region's NPCs and enemies follow IslandRosters.CLOUDTOP (the upper region keeps its own).
+		anchor(Anchor.of(Type.FISHERMAN, 22, 14));                    // the Angler, by the pool under the falls
 		anchor(Anchor.at(Type.DOCK, 5, 63, 58));
 		anchor(Anchor.at(Type.QUEST, -40, V_Y + 1, -34, 180));
 		anchor(Anchor.at(Type.HOME, -49, V_Y + 1, -36, 90));
-		anchor(Anchor.at(Type.ENEMY_CAMP, WF_X - 2, WF_Y, WF_Z - 3));
-		anchor(Anchor.at(Type.ENEMY_CAMP, 20, T_Y, -52));
-		anchor(Anchor.at(Type.BOSS_ARENA, CH_X + CIT_DX, K_Y, CH_Z + CIT_DZ)); // in the citadel's domed chamber
+		anchor(new Anchor(Type.ENEMY_CAMP, T_X, T_Y, T_Z, 18));                 // Cloudstep Raiders: round the temple on Azure Rise
+		anchor(new Anchor(Type.ENEMY_CAMP, K_X + CIT_DX, K_Y, K_Z + CIT_DZ, 30)); // Duskwardens: Skyreach Citadel's grounds
 		// Upper region (Lv 450-625): the Upper Cloudtop Isles.
 		anchor(Anchor.at(Type.QUEST, -137, UpperCloudtop.SET_Y + 1, -146, 180).upper());
 		anchor(Anchor.at(Type.ENEMY_CAMP, -70, UpperCloudtop.T_Y, -150).upper());

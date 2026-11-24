@@ -31,11 +31,22 @@ public final class EnemyBehavior {
 		trainee.pursuitRadius = 12;
 		map.put("marine_trainee", trainee);
 		// Island looks (GrandLineEnemy.skin) with their own leash: short enough never to reach a bridge, gate or harbour.
-		for (String skin : new String[]{"canopy_primate", "ironback", "redcoat_raider", "dock_enforcer", "dune_prowler", "sandwatch_captain", "frost_rover", "rime_construct"}) {
+		for (String skin : new String[]{"canopy_primate", "ironback", "redcoat_raider", "dock_enforcer", "dune_prowler", "sandwatch_captain", "frost_rover", "rime_construct", "harbor_sentinel", "cloudstep_raider", "duskwarden"}) {
 			EnemyBehavior b = new EnemyBehavior();
 			b.pursuitRadius = 12;
 			map.put(skin, b);
 		}
+		EnemyBehavior commander = new EnemyBehavior(); // Redbrick's Bastion Commander keeps to the headquarters' hall
+		commander.aggressionRadius = 6;
+		commander.idleRadius = 2;
+		commander.pursuitRadius = 8;
+		map.put("bastion_commander", commander);
+		EnemyBehavior raid = new EnemyBehavior(); // the Quake Monarch: a raid boss with a big presence in his arena
+		raid.aggressionRadius = 10;
+		raid.idleRadius = 4;
+		raid.pursuitRadius = 20;
+		raid.groupAggression = true;
+		map.put("quake_monarch", raid);
 		for (String skin : new String[]{"crownback", "galley_master", "glacier_maw"}) { // island bosses: a bigger presence, a tight arena
 			EnemyBehavior b = new EnemyBehavior();
 			b.aggressionRadius = 6;

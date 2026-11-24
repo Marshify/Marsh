@@ -59,9 +59,9 @@ public final class NpcService {
 			prices.add(com.grandline.gear.EquipmentOwnership.owns(player, com.grandline.registry.ModItems.STARTER_FISHING_ROD) ? -1L : GrandLineMod.config().fishingRodPrice);
 		}
 		if (npc.role() == Islander.Role.ACCESSORY_DEALER) {
-			stock.addAll(AccessoryShop.ids());
-			for (int i = 0; i < AccessoryShop.STOCK.size(); i++) {
-				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, AccessoryShop.STOCK.get(i)) ? -1L : AccessoryShop.price(i));
+			stock.addAll(AccessoryShop.ids(island));
+			for (var item : AccessoryShop.stock(island)) {
+				prices.add(com.grandline.gear.EquipmentOwnership.owns(player, item) ? -1L : AccessoryShop.price(item));
 			}
 		}
 		if (npc.role() == Islander.Role.SWORDSMITH) {
@@ -114,7 +114,7 @@ public final class NpcService {
 			case NpcActionPayload.ACCEPT_ROSTER, NpcActionPayload.ACCEPT_ROSTER + 1, NpcActionPayload.ACCEPT_ROSTER + 2, NpcActionPayload.ACCEPT_ROSTER + 3 ->
 					QuestService.acceptRoster(player, npc, packet.action() - NpcActionPayload.ACCEPT_ROSTER).name().toLowerCase(java.util.Locale.ROOT);
 			case NpcActionPayload.BUY_ACCESSORY, NpcActionPayload.BUY_ACCESSORY + 1, NpcActionPayload.BUY_ACCESSORY + 2 -> npc.role() == Islander.Role.ACCESSORY_DEALER
-					? AccessoryShop.buy(player, packet.action() - NpcActionPayload.BUY_ACCESSORY) : "too_far";
+					? AccessoryShop.buy(player, IslandRegistry.get(player.server).get(npc.islandId()), packet.action() - NpcActionPayload.BUY_ACCESSORY) : "too_far";
 			case NpcActionPayload.JOIN_MARINES -> npc.role() == Islander.Role.MARINE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.MARINES) : "too_far";
 			case NpcActionPayload.JOIN_PIRATES -> npc.role() == Islander.Role.PIRATE_RECRUITER ? join(player, com.grandline.player.TeamService.Side.PIRATES) : "too_far";
 			case NpcActionPayload.BUY_GUN, NpcActionPayload.BUY_GUN + 1 -> npc.role() == Islander.Role.GUNSMITH

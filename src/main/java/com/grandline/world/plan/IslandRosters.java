@@ -15,6 +15,15 @@ final class IslandRosters {
 	private IslandRosters() {
 	}
 
+	/** Spots at an exact standing height (floating islands, where the island's ground map is the sea floor). */
+	private static List<int[]> atY(int y, int... xz) {
+		int[][] spots = new int[xz.length / 2][];
+		for (int i = 0; i < spots.length; i++) {
+			spots[i] = new int[]{xz[i * 2], y, xz[i * 2 + 1]};
+		}
+		return List.of(spots);
+	}
+
 	private static List<int[]> at(int... xz) {
 		int[][] spots = new int[xz.length / 2][];
 		for (int i = 0; i < spots.length; i++) {
@@ -98,4 +107,37 @@ final class IslandRosters {
 							FrostpeakIsle.ABILITY_MASTER_SPOT[2], FrostpeakIsle.ABILITY_MASTER_YAW)), // the Ability Teacher, in the ice cavern
 			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 90), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 100),
 					new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 105)));
+
+	/**
+	 * Redbrick Port: Harbor Sentinels in two groups of four on the grass behind the crescent wall, west and east of the
+	 * headquarters; the Bastion Commander in the headquarters' hall. The Quake Monarch is a raid boss (RaidEvents), not
+	 * part of this population. Parlus sells the Black Cape in the south-west watchtower's chamber.
+	 */
+	static final IslandRoster REDBRICK = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "harbor_sentinel", 120, 120, seconds(15),
+					at(-50, -38, -34, -52, -22, -56, -40, -58, 46, -44, 34, -52, 22, -56, 40, -58)),
+			new IslandRoster.Group(EnemyKind.CAPTAIN, "bastion_commander", 130, 130, seconds(300), at(0, 0))),
+			island -> List.of(
+					new IslandRoster.Slot("QUEST_GIVER", -5, RedbrickPort.G + 1, 24, -90),   // Marine Officer, left of the path to the HQ
+					new IslandRoster.Slot("GUNSMITH", 24, RedbrickPort.G + 1, 20, 90),       // Advanced Weapon Dealer, by the south-east hall
+					new IslandRoster.Slot("ACCESSORY_DEALER", -58, 83, 32, 0)),             // Parlus, in the south-west watchtower's chamber
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 8, 120), new IslandRoster.Quest(EnemyKind.CAPTAIN, 1, 130)));
+
+	/**
+	 * Cloudtop Isles, lower region only (the upper region keeps its own population): Cloudstep Raiders round the temple on
+	 * Azure Rise, Duskwardens on Skyreach Citadel's grounds. No boss. NPCs on Cloudfoot Cove and in Bloomhold village.
+	 */
+	static final IslandRoster CLOUDTOP = new IslandRoster(List.of(
+			new IslandRoster.Group(EnemyKind.BANDIT, "cloudstep_raider", 150, 150, seconds(15), atY(CloudtopIsles.T_Y + 1, 18, -72, 56, -62, 36, -88, 20, -48)),
+			new IslandRoster.Group(EnemyKind.RAIDER, "duskwarden", 175, 175, seconds(15), atY(CloudtopIsles.K_Y + 1, -170, -16, -131, -11, -185, 35, -115, 35))),
+			island -> List.of(
+					new IslandRoster.Slot("MAD_SCIENTIST", -18, 24, 180),                        // Cloudfoot Cove, by the rocks at the back
+					new IslandRoster.Slot("BOAT_DEALER", -4, 44, 0),                             // at the wharf
+					new IslandRoster.Slot("LUXURY_BOAT_DEALER", 4, 44, 0),                       // at the wharf
+					new IslandRoster.Slot("FISHERMAN", 22, 14, -90),                             // the Angler, by the pool under the falls
+					new IslandRoster.Slot("QUEST_GIVER", CloudtopIsles.V_X + 4, CloudtopIsles.V_Y + 1, CloudtopIsles.V_Z + 6, 180), // Sky Adventurer
+					new IslandRoster.Slot("SWORDSMITH", CloudtopIsles.V_X + 14, CloudtopIsles.V_Y + 1, CloudtopIsles.V_Z + 10, 90), // Master Sword Dealer
+					new IslandRoster.Slot("ACCESSORY_DEALER", -37, CloudtopIsles.V_Y + 1, -52, 0),   // Yoshi, outside the pink house
+					new IslandRoster.Slot("INNKEEPER", CloudtopIsles.V_X - 5, CloudtopIsles.V_Y + 1, CloudtopIsles.V_Z + 4, 90)), // Set Home Point
+			List.of(new IslandRoster.Quest(EnemyKind.BANDIT, 7, 150), new IslandRoster.Quest(EnemyKind.RAIDER, 8, 175)));
 }

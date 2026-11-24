@@ -57,7 +57,7 @@ public final class QuestService {
 			return new QuestState(EnemyKind.CAPTAIN.name(), name, 1, 0, xp * 5, currency * 5, x, z, true);
 		}
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster != null && !roster.quests().isEmpty()) { // a roster island's first quest
+		if (roster != null && !roster.quests().isEmpty() && com.grandline.world.plan.IslandRoster.covers(island, npc.region())) { // a roster island's first quest
 			return rosterQuest(island, npc, roster.quests().get(0));
 		}
 		return new QuestState(EnemyKind.forLevel(level).name(), name, KILL_COUNT, 0, xp, currency, x, z, false);
@@ -86,7 +86,7 @@ public final class QuestService {
 	public static java.util.List<QuestState> rosterOffers(Island island, Islander npc) {
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
 		java.util.List<QuestState> offers = new java.util.ArrayList<>();
-		if (roster != null && npc.role() == Islander.Role.QUEST_GIVER) {
+		if (roster != null && npc.role() == Islander.Role.QUEST_GIVER && com.grandline.world.plan.IslandRoster.covers(island, npc.region())) {
 			for (var q : roster.quests()) {
 				offers.add(rosterQuest(island, npc, q));
 			}
@@ -104,7 +104,7 @@ public final class QuestService {
 		}
 		Island island = IslandRegistry.get(player.server).get(npc.islandId());
 		var roster = com.grandline.world.plan.IslandRoster.of(island);
-		if (roster == null || index < 0 || index >= roster.quests().size()) {
+		if (roster == null || index < 0 || index >= roster.quests().size() || !com.grandline.world.plan.IslandRoster.covers(island, npc.region())) {
 			return Result.NO_QUEST;
 		}
 		var q = roster.quests().get(index);

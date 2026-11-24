@@ -41,8 +41,8 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		}
 	}
 
-	/** One spawn spot: its group and island-local position. */
-	public record Spot(Group group, int x, int z) {
+	/** One spawn spot: its group and island-local position; y is {@link Anchor#SURFACE} (the island's ground) or exact. */
+	public record Spot(Group group, int x, int y, int z) {
 	}
 
 	/** Every spawn spot, numbered through the groups in order (the number is the spot index enemies carry). */
@@ -50,7 +50,7 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		List<Spot> all = new ArrayList<>();
 		for (Group g : groups) {
 			for (int[] p : g.spots()) {
-				all.add(new Spot(g, p[0], p[1]));
+				all.add(p.length == 3 ? new Spot(g, p[0], p[1], p[2]) : new Spot(g, p[0], Anchor.SURFACE, p[1]));
 			}
 		}
 		return all;
@@ -64,6 +64,19 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Whether the roster covers only the island's lower region (Cloudtop Isles): its upper region keeps its own quest
+	 * giver, trainer, camps and respawns, run by the general systems.
+	 */
+	public static boolean lowerOnly(Island island) {
+		return island != null && IslandPlans.get(island) instanceof CloudtopIsles;
+	}
+
+	/** Whether a spot or an NPC of this region belongs to the island's roster. */
+	public static boolean covers(Island island, int region) {
+		return of(island) != null && (!lowerOnly(island) || region == com.grandline.world.FirstSeaProgression.LOWER);
 	}
 
 	public static int seconds(int s) {
@@ -93,6 +106,12 @@ public record IslandRoster(List<Group> groups, Function<Island, List<Slot>> slot
 		}
 		if (plan instanceof FrostpeakIsle) {
 			return IslandRosters.FROSTPEAK;
+		}
+		if (plan instanceof RedbrickPort) {
+			return IslandRosters.REDBRICK;
+		}
+		if (plan instanceof CloudtopIsles) {
+			return IslandRosters.CLOUDTOP;
 		}
 		return null;
 	}

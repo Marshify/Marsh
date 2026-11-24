@@ -38,7 +38,7 @@ public final class NpcScreens {
 			case BOAT_DEALER, LUXURY_BOAT_DEALER -> boatDealer(data);
 			case MARINE_RECRUITER -> recruiter(data, true);
 			case PIRATE_RECRUITER -> recruiter(data, false);
-			case DARK_STEP_TEACHER, BLACKSMITH, DESERT_MERCHANT -> talker(data);
+			case DARK_STEP_TEACHER, BLACKSMITH, DESERT_MERCHANT, MAD_SCIENTIST -> talker(data);
 			case ACCESSORY_DEALER -> accessoryDealer(data);
 		});
 	}

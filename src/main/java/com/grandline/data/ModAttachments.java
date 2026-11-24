@@ -160,6 +160,12 @@ public final class ModAttachments {
 					.copyOnDeath()
 					.buildAndRegister(GrandLineMod.id("fishing_mastery"));
 
+	/** Bisento V2: unlocked by defeating Redbrick Port's raid boss, the Quake Monarch, while owning the Bisento. */
+	public static final AttachmentType<Boolean> BISENTO_V2 = AttachmentRegistry.<Boolean>builder()
+			.persistent(com.mojang.serialization.Codec.BOOL)
+			.copyOnDeath()
+			.buildAndRegister(GrandLineMod.id("bisento_v2"));
+
 	/** Quest navigation (compass + highlighted quest giver) on or off, per player. Absent = on. */
 	public static final AttachmentType<Boolean> QUEST_NAVIGATION = AttachmentRegistry.<Boolean>builder()
 			.persistent(com.mojang.serialization.Codec.BOOL)

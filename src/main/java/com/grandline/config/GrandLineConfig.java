@@ -279,7 +279,10 @@ public final class GrandLineConfig {
 	public long[] swordPrices = {500, 300, 1_200, 8_000, 15_000, 40_000, 100_000, 150_000, 200_000, 250_000, 300_000,
 			1_000_000, 1_500_000, 4_000_000};
 	/** Accessory prices at the accessory dealer (Sunscorch Dunes' Guy), in AccessoryShop.STOCK order: Swordsman Hat. */
-	public long[] accessoryPrices = {15_000};
+	public long[] accessoryPrices = {15_000, 50_000, 100_000};
+	/** Raid events (Redbrick Port's Quake Monarch): minutes between raids while players are online, and how long one lasts. */
+	public int raidIntervalMinutes = 120;
+	public int raidDurationMinutes = 15;
 	/** Sword mastery at which the Bisento and the Eclipse Blade switch to their upgraded moves. */
 	public int swordUpgradeMastery = 300;
 
@@ -500,9 +503,12 @@ public final class GrandLineConfig {
 		for (int i = 0; i < gunPrices.length; i++) {
 			gunPrices[i] = clamp(gunPrices[i], 0, maxCurrency);
 		}
-		if (accessoryPrices == null || accessoryPrices.length != 1) {
-			accessoryPrices = new long[]{15_000};
+		if (accessoryPrices == null || accessoryPrices.length != 3) {
+			long hat = accessoryPrices != null && accessoryPrices.length > 0 ? accessoryPrices[0] : 15_000;
+			accessoryPrices = new long[]{hat, 50_000, 100_000}; // Swordsman Hat, Black Cape, Tomoe Ring
 		}
+		raidIntervalMinutes = clamp(raidIntervalMinutes, 5, 10_080);
+		raidDurationMinutes = clamp(raidDurationMinutes, 1, 120);
 		enemyRespawnSeconds = clamp(enemyRespawnSeconds, 0, 3600);
 		killCreditSeconds = clamp(killCreditSeconds, 0, 300);
 		fishingRodPrice = clamp(fishingRodPrice, 0, maxCurrency);

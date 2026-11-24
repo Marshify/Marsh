@@ -123,6 +123,9 @@ public final class GrandLineSwordGameTests implements FabricGameTest {
 	/** Runs the sword's Z, then its X against fresh dummies, and checks each one dealt damage. */
 	private static void bothMovesHit(GameTestHelper helper, Item sword, int mastery) {
 		ServerPlayer p = player(helper, sword, mastery);
+		if (sword == Gear.BISENTO && mastery >= 300) {
+			p.setAttached(com.grandline.data.ModAttachments.BISENTO_V2, true); // Bisento V2 comes from the Quake Monarch raid
+		}
 		Power power = Gear.powerFor(sword);
 		IronGolem first = dummy(helper, p);
 		run(p, power, 0);
