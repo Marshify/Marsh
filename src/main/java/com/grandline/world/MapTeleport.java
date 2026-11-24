@@ -38,6 +38,22 @@ public final class MapTeleport {
 		}
 		Island island = IslandRegistry.get(player.server).get(islandId);
 		if (island == null) {
+			// The Upper Cloudtop Isles' own chart entry (UpperIsles.id of the Cloudtop Isles): their arrival point.
+			for (Island cloud : IslandRegistry.get(player.server).all()) {
+				if (UpperIsles.hosts(cloud) && UpperIsles.id(cloud) == islandId) {
+					int[][] portals = com.grandline.world.plan.CloudtopAccess.portals(IslandPlans.get(cloud));
+					if (portals == null) {
+						return false; // the original Cloudtop has no upper isles
+					}
+					int[] up = portals[1];
+					ServerLevel level = player.server.overworld();
+					level.getChunk((cloud.x() + up[0]) >> 4, (cloud.z() + up[2]) >> 4);
+					player.teleportTo(level, cloud.x() + up[0] + 0.5, up[1], cloud.z() + up[2] + 0.5, player.getYRot(), player.getXRot());
+					player.fallDistance = 0;
+					ModWorld.discoverUpper(player, cloud);
+					return true;
+				}
+			}
 			return false;
 		}
 		int x = island.x();

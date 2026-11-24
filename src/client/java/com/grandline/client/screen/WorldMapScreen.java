@@ -238,7 +238,10 @@ public final class WorldMapScreen extends Screen {
 	}
 
 	/** One island as placed on the chart: anchor and the art's on-screen box. */
-	private record Placed(Island island, double ax, double ay, int left, int top, int right, int bottom) {
+	private record Placed(Island island, double ax, double ay, int left, int top, int right, int bottom, boolean upper) {
+		Placed(Island island, double ax, double ay, int left, int top, int right, int bottom) {
+			this(island, ax, ay, left, top, right, bottom, false);
+		}
 	}
 
 	@Override
@@ -324,6 +327,9 @@ public final class WorldMapScreen extends Screen {
 					ResourceLocation upper = ClientProfileCache.discoveredId(com.grandline.world.UpperIsles.id(island))
 							? UPPER_ART.texture() : gray(UPPER_ART.texture());
 					blitCrisp(graphics, upper, ax + UPPER_DX - uw / 2, ay + UPPER_DY - uh * UPPER_ART.anchorY(), us, UPPER_ART.w(), UPPER_ART.h());
+					double ux = ax + UPPER_DX, uy = ay + UPPER_DY; // its own clickable box (creative teleport, tooltip)
+					placed.add(new Placed(island, ux, uy, screenX(ux - uw * 0.42), screenY(uy - uh * 0.4), screenX(ux + uw * 0.42),
+							screenY(uy + uh * 0.4), true));
 				}
 				continue;
 			} else if (art != null && firstSeaArt && island.theme().equalsIgnoreCase("palace")) {
@@ -419,10 +425,13 @@ public final class WorldMapScreen extends Screen {
 		super.render(graphics, mouseX, mouseY, partialTick);
 		if (hovered != null) {
 			Island island = hovered.island();
-			int color = island.level() <= playerLevel ? 0x9CFF9C : island.level() <= playerLevel + 50 ? 0xFFE080 : 0xFF9C9C;
-			List<Component> lines = ClientProfileCache.discovered(island)
-					? new ArrayList<>(List.of(Component.literal(com.grandline.names.GrandLineNames.island(island.name())),
-							Component.translatable("screen.grandline.map.level", island.level()).withStyle(s -> s.withColor(color))))
+			int lv = hovered.upper() ? com.grandline.world.UpperIsles.LEVEL : island.level();
+			int color = lv <= playerLevel ? 0x9CFF9C : lv <= playerLevel + 50 ? 0xFFE080 : 0xFF9C9C;
+			boolean known = hovered.upper() ? ClientProfileCache.discoveredId(com.grandline.world.UpperIsles.id(island)) : ClientProfileCache.discovered(island);
+			String name = hovered.upper() ? com.grandline.world.UpperIsles.NAME : island.name();
+			List<Component> lines = known
+					? new ArrayList<>(List.of(Component.literal(com.grandline.names.GrandLineNames.island(name)),
+							Component.translatable("screen.grandline.map.level", lv).withStyle(s -> s.withColor(color))))
 					: new ArrayList<>(List.of(Component.translatable("screen.grandline.map.undiscovered").withStyle(net.minecraft.ChatFormatting.GRAY)));
 			if (minecraft.player != null && minecraft.player.isCreative()) {
 				lines.add(Component.translatable("screen.grandline.map.teleport").withStyle(net.minecraft.ChatFormatting.AQUA));
@@ -541,7 +550,7 @@ public final class WorldMapScreen extends Screen {
 			if (hit != null && net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(
 					com.grandline.network.payload.MapTeleportPayload.TYPE)) {
 				net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(
-						new com.grandline.network.payload.MapTeleportPayload(hit.island().id()));
+						new com.grandline.network.payload.MapTeleportPayload(hit.upper() ? com.grandline.world.UpperIsles.id(hit.island()) : hit.island().id()));
 				onClose();
 				return true;
 			}
