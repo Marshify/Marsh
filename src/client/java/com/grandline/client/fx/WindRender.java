@@ -37,12 +37,15 @@ public final class WindRender {
 
 	/** Surface material: compressed air (Spin) or sharpened steel (Blade), each its own GLSL program. */
 	public enum Material {
-		WIND, METAL, FIRE
+		WIND, METAL, FIRE, SMOKE
 	}
 
 	private static ShaderInstance shader;
 	private static ShaderInstance metal;
 	private static ShaderInstance fire;
+	private static ShaderInstance smoke;
+	public static final ResourceLocation SMOKE_MASK = GrandLineMod.id("textures/fx/smoke_mask.png");
+	public static final ResourceLocation SMOKE_FLOW = GrandLineMod.id("textures/fx/smoke_flow.png");
 	public static final ResourceLocation FIRE_MASK = GrandLineMod.id("textures/fx/fire_mask.png");
 	public static final ResourceLocation FIRE_FLOW = GrandLineMod.id("textures/fx/fire_flow.png");
 	private static Material material = Material.WIND;
@@ -71,12 +74,15 @@ public final class WindRender {
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> metal = program));
 		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("blast"),
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> fire = program));
+		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("smoke"),
+				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> smoke = program));
 	}
 
 	private static ShaderInstance program() {
 		return switch (material) {
 			case METAL -> metal;
 			case FIRE -> fire;
+			case SMOKE -> smoke;
 			default -> shader;
 		};
 	}
@@ -111,7 +117,12 @@ public final class WindRender {
 		float r = (rgb >> 16 & 255) / 255f, g = (rgb >> 8 & 255) / 255f, b = (rgb & 255) / 255f;
 		if (shaderPath()) {
 			ShaderInstance program = program();
-			ResourceLocation key = material == Material.METAL ? METAL_MASK : material == Material.FIRE ? FIRE_MASK : MASK;
+			ResourceLocation key = switch (material) {
+				case METAL -> METAL_MASK;
+				case FIRE -> FIRE_MASK;
+				case SMOKE -> SMOKE_MASK;
+				default -> MASK;
+			};
 			VertexConsumer c = d.buffer(glow ? FxRenderTypes.shaderGlow(key, () -> program) : FxRenderTypes.shaderSoft(key, () -> program));
 			int dis = (int) (Math.max(0, Math.min(1, dissolve)) * 240);
 			for (int i = 0; i < 4; i++) {
@@ -119,9 +130,21 @@ public final class WindRender {
 			}
 			return;
 		}
-		ResourceLocation fallback = material == Material.METAL ? METAL_FLOW : material == Material.FIRE ? FIRE_FLOW : FLOW;
+		ResourceLocation fallback = switch (material) {
+			case METAL -> METAL_FLOW;
+			case FIRE -> FIRE_FLOW;
+			case SMOKE -> SMOKE_FLOW;
+			default -> FLOW;
+		};
 		VertexConsumer c = d.buffer(glow ? FxRenderTypes.glow(fallback) : FxRenderTypes.soft(fallback));
 		float keep = 1 - Math.max(0, Math.min(1, dissolve));
+		if (material == Material.SMOKE) {
+			// Smoke fades at its edges instead of lighting up (soft volume, no rim glow).
+			for (int i = 0; i < 4; i++) {
+				d.vertex(c, p[i], r, g, b, alpha[i] * keep * (1 - 0.8f * fresnel[i]), u[i], v[i]);
+			}
+			return;
+		}
 		for (int i = 0; i < 4; i++) {
 			float lift = 1 + 0.6f * fresnel[i];
 			d.vertex(c, p[i], Math.min(1, r * lift), Math.min(1, g * lift), Math.min(1, b * lift), alpha[i] * keep * (0.6f + 0.6f * fresnel[i]), u[i], v[i]);

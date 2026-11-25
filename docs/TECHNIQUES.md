@@ -62,8 +62,7 @@ islanders, armour stands and same-side players give none. Coating: hands → arm
 body (`AuraLayer`, wide and slim models, first-person arm), the held weapon darkened (`CoatedBuffers`). The coating tint
 is a single parameter, ready for coloured Aura later.
 
-**Elemental immunity** (new): players with Smoke, Sand, Ice, Light, Magma, Lightning, Gas or Blizzard cannot be hurt by
-other players' plain physical attacks; Aura breaks through, for that hit only. Enemies still hit them normally.
+**Elemental Reflex** (replaces the old elemental immunity): see docs/SMOKE.md. Only fruits that register a profile have it (Smoke so far); it is checked before Instinct, so a negated hit never spends a dodge.
 
 ## Instinct
 Toggle. Evades combat attacks (an attacker is behind them: melee, swords, guns, moves, bosses), one charge each:

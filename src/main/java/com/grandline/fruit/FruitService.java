@@ -150,7 +150,8 @@ public final class FruitService {
 
 	/** Fruits priced apart from their rarity's dealer price (by fruit id). */
 	public static final java.util.Map<String, Long> PRICE_OVERRIDES = java.util.Map.of("grandline:spin", 7_500L, "grandline:blade", 30_000L, "grandline:spring", 60_000L,
-			"grandline:bomb", 80_000L);
+			"grandline:bomb", 80_000L,
+			"grandline:smoke", 100_000L);
 
 	public static long price(Fruits.FruitDef fruit) {
 		Long own = PRICE_OVERRIDES.get(fruit.id());

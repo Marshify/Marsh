@@ -20,17 +20,13 @@ import java.util.WeakHashMap;
  * Where techniques meet damage (called from TechniqueDamageMixin, in this order):
  * <ol>
  *   <li>{@link #evades}: Instinct evades an eligible attack (a charge is spent, the hit and its knockback and effects
- *   are cancelled), and elemental bodies let other players' plain physical attacks pass through.</li>
+ *   are cancelled), (Elemental Reflex is checked first: see ElementalReflex).</li>
  *   <li>{@link #modify}: Aura adds its physical damage bonus to the attacker's hit and takes its reduction off hits
  *   on the wearer. Temporary: stats are never changed.</li>
  *   <li>{@link #afterHurt}: a landed physical hit with Aura on gives Aura XP (capped, and spaced out).</li>
  * </ol>
  */
 public final class Dodges {
-	/** Fruits whose users' bodies are elemental (players' plain physical attacks pass through them). */
-	public static final Set<String> ELEMENTAL_FRUITS = Set.of("grandline:smoke", "grandline:sand", "grandline:ice", "grandline:light",
-			"grandline:magma", "grandline:lightning", "grandline:gas", "grandline:blizzard");
-
 	/** Entity → game time of its last evasion: knockback and effects arriving the same tick are dropped. */
 	private static final Map<Entity, Long> EVADED = new WeakHashMap<>();
 
@@ -52,6 +48,10 @@ public final class Dodges {
 		if (!(target instanceof ServerPlayer player) || target.level().isClientSide) {
 			return false;
 		}
+		// Elemental Reflex first: a hit the body already lets through never spends an Instinct charge.
+		if (com.grandline.combat.ElementalReflex.negates(player, source)) {
+			return true;
+		}
 		if (justEvaded(player) && CombatContext.combat(source, player) && !CombatContext.instinctBreaking()) {
 			return true; // the rest of the attack that was just evaded (a multi-hit move landing the same tick)
 		}
@@ -71,20 +71,7 @@ public final class Dodges {
 				return true;
 			}
 		}
-		if (com.grandline.GrandLineMod.config().elementalImmunity && elemental(player)) {
-			ServerPlayer attacker = CombatContext.playerAttacker(source);
-			if (attacker != null && attacker != player && CombatContext.physical(source) && !TechniqueService.auraOn(attacker)) {
-				FxEvents.send(player, "tq:intangible", player.position().add(0, 1.0, 0), Vec3.ZERO, 0, 0, 0);
-				return true;
-			}
-		}
 		return false;
-	}
-
-	/** Whether the player's fruit makes their body elemental. */
-	public static boolean elemental(ServerPlayer player) {
-		var powers = com.grandline.player.PlayerProfileService.get(player).powers();
-		return powers.hasFruit() && ELEMENTAL_FRUITS.contains(powers.fruit());
 	}
 
 	/** Aura's temporary bonus and reduction. */

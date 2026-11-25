@@ -56,6 +56,7 @@
       "com.grandline.test.GrandLineBladeGameTests",
       "com.grandline.test.GrandLineSpringGameTests",
       "com.grandline.test.GrandLineBombGameTests",
+      "com.grandline.test.GrandLineSmokeGameTests",
       "com.grandline.test.GrandLineRosterGameTests",
       "com.grandline.test.GrandLineIslandGameTests",
       "com.grandline.test.GrandLinePlanGameTests",

@@ -49,7 +49,9 @@ public final class BodyMotion {
 		 * Bomb ({@link #bomb}): 0 throw (wind-up / charging stance, {@link #release} throws), 1 directing a targeted
 		 * charge, 2 propulsion dash and grab, 3 ring toss, 4 planting mines, 5 Self Destruct tension, 6 explosive jump.
 		 */
-		BOMB
+		BOMB,
+		/** Smoke ({@link #smoke}): 0 Smoke Slam, 1 Smoke Blast, 2 Smoke Liberation, 3 Smoke Bomber flight. */
+		SMOKE
 	}
 
 	private static final class State {
@@ -132,6 +134,13 @@ public final class BodyMotion {
 		STATES.put(entity, s);
 	}
 
+	/** SMOKE pose {@code variant} starts (ended with {@link #stop}). */
+	public static void smoke(int entity, float age, int variant) {
+		State s = new State(Kind.SMOKE, age);
+		s.variant = variant;
+		STATES.put(entity, s);
+	}
+
 	/** BOMB: the throw / grab / detonation happens now. */
 	public static void release(int entity, float age) {
 		State s = STATES.get(entity);
@@ -195,7 +204,7 @@ public final class BodyMotion {
 			case ROTOR -> 1.5;
 			case ARM_ROTOR -> 1.8;
 			case DANCE -> 0.42; // body turns (radians per tick): two and a half turns over the move
-			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE, BOMB -> 0;
+			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE, BOMB, SMOKE -> 0;
 		};
 		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
 		return max * up * down;
@@ -478,6 +487,60 @@ public final class BodyMotion {
 					s.end = age; // a lost end beat never holds a pose
 				}
 			}
+			case SMOKE -> {
+				float t = age - s.start;
+				switch (s.variant) {
+					case 0 -> { // Smoke Slam: arm drawn back and up, then driven down; torso and other arm follow the force
+						if (t < 3) {
+							aim(rightArm, w, dir(-0.35, 0.75, 0.3, false));
+							body.yRot = Mth.lerp(w, body.yRot, 0.3f);
+						} else {
+							float k = Mth.clamp((t - 3) / 3f, 0, 1);
+							aim(rightArm, w, dir(0.3 + 0.6 * k, 0.9 - 1.3 * k, 0.15, false).normalize());
+							body.yRot = Mth.lerp(w, body.yRot, 0.3f - 0.55f * k);
+							body.xRot = Mth.lerp(w, body.xRot, 0.3f * k);
+						}
+						aim(leftArm, w, dir(-0.25, -0.45, 0.45, true));
+						if (t > 16 && s.end < 0) {
+							s.end = age;
+						}
+					}
+					case 1 -> { // Smoke Blast: draw the arm back gathering smoke, then thrust it at the crosshair
+						if (t < 2) {
+							aim(rightArm, w, dir(-0.5, 0.1, 0.45, false));
+						} else {
+							double pitch = -head.xRot;
+							Vec3 d = dir(Math.cos(pitch), Math.sin(pitch), 0.05, false);
+							double hy = head.yRot;
+							aim(rightArm, w, new Vec3(d.x * Math.cos(hy) + d.z * Math.sin(hy), d.y, -d.x * Math.sin(hy) + d.z * Math.cos(hy)));
+						}
+						aim(leftArm, w, dir(0.3, -0.3, 0.4, true));
+						if (t > 10 && s.end < 0) {
+							s.end = age;
+						}
+					}
+					case 2 -> { // Smoke Liberation: grounded stance, both arms flung wide and slightly up
+						float k = Mth.clamp(t / 3f, 0, 1);
+						aim(rightArm, w, dir(0.35 - 0.25 * k, 0.1 + 0.2 * k, 0.5 + 0.5 * k, false));
+						aim(leftArm, w, dir(0.35 - 0.25 * k, 0.1 + 0.2 * k, 0.5 + 0.5 * k, true));
+						rightLeg.zRot = Mth.lerp(w, rightLeg.zRot, 0.18f);
+						leftLeg.zRot = Mth.lerp(w, leftLeg.zRot, -0.18f);
+						if (t > 26 && s.end < 0) {
+							s.end = age;
+						}
+					}
+					default -> { // Smoke Bomber: arms trailing down and back as smoke streams, legs loosely bent
+						float sway = Mth.sin(age * 0.15f) * 0.06f;
+						aim(rightArm, w, dir(-0.35, -0.8, 0.25 + sway, false));
+						aim(leftArm, w, dir(-0.35, -0.8, 0.25 - sway, true));
+						rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, 0.35f);
+						leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.15f);
+					}
+				}
+				if (s.end < 0 && s.variant != 3 && t > 20 * 4) {
+					s.end = age;
+				}
+			}
 			case ARM_ROTOR -> {
 				// Both arms straight up, each holding a rotor; legs hang loose beneath.
 				aim(rightArm, w, dir(0.05, 1, 0.1, false));
@@ -560,7 +623,7 @@ public final class BodyMotion {
 				|| s.kind == Kind.PUNCH_EXTEND) {
 			return;
 		}
-		if (s.kind == Kind.BOMB && s.variant != 2 && s.variant != 6) {
+		if (s.kind == Kind.BOMB && s.variant != 2 && s.variant != 6 || s.kind == Kind.SMOKE && s.variant != 3) {
 			return;
 		}
 		if (s.kind == Kind.SPRING_MOVE || s.kind == Kind.BOMB) {
@@ -587,7 +650,7 @@ public final class BodyMotion {
 		double forward = -v.x * Math.sin(yaw) + v.z * Math.cos(yaw);
 		double sideways = -v.x * Math.cos(yaw) - v.z * Math.sin(yaw);
 		float turn = Mth.wrapDegrees(entity.getYRot() - entity.yRotO);
-		boolean rotor = s.kind == Kind.ROTOR || s.kind == Kind.ARM_ROTOR;
+		boolean rotor = s.kind == Kind.ROTOR || s.kind == Kind.ARM_ROTOR || s.kind == Kind.SMOKE;
 		float targetLean = (float) Mth.clamp(forward * (rotor ? 70 : 30), -12, rotor ? 26 : 14);
 		float targetBank = (float) Mth.clamp(-turn * 1.6 + sideways * 40, -22, 22);
 		s.lean = Mth.lerp(0.15f, s.lean, targetLean);

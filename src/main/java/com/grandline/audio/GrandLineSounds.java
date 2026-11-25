@@ -186,6 +186,21 @@ public final class GrandLineSounds {
 	public static final Cue BOMB_JUMP = ability("fruits.bomb.explosive_jump.cast", Stage.CAST, 32, null, 0, 1);
 	public static final Cue BOMB_JUMP_HURT = ability("fruits.bomb.explosive_jump.fizzle", Stage.AFTERMATH, 12, null, 0, 1);
 
+	// ============================================================================ Smoke (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue SMOKE_REFLEX = ability("fruits.smoke.elemental_reflex.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
+	public static final Cue SMOKE_SLAM_CAST = ability("fruits.smoke.smoke_slam.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue SMOKE_SLAM_IMPACT = ability("fruits.smoke.smoke_slam.impact", Stage.IMPACT, 36, null, 0, 1);
+	public static final Cue SMOKE_BLAST_CAST = ability("fruits.smoke.smoke_blast.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue SMOKE_SLASH = ability("fruits.smoke.smoke_blast.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue SMOKE_CLOUD_LOOP = abilityLoop("fruits.smoke.smoke_blast.travel", Stage.TRAVEL, 18, null, 0, 1);
+	public static final Cue SMOKE_LIBERATION = ability("fruits.smoke.smoke_liberation.cast", Stage.CAST, 40, null, 0, 1);
+	public static final Cue SMOKE_LIBERATION_HIT = ability("fruits.smoke.smoke_liberation.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue SMOKE_BOMBER_START = ability("fruits.smoke.smoke_bomber.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue SMOKE_BOMBER_LOOP = abilityLoop("fruits.smoke.smoke_bomber.travel", Stage.TRAVEL, 20, null, 0, 1);
+	public static final Cue SMOKE_BOMB_DROP = ability("fruits.smoke.smoke_bomber.cast_drop", Stage.CAST, 16, null, 0, 1);
+	public static final Cue SMOKE_BOMB_BURST = ability("fruits.smoke.smoke_bomber.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue SMOKE_REFORM = ability("fruits.smoke.smoke_bomber.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

@@ -1,0 +1,13 @@
+{
+  "_comment": "Elemental Reflex NPC thresholds, keyed by stable entity type id (never display names). An NPC's conventional attack is negated only when the player's level >= max(min_player_level, npc_level + level_margin, sea floor of 'sea'). ALL VALUES ARE PROVISIONAL (no source data existed); tune them through play. 'aura': the NPC's attacks carry Aura (always bypass). 'bypass': this NPC always bypasses. 'boss': classified as a boss (always bypasses). 'bypass_attacks': damage type ids from this NPC that always bypass. Override with config/grandline/elemental_reflex.json (same format).",
+  "sea_floors": { "1": 1, "2": 700, "3": 1500 },
+  "default": { "min_player_level": 1, "level_margin": 0, "sea": 1 },
+  "npcs": {
+    "grandline:bandit": { "min_player_level": 1, "level_margin": 0, "sea": 1 },
+    "grandline:marine_trainee": { "min_player_level": 1, "level_margin": 0, "sea": 1 },
+    "grandline:raider": { "min_player_level": 1, "level_margin": 5, "sea": 1 },
+    "grandline:corsair": { "min_player_level": 1, "level_margin": 10, "sea": 1 },
+    "grandline:captain": { "boss": true, "sea": 1 },
+    "grandline:saber_boss": { "boss": true, "aura": true, "sea": 1 }
+  }
+}

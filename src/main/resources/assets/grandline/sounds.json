@@ -587,6 +587,110 @@
       }
     ]
   },
+  "fruits.smoke.elemental_reflex.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/elemental_reflex/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.smoke.smoke_blast.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_blast/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.smoke.smoke_blast.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_blast/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.smoke.smoke_blast.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_blast/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.smoke.smoke_bomber.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_bomber/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.smoke.smoke_bomber.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_bomber/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.smoke.smoke_bomber.cast_drop": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_bomber/cast_drop",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.smoke.smoke_bomber.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_bomber/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.smoke.smoke_bomber.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_bomber/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.smoke.smoke_liberation.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_liberation/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.smoke.smoke_liberation.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_liberation/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.smoke.smoke_slam.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_slam/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.smoke.smoke_slam.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/smoke/smoke_slam/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "fruits.spin.air_slasher.cast": {
     "sounds": [
       {

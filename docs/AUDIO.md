@@ -194,6 +194,17 @@ How they were made:
 - **Takes are short** (about 1 second each), so the loops repeat quickly.
 - **Not yet approved by ear** by the owner.
 
+## Smoke cues (0.80.0)
+
+- **13 files** (ElevenLabs, single takes):
+  - Elemental Reflex: dispersal (at most one every 4 ticks);
+  - Smoke Slam: rush, impact;
+  - Smoke Blast: release, cloud loop, slash;
+  - Smoke Liberation: vortex, hit;
+  - Smoke Bomber: transformation, flight loop, bomb drop, detonation, reform.
+- **Volume control:** one slash or hit sound per tick, and at most one bomb detonation sound every 2 ticks.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

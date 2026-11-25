@@ -49,14 +49,8 @@ public final class Fruits {
 	/** Bomb (formerly "blast", migrated by FruitRenames): its own moves (fruit/bomb/BombMoves, client BombFx). */
 	public static final FruitDef BOMB = register("bomb", FruitRarity.COMMON, 0x5A3A3A, com.grandline.fruit.bomb.BombMoves.moves());
 
-	/** Smoke (formerly "mist", migrated by FruitRenames). */
-	public static final FruitDef SMOKE = register("smoke", FruitRarity.COMMON, Element.MIST, 0xBDBDBD,
-			FruitMoves.bolt(Element.MIST, 14, 1.6, 5f),
-			FruitMoves.burst(Element.MIST, 5.5, 6f),
-			FruitMoves.lingering(Element.MIST, 14, 4.5, 5f, 3f, 5),
-			FruitMoves.vortex(Element.MIST, 16, 5.5, 12f),
-			FruitMoves.blink(Element.MIST, 10),
-			"smoke_puff", "smoke_ring", "smoke_haze", "smoke_storm", "smoke_drift");
+	/** Smoke (formerly "mist", migrated by FruitRenames): Elemental; its own moves and Elemental Reflex (fruit/smoke/SmokeMoves, client SmokeFx). */
+	public static final FruitDef SMOKE = register("smoke", FruitRarity.COMMON, 0xBDBDBD, com.grandline.fruit.smoke.SmokeMoves.moves());
 
 	public static final FruitDef SPIKE = register("spike", FruitRarity.COMMON, Element.METAL, 0x9A9AA6,
 			FruitMoves.bolt(Element.METAL, 16, 1, 7f),
