@@ -164,6 +164,28 @@ public final class GrandLineSounds {
 	public static final Cue SPRING_LEAP_LOOP = abilityLoop("fruits.spring.spring_leap.travel", Stage.TRAVEL, 20, null, 0, 1);
 	public static final Cue SPRING_RETRACT = ability("fruits.spring.spring_leap.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
 
+	// ============================================================================ Bomb (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue BOMB_IGNITE = ability("fruits.bomb.blast_toss.cast", Stage.CAST, 20, null, 0, 1);
+	public static final Cue BOMB_FUSE_LOOP = abilityLoop("fruits.bomb.blast_toss.travel", Stage.TRAVEL, 14, null, 0, 1);
+	public static final Cue BOMB_THROW = ability("fruits.bomb.blast_toss.cast_throw", Stage.CAST, 24, null, 0, 1);
+	public static final Cue BOMB_EXPLODE = ability("fruits.bomb.blast_toss.impact", Stage.IMPACT, 40, null, 0, 1);
+	public static final Cue BOMB_EXPLODE_HEAVY = ability("fruits.bomb.blast_toss.impact_heavy", Stage.IMPACT, 48, null, 0, 1);
+	public static final Cue BOMB_TARGET_CHARGE = abilityLoop("fruits.bomb.targeted_bomb.charge", Stage.CHARGE, 20, null, 0, 1);
+	public static final Cue BOMB_TARGET_BLAST = ability("fruits.bomb.targeted_bomb.impact", Stage.IMPACT, 48, null, 0, 1);
+	public static final Cue BOMB_GRAB_LAUNCH = ability("fruits.bomb.bomb_grab.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue BOMB_GRAB_ATTACH = ability("fruits.bomb.bomb_grab.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue BOMB_DELAYED_BLAST = ability("fruits.bomb.bomb_grab.impact_delayed", Stage.IMPACT, 44, null, 0, 1);
+	public static final Cue BOMB_MINE_DEPLOY = ability("fruits.bomb.land_mines.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue BOMB_MINE_ARM = ability("fruits.bomb.land_mines.charge", Stage.CHARGE, 12, null, 0, 1);
+	public static final Cue BOMB_MINE_TRIGGER = ability("fruits.bomb.land_mines.cast_trigger", Stage.CAST, 20, null, 0, 1);
+	public static final Cue BOMB_HEAD = ability("fruits.bomb.self_destruct.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue BOMB_SELF_CHARGE = abilityLoop("fruits.bomb.self_destruct.charge", Stage.CHARGE, 28, null, 0, 1);
+	public static final Cue BOMB_SELF_MAX = ability("fruits.bomb.self_destruct.charge_max", Stage.CHARGE, 28, null, 0, 1);
+	public static final Cue BOMB_SELF_BLAST = ability("fruits.bomb.self_destruct.impact", Stage.IMPACT, 64, null, 0, 1);
+	public static final Cue BOMB_RESIDUE = ability("fruits.bomb.self_destruct.aftermath", Stage.AFTERMATH, 28, null, 0, 1);
+	public static final Cue BOMB_JUMP = ability("fruits.bomb.explosive_jump.cast", Stage.CAST, 32, null, 0, 1);
+	public static final Cue BOMB_JUMP_HURT = ability("fruits.bomb.explosive_jump.fizzle", Stage.AFTERMATH, 12, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

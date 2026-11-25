@@ -13,6 +13,7 @@ public final class GrandLineClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		com.grandline.client.fx.GrandLineFx.register();
 		com.grandline.client.fx.WindRender.register();
+		com.grandline.client.FruitStrikeInput.register();
 		com.grandline.client.render.sword.HeldSwords.register();
 		com.grandline.client.technique.ClientTechniques.register();
 		com.grandline.client.technique.TechniqueKeys.register();

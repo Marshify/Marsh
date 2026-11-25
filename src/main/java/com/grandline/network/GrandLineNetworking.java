@@ -48,7 +48,13 @@ public final class GrandLineNetworking {
 				(packet, player, responseSender) -> AbilityActivationHandler.release(player, packet));
 
 		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.FruitStrikePayload.TYPE,
-				(packet, player, responseSender) -> com.grandline.combat.ability.FruitStrikes.swing(player));
+				(packet, player, responseSender) -> {
+					if (packet.release()) {
+						com.grandline.combat.ability.FruitStrikes.release(player);
+					} else {
+						com.grandline.combat.ability.FruitStrikes.swing(player);
+					}
+				});
 
 		ServerPlayNetworking.registerGlobalReceiver(com.grandline.network.payload.SwordSwingPayload.TYPE,
 				(packet, player, responseSender) -> com.grandline.gear.sword.SwordCombos.swing(player));

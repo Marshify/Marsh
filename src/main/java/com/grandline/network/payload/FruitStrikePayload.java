@@ -10,11 +10,13 @@ import net.minecraft.network.FriendlyByteBuf;
  * server decides the combo step, timing and every hit ({@link com.grandline.combat.ability.FruitStrikes}); the client
  * sends no vanilla attack, so no punch damage is ever added.
  */
-public record FruitStrikePayload() implements FabricPacket {
-	public static final PacketType<FruitStrikePayload> TYPE = PacketType.create(GrandLineMod.id("fruit_strike"), buf -> new FruitStrikePayload());
+/** {@code release}: the attack button was let go (held M1 moves, see FruitStrikes#charged). */
+public record FruitStrikePayload(boolean release) implements FabricPacket {
+	public static final PacketType<FruitStrikePayload> TYPE = PacketType.create(GrandLineMod.id("fruit_strike"), buf -> new FruitStrikePayload(buf.readBoolean()));
 
 	@Override
 	public void write(FriendlyByteBuf buf) {
+		buf.writeBoolean(release);
 	}
 
 	@Override

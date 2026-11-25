@@ -241,6 +241,10 @@ public final class ProfileHud {
 			}
 
 			int nameColor = !unlocked ? LOCKED_NAME : cooldown > 0 ? COOLING_NAME : 0xFFFFFFFF;
+			// Explosive Jump: red while the next use would cost health (repeated-use penalty, synced from the server).
+			if (unlocked && "bomb_jump".equals(ability.key()) && com.grandline.client.fx.BombFx.jumpWarning()) {
+				nameColor = 0xFFFF5555;
+			}
 			graphics.drawString(font, Component.translatable(ability.translationKey()), x + 3, y + 3, nameColor);
 
 			String key = "[" + GrandLineKeys.MOVES[slot].getTranslatedKeyMessage().getString() + "]";

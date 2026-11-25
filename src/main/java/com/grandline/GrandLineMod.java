@@ -79,6 +79,8 @@ public final class GrandLineMod implements ModInitializer {
 		com.grandline.combat.ability.FruitStrikes.register();
 		com.grandline.combat.DefensivePassives.register();
 		com.grandline.combat.MovementGuards.register();
+		com.grandline.combat.ability.Traps.register();
+		com.grandline.combat.ability.AttachedCharges.register();
 		com.grandline.technique.TechniqueService.register();
 		com.grandline.combat.ability.FlightService.register();
 		com.grandline.combat.CombatCredit.register();

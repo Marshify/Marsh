@@ -44,7 +44,12 @@ public final class BodyMotion {
 		 * Spring-legged movement ({@link #spring}): variant 0 a crouched launch then a lean into the dash, 1 a vertical
 		 * rise and slam, 2/3 bouncing; {@link #contact} turns the legs onto the real contact surface for a moment.
 		 */
-		SPRING_MOVE
+		SPRING_MOVE,
+		/**
+		 * Bomb ({@link #bomb}): 0 throw (wind-up / charging stance, {@link #release} throws), 1 directing a targeted
+		 * charge, 2 propulsion dash and grab, 3 ring toss, 4 planting mines, 5 Self Destruct tension, 6 explosive jump.
+		 */
+		BOMB
 	}
 
 	private static final class State {
@@ -120,6 +125,25 @@ public final class BodyMotion {
 		STATES.put(entity, s);
 	}
 
+	/** BOMB pose {@code variant} starts (ended with {@link #stop}). */
+	public static void bomb(int entity, float age, int variant) {
+		State s = new State(Kind.BOMB, age);
+		s.variant = variant;
+		STATES.put(entity, s);
+	}
+
+	/** BOMB: the throw / grab / detonation happens now. */
+	public static void release(int entity, float age) {
+		State s = STATES.get(entity);
+		if (s != null && s.kind == Kind.BOMB) {
+			s.slashAge = age;
+			s.finale = true;
+			if (s.end < 0) {
+				s.end = age + 6;
+			}
+		}
+	}
+
 	/** SPRING_MOVE: the legs met a surface with world normal {@code normal} now. */
 	public static void contact(int entity, float age, Vec3 normal) {
 		State s = STATES.get(entity);
@@ -171,7 +195,7 @@ public final class BodyMotion {
 			case ROTOR -> 1.5;
 			case ARM_ROTOR -> 1.8;
 			case DANCE -> 0.42; // body turns (radians per tick): two and a half turns over the move
-			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE -> 0;
+			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE, BOMB -> 0;
 		};
 		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
 		return max * up * down;
@@ -373,6 +397,87 @@ public final class BodyMotion {
 					}
 				}
 			}
+			case BOMB -> {
+				float t = age - s.start;
+				float rt = age - s.slashAge;
+				switch (s.variant) {
+					case 0 -> { // Blast Toss: arm drawn back holding the bomb (deeper the longer it charges), then the throw
+						if (!s.finale) {
+							float k = Mth.clamp(t / 20f, 0, 1);
+							aim(rightArm, w, dir(-0.45 - 0.25 * k, 0.55 + 0.2 * k, 0.35, false));
+							aim(leftArm, w, dir(0.8, 0.2, 0.25, true));
+							body.yRot = Mth.lerp(w, body.yRot, 0.35f + 0.15f * k);
+						} else {
+							float k = Mth.clamp(rt / 3f, 0, 1);
+							double pitch = -head.xRot;
+							aim(rightArm, w, dir(-0.4 + 1.4 * k, 0.75 - 0.6 * k + Math.sin(pitch) * 0.4 * k, 0.3 - 0.25 * k, false).normalize());
+							aim(leftArm, w, dir(-0.3, -0.2, 0.5, true));
+							body.yRot = Mth.lerp(w, body.yRot, 0.4f - 0.75f * k);
+						}
+					}
+					case 1 -> { // Targeted Bomb: casting arm extended toward the target, other hand at the chest
+						double pitch = -head.xRot;
+						Vec3 d = dir(Math.cos(pitch), Math.sin(pitch), 0.08, false);
+						double hy = head.yRot;
+						d = new Vec3(d.x * Math.cos(hy) + d.z * Math.sin(hy), d.y, -d.x * Math.sin(hy) + d.z * Math.cos(hy));
+						float pulse = s.finale ? Mth.clamp(1 - rt / 4f, 0, 1) : 0;
+						aim(rightArm, w, d.add(0, 0.25 * pulse, 0).normalize());
+						aim(leftArm, w, dir(0.55, 0.15, -0.35, true));
+						body.yRot = Mth.lerp(w, body.yRot, -0.2f);
+					}
+					case 2 -> { // Bomb Grab: lean into the blast, both arms reaching; then the slap of the bomb
+						if (!s.finale) {
+							aim(rightArm, w, dir(0.9, 0.05, 0.3, false));
+							aim(leftArm, w, dir(0.9, 0.05, 0.3, true));
+						} else {
+							float k = Mth.clamp(rt / 4f, 0, 1);
+							aim(rightArm, w, dir(0.7, 0.55 - 0.5 * k, 0.1, false));
+							aim(leftArm, w, dir(0.8, -0.1, 0.4, true));
+						}
+						rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, 0.5f);
+						leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, -0.35f);
+					}
+					case 3 -> { // Land Mines ring: both arms fling out wide
+						float k = Mth.clamp(t / 4f, 0, 1);
+						aim(rightArm, w, dir(0.5 - 0.4 * k, 0.1 + 0.15 * k, 0.4 + 0.6 * k, false));
+						aim(leftArm, w, dir(0.5 - 0.4 * k, 0.1 + 0.15 * k, 0.4 + 0.6 * k, true));
+						if (t > 10 && s.end < 0) {
+							s.end = age;
+						}
+					}
+					case 4 -> { // planting mines: crouched, hands down to the ground
+						body.xRot = Mth.lerp(w, body.xRot, 0.5f);
+						aim(rightArm, w, dir(0.6, -0.8, 0.15, false));
+						aim(leftArm, w, dir(0.45, -0.85, 0.25, true));
+						rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, -0.5f);
+						leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, -0.5f);
+					}
+					case 5 -> { // Self Destruct: braced, arms down and out, trembling harder as it charges
+						float k = Mth.clamp(t / 80f, 0, 1);
+						float shake = Mth.sin(age * 3.1f) * 0.05f * k + Mth.sin(age * 5.3f) * 0.03f * k;
+						aim(rightArm, w, dir(0.15, -0.65, 0.55 + shake, false));
+						aim(leftArm, w, dir(0.15, -0.65, 0.55 - shake, true));
+						body.xRot = Mth.lerp(w, body.xRot, 0.12f + 0.1f * k);
+						rightLeg.zRot = Mth.lerp(w, rightLeg.zRot, 0.16f);
+						leftLeg.zRot = Mth.lerp(w, leftLeg.zRot, -0.16f);
+					}
+					default -> { // Explosive Jump: a quick crouch, then arms swept back and legs tucked in the air
+						if (t < 2) {
+							body.xRot = Mth.lerp(w, body.xRot, 0.5f);
+							rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, -0.6f);
+							leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, -0.6f);
+						} else {
+							aim(rightArm, w, dir(-0.45, 0.35, 0.55, false));
+							aim(leftArm, w, dir(-0.45, 0.35, 0.55, true));
+							rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, -0.55f);
+							leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, 0.3f);
+						}
+					}
+				}
+				if (s.end < 0 && t > 20 * 8) {
+					s.end = age; // a lost end beat never holds a pose
+				}
+			}
 			case ARM_ROTOR -> {
 				// Both arms straight up, each holding a rotor; legs hang loose beneath.
 				aim(rightArm, w, dir(0.05, 1, 0.1, false));
@@ -455,7 +560,10 @@ public final class BodyMotion {
 				|| s.kind == Kind.PUNCH_EXTEND) {
 			return;
 		}
-		if (s.kind == Kind.SPRING_MOVE) {
+		if (s.kind == Kind.BOMB && s.variant != 2 && s.variant != 6) {
+			return;
+		}
+		if (s.kind == Kind.SPRING_MOVE || s.kind == Kind.BOMB) {
 			// Turn toward the travel direction and lean into it (rendering only; the camera keeps its own aim).
 			float w = weight(s, age);
 			Vec3 v = entity.getDeltaMovement();

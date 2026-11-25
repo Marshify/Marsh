@@ -22,7 +22,8 @@ public abstract class MinecraftAimMixin {
 				&& com.grandline.client.GrandLineKeys.movesReady()
 				&& com.grandline.combat.ability.FruitStrikes.has(profile.powers().fruit())
 				&& net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.canSend(com.grandline.network.payload.FruitStrikePayload.TYPE)) {
-			net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.grandline.network.payload.FruitStrikePayload());
+			net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.grandline.network.payload.FruitStrikePayload(false));
+			com.grandline.client.FruitStrikeInput.pressed(profile.powers().fruit());
 			cir.setReturnValue(false);
 			return;
 		}

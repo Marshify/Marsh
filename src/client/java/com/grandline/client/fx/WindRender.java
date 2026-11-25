@@ -37,11 +37,14 @@ public final class WindRender {
 
 	/** Surface material: compressed air (Spin) or sharpened steel (Blade), each its own GLSL program. */
 	public enum Material {
-		WIND, METAL
+		WIND, METAL, FIRE
 	}
 
 	private static ShaderInstance shader;
 	private static ShaderInstance metal;
+	private static ShaderInstance fire;
+	public static final ResourceLocation FIRE_MASK = GrandLineMod.id("textures/fx/fire_mask.png");
+	public static final ResourceLocation FIRE_FLOW = GrandLineMod.id("textures/fx/fire_flow.png");
 	private static Material material = Material.WIND;
 
 	/** Draws {@code draw} with {@code m} (meshes drawn inside use that material's shader and fallback texture). */
@@ -66,11 +69,21 @@ public final class WindRender {
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> shader = program));
 		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("metal"),
 				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> metal = program));
+		CoreShaderRegistrationCallback.EVENT.register(context -> context.register(GrandLineMod.id("blast"),
+				DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, program -> fire = program));
+	}
+
+	private static ShaderInstance program() {
+		return switch (material) {
+			case METAL -> metal;
+			case FIRE -> fire;
+			default -> shader;
+		};
 	}
 
 	/** Whether the custom shader path is used this frame. */
 	public static boolean shaderPath() {
-		return (material == Material.METAL ? metal : shader) != null && !shaderPackActive();
+		return program() != null && !shaderPackActive();
 	}
 
 	/** An Iris shader pack is in use (Iris replaces the core shader pipeline, so custom core shaders aren't safe). */
@@ -97,8 +110,8 @@ public final class WindRender {
 	public static void quad(FxDraw d, boolean glow, Vec3[] p, float[] u, float[] v, int rgb, float[] alpha, float dissolve, float[] fresnel) {
 		float r = (rgb >> 16 & 255) / 255f, g = (rgb >> 8 & 255) / 255f, b = (rgb & 255) / 255f;
 		if (shaderPath()) {
-			ShaderInstance program = material == Material.METAL ? metal : shader;
-			ResourceLocation key = material == Material.METAL ? METAL_MASK : MASK;
+			ShaderInstance program = program();
+			ResourceLocation key = material == Material.METAL ? METAL_MASK : material == Material.FIRE ? FIRE_MASK : MASK;
 			VertexConsumer c = d.buffer(glow ? FxRenderTypes.shaderGlow(key, () -> program) : FxRenderTypes.shaderSoft(key, () -> program));
 			int dis = (int) (Math.max(0, Math.min(1, dissolve)) * 240);
 			for (int i = 0; i < 4; i++) {
@@ -106,7 +119,7 @@ public final class WindRender {
 			}
 			return;
 		}
-		ResourceLocation fallback = material == Material.METAL ? METAL_FLOW : FLOW;
+		ResourceLocation fallback = material == Material.METAL ? METAL_FLOW : material == Material.FIRE ? FIRE_FLOW : FLOW;
 		VertexConsumer c = d.buffer(glow ? FxRenderTypes.glow(fallback) : FxRenderTypes.soft(fallback));
 		float keep = 1 - Math.max(0, Math.min(1, dissolve));
 		for (int i = 0; i < 4; i++) {

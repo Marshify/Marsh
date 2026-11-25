@@ -7,6 +7,8 @@
     "HumanoidModelPunchMixin",
     "PlayerRendererBodyMotionMixin",
     "PlayerRendererHandAttachmentMixin",
+    "PlayerRendererBombHeadMixin",
+    "HumanoidArmorLayerBombHeadMixin",
     "GameRendererShakeMixin",
     "GuiHotbarMixin",
     "GuiExperienceBarMixin",

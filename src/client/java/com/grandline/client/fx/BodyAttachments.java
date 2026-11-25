@@ -164,6 +164,7 @@ public final class BodyAttachments {
 					pose.popPose();
 				}
 			}
+			BombFx.drawLayer(pose, buffers, light, player, model, age);
 			if (!STATES.containsKey(id)) {
 				return;
 			}

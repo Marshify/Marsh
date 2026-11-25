@@ -30,7 +30,8 @@ INCOMING = ROOT / "tools/sounds/incoming"
 CUES_JAVA = ROOT / "src/main/java/com/grandline/audio/GrandLineSounds.java"
 # Distance (blocks) at which a cue fades to silence, by its stage (the last part of its id).
 RANGE = {"charge": 16, "cast": 32, "travel": 24, "impact": 48, "impact_terrain": 32, "aftermath": 28, "fizzle": 16}
-BIG = {"fruits.flame.inferno_nova.impact": 64, "fruits.flame.pyre_ring.cast": 40}
+BIG = {"fruits.flame.inferno_nova.impact": 64, "fruits.flame.pyre_ring.cast": 40, "fruits.bomb.self_destruct.impact": 72,
+       "fruits.bomb.blast_toss.impact_heavy": 48, "fruits.bomb.bomb_grab.impact_delayed": 44, "fruits.bomb.blast_toss.cast_throw": 24}
 
 
 def cue_ids():

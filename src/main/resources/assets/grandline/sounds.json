@@ -147,6 +147,166 @@
       }
     ]
   },
+  "fruits.bomb.blast_toss.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/blast_toss/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.bomb.blast_toss.cast_throw": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/blast_toss/cast_throw",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.bomb.blast_toss.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/blast_toss/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.bomb.blast_toss.impact_heavy": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/blast_toss/impact_heavy",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.bomb.blast_toss.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/blast_toss/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.bomb.bomb_grab.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/bomb_grab/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.bomb.bomb_grab.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/bomb_grab/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.bomb.bomb_grab.impact_delayed": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/bomb_grab/impact_delayed",
+        "attenuation_distance": 44
+      }
+    ]
+  },
+  "fruits.bomb.explosive_jump.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/explosive_jump/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.bomb.explosive_jump.fizzle": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/explosive_jump/fizzle",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.bomb.land_mines.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/land_mines/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.bomb.land_mines.cast_trigger": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/land_mines/cast_trigger",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.bomb.land_mines.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/land_mines/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.bomb.self_destruct.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/self_destruct/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.bomb.self_destruct.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/self_destruct/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.bomb.self_destruct.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/self_destruct/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.bomb.self_destruct.charge_max": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/self_destruct/charge_max",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.bomb.self_destruct.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/self_destruct/impact",
+        "attenuation_distance": 72
+      }
+    ]
+  },
+  "fruits.bomb.targeted_bomb.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/targeted_bomb/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.bomb.targeted_bomb.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/bomb/targeted_bomb/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "fruits.flame.blaze_wave.aftermath": {
     "sounds": [
       {

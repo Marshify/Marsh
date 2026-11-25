@@ -31,13 +31,23 @@ public final class ChargeService {
 	public record Charging(Power power, AbilityDef ability, int slot, int startTick, double multiplier, ChargeVisual visual) {
 		public double charge(int nowTick) {
 			int held = nowTick - startTick;
-			return held < TAP_TICKS ? 0.0 : Math.min(1.0, (held - TAP_TICKS) / (double) (MAX_CHARGE_TICKS - TAP_TICKS));
+			return held < TAP_TICKS ? 0.0 : Math.min(1.0, (held - TAP_TICKS) / (double) (maxTicks(ability) - TAP_TICKS));
 		}
 	}
 
 	private static final Map<UUID, Charging> CHARGING = new HashMap<>();
 	private static final Map<AbilityDef, ChargeVisual> VISUALS = new HashMap<>();
 	private static final Map<AbilityDef, HeldTick> HELD = new HashMap<>();
+	private static final Map<AbilityDef, Integer> MAX = new HashMap<>();
+
+	/** This move charges (or is held) for up to {@code ticks} instead of {@link #MAX_CHARGE_TICKS}. */
+	public static void maxTicks(AbilityDef ability, int ticks) {
+		MAX.put(ability, ticks);
+	}
+
+	public static int maxTicks(AbilityDef ability) {
+		return MAX.getOrDefault(ability, MAX_CHARGE_TICKS);
+	}
 
 	/** Called every server tick while a {@link AbilityDef.Activation#HELD} move is held (ticks from 0). */
 	@FunctionalInterface
@@ -123,7 +133,7 @@ public final class ChargeService {
 			}
 			// Charging slows the caster down, like winding up a big attack; a held move only a little (it can be steered).
 			player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5, tick != null ? 0 : 1, false, false));
-			if (held >= MAX_CHARGE_TICKS) {
+			if (held >= maxTicks(charging.ability())) {
 				AbilityActivationHandler.releaseCharge(player, charging.slot());
 			}
 		}

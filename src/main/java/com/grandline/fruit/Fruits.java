@@ -46,14 +46,8 @@ public final class Fruits {
 	/** Spring: its own moves (fruit/spring/SpringMoves, client SpringFx). */
 	public static final FruitDef SPRING = register("spring", FruitRarity.COMMON, 0xB8BCC8, com.grandline.fruit.spring.SpringMoves.moves());
 
-	/** Bomb (formerly "blast", migrated by FruitRenames). */
-	public static final FruitDef BOMB = register("bomb", FruitRarity.COMMON, Element.EXPLOSION, 0x5A3A3A,
-			FruitMoves.bolt(Element.EXPLOSION, 14, 1.4, 7f),
-			FruitMoves.burst(Element.EXPLOSION, 5, 9f),
-			FruitMoves.lingering(Element.EXPLOSION, 14, 3.5, 6f, 3f, 5),
-			FruitMoves.eruption(Element.EXPLOSION, 18, 6, 14f, 1),
-			FruitMoves.leap(Element.EXPLOSION, 3.5, 5f),
-			"bomb_fuse", "bomb_ring", "bomb_mines", "bomb_charge", "bomb_jump");
+	/** Bomb (formerly "blast", migrated by FruitRenames): its own moves (fruit/bomb/BombMoves, client BombFx). */
+	public static final FruitDef BOMB = register("bomb", FruitRarity.COMMON, 0x5A3A3A, com.grandline.fruit.bomb.BombMoves.moves());
 
 	/** Smoke (formerly "mist", migrated by FruitRenames). */
 	public static final FruitDef SMOKE = register("smoke", FruitRarity.COMMON, Element.MIST, 0xBDBDBD,

@@ -181,6 +181,19 @@ How they were made:
 - **Volume control:** rebounds are limited per caster so Emperor does not stack.
 - **Not yet approved by ear** by the owner.
 
+## Bomb cues (0.79.0)
+
+- **20 files** (ElevenLabs, single takes; the jump launch reuses the grab launch take):
+  - Blast Toss: ignition, fuse loop, throw, explosion, heavy explosion;
+  - Targeted Bomb: tension and rattle loop, vertical detonation;
+  - Bomb Grab: launch, grab and attach, delayed detonation;
+  - Land Mines: deployment, arming click, trigger;
+  - Self Destruct: transformation, charge loop, max-charge ping, blast, aftermath;
+  - Explosive Jump: launch, self-damage warning.
+- **Volume control:** at most 3 explosion sounds per tick, each later one quieter.
+- **Takes are short** (about 1 second each), so the loops repeat quickly.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:
