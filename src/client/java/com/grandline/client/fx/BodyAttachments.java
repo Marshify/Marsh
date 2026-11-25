@@ -165,6 +165,7 @@ public final class BodyAttachments {
 				}
 			}
 			BombFx.drawLayer(pose, buffers, light, player, model, age);
+			SpikeFx.drawLayer(pose, buffers, light, player, model, age);
 			if (!STATES.containsKey(id)) {
 				return;
 			}

@@ -137,12 +137,14 @@ public final class GrandLineSmokeGameTests implements FabricGameTest {
 		helper.assertTrue(ElementalReflex.negates(player, sources.mobAttack(husk)), "ordinary melee passes through smoke");
 		// A Grand Line bandit above the player's level: below its threshold, so it lands.
 		var bandit = com.grandline.entity.GrandLineEntities.typeOf(com.grandline.entity.EnemyKind.BANDIT).create(helper.getLevel());
-		bandit.setGrandLineLevel(50);
+		int lvl = PlayerProfileService.get(player).level();
 		bandit.moveTo(player.getX() + 2, player.getY(), player.getZ());
 		helper.getLevel().addFreshEntity(bandit);
-		eq(helper, ElementalReflex.classify(player, sources.mobAttack(bandit)), ElementalReflex.Category.NPC_BELOW_THRESHOLD, "level threshold");
+		bandit.setGrandLineLevel(lvl + 20); // after spawning (spawning assigns the island's level)
+		eq(helper, ElementalReflex.classify(player, sources.mobAttack(bandit)), ElementalReflex.Category.NPC_BELOW_THRESHOLD, "level threshold (player " + PlayerProfileService.get(player).level() + ", bandit "
+				+ bandit.grandLineLevel() + ", rule " + ElementalReflex.rule(bandit) + ", type " + net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(bandit.getType()) + ")");
 		helper.assertFalse(ElementalReflex.negates(player, sources.mobAttack(bandit)), "high-level bandit still hits");
-		bandit.setGrandLineLevel(20);
+		bandit.setGrandLineLevel(Math.max(1, lvl - 10));
 		helper.assertTrue(ElementalReflex.negates(player, sources.mobAttack(bandit)), "lower-level bandit is negated");
 		bandit.discard();
 		// Environment, falls and drowning always land.

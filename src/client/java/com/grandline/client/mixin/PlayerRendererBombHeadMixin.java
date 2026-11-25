@@ -13,6 +13,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(PlayerRenderer.class)
 public abstract class PlayerRendererBombHeadMixin {
+	/** Spiky Ball: the whole player (model, armour, held items, cosmetics) is replaced by the ball while it rolls. */
+	@Inject(method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+			at = @At("HEAD"), cancellable = true)
+	private void grandline$ball(AbstractClientPlayer player, float yaw, float partial, com.mojang.blaze3d.vertex.PoseStack pose,
+			net.minecraft.client.renderer.MultiBufferSource buffers, int light, CallbackInfo ci) {
+		if (com.grandline.client.fx.SpikeFx.ballActive(player.getId())) {
+			ci.cancel();
+		}
+	}
+
 	@Inject(method = "setModelProperties", at = @At("TAIL"))
 	private void grandline$bombHead(AbstractClientPlayer player, CallbackInfo ci) {
 		var model = ((PlayerRenderer) (Object) this).getModel();

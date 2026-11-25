@@ -205,6 +205,16 @@ How they were made:
 - **Volume control:** one slash or hit sound per tick, and at most one bomb detonation sound every 2 ticks.
 - **Not yet approved by ear** by the owner.
 
+## Spike cues (0.81.0)
+
+- **13 files** (ElevenLabs, single takes):
+  - Spike Summon: rumble loop, eruption, heavy eruption;
+  - Whirlwind: spikes growing, rotation loop (pitch follows the spin), stab;
+  - Spiky Ball: transformation, rolling loop (pitch follows the real speed), impact, unfolding;
+  - Spike Barrage: tension loop, rupture, final rupture.
+- **Volume control:** at most 2 eruption or stab sounds per tick, each later one quieter.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

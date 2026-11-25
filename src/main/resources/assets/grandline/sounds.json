@@ -691,6 +691,110 @@
       }
     ]
   },
+  "fruits.spike.spike_barrage.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_barrage/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.spike.spike_barrage.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_barrage/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spike.spike_barrage.impact_final": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_barrage/impact_final",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spike.spike_summon.charge": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_summon/charge",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "fruits.spike.spike_summon.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_summon/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spike.spike_summon.impact_heavy": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spike_summon/impact_heavy",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spike.spiky_ball.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spiky_ball/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.spike.spiky_ball.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spiky_ball/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spike.spiky_ball.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spiky_ball/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spike.spiky_ball.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/spiky_ball/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spike.whirlwind.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/whirlwind/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spike.whirlwind.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/whirlwind/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spike.whirlwind.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spike/whirlwind/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
   "fruits.spin.air_slasher.cast": {
     "sounds": [
       {

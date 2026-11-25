@@ -52,13 +52,8 @@ public final class Fruits {
 	/** Smoke (formerly "mist", migrated by FruitRenames): Elemental; its own moves and Elemental Reflex (fruit/smoke/SmokeMoves, client SmokeFx). */
 	public static final FruitDef SMOKE = register("smoke", FruitRarity.COMMON, 0xBDBDBD, com.grandline.fruit.smoke.SmokeMoves.moves());
 
-	public static final FruitDef SPIKE = register("spike", FruitRarity.COMMON, Element.METAL, 0x9A9AA6,
-			FruitMoves.bolt(Element.METAL, 16, 1, 7f),
-			FruitMoves.burst(Element.METAL, 4.5, 8f),
-			FruitMoves.lingering(Element.METAL, 14, 4, 6f, 3f, 5),
-			FruitMoves.eruption(Element.METAL, 16, 5, 13f, 1.1),
-			FruitMoves.dash(Element.METAL, 2, 5f),
-			"spike_needle", "spike_urchin", "spike_bed", "spike_maiden", "spike_quill");
+	/** Spike: its own moves (fruit/spike/SpikeMoves, client SpikeFx). */
+	public static final FruitDef SPIKE = register("spike", FruitRarity.COMMON, 0x9A9AA6, com.grandline.fruit.spike.SpikeMoves.moves());
 
 	/** Flame: hand-made moveset, see FlameMoves. Formerly "ember" (saves are migrated by FruitRenames). */
 	public static final FruitDef FLAME = register("flame", FruitRarity.UNCOMMON, 0xFF7A33, com.grandline.fruit.flame.FlameMoves.moves());

@@ -51,7 +51,9 @@ public final class BodyMotion {
 		 */
 		BOMB,
 		/** Smoke ({@link #smoke}): 0 Smoke Slam, 1 Smoke Blast, 2 Smoke Liberation, 3 Smoke Bomber flight. */
-		SMOKE
+		SMOKE,
+		/** Spike ({@link #spike}): 0 Spike Summon (arm directed at the target, sharp release), 1 Spike Barrage (tension, thrust). */
+		SPIKE
 	}
 
 	private static final class State {
@@ -134,6 +136,13 @@ public final class BodyMotion {
 		STATES.put(entity, s);
 	}
 
+	/** SPIKE pose {@code variant} starts (released with {@link #release}, ended with {@link #stop}). */
+	public static void spike(int entity, float age, int variant) {
+		State s = new State(Kind.SPIKE, age);
+		s.variant = variant;
+		STATES.put(entity, s);
+	}
+
 	/** SMOKE pose {@code variant} starts (ended with {@link #stop}). */
 	public static void smoke(int entity, float age, int variant) {
 		State s = new State(Kind.SMOKE, age);
@@ -144,7 +153,7 @@ public final class BodyMotion {
 	/** BOMB: the throw / grab / detonation happens now. */
 	public static void release(int entity, float age) {
 		State s = STATES.get(entity);
-		if (s != null && s.kind == Kind.BOMB) {
+		if (s != null && (s.kind == Kind.BOMB || s.kind == Kind.SPIKE)) {
 			s.slashAge = age;
 			s.finale = true;
 			if (s.end < 0) {
@@ -204,7 +213,7 @@ public final class BodyMotion {
 			case ROTOR -> 1.5;
 			case ARM_ROTOR -> 1.8;
 			case DANCE -> 0.42; // body turns (radians per tick): two and a half turns over the move
-			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE, BOMB, SMOKE -> 0;
+			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE, BOMB, SMOKE, SPIKE -> 0;
 		};
 		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
 		return max * up * down;
@@ -485,6 +494,37 @@ public final class BodyMotion {
 				}
 				if (s.end < 0 && t > 20 * 8) {
 					s.end = age; // a lost end beat never holds a pose
+				}
+			}
+			case SPIKE -> {
+				float t = age - s.start;
+				float rt = age - s.slashAge;
+				double pitch = -head.xRot;
+				Vec3 aimDir = dir(Math.cos(pitch), Math.sin(pitch), 0.05, false);
+				double hy = head.yRot;
+				aimDir = new Vec3(aimDir.x * Math.cos(hy) + aimDir.z * Math.sin(hy), aimDir.y, -aimDir.x * Math.sin(hy) + aimDir.z * Math.cos(hy));
+				if (s.variant == 0) { // Spike Summon: the arm points at the target while charging; a sharp upward flick on release
+					float flick = s.finale ? (float) Math.sin(Math.min(1, rt / 4f) * Math.PI) : 0;
+					aim(rightArm, w, aimDir.add(0, 0.6 * flick, 0).normalize());
+					aim(leftArm, w, dir(0.2, -0.3, 0.5, true));
+					body.yRot = Mth.lerp(w, body.yRot, -0.15f);
+				} else if (!s.finale) { // Spike Barrage charge: grounded, arm drawn back, trembling with tension
+					float k = Mth.clamp(t / 60f, 0, 1);
+					float shake = Mth.sin(age * 2.9f) * 0.04f * k;
+					aim(rightArm, w, dir(-0.5, -0.1 + shake, 0.45, false));
+					aim(leftArm, w, dir(0.5, -0.2, 0.3, true));
+					body.xRot = Mth.lerp(w, body.xRot, 0.15f + 0.12f * k);
+					body.yRot = Mth.lerp(w, body.yRot, 0.35f);
+					rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, 0.3f);
+					leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, -0.35f);
+				} else { // release: forceful forward thrust, then the arm follows the aim that steers the row
+					float k = Mth.clamp(rt / 3f, 0, 1);
+					aim(rightArm, w, dir(-0.5 + 1.4 * k, -0.1 - 0.4 * k, 0.45 - 0.35 * k, false).normalize().lerp(aimDir, k * 0.5).normalize());
+					aim(leftArm, w, dir(-0.3, -0.3, 0.45, true));
+					body.yRot = Mth.lerp(w, body.yRot, 0.35f - 0.6f * k);
+				}
+				if (s.end < 0 && t > 20 * 5) {
+					s.end = age;
 				}
 			}
 			case SMOKE -> {

@@ -201,6 +201,21 @@ public final class GrandLineSounds {
 	public static final Cue SMOKE_BOMB_BURST = ability("fruits.smoke.smoke_bomber.impact", Stage.IMPACT, 28, null, 0, 1);
 	public static final Cue SMOKE_REFORM = ability("fruits.smoke.smoke_bomber.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
 
+	// ============================================================================ Spike (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue SPIKE_RUMBLE = abilityLoop("fruits.spike.spike_summon.charge", Stage.CHARGE, 20, null, 0, 1);
+	public static final Cue SPIKE_RISE = ability("fruits.spike.spike_summon.impact", Stage.IMPACT, 32, null, 0, 1);
+	public static final Cue SPIKE_RISE_HEAVY = ability("fruits.spike.spike_summon.impact_heavy", Stage.IMPACT, 44, null, 0, 1);
+	public static final Cue SPIKE_WHIRL_LOOP = abilityLoop("fruits.spike.whirlwind.travel", Stage.TRAVEL, 24, null, 0, 1);
+	public static final Cue SPIKE_STAB = ability("fruits.spike.whirlwind.impact", Stage.IMPACT, 20, null, 0, 1);
+	public static final Cue SPIKE_ARMS = ability("fruits.spike.whirlwind.cast", Stage.CAST, 20, null, 0, 1);
+	public static final Cue SPIKE_BALL_START = ability("fruits.spike.spiky_ball.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue SPIKE_BALL_LOOP = abilityLoop("fruits.spike.spiky_ball.travel", Stage.TRAVEL, 24, null, 0, 1);
+	public static final Cue SPIKE_BALL_HIT = ability("fruits.spike.spiky_ball.impact", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue SPIKE_BALL_END = ability("fruits.spike.spiky_ball.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
+	public static final Cue SPIKE_TENSION = abilityLoop("fruits.spike.spike_barrage.charge", Stage.CHARGE, 20, null, 0, 1);
+	public static final Cue SPIKE_RUPTURE = ability("fruits.spike.spike_barrage.impact", Stage.IMPACT, 32, null, 0, 1);
+	public static final Cue SPIKE_RUPTURE_FINAL = ability("fruits.spike.spike_barrage.impact_final", Stage.IMPACT, 48, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 
