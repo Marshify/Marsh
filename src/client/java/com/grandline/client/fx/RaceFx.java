@@ -236,7 +236,8 @@ final class RaceFx {
 		Minecraft mc = Minecraft.getInstance();
 		for (Player p : level.players()) {
 			ClientRace.Look look = ClientRace.look(p);
-			if (look == null || p.isInvisible() || p.isSpectator() || p.distanceToSqr(mc.gameRenderer.getMainCamera().getPosition()) > 64 * 64) {
+			if (look == null || p.isInvisible() || p.isSpectator() || p.distanceToSqr(mc.gameRenderer.getMainCamera().getPosition()) > 64 * 64
+					|| SpikeFx.ballActive(p.getId()) || BombFx.headActive(p.getId())) { // replaced by a transformation
 				continue;
 			}
 			boolean firstPerson = p == mc.player && mc.options.getCameraType().isFirstPerson();
