@@ -43,13 +43,8 @@ public final class Fruits {
 	/** Blade: its own moves, M1 combo and Blade Body passive (fruit/blade/BladeMoves, client BladeFx). */
 	public static final FruitDef BLADE = register("blade", FruitRarity.COMMON, 0x8C9BB5, com.grandline.fruit.blade.BladeMoves.moves());
 
-	public static final FruitDef SPRING = register("spring", FruitRarity.COMMON, Element.BOUNCE, 0xB8BCC8,
-			FruitMoves.strike(Element.BOUNCE, 12, 7f),
-			FruitMoves.burst(Element.BOUNCE, 4.5, 7f),
-			FruitMoves.leap(Element.BOUNCE, 4.5, 9f),
-			FruitMoves.eruption(Element.BOUNCE, 16, 5, 13f, 1.2),
-			FruitMoves.updraft(Element.BOUNCE),
-			"spring_jab", "spring_recoil", "spring_pogo", "spring_overwound", "spring_hop");
+	/** Spring: its own moves (fruit/spring/SpringMoves, client SpringFx). */
+	public static final FruitDef SPRING = register("spring", FruitRarity.COMMON, 0xB8BCC8, com.grandline.fruit.spring.SpringMoves.moves());
 
 	/** Bomb (formerly "blast", migrated by FruitRenames). */
 	public static final FruitDef BOMB = register("bomb", FruitRarity.COMMON, Element.EXPLOSION, 0x5A3A3A,

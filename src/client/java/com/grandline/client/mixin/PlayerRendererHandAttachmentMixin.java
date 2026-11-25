@@ -28,6 +28,7 @@ public abstract class PlayerRendererHandAttachmentMixin {
 		(left ? model.leftArm : model.rightArm).translateAndRotate(pose);
 		com.grandline.client.fx.BodyAttachments.drawArm(pose, buffers, light, player.getId(),
 				player.tickCount + net.minecraft.client.Minecraft.getInstance().getFrameTime(), left, "slim".equals(player.getModelName()));
+		com.grandline.client.fx.SpringLimbs.drawArm(pose, buffers, light, player, player.tickCount + net.minecraft.client.Minecraft.getInstance().getFrameTime(), left);
 		pose.popPose();
 	}
 }

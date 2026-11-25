@@ -153,6 +153,17 @@ public final class GrandLineSounds {
 	public static final Cue BLADE_FLIGHT_LOOP = abilityLoop("fruits.blade.blade_flight.travel", Stage.TRAVEL, 24, null, 0, 1);
 	public static final Cue BLADE_FLIGHT_AFTERMATH = ability("fruits.blade.blade_flight.aftermath", Stage.AFTERMATH, 20, null, 0, 1);
 
+	// ============================================================================ Spring (own audio, ElevenLabs, see docs/AUDIO.md)
+	public static final Cue SPRING_KNOCK_CAST = ability("fruits.spring.knock.cast", Stage.CAST, 24, null, 0, 1);
+	public static final Cue SPRING_KNOCK_IMPACT = ability("fruits.spring.knock.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue SPRING_SNIPE_CAST = ability("fruits.spring.spring_snipe.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue SPRING_SNIPE_IMPACT = ability("fruits.spring.spring_snipe.impact", Stage.IMPACT, 28, null, 0, 1);
+	public static final Cue SPRING_CANNON_CAST = ability("fruits.spring.spring_cannon.cast", Stage.CAST, 28, null, 0, 1);
+	public static final Cue SPRING_CANNON_IMPACT = ability("fruits.spring.spring_cannon.impact", Stage.IMPACT, 40, null, 0, 1);
+	public static final Cue SPRING_REBOUND = ability("fruits.spring.spring_emperor.rebound", Stage.IMPACT, 24, null, 0, 1);
+	public static final Cue SPRING_LEAP_LOOP = abilityLoop("fruits.spring.spring_leap.travel", Stage.TRAVEL, 20, null, 0, 1);
+	public static final Cue SPRING_RETRACT = ability("fruits.spring.spring_leap.aftermath", Stage.AFTERMATH, 16, null, 0, 1);
+
 	private GrandLineSounds() {
 	}
 

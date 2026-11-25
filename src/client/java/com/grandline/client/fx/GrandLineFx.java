@@ -153,6 +153,8 @@ public final class GrandLineFx {
 			RocketFx.handle(packet, level, caster, own);
 			SpinFx.flightEnd(packet.caster(), caster);
 			BladeFx.flightEnd(packet.caster(), caster);
+		} else if (SpringFx.handles(packet.effect())) {
+			SpringFx.handle(packet, level, caster, own);
 		} else if (BladeFx.handles(packet.effect())) {
 			BladeFx.handle(packet, level, caster, own);
 		} else if (SpinFx.handles(packet.effect())) {
@@ -197,6 +199,7 @@ public final class GrandLineFx {
 		MovePoses.clearAll();
 		BodyMotion.clearAll();
 		BodyAttachments.clearAll();
+		SpringLimbs.clearAll();
 	}
 
 	private static void tick() {

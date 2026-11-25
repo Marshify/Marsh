@@ -170,6 +170,17 @@ How they were made:
 - **Volume control:** Blade Dance hit sounds are limited to one per tick per caster.
 - **Not yet approved by ear** by the owner.
 
+## Spring cues (0.78.0)
+
+- **11 files** (ElevenLabs, single takes; levelled with loudnorm):
+  - Knock: cast, impact;
+  - Spring Snipe: cast, impact;
+  - Spring Cannon: cast, impact;
+  - Spring Emperor: rebound, with one variant;
+  - Spring Leap: travel loop, aftermath (retract).
+- **Volume control:** rebounds are limited per caster so Emperor does not stack.
+- **Not yet approved by ear** by the owner.
+
 ## Migration plan for the rest
 
 The pattern for each ability is the same:

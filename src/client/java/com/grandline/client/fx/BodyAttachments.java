@@ -150,12 +150,24 @@ public final class BodyAttachments {
 		public void render(PoseStack pose, MultiBufferSource buffers, int light, AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
 				float partial, float ageInTicks, float netHeadYaw, float headPitch) {
 			int id = player.getId();
+			float age = player.tickCount + partial;
+			PlayerModel<AbstractClientPlayer> model = getParentModel();
+			if (SpringLimbs.any(id)) {
+				for (boolean left : new boolean[]{false, true}) {
+					pose.pushPose();
+					(left ? model.leftArm : model.rightArm).translateAndRotate(pose);
+					SpringLimbs.drawArm(pose, buffers, light, player, age, left);
+					pose.popPose();
+					pose.pushPose();
+					(left ? model.leftLeg : model.rightLeg).translateAndRotate(pose);
+					SpringLimbs.drawLeg(pose, buffers, light, player, age, left);
+					pose.popPose();
+				}
+			}
 			if (!STATES.containsKey(id)) {
 				return;
 			}
-			float age = player.tickCount + partial;
 			boolean slim = "slim".equals(player.getModelName());
-			PlayerModel<AbstractClientPlayer> model = getParentModel();
 			for (boolean left : new boolean[]{false, true}) {
 				ModelPart arm = left ? model.leftArm : model.rightArm;
 				pose.pushPose();

@@ -37,7 +37,14 @@ public final class BodyMotion {
 		/** A controlled spinning flurry of alternating cuts; {@link #finish} opens into a wide final sweep. */
 		DANCE,
 		/** Both arms straight up holding a rotor each; legs hang; leans and banks like {@link #ROTOR}. */
-		ARM_ROTOR
+		ARM_ROTOR,
+		/** A fast straight punch along the aim (pulled back for a moment first), the other arm and torso recoiling. */
+		PUNCH_EXTEND,
+		/**
+		 * Spring-legged movement ({@link #spring}): variant 0 a crouched launch then a lean into the dash, 1 a vertical
+		 * rise and slam, 2/3 bouncing; {@link #contact} turns the legs onto the real contact surface for a moment.
+		 */
+		SPRING_MOVE
 	}
 
 	private static final class State {
@@ -51,6 +58,8 @@ public final class BodyMotion {
 		float slashAge = -99; // last blade release (SLASH)
 		boolean slashLeft, finale;
 		int variant;
+		Vec3 contact;     // world normal of the last surface contact (SPRING_MOVE)
+		float yawOffset;  // smoothed turn toward the travel direction (degrees)
 
 		State(Kind kind, float start) {
 			this.kind = kind;
@@ -99,6 +108,27 @@ public final class BodyMotion {
 		STATES.put(entity, s);
 	}
 
+	/** PUNCH_EXTEND: a punch now. */
+	public static void punch(int entity, float age) {
+		STATES.put(entity, new State(Kind.PUNCH_EXTEND, age));
+	}
+
+	/** SPRING_MOVE of {@code variant} starts (stopped with {@link #stop}). */
+	public static void spring(int entity, float age, int variant) {
+		State s = new State(Kind.SPRING_MOVE, age);
+		s.variant = variant;
+		STATES.put(entity, s);
+	}
+
+	/** SPRING_MOVE: the legs met a surface with world normal {@code normal} now. */
+	public static void contact(int entity, float age, Vec3 normal) {
+		State s = STATES.get(entity);
+		if (s != null && s.kind == Kind.SPRING_MOVE) {
+			s.contact = normal;
+			s.slashAge = age;
+		}
+	}
+
 	/** RUSH or DANCE: the finishing cut happens now (the state then winds down on its own). */
 	public static void finish(int entity, Kind kind, float age) {
 		State s = STATES.get(entity);
@@ -141,7 +171,7 @@ public final class BodyMotion {
 			case ROTOR -> 1.5;
 			case ARM_ROTOR -> 1.8;
 			case DANCE -> 0.42; // body turns (radians per tick): two and a half turns over the move
-			case SLASH, STRIKE, RUSH -> 0;
+			case SLASH, STRIKE, RUSH, PUNCH_EXTEND, SPRING_MOVE -> 0;
 		};
 		double down = s.end < 0 ? 1 : 1 - WindMesh.ease((age - s.end) / SPIN_DOWN);
 		return max * up * down;
@@ -282,6 +312,67 @@ public final class BodyMotion {
 					}
 				}
 			}
+			case PUNCH_EXTEND -> {
+				float t = age - s.start;
+				if (t > 10) {
+					STATES.remove(entity);
+					return;
+				}
+				float k = Mth.clamp(1 - (t - 5) / 5f, 0, 1);
+				double pitch = -head.xRot;
+				if (t < 0.6f) {
+					aim(rightArm, k, dir(-0.25, -0.15, 0.35, false)); // pulled back
+				} else {
+					// Along the aim: the head's pitch, and its yaw relative to the body (the look can lead the body).
+					Vec3 d = dir(Math.cos(pitch), Math.sin(pitch), 0.05, false);
+					double hy = head.yRot;
+					d = new Vec3(d.x * Math.cos(hy) + d.z * Math.sin(hy), d.y, -d.x * Math.sin(hy) + d.z * Math.cos(hy));
+					aim(rightArm, k, d);
+				}
+				aim(leftArm, k * 0.8f, dir(-0.35, -0.25, 0.45, true)); // thrown back by the recoil
+				body.yRot = Mth.lerp(k, body.yRot, t < 0.6f ? 0.25f : -0.3f);
+			}
+			case SPRING_MOVE -> {
+				float t = age - s.start;
+				switch (s.variant) {
+					case 0 -> { // Spring Snipe: crouch, then arms trail behind the launch
+						if (t < 4) {
+							body.xRot = Mth.lerp(w, body.xRot, 0.55f);
+							rightLeg.xRot = Mth.lerp(w, rightLeg.xRot, -0.45f);
+							leftLeg.xRot = Mth.lerp(w, leftLeg.xRot, -0.45f);
+							aim(rightArm, w, dir(0.3, -0.5, 0.3, false));
+							aim(leftArm, w, dir(0.3, -0.5, 0.3, true));
+						} else {
+							aim(rightArm, w, dir(-0.5, -0.2, 0.45, false));
+							aim(leftArm, w, dir(-0.5, -0.2, 0.45, true));
+						}
+					}
+					case 1 -> { // Spring Cannon: arms up and out on the rise, driven down for the slam
+						boolean slam = s.finale;
+						aim(rightArm, w, slam ? dir(0.6, -0.6, 0.3, false) : dir(0.1, 0.75, 0.65, false));
+						aim(leftArm, w, slam ? dir(0.6, -0.6, 0.3, true) : dir(0.1, 0.75, 0.65, true));
+					}
+					default -> { // bouncing: arms out for balance
+						aim(rightArm, w, dir(0.2, 0.15, 0.95, false));
+						aim(leftArm, w, dir(0.2, 0.15, 0.95, true));
+					}
+				}
+				// At a contact the legs point onto the real surface (wall or ground) while the springs compress.
+				float ct = age - s.slashAge;
+				if (s.contact != null && ct >= 0 && ct < 6) {
+					Entity e = net.minecraft.client.Minecraft.getInstance().level == null ? null
+							: net.minecraft.client.Minecraft.getInstance().level.getEntity(entity);
+					if (e != null) {
+						double yaw = Math.toRadians(e.getYRot()) - Math.toRadians(s.yawOffset);
+						Vec3 fwd = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw)), right = new Vec3(-Math.cos(yaw), 0, -Math.sin(yaw));
+						Vec3 into = s.contact.scale(-1);
+						Vec3 m = new Vec3(-into.dot(right), -into.y, -into.dot(fwd)).normalize();
+						float k = (float) Math.sin(Math.min(1, ct / 6f) * Math.PI);
+						aim(rightLeg, k, m.add(-0.12, 0, 0).normalize());
+						aim(leftLeg, k, m.add(0.12, 0, 0).normalize());
+					}
+				}
+			}
 			case ARM_ROTOR -> {
 				// Both arms straight up, each holding a rotor; legs hang loose beneath.
 				aim(rightArm, w, dir(0.05, 1, 0.1, false));
@@ -360,7 +451,25 @@ public final class BodyMotion {
 	 */
 	public static void applyBody(Entity entity, PoseStack pose, float age) {
 		State s = STATES.get(entity.getId());
-		if (s == null || s.kind == Kind.ARM_WHIRL || s.kind == Kind.SLASH || s.kind == Kind.STRIKE || s.kind == Kind.RUSH) {
+		if (s == null || s.kind == Kind.ARM_WHIRL || s.kind == Kind.SLASH || s.kind == Kind.STRIKE || s.kind == Kind.RUSH
+				|| s.kind == Kind.PUNCH_EXTEND) {
+			return;
+		}
+		if (s.kind == Kind.SPRING_MOVE) {
+			// Turn toward the travel direction and lean into it (rendering only; the camera keeps its own aim).
+			float w = weight(s, age);
+			Vec3 v = entity.getDeltaMovement();
+			double h = Math.hypot(v.x, v.z);
+			if (h > 0.05) {
+				float travel = (float) Math.toDegrees(Math.atan2(-v.x, v.z));
+				float want = Mth.wrapDegrees(entity.getYRot() - travel);
+				s.yawOffset = Mth.lerp(0.3f, s.yawOffset, want);
+			}
+			s.lean = Mth.lerp(0.25f, s.lean, (float) Mth.clamp(h * 35, 0, 40));
+			pose.translate(0, 0.9, 0);
+			pose.mulPose(Axis.YP.rotationDegrees(s.yawOffset * w));
+			pose.mulPose(Axis.XP.rotationDegrees(-s.lean * w));
+			pose.translate(0, -0.9, 0);
 			return;
 		}
 		float w = weight(s, age);

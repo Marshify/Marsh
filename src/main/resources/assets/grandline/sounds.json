@@ -555,6 +555,82 @@
       }
     ]
   },
+  "fruits.spring.knock.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/knock/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spring.knock.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/knock/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spring.spring_cannon.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_cannon/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spring.spring_cannon.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_cannon/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "fruits.spring.spring_emperor.rebound": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_emperor/rebound",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "grandline:fruits/spring/spring_emperor/rebound_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spring.spring_leap.aftermath": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_leap/aftermath",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "fruits.spring.spring_leap.travel": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_leap/travel",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "fruits.spring.spring_snipe.cast": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_snipe/cast",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "fruits.spring.spring_snipe.impact": {
+    "sounds": [
+      {
+        "name": "grandline:fruits/spring/spring_snipe/impact",
+        "attenuation_distance": 48
+      }
+    ]
+  },
   "music.boss.final": {
     "sounds": [
       {
