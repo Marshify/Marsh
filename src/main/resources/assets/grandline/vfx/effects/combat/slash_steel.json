@@ -1,0 +1,83 @@
+{
+  "category": "combat",
+  "description": "Sword cut: a sweeping steel crescent with a bright edge and sparks.",
+  "duration": 10,
+  "primary": "#E8EEF5",
+  "secondary": "#9FB0C4",
+  "layers": [
+    {
+      "type": "slash",
+      "material": "metal",
+      "life": 8,
+      "radius": 2.2,
+      "width": [
+        [
+          0,
+          0.55
+        ],
+        [
+          1,
+          0.2
+        ]
+      ],
+      "arc": 160,
+      "sweep": [
+        [
+          0,
+          -50
+        ],
+        [
+          1,
+          40
+        ]
+      ],
+      "tilt": -20,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.95
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "blend": "translucent"
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "count": 6,
+      "delay": 2,
+      "lifetime": [
+        4,
+        8
+      ],
+      "speed": [
+        0.2,
+        0.4
+      ],
+      "spread": 0.6,
+      "stretch": 2,
+      "size": [
+        0.08,
+        0.02
+      ],
+      "color": [
+        [
+          0,
+          "#FFE8B0",
+          1
+        ],
+        [
+          1,
+          "#FF9A40",
+          0
+        ]
+      ],
+      "life": 2
+    }
+  ]
+}

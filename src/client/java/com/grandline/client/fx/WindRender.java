@@ -87,13 +87,16 @@ public final class WindRender {
 		};
 	}
 
+	/** Developer toggle (VFX browser): force the shader-pack fallback path to compare the two. */
+	public static boolean forceFallback;
+
 	/** Whether the custom shader path is used this frame. */
 	public static boolean shaderPath() {
-		return program() != null && !shaderPackActive();
+		return !forceFallback && program() != null && !shaderPackActive();
 	}
 
 	/** An Iris shader pack is in use (Iris replaces the core shader pipeline, so custom core shaders aren't safe). */
-	static boolean shaderPackActive() {
+	public static boolean shaderPackActive() {
 		if (irisPresent == null) {
 			irisPresent = FabricLoader.getInstance().isModLoaded("iris");
 		}

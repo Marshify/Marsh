@@ -1,0 +1,52 @@
+{
+  "category": "environmental",
+  "description": "Ground dust puff and debris, coloured by the terrain.",
+  "duration": 30,
+  "primary": "#B8AF9F",
+  "secondary": "#D8D0C2",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "ground",
+      "radius": 2,
+      "count": 12
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/cloud.png",
+      "blend": "translucent",
+      "count": 8,
+      "lifetime": [
+        20,
+        30
+      ],
+      "speed": [
+        0.04,
+        0.1
+      ],
+      "shape": "disc",
+      "radius": 0.8,
+      "emit_axis": "up",
+      "spread": 1.4,
+      "gravity": -0.003,
+      "drag": 0.9,
+      "size": [
+        0.8,
+        2.0
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.45
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 2
+    }
+  ]
+}

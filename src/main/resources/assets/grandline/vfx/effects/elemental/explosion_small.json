@@ -1,0 +1,22 @@
+{
+  "category": "elemental",
+  "description": "Small fireball explosion (Bomb renderer).",
+  "duration": 30,
+  "primary": "#FFCE54",
+  "secondary": "#D94A23",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "explosion",
+      "radius": 2.2,
+      "power": 0.35,
+      "shockwaves": 1,
+      "scorch": true,
+      "shake": 0.6
+    },
+    {
+      "type": "sound",
+      "sound": "grandline:fruits.bomb.blast_toss.impact"
+    }
+  ]
+}

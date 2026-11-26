@@ -1,0 +1,28 @@
+{
+  "category": "combat",
+  "description": "Ribbon trail that follows its anchor (use with an entity anchor).",
+  "duration": 20,
+  "primary": "#FFFFFF",
+  "secondary": "#C5E6F5",
+  "layers": [
+    {
+      "type": "ribbon",
+      "texture": "grandline:textures/fx/streak.png",
+      "life": 20,
+      "points": 10,
+      "size": 0.8,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.6
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -153,6 +153,11 @@ public final class GrandLineFx {
 			RocketFx.handle(packet, level, caster, own);
 			SpinFx.flightEnd(packet.caster(), caster);
 			BladeFx.flightEnd(packet.caster(), caster);
+		} else if (packet.effect().startsWith("vfx:")) {
+			// Library effects triggered by the server (see combat.fx.Vfx): speed = scale, range = anchor, size = colour.
+			int colour = (int) packet.size();
+			VfxInstance.play(packet.effect().substring(4), VfxInstance.Params.at(packet.pos()).dir(packet.dir()).scale(packet.speed() > 0 ? packet.speed() : 1)
+					.anchor((int) packet.range()).colors(colour >= 0 ? colour : null, null));
 		} else if (SpikeFx.handles(packet.effect())) {
 			SpikeFx.handle(packet, level, caster, own);
 		} else if (SmokeFx.handles(packet.effect())) {

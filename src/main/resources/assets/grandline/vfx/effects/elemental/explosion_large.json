@@ -1,0 +1,23 @@
+{
+  "category": "elemental",
+  "description": "Large layered explosion with cracks and heavy shake.",
+  "duration": 60,
+  "primary": "#FFCE54",
+  "secondary": "#D94A23",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "explosion",
+      "radius": 6,
+      "power": 0.9,
+      "shockwaves": 3,
+      "scorch": true,
+      "cracks": true,
+      "shake": 2.5
+    },
+    {
+      "type": "sound",
+      "sound": "grandline:fruits.bomb.self_destruct.impact"
+    }
+  ]
+}

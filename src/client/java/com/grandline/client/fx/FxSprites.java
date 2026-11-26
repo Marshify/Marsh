@@ -31,6 +31,11 @@ public final class FxSprites {
 	private FxSprites() {
 	}
 
+	/** Live sprite count (VFX diagnostics). */
+	public static int active() {
+		return SPRITES.size();
+	}
+
 	/** How many of {@code base} sprites to spawn at the current density setting (at least one when base > 0). */
 	public static int count(int base) {
 		double f = switch (com.grandline.client.settings.ClientSettings.get().fxDensity) {

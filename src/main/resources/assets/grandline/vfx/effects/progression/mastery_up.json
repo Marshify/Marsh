@@ -1,0 +1,70 @@
+{
+  "category": "progression",
+  "description": "Spiralling motes converging on the target, then a soft flash.",
+  "duration": 34,
+  "primary": "#A8F0FF",
+  "secondary": "#4AA0FF",
+  "layers": [
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "count": 20,
+      "lifetime": [
+        16,
+        22
+      ],
+      "speed": [
+        0.08,
+        0.12
+      ],
+      "shape": "sphere",
+      "radius": 2,
+      "inward": true,
+      "drag": 0.98,
+      "size": [
+        0.14,
+        0.04
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0
+        ],
+        [
+          0.3,
+          "$primary",
+          1
+        ],
+        [
+          1,
+          "$secondary",
+          0.6
+        ]
+      ],
+      "life": 2
+    },
+    {
+      "type": "sprite",
+      "texture": "grandline:textures/fx/glow.png",
+      "delay": 18,
+      "life": 10,
+      "size": [
+        0.5,
+        2.5
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.9
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    }
+  ]
+}

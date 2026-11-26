@@ -1,0 +1,109 @@
+{
+  "category": "combat",
+  "description": "Small physical hit: flash, sparks, quick ring.",
+  "duration": 10,
+  "primary": "#FFFFFF",
+  "secondary": "#FFC56D",
+  "layers": [
+    {
+      "type": "sprite",
+      "texture": "grandline:textures/fx/glow.png",
+      "life": 4,
+      "size": [
+        [
+          0,
+          0.6
+        ],
+        [
+          1,
+          1.2
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.9
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "count": 8,
+      "lifetime": [
+        5,
+        9
+      ],
+      "speed": [
+        0.15,
+        0.35
+      ],
+      "spread": 1,
+      "shape": "sphere",
+      "drag": 0.85,
+      "gravity": 0.02,
+      "stretch": 2.5,
+      "size": [
+        0.12,
+        0.03
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          1
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 2
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 7,
+      "facing": "camera",
+      "radius": [
+        [
+          0,
+          0.2
+        ],
+        [
+          1,
+          1.2
+        ]
+      ],
+      "width": [
+        [
+          0,
+          0.3
+        ],
+        [
+          1,
+          0.05
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.6
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "category": "elemental",
+  "description": "Expanding compressed smoke (Smoke renderer).",
+  "duration": 26,
+  "primary": "#A0A7B2",
+  "secondary": "#C4C9D2",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "smoke_volume",
+      "life": 24,
+      "radius": [
+        [
+          0,
+          0.6
+        ],
+        [
+          0.3,
+          2.0
+        ],
+        [
+          1,
+          2.6
+        ]
+      ],
+      "layers": 3,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.85
+        ],
+        [
+          1,
+          "$secondary",
+          0.2
+        ]
+      ]
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/cloud.png",
+      "blend": "translucent",
+      "life": 10,
+      "facing": "up",
+      "offset": [
+        0,
+        -0.9,
+        0
+      ],
+      "radius": [
+        0.5,
+        3.5
+      ],
+      "width": [
+        0.8,
+        0.2
+      ],
+      "color": [
+        [
+          0,
+          "$secondary",
+          0.5
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    }
+  ]
+}

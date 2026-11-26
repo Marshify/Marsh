@@ -1,0 +1,129 @@
+{
+  "category": "combat",
+  "description": "Heavy hit: impact frame, shockwave, debris and shake.",
+  "duration": 18,
+  "primary": "#FFFFFF",
+  "secondary": "#D2DCE6",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "flash",
+      "radius": 0.9,
+      "lifetime": 2
+    },
+    {
+      "type": "sprite",
+      "texture": "grandline:textures/fx/glow.png",
+      "life": 5,
+      "size": [
+        [
+          0,
+          1.2
+        ],
+        [
+          1,
+          2.4
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 10,
+      "facing": "camera",
+      "radius": [
+        [
+          0,
+          0.3
+        ],
+        [
+          1,
+          2.6
+        ]
+      ],
+      "width": [
+        [
+          0,
+          0.6
+        ],
+        [
+          1,
+          0.08
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$secondary",
+          0.7
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "count": 14,
+      "lifetime": [
+        8,
+        14
+      ],
+      "speed": [
+        0.2,
+        0.5
+      ],
+      "shape": "sphere",
+      "drag": 0.86,
+      "gravity": 0.03,
+      "stretch": 3,
+      "size": [
+        0.15,
+        0.04
+      ],
+      "color": [
+        [
+          0,
+          "#FFFFFF",
+          1
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 2
+    },
+    {
+      "type": "builtin",
+      "effect": "ground",
+      "radius": 1.4,
+      "count": 8,
+      "offset": [
+        0,
+        -0.8,
+        0
+      ]
+    },
+    {
+      "type": "shake",
+      "degrees": 1.2
+    }
+  ]
+}

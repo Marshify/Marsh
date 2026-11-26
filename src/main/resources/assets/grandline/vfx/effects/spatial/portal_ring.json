@@ -1,0 +1,124 @@
+{
+  "category": "spatial",
+  "description": "Rotating double ring with inward motes (a magic-circle stand-in until custom art).",
+  "duration": 60,
+  "primary": "#B8E1FF",
+  "secondary": "#6F8CFF",
+  "layers": [
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 60,
+      "facing": "up",
+      "radius": [
+        [
+          0,
+          0
+        ],
+        [
+          0.15,
+          2.4
+        ],
+        [
+          1,
+          2.4
+        ]
+      ],
+      "width": 0.25,
+      "repeat": 8,
+      "scroll": 2,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          0.85,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 60,
+      "facing": "up",
+      "radius": [
+        [
+          0,
+          0
+        ],
+        [
+          0.15,
+          1.6
+        ],
+        [
+          1,
+          1.6
+        ]
+      ],
+      "width": 0.12,
+      "repeat": 6,
+      "scroll": -3,
+      "color": [
+        [
+          0,
+          "$secondary",
+          0.7
+        ],
+        [
+          0.85,
+          "$secondary",
+          0.7
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "rate": 1.5,
+      "lifetime": [
+        14,
+        20
+      ],
+      "speed": [
+        0.05,
+        0.08
+      ],
+      "shape": "ring",
+      "radius": 2.4,
+      "inward": true,
+      "emit_axis": "up",
+      "spread": 0.2,
+      "size": [
+        0.12,
+        0.03
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.9
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 50
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "category": "progression",
+  "description": "Golden ring burst and rising sparks.",
+  "duration": 40,
+  "primary": "#FFE680",
+  "secondary": "#FFB030",
+  "layers": [
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 20,
+      "facing": "up",
+      "radius": [
+        0.3,
+        3
+      ],
+      "width": [
+        0.5,
+        0.05
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.9
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "delay": 6,
+      "life": 20,
+      "facing": "up",
+      "radius": [
+        0.3,
+        2.2
+      ],
+      "width": [
+        0.4,
+        0.05
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.7
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "count": 24,
+      "lifetime": [
+        20,
+        30
+      ],
+      "speed": [
+        0.08,
+        0.16
+      ],
+      "emit_axis": "up",
+      "shape": "ring",
+      "radius": 0.8,
+      "spread": 0.4,
+      "gravity": -0.002,
+      "drag": 0.97,
+      "size": [
+        0.16,
+        0.04
+      ],
+      "color": [
+        [
+          0,
+          "#FFFFFF",
+          1
+        ],
+        [
+          0.5,
+          "$primary",
+          0.9
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 2
+    },
+    {
+      "type": "sound",
+      "sound": "minecraft:entity.player.levelup",
+      "volume": 0.6
+    }
+  ]
+}

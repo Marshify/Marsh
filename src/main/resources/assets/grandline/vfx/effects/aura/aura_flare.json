@@ -1,0 +1,77 @@
+{
+  "category": "aura",
+  "description": "Body-hugging flame flare (anchor it to an entity).",
+  "duration": 30,
+  "primary": "#9C7CFF",
+  "secondary": "#3A2A80",
+  "layers": [
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/flame.png",
+      "frames": [
+        4,
+        1
+      ],
+      "frame_time": 2,
+      "rate": 2,
+      "lifetime": [
+        8,
+        14
+      ],
+      "speed": [
+        0.04,
+        0.08
+      ],
+      "emit_axis": "up",
+      "shape": "sphere",
+      "radius": 0.5,
+      "spread": 0.3,
+      "gravity": -0.01,
+      "size": [
+        0.6,
+        0.2
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 26
+    },
+    {
+      "type": "sprite",
+      "texture": "grandline:textures/fx/glow.png",
+      "life": 30,
+      "size": 2.2,
+      "color": [
+        [
+          0,
+          "$primary",
+          0
+        ],
+        [
+          0.2,
+          "$primary",
+          0.35
+        ],
+        [
+          0.8,
+          "$primary",
+          0.35
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    }
+  ]
+}

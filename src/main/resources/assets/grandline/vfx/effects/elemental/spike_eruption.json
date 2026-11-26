@@ -1,0 +1,39 @@
+{
+  "category": "elemental",
+  "description": "Ground spikes with cracks and debris (Spike renderer).",
+  "duration": 30,
+  "primary": "#BFB5C6",
+  "secondary": "#B8AF9F",
+  "layers": [
+    {
+      "type": "builtin",
+      "effect": "spike",
+      "height": 3.5,
+      "radius": 0.7,
+      "lifetime": 28
+    },
+    {
+      "type": "builtin",
+      "effect": "crack",
+      "radius": 2.2,
+      "lifetime": 60
+    },
+    {
+      "type": "builtin",
+      "effect": "ground",
+      "radius": 1.6,
+      "count": 10
+    },
+    {
+      "type": "builtin",
+      "effect": "pressure_ring",
+      "radius": 3,
+      "lifetime": 9,
+      "color": "$secondary"
+    },
+    {
+      "type": "sound",
+      "sound": "grandline:fruits.spike.spike_summon.impact"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "category": "combat",
+  "description": "Wind blade: translucent air crescent.",
+  "duration": 12,
+  "primary": "#F1FCFF",
+  "secondary": "#91BED8",
+  "layers": [
+    {
+      "type": "slash",
+      "material": "wind",
+      "life": 10,
+      "radius": 2.6,
+      "width": [
+        [
+          0,
+          0.7
+        ],
+        [
+          1,
+          0.25
+        ]
+      ],
+      "arc": 150,
+      "sweep": [
+        [
+          0,
+          -40
+        ],
+        [
+          1,
+          40
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    }
+  ]
+}

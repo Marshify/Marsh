@@ -1,0 +1,121 @@
+{
+  "category": "transformation",
+  "description": "Rising energy column with an expanding base ring.",
+  "duration": 40,
+  "primary": "#FFE680",
+  "secondary": "#FF9A30",
+  "layers": [
+    {
+      "type": "beam",
+      "texture": "grandline:textures/fx/streak.png",
+      "life": 30,
+      "length": [
+        [
+          0,
+          0
+        ],
+        [
+          0.3,
+          5
+        ],
+        [
+          1,
+          6
+        ]
+      ],
+      "size": [
+        [
+          0,
+          2.2
+        ],
+        [
+          1,
+          0.6
+        ]
+      ],
+      "scroll": -4,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.7
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "ring",
+      "texture": "grandline:textures/fx/band.png",
+      "life": 16,
+      "facing": "up",
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "radius": [
+        0.5,
+        4
+      ],
+      "width": [
+        0.6,
+        0.1
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "particles",
+      "texture": "grandline:textures/fx/spark.png",
+      "rate": 3,
+      "lifetime": [
+        10,
+        16
+      ],
+      "speed": [
+        0.12,
+        0.25
+      ],
+      "emit_axis": "up",
+      "shape": "disc",
+      "radius": 1.2,
+      "spread": 0.2,
+      "stretch": 2,
+      "size": [
+        0.12,
+        0.03
+      ],
+      "color": [
+        [
+          0,
+          "#FFFFFF",
+          1
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ],
+      "life": 26
+    },
+    {
+      "type": "shake",
+      "degrees": 0.6
+    }
+  ]
+}

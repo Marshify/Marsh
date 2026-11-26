@@ -1,0 +1,94 @@
+{
+  "category": "elemental",
+  "description": "Jagged vertical bolt with a ground flash (procedural; replace the texture with lightning art later).",
+  "duration": 10,
+  "primary": "#E8F4FF",
+  "secondary": "#7FB8FF",
+  "layers": [
+    {
+      "type": "beam",
+      "texture": "grandline:textures/fx/streak.png",
+      "life": 6,
+      "length": 12,
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "size": [
+        0.6,
+        0.2
+      ],
+      "wobble": 0.9,
+      "segments": 14,
+      "scroll": 6,
+      "color": [
+        [
+          0,
+          "$primary",
+          1
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "beam",
+      "texture": "grandline:textures/fx/glow.png",
+      "life": 4,
+      "length": 12,
+      "size": 1.6,
+      "wobble": 0.9,
+      "segments": 14,
+      "color": [
+        [
+          0,
+          "$secondary",
+          0.5
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "sprite",
+      "texture": "grandline:textures/fx/glow.png",
+      "life": 4,
+      "facing": "up",
+      "size": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$secondary",
+          0
+        ]
+      ]
+    },
+    {
+      "type": "builtin",
+      "effect": "scorch",
+      "radius": 1.2,
+      "lifetime": 80
+    }
+  ]
+}

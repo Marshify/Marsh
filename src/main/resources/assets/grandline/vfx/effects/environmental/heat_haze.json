@@ -1,0 +1,25 @@
+{
+  "category": "environmental",
+  "description": "Shimmer stand-in for distortion (no framebuffer pass: shader-pack safe).",
+  "duration": 40,
+  "primary": "#FFE8C8",
+  "layers": [
+    {
+      "type": "distortion",
+      "life": 40,
+      "size": 2.5,
+      "color": [
+        [
+          0,
+          "$primary",
+          0.8
+        ],
+        [
+          1,
+          "$primary",
+          0
+        ]
+      ]
+    }
+  ]
+}
