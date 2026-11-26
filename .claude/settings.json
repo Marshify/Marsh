@@ -23,6 +23,10 @@
       "Bash(python3 tools/vfx/import_vfx.py --check:*)"
     ],
     "ask": [
+      "Bash(*runClient*)",
+      "Bash(*client.ps1*)",
+      "PowerShell(*runClient*)",
+      "PowerShell(*client.ps1*)",
       "Bash(git push:*)",
       "Bash(git reset:*)",
       "Bash(git clean:*)",

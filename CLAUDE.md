@@ -19,6 +19,9 @@ Branch: `claude/grand-line-mod-setup-cl0e4n`. Do not upgrade Minecraft, Java, Fa
 | Logs / crash | `run/logs/latest.log`, `run/crash-reports/` | `tools/dev/logs.ps1 [-Crash]` |
 | Review changes | `git status`, `git diff --stat` | `tools/dev/review.ps1` |
 
+**Ask the user before launching the dev client (`runClient`, `client.ps1`) or any other GUI application.** Builds, unit
+tests, asset checks and log reading need no approval.
+
 Release: bump `mod_version`, build, copy `build/libs/grandline-<ver>.jar` to `dist/` (`build.ps1 -Dist`), add a
 `CHANGELOG.md` entry. Report: what changed, tests run (only ones that really ran), jar link
 `https://github.com/Marshify/Marsh/raw/claude/grand-line-mod-setup-cl0e4n/dist/grandline-<ver>.jar`.
