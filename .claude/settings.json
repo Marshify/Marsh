@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew runGameTest:*)",
+      "Bash(./gradlew compileJava:*)",
+      "Bash(./gradlew compileClientJava:*)",
+      "Bash(./gradlew.bat build:*)",
+      "Bash(./gradlew.bat test:*)",
+      "Bash(./gradlew.bat runGameTest:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(pwsh -NoProfile -File tools/dev/build.ps1:*)",
+      "Bash(pwsh -NoProfile -File tools/dev/test.ps1:*)",
+      "Bash(pwsh -NoProfile -File tools/dev/logs.ps1:*)",
+      "Bash(pwsh -NoProfile -File tools/dev/review.ps1:*)",
+      "Bash(pwsh -NoProfile -File tools/dev/check-env.ps1:*)",
+      "Bash(python tools/vfx/import_vfx.py --check:*)",
+      "Bash(python3 tools/vfx/import_vfx.py --check:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(git stash:*)",
+      "Bash(git rebase:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git branch -d:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)"
+    ]
+  }
+}

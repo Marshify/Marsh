@@ -121,12 +121,16 @@ public final class VfxBrowserScreen extends Screen {
 			g.drawString(font, font.plainSubstrByWidth(sel.description(), PANEL), 4, iy + 9, 0xFFB0B0B0);
 		}
 		g.drawString(font, String.format("scale %.2f", VfxPreview.scale), 4, height - 12, 0xFF909090);
-		g.drawString(font, VfxPreview.stats(), PANEL + 12, 6, 0xFFFFFFFF);
-		int ey = 18;
+		int ey = 6;
+		for (String part : VfxPreview.stats().split(" \\| ")) { // one stat per line so it fits at any GUI scale
+			g.drawString(font, part, PANEL + 12, ey, 0xFFFFFFFF);
+			ey += 10;
+		}
+		ey += 4;
 		for (String err : VfxLibrary.errors()) {
 			g.drawString(font, font.plainSubstrByWidth(err, width - PANEL - 20), PANEL + 12, ey, 0xFFFF7060);
 			ey += 10;
-			if (ey > 80) {
+			if (ey > height / 2) {
 				break;
 			}
 		}
